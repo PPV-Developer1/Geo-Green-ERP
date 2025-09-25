@@ -1,0 +1,1871 @@
+<div *ngIf="show" class="row mbm-20">
+  <div class="col">
+      <div widget class="card">
+          <div class="card-body widget-body">
+              <div id="accordion" role="tablist" aria-multiselectable="true">
+                  <div class="card">
+                      <div class="card-header" role="tab" id="headingOne">
+                          <h5 class="mb-0">
+                              <a data-toggle="collapse" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                General Settings
+                              </a>
+                          </h5>
+                      </div>
+                      <div id="collapseOne" class="collapse show" data-parent="#accordion" role="tabpanel" aria-labelledby="headingOne">
+                        <div class="card-body widget-body">
+                          <div class="row">
+                            <div class="col-sm-3 col-md-6 col-xl-6" >
+                                <a href="javascript:void(0);" (click)="organization_profile()" class="list-group-item">Organization Profile</a>
+                                <a href="javascript:void(0);" (click)="poduct()" class="list-group-item">Product Type</a>
+                            </div>
+                            <div class="col-sm-3 col-md-6 col-xl-6" >
+                              <a href="javascript:void(0);" (click)="tax_edit()" class="list-group-item">Tax</a>
+                              <a href="javascript:void(0);" (click)="Unit_edit()" class="list-group-item">Unit</a>
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                  <div class="card">
+                      <div class="card-header" role="tab" id="headingTwo">
+                          <h5 class="mb-0">
+                              <a  data-toggle="collapse" href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                                Templates
+                              </a>
+                          </h5>
+                      </div>
+                      <div id="collapseTwo" class="collapse show" data-parent="#accordion" role="tabpanel" aria-labelledby="headingTwo">
+                          <div class="card-body">
+                            <div class="row">
+                              <div class="col-sm-3 col-md-6 col-xl-6" >
+                                <a href="javascript:void(0);" (click)="prefix()" class="list-group-item">Prefix</a>
+                                <a href="javascript:void(0);" (click)="menubar()" class="list-group-item">Menu Bar</a>
+                                  <!-- <a href="javascript:void(0);" class="list-group-item">Delivery Challan</a>
+                                  <a href="javascript:void(0);" class="list-group-item">Invoice</a>
+                                  <a href="javascript:void(0);" class="list-group-item">Credit Notes</a> -->
+                              </div>
+                             <div class="col-sm-3 col-md-6 col-xl-6" >
+                                <a href="javascript:void(0);" class="list-group-item" (click)="payment_term_view()">Payment Terms</a>
+                                <a href="javascript:void(0);" (click)="payrole()" class="list-group-item">Pay Role Setting</a>
+                                 <!-- <a href="javascript:void(0);" class="list-group-item">Payment Receipt</a>
+                                <a href="javascript:void(0);" class="list-group-item">Bill</a>-->
+                              </div>
+                            </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+
+<ng-template #edit_address let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Edit Address</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="profile_update" (ngSubmit)="submit(profile_update.value)">
+
+      <div class="row">
+       <div class="form-group col-xl-3">
+        <label for="name">Company Name</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="name" id="name" placeholder="Enter Name" type="text" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('name').touched && profile_update.get('name').hasError('required')">Enter
+          Name !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">GST NO</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="gst_no" id="gst_no" placeholder="Enter GST Number" type="text" class="form-control">
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('gst_no').touched && profile_update.get('gst_no').hasError('required')">Enter
+          GST !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">Address Line 1</label>
+        </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="addressline1" id="addressline1" placeholder="Enter Addressline 1" type="text"
+          class="form-control" >
+
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('addressline1').touched && profile_update.get('addressline1').hasError('required')">Enter
+          AddressLine 1 !</span>
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">Address Line 2</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="addressline2" id="addressline2" placeholder="Enter Addressline 2" type="text"
+          class="form-control" >
+
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('addressline2').touched && profile_update.get('addressline2').hasError('required')">Enter
+          Addressline 2 !</span>
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">City</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="city" id="city" placeholder="Enter City" type="text" class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('city').touched && profile_update.get('city').hasError('required')">Enter
+          City !</span>
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">State</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="state" id="state" placeholder="Enter State" type="text" class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('state').touched && profile_update.get('state').hasError('required')">Enter
+          State !</span>
+      </div>
+
+
+      <div class="form-group  col-xl-3">
+        <label for="name">Pin code</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="zipcode" id="zipcode" placeholder="Enter Pincode" type="number" class="form-control"
+           onKeyPress="if(this.value.length==6) return false;">
+
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('zipcode').touched && profile_update.get('zipcode').hasError('required')">Enter
+          Pin code !</span>
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('zipcode').touched && profile_update.get('zipcode').hasError('pattern')">Enter
+          6 Digit Pin code!</span>
+
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">Mobile Number</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="mobile" id="mobile" placeholder="Enter Mobile Number" type="text" class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('mobile').touched && profile_update.get('mobile').hasError('required')">valid
+          Mobile number !</span>
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('mobile').touched && profile_update.get('mobile').hasError('pattern')">Enter
+          10 Digit Mobile number!</span>
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">PAN No</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="pan_no" id="pan_no" placeholder="Enter PAN Number" type="text" class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('pan_no').touched && profile_update.get('pan_no').hasError('required')">valid
+          Mobile number !</span>
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('pan_no').touched && profile_update.get('pan_no').hasError('pattern')">Enter
+          Valid pan number!</span>
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">Bank Name</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="bank" id="bank" placeholder="Enter Bank Name" type="text" class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('bank').touched && profile_update.get('bank').hasError('required')">valid
+          Bank Name !</span>
+
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">Account No</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="acc_no" id="acc_no" placeholder="Enter Account Number" type="number" class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('acc_no').touched && profile_update.get('acc_no').hasError('required')">valid
+          Account No !</span>
+
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">IFSC Code</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="ifsc_code" id="ifsc_code" placeholder="Enter IFSC Code" type="text" class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('ifsc_code').touched && profile_update.get('ifsc_code').hasError('required')">
+          IFSC Code !</span>
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">TAN No</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="tan_no" id="tan_no" placeholder="Enter TAN No" type="text" class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('tan_no').touched && profile_update.get('tan_no').hasError('required')">
+          IFSC Code !</span>
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">UDYAM No</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="udyam_no" id="udyam_no" placeholder="Enter UDYAM No" type="text" class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('udyam_no').touched && profile_update.get('udyam_no').hasError('required')">
+          IFSC Code !</span>
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">Website</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="website" id="website" placeholder="Enter Website" type="text" class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('website').touched && profile_update.get('website').hasError('required')">
+          website !</span>
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">Email</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="email" id="email" placeholder="Enter Email" type="text" class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('email').touched && profile_update.get('email').hasError('required')">
+          email !</span>
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">Notes Line1</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <textarea formControlName="inv_note1" id="inv_note1" placeholder="Enter Notes" type="text" class="form-control"></textarea>
+
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('inv_note1').touched && profile_update.get('inv_note1').hasError('required')">
+          Notes !</span>
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">Notes Line2</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <textarea formControlName="inv_note2" id="inv_note2" placeholder="Enter Notes" type="text" class="form-control"></textarea>
+
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('inv_note2').touched && profile_update.get('inv_note2').hasError('required')">
+          Notes !</span>
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">Payment Term1</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <textarea formControlName="payment_term1" id="payment_term1" placeholder="Enter Terms" type="text" class="form-control"></textarea>
+
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('payment_term1').touched && profile_update.get('payment_term1').hasError('required')">
+          Notes !</span>
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">Payment Term2</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <textarea formControlName="payment_term2" id="payment_term" placeholder="Enter Terms" type="text" class="form-control"></textarea>
+
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('payment_term2').touched && profile_update.get('payment_term2').hasError('required')">
+          Notes !</span>
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">Payment Term3</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <textarea formControlName="payment_term3" id="payment_term3" placeholder="Enter Terms" type="text" class="form-control"></textarea>
+
+        <span class="help-block text-danger"
+          *ngIf="profile_update.get('payment_term3').touched && profile_update.get('payment_term3').hasError('required')">
+          Notes !</span>
+       </div>
+
+       <div class="col-xl-6"></div>
+        <div>
+          <button [disabled]="loading" class="btn btn-primary" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+         </div>
+      </div>
+
+    </form>
+  </div>
+</ng-template>
+
+<div *ngIf="organisation">
+  <div class="modal-header">
+    <div>
+      <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero($event)"> Back</button>
+    </div>
+    <div class="pull-right">
+      <button type="submit" class="btn btn-success fa fa-pencil-square-o " (click)="edit()"> Edit</button>
+     </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div widget class="card">
+        <div class="card-header">
+          <span>COMPANY PROFILE</span>
+        </div>
+        <div class="card-body widget-body">
+          <div class="row">
+            <table class="table col-md-6">
+              <tbody>
+                  <tr>
+                    <th>Company Name</th>
+                    <td>{{detail_view?.company_name}}</td>
+                  </tr>
+                  <tr>
+                    <th>GST Number</th>
+                    <td>{{detail_view?.gst_number}}</td>
+                  </tr>
+                  <tr>
+                      <th>Address Line 1</th>
+                      <td>{{detail_view?.address_1}}</td>
+                  </tr>
+                  <tr>
+                    <th>Address Line 2</th>
+                    <td>{{detail_view?.address_2}}</td>
+                  </tr>
+
+
+                  <tr>
+                    <th>Bank</th>
+                      <td>{{detail_view?.bank_name}}</td>
+                </tr>
+
+                <tr>
+                  <th>Account Number</th>
+                    <td>{{detail_view?.account_no}}</td>
+              </tr>
+
+              <tr>
+                <th>IFSC Code</th>
+                  <td>{{detail_view?.ifsc_code}}</td>
+            </tr>
+
+            <tr>
+              <th>Notes 1</th>
+                <td>{{detail_view?.inv_note1}}</td>
+          </tr>
+
+          <tr>
+            <th>Payment Term 1</th>
+              <td>{{detail_view?.payment_term1}}</td>
+        </tr>
+        <tr>
+          <th>Payment Term 3</th>
+            <td>{{detail_view?.payment_term3}}</td>
+      </tr>
+
+              </tbody>
+            </table>
+            <table class="table col-md-6">
+              <tbody>
+                <tr>
+                  <th>City</th>
+                 <td>{{detail_view?.city}}</td>
+                </tr>
+                <tr>
+                  <th>State</th>
+                  <td>{{detail_view?.state}}</td>
+                </tr>
+                <tr>
+                  <th>Zipcode</th>
+                  <td>{{detail_view?.pincode}}</td>
+                </tr>
+                <tr>
+                    <th>Mobile</th>
+                    <td>{{detail_view?.mobile}}</td>
+                </tr>
+                <tr>
+                  <th>PAN Number</th>
+                  <td> {{detail_view?.pan_number}} </td>
+                </tr>
+                <tr>
+                  <th>TAN Number</th>
+                  <td> {{detail_view?.tan_number}} </td>
+                </tr>
+
+                <tr>
+                  <th>Website</th>
+                  <td> {{detail_view?.website}} </td>
+                </tr>
+
+                <tr>
+                  <th>Email</th>
+                  <td> {{detail_view?.email}} </td>
+                </tr>
+
+                <tr>
+                  <th>Notes 2</th>
+                    <td>{{detail_view?.inv_note2}}</td>
+              </tr>
+
+              <tr>
+                <th>Payment Term 2</th>
+                  <td>{{detail_view?.payment_term2}}</td>
+            </tr>
+
+              </tbody>
+            </table>
+            <table class="table col-md-12">
+              <tbody>
+                <tr>
+                  <th class="col-1">UDYAM No</th>
+                    <td>{{detail_view?.udyam_no}}</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div *ngIf="prefix_view">
+  <div class="modal-header">
+    <div>
+      <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero($event)"> Back</button>
+    </div>
+    <div class="pull-right">
+      <button type="submit" class="btn btn-success fa fa-pencil-square-o" (click)="edit_prefix_data()"> Edit</button>
+     </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div widget class="card">
+        <div class="card-header">
+          <span>Prefix</span>
+        </div>
+        <div class="card-body widget-body">
+          <div class="row">
+            <table class="table col-md-6">
+              <tbody>
+                  <tr>
+                    <th>DC</th>
+                    <td>{{detail_view?.dc_year}}</td>
+                  </tr>
+                  <tr>
+                    <th>BILL</th>
+                    <td>{{detail_view?.bill_year}}</td>
+                  </tr>
+                  <tr>
+                      <th>Invoice</th>
+                      <td>{{detail_view?.inv_year}}</td>
+                  </tr>
+                  <tr>
+                      <th>Credit Note</th>
+                      <td>{{detail_view?.credit_notes}}</td>
+                  </tr>
+              </tbody>
+            </table>
+            <table class="table col-md-6">
+              <tbody>
+
+                <tr>
+                  <th>Payment Made</th>
+                  <td> {{detail_view?.payment_made}} </td>
+                </tr>
+                <tr>
+                  <th>PO</th>
+                  <td>{{detail_view?.po_year}}</td>
+                </tr>
+                <tr>
+                  <th>Payment Received</th>
+                  <td>{{detail_view?.payment_receipt}} </td>
+                </tr>
+                 <tr>
+                      <th>Debit Note</th>
+                      <td>{{detail_view?.debit_note}}</td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #edit_prefix let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Edit Prefix</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="prefix_update" (ngSubmit)="submit_prefix(prefix_update.value)">
+
+      <div class="row">
+       <div class="form-group col-xl-3">
+        <label for="name">Bill Prefix</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="bill" id="bill" placeholder="Enter Bill Prefix" type="text" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="prefix_update.get('bill').touched && prefix_update.get('bill').hasError('required')">Enter
+          Bill Prefix !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">DC Prefix</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="dc" id="dc" placeholder="Enter DC Prefix" type="text" class="form-control">
+        <span class="help-block text-danger"
+          *ngIf="prefix_update.get('dc').touched && prefix_update.get('dc').hasError('required')">Enter
+          DC Prefix !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">Invoice Prefix</label>
+        </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="invoice" id="invoice" placeholder="Enter Invoice Prefix" type="text"
+          class="form-control" >
+
+        <span class="help-block text-danger"
+          *ngIf="prefix_update.get('invoice').touched && prefix_update.get('invoice').hasError('required')">Enter
+          Invoice Prefix !</span>
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">PO Prefix Prefix</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="po" id="po" placeholder="Enter PO Prefix" type="text"
+          class="form-control" >
+
+        <span class="help-block text-danger"
+          *ngIf="prefix_update.get('po').touched && prefix_update.get('po').hasError('required')">Enter
+          PO Prefix !</span>
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">Payment Made Prefix</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="payment_made" id="payment_made" placeholder="Enter Payment Made Prefix" type="text" class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="prefix_update.get('payment_made').touched && prefix_update.get('payment_made').hasError('required')">Enter
+          Payment Made Prefix !</span>
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">Payment Received Prefix</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="payment_receipt" id="payment_receipt" placeholder="Enter Payment Received Prefix" type="text" class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="prefix_update.get('payment_receipt').touched && prefix_update.get('payment_receipt').hasError('required')">Enter
+          Payment Received Prefix !</span>
+      </div>
+
+      <div class="form-group  col-xl-3">
+        <label for="name">Credit Notes Prefix</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="credit" id="credit" placeholder="Enter Credit Prefix" type="text" class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="prefix_update.get('credit').touched && prefix_update.get('credit').hasError('required')">Enter
+          Credit  Prefix!</span>
+      </div>
+
+        <div class="form-group  col-xl-3">
+        <label for="name">Debit Notes Prefix</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="debit" id="debit" placeholder="Enter Credit Prefix" type="text" class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="prefix_update.get('debit').touched && prefix_update.get('debit').hasError('required')">Enter
+          Debit  Prefix!</span>
+      </div>
+
+       <div class="col-xl-6"></div>
+        <div>
+          <button [disabled]="loading" class="btn btn-primary" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+         </div>
+      </div>
+
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #edit_product let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Edit Product</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="product" (ngSubmit)="submit_product(product.value)">
+
+      <div class="row">
+       <div class="form-group col-xl-3">
+        <label for="name">Name</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="name" id="name" placeholder="Enter Name" type="text" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="product.get('name').touched && product.get('name').hasError('required')">Enter
+          Name  !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">Tax</label>
+        </div>
+        <div class="form-group col-xl-9">
+          <!-- <select formControlName="tax"  class="form-control">
+            <option [disabled]="statehide" *ngFor="let state of list_tax"
+              value="{{state.rate}}"> {{state.name}}
+            </option>
+          </select> -->
+
+          <ng-select formControlName="tax"  class=" form-control custom-select" [clearable]="false" >
+            <ng-option  *ngFor="let state of list_tax" [value]="state.rate" class="form-control">
+              {{state.name}}
+            </ng-option>
+          </ng-select>
+        <span class="help-block text-danger"
+          *ngIf="product.get('tax').touched && product.get('tax').hasError('required')">Select
+          Tax !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">HSN Code</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="hsn" id="hsn" placeholder="Enter HSN" type="text" class="form-control">
+        <span class="help-block text-danger"
+          *ngIf="product.get('hsn').touched && product.get('hsn').hasError('required')">Enter
+          HSN code !</span>
+      </div>
+
+      <div class="form-group col-md-6">
+        <label>STATUS</label>
+      </div>
+      <div class="form-group col-md-6">
+        <div class="custom-control custom-switch">
+          <input type="checkbox" formControlName="status" class="custom-control-input" id="customSwitch2" />
+          <label class="custom-control-label" for="customSwitch2"></label>
+        </div>
+      </div>
+
+       <div class="col-xl-6"></div>
+        <div>
+          <button [disabled]="loading" class="btn btn-primary" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+         </div>
+      </div>
+
+    </form>
+  </div>
+</ng-template>
+
+
+<ng-template #add_product let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Add Product</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="product" (ngSubmit)="new_product(product.value)">
+
+      <div class="row">
+       <div class="form-group col-xl-3">
+        <label for="name">Name</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="name" id="name" placeholder="Enter Name" type="text" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="product.get('name').touched && product.get('name').hasError('required')">Enter
+          Name  !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">Tax</label>
+        </div>
+        <div class="form-group col-xl-9">
+          <!-- <select formControlName="tax"  class="form-control">
+            <option [disabled]="statehide" *ngFor="let state of list_tax"
+              value="{{state.rate}}"> {{state.name}}
+            </option>
+          </select> -->
+
+          <ng-select formControlName="tax"  class=" form-control custom-select" [clearable]="false" >
+            <ng-option  *ngFor="let state of list_tax" value="{{state.rate}}" class="form-control">
+              {{state.name}}
+            </ng-option>
+          </ng-select>
+
+        <span class="help-block text-danger" *ngIf="product.get('tax').touched && product.get('tax').hasError('required')">Select Tax !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">HSN Code</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="hsn" id="type" placeholder="Enter HSN" type="text" class="form-control">
+        <span class="help-block text-danger"
+          *ngIf="product.get('hsn').touched && product.get('hsn').hasError('required')">Enter
+          HSN code !</span>
+      </div>
+
+      <div class="form-group col-md-6">
+        <label>STATUS</label>
+      </div>
+      <div class="form-group col-md-6">
+        <div class="custom-control custom-switch">
+          <input type="checkbox" formControlName="status" class="custom-control-input" id="customSwitch2" />
+          <label class="custom-control-label" for="customSwitch2"></label>
+        </div>
+      </div>
+
+       <div class="col-xl-6"></div>
+        <div>
+          <button [disabled]="loading" class="btn btn-primary" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+         </div>
+      </div>
+
+    </form>
+  </div>
+</ng-template>
+
+<div *ngIf="product_view">
+  <div class="">
+    <button type="submit" class="btn btn-info fa fa-arrow-left " (click)="set_zero($event)"> Back</button>
+  </div>
+
+  <div class="col-md-12">
+    <table>
+      <tr>
+        <td style="width: 10px;">
+          <h1><small></small></h1>
+        </td>
+        <td style="width: 200px;">
+          <h5>PRODUCT LIST</h5>
+        </td>
+        <!-- <td style="width: 1150px;">
+          <div class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+             <input class="form-control" type="text" placeholder="Search Category by Key words - Category Name " (keyup)="updateFilter($event)" />
+          </div>
+        </td> -->
+        <td style="width: 100px;"> </td>
+        <td style="width: 100px; text-align: center; vertical-align: center;">
+        </td>
+        <td style="width: 200px; text-align: center; vertical-align: center;">
+          <div class="btn-group" role="group" aria-label="Basic example">
+
+          </div>
+        </td>
+        <td  style="width: 1000px">
+          <div class=" col-12 ">
+            <button type="button" class="btn btn-success fa fa-plus pull-right"  (click)="OpenCatAdd()"> Add Product</button>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  &nbsp;
+  <div class="row">
+    <div class="col">
+      <ngx-datatable
+      #table
+      class="custom_table"
+      [headerHeight]="50"
+      [limit]="15"
+      [columnMode]="'force'"
+      [footerHeight]="50"
+      [rowHeight]="'auto'"
+      [rows]="product_list"
+      (activate)="onActivate($event)">
+
+        <ngx-datatable-column prop="title" name="NAME">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.name}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="type" name="TAX">
+          <ng-template ngx-datatable-cell-template let-row="row">
+         {{row.tax}} %
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="hsn_code" name="HSN">
+          <ng-template ngx-datatable-cell-template let-row="row">
+         {{row.hsn_code}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="status" name="STATUS">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <label *ngIf="row.status == 0" style="color:red"><strong>Inactive</strong></label>
+            <label *ngIf="row.status == 1" style="color:green"><strong>Active</strong></label>
+          </ng-template>
+        </ngx-datatable-column>
+
+      </ngx-datatable>
+    </div>
+  </div>
+</div>
+
+
+<div *ngIf="tax_view">
+  <div class="">
+    <button type="submit" class="btn btn-info fa fa-arrow-left " (click)="set_zero($event)"> Back</button>
+  </div>
+
+  <div class="col-md-12">
+    <table>
+      <tr>
+        <td style="width: 10px;">
+          <h1><small></small></h1>
+        </td>
+        <td style="width: 200px;">
+          <h5>TAX LIST</h5>
+        </td>
+        <!-- <td style="width: 1150px;">
+          <div class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+             <input class="form-control" type="text" placeholder="Search Category by Key words - Category Name " (keyup)="updateFilter($event)" />
+          </div>
+        </td> -->
+        <td style="width: 100px;"> </td>
+        <td style="width: 100px; text-align: center; vertical-align: center;">
+        </td>
+        <td style="width: 200px; text-align: center; vertical-align: center;">
+          <div class="btn-group" role="group" aria-label="Basic example">
+
+          </div>
+        </td>
+        <td  style="width: 1000px">
+          <div class=" col-12 ">
+            <button type="button" class="btn btn-success fa fa-plus pull-right"  (click)="Addtax()"> Add Tax</button>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  &nbsp;
+  <div class="row">
+    <div class="col">
+      <ngx-datatable
+      #table
+      class="custom_table"
+      [headerHeight]="50"
+      [limit]="15"
+      [columnMode]="'force'"
+      [footerHeight]="50"
+      [rowHeight]="'auto'"
+      [rows]="tax_list"
+      (activate)="onActivate_tax($event)">
+
+        <ngx-datatable-column prop="title" name="NAME">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.name}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="type" name="TYPE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+         {{row.type}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="rate" name="RATE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.rate}}
+          </ng-template>
+        </ngx-datatable-column>
+
+      </ngx-datatable>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #tax_update let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Edit Tax</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="edit_tax" (ngSubmit)="submit_tax(edit_tax.value)">
+
+      <div class="row">
+       <div class="form-group col-xl-3">
+        <label for="name">Name</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="name" id="name" placeholder="Enter Name" type="text" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="edit_tax.get('name').touched && edit_tax.get('name').hasError('required')">Enter
+          Name  !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">Type</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="type" id="tax" placeholder="Enter Type" type="text" class="form-control">
+        <span class="help-block text-danger"
+          *ngIf="edit_tax.get('type').touched && edit_tax.get('type').hasError('required')">Enter
+          DC Prefix !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">Rate</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="rate" id="rate" placeholder="Enter Rate" type="text" class="form-control">
+        <span class="help-block text-danger"
+          *ngIf="edit_tax.get('rate').touched && edit_tax.get('rate').hasError('required')">Enter
+          Rate !</span>
+      </div>
+       <div class="col-xl-6"></div>
+        <div>
+          <button [disabled]="loading" class="btn btn-primary" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+         </div>
+      </div>
+
+    </form>
+  </div>
+</ng-template>
+
+
+
+
+<div *ngIf="unit_view">
+  <div class="">
+    <button type="submit" class="btn btn-info fa fa-arrow-left " (click)="set_zero($event)"> Back</button>
+  </div>
+
+  <div class="col-md-12">
+    <table>
+      <tr>
+        <td style="width: 10px;">
+          <h1><small></small></h1>
+        </td>
+        <td style="width: 200px;">
+          <h5>UNIT LIST</h5>
+        </td>
+        <!-- <td style="width: 1150px;">
+          <div class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+             <input class="form-control" type="text" placeholder="Search Category by Key words - Category Name " (keyup)="updateFilter($event)" />
+          </div>
+        </td> -->
+        <td style="width: 100px;"> </td>
+        <td style="width: 100px; text-align: center; vertical-align: center;">
+        </td>
+        <td style="width: 200px; text-align: center; vertical-align: center;">
+          <div class="btn-group" role="group" aria-label="Basic example">
+
+          </div>
+        </td>
+        <td  style="width: 1000px">
+          <div class=" col-12 ">
+            <button type="button" class="btn btn-success fa fa-plus pull-right"  (click)="Addunit()"> Add Unit</button>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  &nbsp;
+  <div class="row">
+    <div class="col">
+      <ngx-datatable
+      #table
+      class="custom_table"
+      [headerHeight]="50"
+      [limit]="15"
+      [columnMode]="'force'"
+      [footerHeight]="50"
+      [rowHeight]="'auto'"
+      [rows]="unit_list"
+      (activate)="onActivate_unit($event)">
+
+        <ngx-datatable-column prop="title" name="NAME">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.name}}
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </div>
+  </div>
+</div>
+
+
+
+<ng-template #edit_unit let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Edit Unit</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="editUnit" (ngSubmit)="submit_unit(editUnit.value)">
+
+      <div class="row">
+       <div class="form-group col-xl-3">
+        <label for="name">Name</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="name" id="name" placeholder="Enter Name" type="text" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="editUnit.get('name').touched && editUnit.get('name').hasError('required')">Enter
+          Name  !</span>
+      </div>
+
+       <div class="col-xl-6"></div>
+        <div>
+          <button [disabled]="loading" class="btn btn-primary" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+         </div>
+      </div>
+
+    </form>
+  </div>
+</ng-template>
+
+
+<ng-template #add_unit let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Add Unit</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="unit" (ngSubmit)="submit_newunit(unit.value)">
+
+      <div class="row">
+       <div class="form-group col-xl-3">
+        <label for="name">Name</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="name" id="name" placeholder="Enter Name" type="text" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="unit.get('name').touched && unit.get('name').hasError('required')">Enter
+          Name  !</span>
+      </div>
+
+       <div class="col-xl-6"></div>
+        <div>
+          <button [disabled]="loading" class="btn btn-primary" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+         </div>
+      </div>
+
+    </form>
+  </div>
+</ng-template>
+
+
+
+
+<ng-template #add_payment_term let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Add Payment Term</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="payment_term" (ngSubmit)="new_payment(payment_term.value)">
+
+      <div class="row">
+       <div class="form-group col-xl-3">
+        <label for="name">Terms</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="terms" id="terms" placeholder="Enter Terms" type="text" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="payment_term.get('terms').touched && payment_term.get('terms').hasError('required')">Enter
+          Terms!</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">Terms Value</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="terms_value" id="terms_value" placeholder="Enter Terms Value" type="text" class="form-control">
+        <span class="help-block text-danger"
+          *ngIf="payment_term.get('terms_value').touched && payment_term.get('terms_value').hasError('required')">Enter
+          Terms Value !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">Title</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="title" id="title" placeholder="Enter Title" type="text" class="form-control">
+        <span class="help-block text-danger"
+          *ngIf="payment_term.get('title').touched && payment_term.get('title').hasError('required')">Enter
+          Title !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">Description</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="description" id="description" placeholder="Enter Description" type="text" class="form-control">
+        <span class="help-block text-danger"
+          *ngIf="payment_term.get('description').touched && payment_term.get('description').hasError('required')">Enter
+          Description !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">Value</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="value" id="value" placeholder="Enter Value" type="text" class="form-control">
+        <span class="help-block text-danger"
+          *ngIf="payment_term.get('value').touched && payment_term.get('value').hasError('required')">Enter
+          Value !</span>
+      </div>
+
+      <div class="form-group col-md-6">
+        <label>Status</label>
+      </div>
+      <div class="form-group col-md-6">
+        <div class="custom-control custom-switch">
+          <input type="checkbox" formControlName="status" class="custom-control-input" id="customSwitch2" />
+          <label class="custom-control-label" for="customSwitch2"></label>
+        </div>
+      </div>
+
+       <div class="col-xl-6"></div>
+        <div>
+          <button [disabled]="loading" class="btn btn-primary" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+         </div>
+      </div>
+
+    </form>
+  </div>
+</ng-template>
+
+
+
+<div *ngIf="payment_view">
+  <div class="">
+    <button type="submit" class="btn btn-info fa fa-arrow-left " (click)="set_zero($event)"> Back</button>
+  </div>
+
+  <div class="col-md-12">
+    <table>
+      <tr>
+        <td style="width: 10px;">
+          <h1><small></small></h1>
+        </td>
+        <td style="width: 400px;">
+          <h5>PAYMENT TERMS LIST</h5>
+        </td>
+        <!-- <td style="width: 1150px;">
+          <div class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+             <input class="form-control" type="text" placeholder="Search Category by Key words - Category Name " (keyup)="updateFilter($event)" />
+          </div>
+        </td> -->
+        <td style="width: 100px;"> </td>
+        <td style="width: 100px; text-align: center; vertical-align: center;">
+        </td>
+        <td style="width: 200px; text-align: center; vertical-align: center;">
+          <div class="btn-group" role="group" aria-label="Basic example">
+
+          </div>
+        </td>
+        <td  style="width: 1000px">
+          <div class=" col-12 ">
+            <button type="button" class="btn btn-success fa fa-plus pull-right"  (click)="AddPayment()"> Payment</button>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  &nbsp;
+  <div class="row">
+    <div class="col">
+      <ngx-datatable
+      #table
+      class="custom_table"
+      [headerHeight]="50"
+      [limit]="15"
+      [columnMode]="'force'"
+      [footerHeight]="50"
+      [rowHeight]="'auto'"
+      [rows]="payment_list"
+      (activate)="onActivate_payment($event)">
+
+        <ngx-datatable-column prop="terms" name="TERMS">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.terms }}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="terms_value" name="TERMS VALUE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.terms_value}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="title" name="TITLE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.title}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="description" name="DESCRIPTION">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.description}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="value" name="VALUE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.value}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <!-- <ngx-datatable-column name="STATUS">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <label *ngIf="row.status == 0" style="color:red"><strong>Inactive</strong></label>
+            <label *ngIf="row.status == 1" style="color:green"><strong>Active</strong></label>
+          </ng-template>
+        </ngx-datatable-column> -->
+
+      </ngx-datatable>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #edit_payment_term let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Edit Payment Term</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="edit_payment" (ngSubmit)="editSubmit_payment(edit_payment.value)">
+
+      <div class="row">
+       <div class="form-group col-xl-3">
+        <label for="name">Terms</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="terms" id="terms" placeholder="Enter Terms" type="text" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="edit_payment.get('terms').touched && edit_payment.get('terms').hasError('required')">Enter
+          Terms!</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">Terms Value</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="terms_value" id="terms_value" placeholder="Enter Terms Value" type="text" class="form-control">
+        <span class="help-block text-danger"
+          *ngIf="edit_payment.get('terms_value').touched && edit_payment.get('terms_value').hasError('required')">Enter
+          Terms Value !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">Title</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="title" id="title" placeholder="Enter Terms Value" type="text" class="form-control">
+        <span class="help-block text-danger"
+          *ngIf="edit_payment.get('title').touched && edit_payment.get('title').hasError('required')">Enter
+          Title !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">Description</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="description" id="description" placeholder="Enter Description" type="text" class="form-control">
+        <span class="help-block text-danger"
+          *ngIf="edit_payment.get('description').touched && edit_payment.get('description').hasError('required')">Enter
+          Description !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">Value</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="value" id="value" placeholder="Enter Value" type="text" class="form-control">
+        <span class="help-block text-danger"
+          *ngIf="edit_payment.get('value').touched && edit_payment.get('value').hasError('required')">Enter
+          Value !</span>
+      </div>
+
+      <div class="form-group col-md-6">
+        <label>STATUS</label>
+      </div>
+      <div class="form-group col-md-6">
+        <div class="custom-control custom-switch">
+          <input type="checkbox" formControlName="status" class="custom-control-input" id="customSwitch2" />
+          <label class="custom-control-label" for="customSwitch2"></label>
+        </div>
+      </div>
+
+       <div class="col-xl-6"></div>
+        <div>
+          <button [disabled]="loading" class="btn btn-primary" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+         </div>
+      </div>
+
+    </form>
+  </div>
+</ng-template>
+
+
+
+<ng-template #add_tax let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Add Tax</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="tax" (ngSubmit)="submit_newtax(tax.value)">
+
+      <div class="row">
+       <div class="form-group col-xl-3">
+        <label for="name">Name</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="name" id="name" placeholder="Enter Name" type="text" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="tax.get('name').touched && tax.get('name').hasError('required')">Enter
+          Name  !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">Type</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="type" id="type" placeholder="Enter Type" type="text" class="form-control">
+        <span class="help-block text-danger"
+          *ngIf="tax.get('type').touched && tax.get('type').hasError('required')">Enter Type !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">Rate</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="rate" id="rate" placeholder="Enter Rate" type="text" class="form-control">
+        <span class="help-block text-danger"
+          *ngIf="tax.get('rate').touched && tax.get('rate').hasError('required')">Enter
+          Rate !</span>
+      </div>
+       <div class="col-xl-6"></div>
+        <div>
+          <button [disabled]="loading" class="btn btn-primary" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+         </div>
+      </div>
+
+    </form>
+  </div>
+</ng-template>
+
+
+   <div *ngIf="menubar_view">
+    <div>
+      <button type="submit" class="btn btn-info fa fa-arrow-left " (click)="set_zero($event)"> Back</button>
+      <button type="submit" class="btn btn-success fa fa-plus pull-right " (click)="adduser()">Add</button>
+    </div>
+    &nbsp;
+    <div>
+      <div class="row">
+        <div class="col">
+          <ngx-datatable
+          #table
+          class="custom_table"
+          [headerHeight]="50"
+          [limit]="15"
+          [columnMode]="'force'"
+          [footerHeight]="50"
+          [rowHeight]="'auto'"
+          [rows]="user_type_list">
+
+          <!-- <ngx-datatable-column prop="terms" name="ID">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.id }}
+            </ng-template>
+          </ngx-datatable-column> -->
+
+          <ngx-datatable-column prop="name" name="USER TYPE">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.name }}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="date_time" name="DATE">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.date_time| date: 'dd-MM-yyyy' }}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column  >
+            <ng-template ngx-datatable-cell-template let-row="row">
+
+              <button class="btn btn-info btn-sm fa fa-file" (click) ="onActivate_user(row)"> Menu view</button>
+              &nbsp;
+              <button *ngIf="row.id>6" class="btn btn-info btn-sm fa fa-pencil" (click) = "edit_user(row)"> Edit</button>
+
+              </ng-template>
+              </ngx-datatable-column>
+
+
+              <ngx-datatable-column  >
+                <ng-template ngx-datatable-cell-template let-row="row">
+
+                  <button class="btn btn-info btn-sm fa fa-file" (click) ="onActivate_user_report(row)"> Report view</button>
+                  &nbsp;
+                  <!-- <button *ngIf="row.id>6" class="btn btn-info btn-sm fa fa-pencil" (click) = "edit_user(row)"> Edit</button> -->
+
+                  </ng-template>
+                  </ngx-datatable-column>
+
+          </ngx-datatable>
+        </div>
+      </div>
+    </div>
+</div>
+
+
+<div *ngIf="list_view">
+  <div>
+    <button type="submit" class="btn btn-info fa fa-arrow-left " (click)="set_zero1($event)"> Back</button>
+  </div>
+  &nbsp;
+  <div>
+    <div class="row">
+      <div class="col">
+        <ngx-datatable
+        #table
+        class="custom_table"
+        [headerHeight]="50"
+        [limit]="24"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="menu_list">
+
+        <!-- <ngx-datatable-column prop="id" name="ID">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.reference_number }}
+          </ng-template>
+        </ngx-datatable-column> -->
+
+        <ngx-datatable-column prop="title" name="MENU">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span *ngIf="row.parentId == 0"><b>{{row.title}}</b></span>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="title" name="SUB MENU">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span *ngIf="row.parentId != 0">{{row.title}}</span>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="paren" name="STATUS">
+          <ng-template ngx-datatable-cell-template let-row="row">
+
+            <div class="custom-control custom-switch">
+              <input type="checkbox" [checked]="row.status" class="custom-control-input" [id]="'customSwitch3_' + row.id" (change)="onCheckboxChange(row)"/>
+              <label class="custom-control-label" [for]="'customSwitch3_' + row.id"></label>
+            </div>
+
+          </ng-template>
+        </ngx-datatable-column>
+
+        </ngx-datatable>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #add_user let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Add User Type</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="new_user" (ngSubmit)="submit_user(new_user.value)">
+
+      <div class="row">
+       <div class="form-group col-xl-3">
+        <label for="name">User Type</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="name" id="name" placeholder="Enter Name" type="text" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="new_user.get('name').touched && new_user.get('name').hasError('required')">Enter User Type!</span>
+      </div>
+
+       <div class="col-xl-6"></div>
+        <div>
+          <button [disabled]="loading" class="btn btn-primary" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+         </div>
+      </div>
+
+    </form>
+  </div>
+</ng-template>
+
+
+<ng-template #edit_user_type let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Edit User Type</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="user_edit" (ngSubmit)="submit_useredit(user_edit.value)">
+
+      <div class="row">
+       <div class="form-group col-xl-3">
+        <label for="name">User Type</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="name" id="name" placeholder="Enter Name" type="text" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="user_edit.get('name').touched && user_edit.get('name').hasError('required')">Enter User Type  !</span>
+      </div>
+
+       <div class="col-xl-6"></div>
+        <div>
+          <button [disabled]="loading" class="btn btn-primary" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+         </div>
+      </div>
+
+    </form>
+  </div>
+</ng-template>
+
+
+<div *ngIf="payrole_view">
+
+  <!-- <div  class="row">
+    <div class="col-12">
+    <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero($event)"> Back</button>
+    </div>
+    &nbsp; -->
+
+   <!-- <div class="col-12">
+    <ngx-datatable
+    #table
+    class="custom_table"
+    [headerHeight]="50"
+    [limit]="15"
+    [columnMode]="'force'"
+    [footerHeight]="50"
+    [rowHeight]="'auto'"
+    [rows]="pay_roll_list"
+    (activate)="onActivate_payrole($event)">
+
+      <ngx-datatable-column prop="title" name="DATA">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.data}}
+        </ng-template>
+      </ngx-datatable-column>
+
+
+      <ngx-datatable-column prop="rate" name="VALUES">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.values}}
+        </ng-template>
+      </ngx-datatable-column>
+
+     </ngx-datatable>
+    </div>
+   </div> -->
+</div>
+
+<ng-template #pay_roll let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Edit Pay Roll</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="pay_roll_update" (ngSubmit)="submit_payroll_edit(pay_roll_update.value)">
+
+      <div class="row">
+       <div class="form-group col-xl-3">
+        <label for="name">PL (days)</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="pl" id="pl" placeholder="Enter PL" type="text" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="pay_roll_update.get('pl').touched && pay_roll_update.get('pl').hasError('required')">Enter PL !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">EPF ₹</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="epf" id="epf" placeholder="Enter EPF" type="text" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="pay_roll_update.get('epf').touched && pay_roll_update.get('epf').hasError('required')">Enter EPF !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">Basic + DA %</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="basic_da" id="basic_da" placeholder="Enter Basic + DA" type="text" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="pay_roll_update.get('basic_da').touched && pay_roll_update.get('basic_da').hasError('required')">Enter EPF !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">EPF Maximum Amount ₹</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="epf_max_amount" id="epf_max_amount" placeholder="Enter Basic DA" type="text" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="pay_roll_update.get('epf_max_amount').touched && pay_roll_update.get('epf_max_amount').hasError('required')">Enter EPF Maximum Amount !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">HRA %</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="hra" id="hra" placeholder="Enter HRA" type="text" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="pay_roll_update.get('hra').touched && pay_roll_update.get('hra').hasError('required')">Enter HRA !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">Allowance %</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="allowance" id="allowance" placeholder="Enter Allowanse" type="text" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="pay_roll_update.get('allowance').touched && pay_roll_update.get('allowance').hasError('required')">Enter Allowance !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">EPF Percentage %</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="epf_percentage" id="epf_percentage" placeholder="Enter EPF Percentage" type="text" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="pay_roll_update.get('epf_percentage').touched && pay_roll_update.get('epf_percentage').hasError('required')">Enter EPF Percentage !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">Company Paid ESI %</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="company_paid_esi" id="company_paid_esi" placeholder="Enter Company Paid ESI" type="text" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="pay_roll_update.get('company_paid_esi').touched && pay_roll_update.get('company_paid_esi').hasError('required')">Enter Company Paid ESI !</span>
+      </div>
+
+
+       <div class="col-xl-6"></div>
+        <div>
+          <button [disabled]="loading" class="btn btn-primary" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+         </div>
+      </div>
+
+    </form>
+  </div>
+</ng-template>
+
+
+<div *ngIf="payrole_view">
+  <div class="modal-header">
+    <div>
+      <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero($event)"> Back</button>
+    </div>
+    <div class="pull-right">
+      <button type="submit" class="btn btn-success " (click)="update_payrole()"> Edit</button>
+     </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div widget class="card">
+        <div class="card-header">
+          <span>Pay Roll Items</span>
+        </div>
+        <div class="card-body widget-body">
+          <div class="row">
+            <table class="table col-md-6">
+              <tbody>
+                  <tr>
+                    <th>PL</th>
+                    <td>{{pay_roll_list?.pl}} days</td>
+                  </tr>
+                  <tr>
+                    <th>EPF</th>
+                    <td>{{pay_roll_list?.epf |indianCurrency}}</td>
+                  </tr>
+                  <tr>
+                      <th>BASIC + DA</th>
+                      <td>{{pay_roll_list?.basic_da}}%</td>
+                  </tr>
+
+                  <tr>
+                    <th>Maximum EPF</th>
+                    <td>{{pay_roll_list?.epf_max_amount|indianCurrency}}</td>
+                </tr>
+
+              </tbody>
+            </table>
+            <table class="table col-md-6">
+              <tbody>
+
+                <tr>
+                  <th>HRA</th>
+                  <td> {{pay_roll_list?.hra}}% </td>
+                </tr>
+                <tr>
+                  <th>Allowance</th>
+                  <td>{{pay_roll_list?.allowance}}%</td>
+                </tr>
+                <tr>
+                  <th>EPF Percentage</th>
+                  <td>{{pay_roll_list?.epf_percentage}}% </td>
+                </tr>
+                <tr>
+                  <th>Company Paid ESI</th>
+                  <td>{{pay_roll_list?.company_paid_esi}}% </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div *ngIf="report_view">
+  <div>
+    <button type="submit" class="btn btn-info fa fa-arrow-left " (click)="set_zero1($event)"> Back</button>
+  </div>
+  &nbsp;
+  <div>
+    <div class="row">
+      <div class="col">
+        <ngx-datatable
+        #table
+        class="custom_table"
+        [headerHeight]="50"
+        [limit]="24"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="list_report">
+
+        <!-- <ngx-datatable-column prop="id" name="ID">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.reference_number }}
+          </ng-template>
+        </ngx-datatable-column> -->
+
+        <!-- <ngx-datatable-column prop="title" name="MENU">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span *ngIf="row.parentId == 0"><b>{{row.title}}</b></span>
+          </ng-template>
+        </ngx-datatable-column> -->
+
+        <ngx-datatable-column prop="title" name="REPORT MENU">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span>{{row.title}}</span>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="paren" name="STATUS">
+          <ng-template ngx-datatable-cell-template let-row="row">
+
+            <div class="custom-control custom-switch">
+              <input type="checkbox" [checked]="row.status" class="custom-control-input" [id]="'customSwitch3_' + row.id" (change)="onChange_report(row)"/>
+              <label class="custom-control-label" [for]="'customSwitch3_' + row.id"></label>
+            </div>
+
+          </ng-template>
+        </ngx-datatable-column>
+
+        </ngx-datatable>
+      </div>
+    </div>
+  </div>
+</div>

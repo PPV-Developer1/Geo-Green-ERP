@@ -1,0 +1,150 @@
+<div  class="col-md-12">
+
+  <div class="row">
+    <div class="col-md-2">
+      <h4 class="ml-5"><span>TRANSACTIONS</span></h4>
+    </div>
+    <div class="btn-group mb-3 col-md-9" role="group" aria-label="Basic example">
+
+      <div *ngIf="invoice_no != null" class="col-12" >
+        <button type="submit"  class="btn btn-success fa fa-print pull-right" (click)="download()"> Print</button>
+      </div>
+
+      <div *ngIf="invoice_no == null" class="col-12" >
+        <button type="submit"  class="btn btn-success pull-right" (click)="advance_download()"> Print</button>
+      </div>
+
+    </div>
+   </div>
+  <div class="card-group col-md-12">
+    <div class="col-md-4">
+      <ngx-datatable #table class="custom_table vh-100" [headerHeight]="0" [limit]="5" [columnMode]="'force'"
+        [footerHeight]="50" [rowHeight]="70" [rows]="paymentlist" [selected]="selected"
+        [selectionType]="SelectionType.single" [scrollbarV]="true" (activate)="onActivate($event)"
+        (select)='onSelect($event)'>
+
+        <ngx-datatable-column [sortable]="false">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <div  [attr.id]="'bill-row-' + row.tran_id">
+              <div class="row">
+
+              <input type="hidden" [value]="row.bill_id">
+              <input type="hidden" [value]="row.vendor_id">
+
+              <div class="col-md-9"> <b> {{row.vendor_name| uppercase }} </b> </div>
+              <div class="col-md-3">{{row.credit | indianCurrency }} </div>
+            </div>
+            <div class="row">
+              <div class="col-md-8 ml-2"> {{ row.tran_date  | date: 'dd-MM-yyyy'}}  </div>
+              <div class="col-md-3 ml-3"> {{ row.tran_type}}  </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 ml-2">{{row.bill_number}} </div>
+              <div class="col-md-3 ml-2">{{ "Bill payment"}} </div>
+            </div>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </div>
+     <div class="card col-md-8 vh-100" style="overflow-y: scroll;">
+      <div class="page-content container">
+        <div class="container px-0">
+          <div id="table1" class="row mt-4">
+            <div class="col-md-12 col-lg-10 offset-lg-1" >
+
+              <div >
+                <div class="row">
+                  <table class="col-1 " style="text-align: center; border: none;">
+                    <div class="text-center text-150">
+                      <img [src]="imgUrl" alt="company logo" style="width:200px;height:80px;">
+                    </div>
+                  </table>
+                   <table class="col-1"></table>
+                  <table class="col-6 " >
+                      <div>
+                        <strong>
+                          <b> {{company_name}}</b>, <br>
+                         </strong>
+                           <p>{{address_line_1}},{{address_line_2}}
+                              {{city}}-{{zip_code}}<br>
+                          <span>GST No:{{gst_number}} </span></p>
+                      </div>
+                  </table>
+                </div>
+              </div>
+              &nbsp;
+
+              <div  style="text-align: center;">
+                <h5 *ngIf="invoice_no != null"><b>PAYMENT RECEIPT</b></h5>
+                <h5 *ngIf="invoice_no == null"><b>VENDOR ADVANCE RECEIPT</b></h5>
+              </div>
+                 &nbsp;
+              <div class="row">
+                <table class="col-7">
+                  <p><b>Receipt No</b> : {{receipt_no}}</p><br>
+                  <p><b>Payment Date</b> : {{payment_date  | date: 'dd-MM-yyyy'}}</p><br>
+                  <p><b>Reference Number</b> : {{reference}}</p><br>
+                  <p><b>Payment Mode</b> : {{payment_mode}}</p><br>
+                </table>
+
+                <table class="col-5">
+                  <div class="square-box text-center">
+                    <div class="flex-container">
+                      <h6>Amount Received</h6>
+                      <h6>{{amount_received | indianCurrency}}</h6>
+                  </div>
+                 </div>
+                </table>
+              </div>
+              &nbsp;
+              <div class="row">
+                <table>
+                  <div>
+                    <strong>
+                      Bill To :<br>
+                      </strong>
+                        <b> {{bill_attention}}</b>, <br>
+                        <p>{{bill_address_line_1}},{{bill_address_line_2}}
+                          {{bill_city}}-{{bill_zip_code}}<br>
+                          {{bill_phone}} </p>
+                  </div>
+                    </table>
+                  </div>
+                  &nbsp;
+              <div class="row">
+                <h6><b>Payment for</b></h6>
+                <table *ngIf="invoice_no != null" class="my-custom-table">
+                  <tr>
+                   <th style="text-align: center;">Bill Number</th>
+                   <th style="text-align: center;">Bill Date</th>
+                   <th style="text-align: center;">Bill Amount</th>
+                   <th style="text-align: center;">Payment Amount</th>
+                </tr>
+                  <tr>
+                      <td>{{invoice_no}}</td>
+                      <td>{{invoice_date  | date: 'dd-MM-yyyy'}}</td>
+                      <td>{{invoice_amount | indianCurrency}}</td>
+                      <td>{{payment_amount | indianCurrency}}</td>
+                  </tr>
+                </table>
+
+                <table *ngIf="invoice_no == null" class="my-custom-table">
+                  <tr >
+                    <th style="text-align: center;" >Date</th>
+                    <th style="text-align: center;">Payment Amount</th>
+                  </tr>
+                  <tr>
+                    <td>{{invoice_date  | date: 'dd-MM-yyyy'}}</td>
+                   <td>{{payment_amount | indianCurrency}}</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <br><br><br>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,1475 @@
+<div *ngIf="show" class="col-md-12">
+
+  <div class="row">
+    <div class="col-md-5">
+      <h4 class="ml-4"><b>INVOICE</b></h4>
+    </div>
+
+    <div class="btn-group mb-3 col-md-7" role="group" aria-label="Basic example">
+
+      <button type="button" class="btn btn-outline-info fa fa-pencil btn-sm" (click)="editbill()"> Edit</button>
+      <button type="button" class="btn btn-outline-info fa fa-print btn-sm" (click)="download()"> Print</button>
+      <button  class="btn btn-outline-info dropdown-toggle fa fa-money btn-sm" [disabled]="payment_view" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">  Payment
+    </button>
+    <div class="dropdown-menu">
+        <a  class="dropdown-item" href="javascript:void(0);"  (click)="payment()" >Payment</a>
+        <a  class="dropdown-item" href="javascript:void(0);" (click)="use_advance()">Use Advance</a>
+    </div>
+      <button type="button" class="btn btn-outline-info fa fa-pencil-square-o btn-sm" (click)="e_bill()"> Transport Vehicle Details</button>
+      <button type="button" class="btn btn-outline-info fa fa-copy btn-sm" (click)="clone()"> Clone</button>
+      <button type="button" class="btn btn-outline-danger fa fa-trash-o btn-sm" (click)="remove()"> Delete</button>
+      &nbsp;
+      &nbsp;
+      &nbsp;
+      &nbsp;
+    </div>
+  </div>
+
+  <div class="card-group col-md-12">
+    <div class="col-md-4">
+      <ngx-datatable #table class="custom_table vh-100" [headerHeight]="0"  [columnMode]="'force'"
+        [footerHeight]="50" [rowHeight]="70" [rows]="CustomerBillList" [selected]="selected"
+        [selectionType]="SelectionType.single" [scrollbarV]="true" (activate)="onActivate($event)"
+        (select)='onSelect($event)'>
+
+        <ngx-datatable-column [sortable]="false">
+          <ng-template ngx-datatable-cell-template let-row="row">
+           <div  [attr.id]="'invoice-row-' + row.serial_no">
+            <div class="row">
+              <input type="hidden" [value]="row.invoice_id">
+              <input type="hidden" [value]="row.customer_id">
+
+              <div class="col-md-9" > <b> {{row.customer_name | uppercase }} </b> </div>
+              <div class="col-md-3">{{row.total | indianCurrency }} </div>
+            </div>
+            <div class="row">
+              <div class="col-md-7">{{row.invoice_number}} | {{row.reference_number}}</div>
+              <div class="col-md-5 ">{{ row.invoice_date  | date: 'dd-MM-yyyy'}} </div>
+            </div>
+           </div>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </div>
+    <div class="card col-md-8 vh-100" style="overflow-y: scroll;">
+      <div class="page-content container">
+        <div class="container px-0">
+          <div class="row mt-4">
+            <div class="col-md-12 col-lg-10 offset-lg-1" *ngFor="let invoice of invoicePdf">
+              <div id="table1">
+                <div>
+                  <table class="col-12 img_border" style="text-align: center; border-bottom: none;">
+                    <div class="text-center text-150">
+                      <img [src]="company_pdf_logo" alt="company logo" style="width:300px;height:80px;">
+                    </div>
+                  </table>
+                </div>
+                <table>
+                  <tr>
+                    <td class="inv_td_bottom" colspan="2" rowspan="1"
+                      style="width: 443px; border-bottom: 1px solid rgb(0, 0, 0); padding: 0em;">
+                      <strong> {{invoice.company_name | uppercase}}</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="inv_td_bottom" colspan="2" rowspan="1"
+                      style="width: 443px; border-bottom: 1px solid rgb(0, 0, 0); padding: 0em;">
+                      <strong>+91 {{invoice.bill_phone}}</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="inv_td_bottom" colspan="2" rowspan="1"
+                      style="width: 443px; border-top: 0px solid rgb(255, 255, 255); border-bottom: 1px solid rgb(0, 0, 0); background-color: rgb(119, 180, 58); padding: 0em;">
+                      <strong>CUSTOMER - TAX INVOICE</strong>
+                    </td>
+                  </tr>
+                  <tr style="border-bottom:none ;">
+
+                    <td class="inv_td_bottom" colspan="1" rowspan="1"
+                      style="text-align: left; width: 442px; border-top: 0px solid rgb(255, 255, 255); border-bottom: none; background-color: rgb(119, 180, 58); padding: 0em;">
+                      <strong>GSTIN: {{invoice.gst_number}}</strong>
+                    </td>
+
+                    <td class="inv_td_bottom" colspan="1" rowspan="1"
+                      style="text-align: right; vertical-align: top; width: 444px; border-top: 0px solid rgb(255, 255, 255); border-bottom:0px solid white; background-color: rgb(119, 180, 58); padding: 0em;">
+                      <strong>UDYAM: {{invoice.company_udyam_no}}</strong>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <div id="table1">
+                <table>
+                  <tr>
+                    <td style="width:50%">
+                      <b> Invoice No :</b> {{invoice.invoice_number}}, <br>
+                      <b> Invoice Date : </b> {{invoice.invoice_date | date: 'dd-MM-yyyy'}},<br>
+                      <b> State : </b> {{invoice.place_from_supply}}.<br>
+                      <b> Pin Code : </b> {{invoice.bill_zip_code}}
+                    </td>
+                    <td>
+                      <b> Shippment : </b>{{invoice.shipment_mode}}, <br>
+                      <b> Vehicle Number : </b>{{invoice.vehicle_number}},<br>
+                      <b> Place of Supply : </b> {{invoice.place_from_supply}},<br>
+                      <b> Ref No : </b>{{invoice.reference_number }}, <br>
+                      <b > Dc No : </b>{{invoice.dc_no}}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <div id="table2">
+                <table>
+                  <tr>
+                    <td style="width:50%;">
+                      <strong>
+                        Bill From :<br>
+                      </strong>
+                      <b>Name :</b> {{invoice.bill_attention}}, <br>
+                      <b>Address :</b> {{invoice.bill_address_line_1}},<br>
+                      {{invoice.bill_address_line_2}},<br>
+                      <b>City :</b> {{invoice.bill_city}}.<br>
+                      <b>Pin Code :</b> {{invoice.bill_zip_code}} <br>
+                      <b> GST Number : </b> {{invoice.customer_gst}}
+
+                    </td>
+                    <td>
+                      <strong>
+                        Ship From:<br>
+                      </strong>
+                      <b>Name :</b> {{invoice.ship_attention}}, <br>
+                      <b>Address :</b> {{invoice.ship_address_line_1}},<br>
+                      {{invoice.ship_address_line_2}},<br>
+                      <b>City :</b> {{invoice.ship_city }}, <br>
+                      <b>Pin code :</b> {{invoice.ship_zip_code}}. <br>
+                      <b> GST Number : </b> {{invoice.customer_gst}}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <div id="table3">
+                <table>
+                  <tr>
+                    <th rowspan="2">S.No</th>
+                    <th rowspan="2" colspan="2">Product Description</th>
+                    <th rowspan="2">HSN</th>
+                    <th rowspan="2">QTY</th>
+                    <th rowspan="2">UOM</th>
+                    <th rowspan="2">Unit Rate </th>
+                    <!-- <th rowspan="2">Tax Value </th> -->
+                    <th *ngIf="stateCode == 33" colspan="2">CGST</th>
+
+                    <th *ngIf="stateCode == 33" colspan="2">SGST </th>
+
+                    <th *ngIf="stateCode != 33" colspan="4">IGST</th>
+
+                    <th rowspan="2">Amount</th>
+                  </tr>
+                  <tr>
+
+                    <td *ngIf="stateCode == 33">%</td>
+                    <td *ngIf="stateCode == 33">&#x20B9;</td>
+                    <td *ngIf="stateCode == 33">%</td>
+                    <td *ngIf="stateCode == 33">&#x20B9;</td>
+
+                    <td *ngIf="stateCode != 33">%</td>
+                    <td *ngIf="stateCode != 33">&#x20B9;</td>
+                  </tr>
+                  <tr *ngFor="let row of invoiceItems; let i=index">
+                    <td>{{i + 1}}</td>
+                    <td colspan="2">{{row.item_name}}<br>{{row.item_description}}<br><span *ngIf="row.serial_number != null"> SN:{{row.serial_number }}</span></td>
+                    <td>{{row.hsn}}</td>
+                    <td>{{row.qty}}</td>
+                    <td>{{row.uom}}</td>
+                    <td>{{row.amount | indianCurrency}}</td>
+                    <!-- <td>{{row.tax_amount/2}}</td> -->
+                    <td *ngIf="stateCode != 33">{{row.tax_percent}}</td>
+                    <td *ngIf="stateCode != 33" colspan="2">{{row.item_tax}}</td>
+
+                    <td *ngIf="stateCode == 33">{{row.tax_percent/2}}</td>
+                    <td *ngIf="stateCode == 33">{{row.item_tax/2 | indianCurrency}}</td>
+                    <td *ngIf="stateCode == 33">{{row.tax_percent/2}}</td>
+                    <td *ngIf="stateCode == 33">{{row.item_tax/2 | indianCurrency}}</td>
+                    <td *ngIf="stateCode == 33">{{row.total | indianCurrency}}</td>
+                    <td *ngIf="stateCode != 33" colspan="2">{{row.total | indianCurrency}}</td>
+                  </tr>
+
+
+                  <tr>
+                    <td colspan="11" class="pos">Total Amount Before Tax</td>
+                    <td>{{invoice.without_tax | indianCurrency}}</td>
+                  </tr>
+
+                  <tr *ngIf="invoice.tax_amount > 0" >
+                    <td colspan="11" class="pos">Tax Amount</td>
+                    <td>{{invoice.tax_amount | indianCurrency}}</td>
+                  </tr>
+
+                  <tr *ngIf="invoice.transport">
+                    <td colspan="11" class="pos">Ship Charge</td>
+                    <td>{{invoice.transport | indianCurrency}}</td>
+                  </tr>
+
+                  <tr *ngIf="invoice.tds ">
+                    <td colspan="11" class="pos">TDS Amount</td>
+                    <td>{{invoice.tds | indianCurrency}}</td>
+                  </tr>
+                  <tr *ngIf="invoice.tcs">
+                    <td colspan="11" class="pos">TCS Amount</td>
+                    <td>{{invoice.tcs | indianCurrency}}</td>
+                  </tr>
+                  <tr>
+                    <td colspan="11" class="pos">Round Off </td>
+                    <td>{{invoice.round_off | indianCurrency}}</td>
+                  </tr>
+                  <tr>
+                    <td colspan="11" class="pos">TotalTax</td>
+                    <td>{{invoice.total | indianCurrency}}</td>
+                  </tr>
+                  <tr>
+                    <th colspan="12">
+                       {{invoice.total | numtoword}}
+                    </th>
+                  </tr>
+                </table>
+
+                <div id="table4">
+                  <table class="tb">
+                      <tr>
+                          <td class="tbl" colspan="2"><b>Customer Note</b> <br>
+                              {{invoice.note}}
+                          </td>
+                          <td class="tbl" colspan="2">
+                            <b> Terms & Conditions of sale: </b><br>
+                            {{invoice.terms_conditions}}
+                        </td>
+
+                      </tr>
+                  </table>
+              </div>
+
+              <div id="table5">
+                  <table class="tb">
+                      <tr>
+                          <td class="tbl space" colspan="2"></td>
+                          <td class="tbl space" colspan="2"> <b> Terms of Payment : </b> <br>
+                            {{invoice.payment_term}}<br>{{invoice.invoice_due_date  | date: 'dd-MM-yyyy'}}
+                        </td>
+                      </tr>
+                      <tr>
+                          <td class="tbl space" colspan="2" style="position: static;"><b> For {{invoice.company_name | uppercase}} </b></td>
+                          <td class="tbl space" colspan="2"></td>
+                      </tr>
+                      <tr>
+                          <td class="tbl space" colspan="2"><h1></h1></td>
+                          <td class="tbl space" colspan="2"></td>
+                      </tr>
+                      <tr>
+                          <td class="tbl space" colspan="2">Authorised Signatory</td>
+                          <td class="tbl space" colspan="2"></td>
+                      </tr>
+                  </table>
+              </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <br><br><br>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div  *ngIf=" show_invoice_edit" >
+  <!-- <div>
+      <button type="submit" class="btn btn-info fa fa-arrow-left mb-3" (click)="Return()">
+        Back
+      </button>
+  </div> -->
+
+<div class="row">
+  <div class="col">
+    <div widget class="card">
+      <div class="card-header">
+        <span class="text-uppercase">EDIT INVOICE</span>
+        <div class="widget-controls">
+          <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+          <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+          <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+          <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+          <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+        </div>
+      </div>
+
+      <div class="header" style="height: auto; ">
+        <form class="mt-3" [formGroup]="Edit_invoice">
+          <div class="col">
+            <div class="row mb-1">
+              <div class="col-md-4">
+                <div class="ml-1">
+                    <span>Vendor Name</span>
+                </div>
+                <div class="position-absolute fixed-bottom mb-5">
+                </div>
+              </div>
+              <div class="col-md-8">
+                <div class="row">
+                  <h4 class="ml-6">{{name}}</h4>
+                </div>
+              </div>
+              </div>
+
+            <div>
+              <div class="row">
+                <div class="col-md-2"></div>
+                <div class="row col-md-10">
+                  <div class="col-md-3">
+                    <div class="row">
+                      <h5 class="ml-2" style="color:gray;">BILL FROM ADDRESS</h5>
+                      <i class="fa fa-pencil ml-2 mt-1" data-toggle="modal1" data-target="#nofooter-modal"
+                            style="cursor:pointer;" aria-hidden="true" data-toggle="modal" data-target="#lg-modal"></i>
+                    </div>
+                    <div>
+                      <input type="hidden">
+                      <p>
+                      <strong>{{billAttention}}</strong><br>
+                      {{billAddress_line_1}}<br>
+                      {{billAddress_line_2}}<br>
+                      {{billCity}}<br>
+                      {{billState}} -
+                      {{billZipcode}}
+                    </p>
+                    </div>
+                  </div>
+
+                  <div class="col-md-2">
+                    <div class="mt-5">
+                    </div>
+                    <div class="position-absolute fixed-bottom mb-5">
+                    </div>
+                  </div>
+
+                  <div class="col-md-5">
+                    <div class="row">
+                      <h5 class="ml-2" style="color:gray;">SHIP FROM ADDRESS</h5>
+                      <i class="fa fa-pencil ml-2 mt-1" data-toggle="modal2" data-target="#nofooter-modal"
+                      style="cursor:pointer;" aria-hidden="true" data-toggle="modal"
+                      data-target="#ship-address"></i>
+                    </div>
+                    <div>
+                      <input type="hidden">
+                      <p>
+                      <strong>{{shipAttention}}</strong><br>
+                      {{shipAddress_line_1}}<br>
+                      {{shipAddress_line_2}}<br>
+                      {{shipCity}}<br>
+                      {{shipState}} -
+                      {{shipZipcode}}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label style="color: #e54643" class="col-sm-2 col-form-label col-form-label-sm">Invoice Number*</label>
+                <div class="col-sm-4">
+                  <input type="text" formControlName="invoiceNo"
+                    class="form-control form-control-sm" readonly />
+                  <span class="help-block text-danger"
+                    *ngIf="Edit_invoice.get('invoiceNo').touched && Edit_invoice.get('invoiceNo').hasError('required')">Enter
+                    INVOICE Number !</span>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label col-form-label-sm">Reff Number</label>
+                <div class="col-sm-4">
+                  <input type="text" formControlName="reference_number" placeholder="Enter Reff number"
+                    class="form-control form-control-sm" />
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label style="color:#d64830" class="col-sm-2 col-form-label col-form-label-sm">Invoice Date*</label>
+                <div class="col-sm-4">
+                  <input type="date" #BillDate (change)="Billdate(BillDate.value)" formControlName="billDate"
+                    class="form-control form-control-sm" />
+                </div>
+
+                <div class="row col-sm-3">
+                  <label class="col-sm-5 col-form-label col-form-label-sm">Terms</label>
+                  <div class="col-sm-7">
+                    <!-- <select formControlName="paymentTerms" class="form-control"
+                      (change)="dueDates($event.target.value , BillDate.value)" placeholder="Due on Receipt">
+                      <option *ngFor="let term of payment_terms " [value]="term.terms_value">{{term.terms}}
+                      </option>
+                    </select> -->
+
+                    <ng-select formControlName="paymentTerms"  class=" form-control custom-select"  (change)="dueDates($event , BillDate.value)" [clearable]="false" >
+                        <ng-option *ngFor="let term of payment_terms " [value]="term.terms_value" class="form-control">
+                          {{term.terms}}
+                        </ng-option>
+                    </ng-select>
+                  </div>
+                </div>
+
+                <div class="row col-sm-3">
+                  <label class="col-sm-5 col-form-label col-form-label-sm">Due Date</label>
+                  <div class="col-sm-7">
+                    <input type="date" [(ngModel)]="fullDate" (change)="dueDateChange()" formControlName="dueDate"
+                      class="form-control form-control-sm">
+                  </div>
+                </div>
+              </div>
+              &nbsp;
+
+            <div class="row mb-3" style="border: 1px solid #c9c9c9 !important;padding-top: 5px;padding-bottom: 5px;">
+                    <label *ngIf="invoice_type == 'project'" class="col-sm-2 col-form-label col-form-label-sm">Project <span style="font-size: smaller;color: rgb(39, 39, 143);"> ( for dc list ) </span></label>
+                          <div class="col-sm-4" *ngIf="invoice_type == 'project'">
+
+                                          <ng-select   class=" form-control custom-select"
+                                              (change)="Project_DctoInvoice($event)" [clearable]="false">
+                                                    <ng-option *ngFor="let item of edit_ItemList"  [value]="item.id" class="form-control">
+                                                        {{item.name}}
+                                                      </ng-option>
+                                              </ng-select>
+
+                          </div>
+
+                           <label class="col-sm-2 col-form-label col-form-label-sm">Use DC</label>
+                          <div class="col-sm-4">
+                                      <ng-multiselect-dropdown
+                                          [placeholder]="'Select DCs'"
+                                          [data]="dc_list"
+                                          [(ngModel)]="selectedDCs"
+                                          [settings]="dropdownSettings"
+                                          (onSelect)="Dcitems($event)"
+                                          (onDeSelect)="RemoveDcitems($event)"
+                                          formControlName="dc_data" >
+                                        </ng-multiselect-dropdown>
+
+                          </div>
+                  </div>
+
+
+              <div class="row" >
+                <div class="col-md-10" style="text-align: right;">
+                 <label for="size">Zoom</label></div>
+                 <div  class="col-md-2" style="text-align: left;" >
+                  <input type="range" min="100" max="200" formControlName="size" [(ngModel)]="tableWidth" (input)="changeTableWidth()" value="100">
+                  <span style="text-align: center; padding-left: 10px;">{{ tableWidth }}%</span>
+
+                </div>
+              </div>
+
+             <div  class="table-responsive">
+                     <div class="row">
+                      <div class="col-12 bottom-30" #tableResponsive>
+                        <table class="table table-striped resizable-table" id="wide-table">
+                          <thead>
+                            <tr>
+                              <th>ITEM NAME <div class="resizer"></div></th>
+                              <th>DESCRIPTION  <div class="resizer"></div></th>
+                              <th>QUANTITY <div class="resizer"></div></th>
+                              <th>UOM <div class="resizer"></div></th>
+                              <th>RATE <div class="resizer"></div></th>
+                              <th>TAX <div class="resizer"></div></th>
+                              <th>TOTAL <div class="resizer"></div></th>
+                                <th></th>
+                            </tr>
+                          </thead>
+                    <tbody *ngIf="invoice_type != 'items'" formArrayName="product">
+                      <tr *ngFor="let product of Edit_invoice.get('product')['controls']; let j = index;" [formGroupName]="j">
+
+                        <td style="min-width: 350px;">
+                          <!-- <select formControlName="items" class="form-control" (change)="specProject($event.target.value, j)">
+                            <option *ngFor="let item of edit_ItemList" [value]="item.id">{{item.name}}
+                          </option>
+                          </select> -->
+
+
+                          <ng-select  formControlName="items"  style="text-align: left;"
+                           class=" form-control custom-select" (change)="specProject($event, j)" [clearable]="false" (click)="adjustTableHeight()">
+                            <ng-option *ngFor="let item of edit_ItemList" [value]="item.id" class="form-control">
+                              {{item.name}}
+                            </ng-option>
+                          </ng-select>
+                        </td>
+
+                        <td style="min-width: 350px;">
+
+                          <textarea type="text" class="form-control form-control-sm"  formControlName="descriptions" ></textarea>
+                        </td>
+
+                        <td>
+                          <input type="number" #qtys (change)="edit_qty(qtys.value, price.value, j)" class="form-control form-control-sm" formControlName="quantity" />
+                        </td>
+
+                        <td>
+                          <input type="text" class="form-control form-control-sm" readonly formControlName="uom"/>
+                        </td>
+
+                        <td>
+                          <input type="number" #price (change)="edit_priceChange(qtys.value, price.value, j)" class="form-control form-control-sm" formControlName="price" />
+                        </td>
+
+                        <td>
+                          <input type="number" class="form-control form-control-sm" readonly formControlName="taxes"/>
+                        </td>
+                        <!-- <td>
+                          <select formControlName="taxes" class="form-control"  (change)="GSTCalculation_tax($event.target.value,j)" >
+                            <option *ngFor="let item of editGST_Data" [value]="item.rate">{{item.name}}
+                          </option>
+                          </select>
+                        </td> -->
+
+                        <td style="min-width: 200px;">
+
+                          <input type="number" class="form-control form-control-sm" readonly formControlName="amount">
+                        </td>
+                      </tr>
+                    </tbody>
+
+                    <tbody *ngIf="invoice_type == 'items'" formArrayName="product" >
+                      <tr *ngFor="let product of Edit_invoice.get('product')['controls']; let j = index;" [formGroupName]="j">
+                        <td style="min-width: 350px;">
+
+                          <!-- <select formControlName="items" class="form-control" (change)="edit_specItem($event.target.value, j)">
+                            <option *ngFor="let item of edit_ItemList" [value]="item.id">{{item.name}}
+                          </option>
+                          </select> -->
+
+                          <ng-select  formControlName="items"  style="text-align: left;" (click)="adjustTableHeight()"
+                           class=" form-control custom-select" (change)="edit_specItem($event, j)" [clearable]="false">
+                            <ng-option *ngFor="let item of edit_ItemList" [value]="item.id" class="form-control" style="align-content:normal;">
+                              {{item.name}}
+                            </ng-option>
+                          </ng-select>
+                        </td>
+
+                        <td style="min-width: 350px;">
+                          <textarea type="text" class="form-control form-control-sm" formControlName="descriptions" ></textarea>
+                        </td>
+                        <td>
+                          <input type="number" #qtys (change)="edit_qty(qtys.value, price.value, j)" class="form-control form-control-sm" formControlName="quantity" />
+                        </td>
+                        <td>
+                          <input type="text" class="form-control form-control-sm" readonly formControlName="uom"/>
+                        </td>
+                        <td>
+                          <input type="number" #price (change)="edit_priceChange(qtys.value, price.value, j)" class="form-control form-control-sm" formControlName="price" />
+                        </td>
+                        <td>
+                          <input type="number" class="form-control form-control-sm" readonly formControlName="taxes"/>
+                        </td>
+                        <td style="min-width: 200px;">
+                          <input type="number" class="form-control form-control-sm" readonly formControlName="amount">
+                        </td>
+                        <td *ngIf="product.get('dc_id')?.value == 0" class="col-sm-1 mt-2 " (click)="edit_onDeleteRow(j)" [disabled]="Edit_invoice.controls.product.controls.length === 1">
+                            <i style="color: red;" class="far fa-times-circle"></i>
+                          </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                 </div>
+             </div>
+              <div *ngIf="invoice_type== 'items'" class="row">
+                <div  class="col-sm-12">
+                  <Button type="button" (click)="edit_initProduct()" class="btn btn-primary">+</Button>
+                </div>
+              </div>
+
+              <div class="row mb-2">
+                <div class="col-sm-5"></div>
+                <div class="col-sm-2">
+                  <div style="text-align: right">Sub Total</div>
+                </div>
+                <div class="col-sm-2"></div>
+                <div style="color: gray;" class="col-sm-2">
+                  <input type="text" style="text-align: end"
+                    class="form-control form-control-sm" readonly formControlName="subTotal"/>
+                </div>
+                <div class="col-sm-1"></div>
+              </div>
+              <span *ngFor="let gst of editGST_Data">
+                <div class="row mb-2" *ngIf="gst.amount != 0">
+                  <div class="col-sm-4"></div>
+                  <div class="col-sm-3">
+                    <div style="text-align: right">{{gst.name}}</div>
+                  </div>
+                  <div class="col-sm-2"></div>
+                  <div style="color: gray;" class="col-sm-2">
+                    <input type="text" style="text-align: end"
+                      class="form-control form-control-sm" readonly [value]="gst.amount"/>
+                  </div>
+                  <div class="col-sm-1"></div>
+                </div>
+              </span>
+
+              <div class="row  mb-2">
+                <div class="col-sm-5"></div>
+                <div class="col-sm-2">
+                  <div style="text-align: right">Shipping Charges</div>
+                </div>
+                <div class="col-sm-2 ">
+                </div>
+                <div class="col-sm-2" style="color: gray;">
+                  <input type="number" (change)="edit_FinalTotalCalculation()" formControlName="shippingCharge" style="text-align: end"
+                    class="form-control form-control-sm" />
+                </div>
+                <div class="col-sm-1"></div>
+              </div>
+
+              <div class="row mb-2">
+                <div class="col-sm-5"></div>
+                <div class="col-sm-2">
+                  <div class="mt-2" style="text-align: right">TDS</div>
+                </div>
+                <div class="col-sm-2"> <input type="number" (input)="tdsCalculation()" [(ngModel)]="tds_percent" style="text-align: end" formControlName="tds_percentage" class="form-control form-control-sm" > </div>
+                <div style="color: gray;" class="col-sm-2">
+                  <input type="number" (change)="edit_FinalTotalCalculation()" style="text-align: end" formControlName="TDS"
+                    class="form-control form-control-sm" />
+                </div>
+                <div class="col-sm-1"></div>
+              </div>
+
+              <div class="row mb-2">
+                <div class="col-sm-5"></div>
+                <div class="col-sm-2">
+                  <div class="mt-2" style="text-align: right">TCS</div>
+                </div>
+                <div class="col-sm-2"> <input type="number" (input)="tcsCalculation()" [(ngModel)]="tcs_percent" style="text-align: end" formControlName="tcs_percentage" class="form-control form-control-sm" > </div>
+                <div style="color: gray;" class="col-sm-2">
+                  <input type="number" (change)="edit_FinalTotalCalculation()" style="text-align: end" formControlName="TCS"
+                    class="form-control form-control-sm" />
+                </div>
+                <div class="col-sm-1"></div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-sm-5"></div>
+                <div class="col-sm-2">
+                  <div class="mt-2" style="text-align: right">Round Off</div>
+                </div>
+                <div class="col-sm-2"> </div>
+                <div style="color: gray;" class="col-sm-2">
+                  <input type="number" style="text-align: end" (change)="edit_FinalTotalCalculation()" formControlName="roundOff"
+                    class="form-control form-control-sm" />
+                </div>
+                <div class="col-sm-1"></div>
+              </div>
+              <div class="row mt-3">
+                <div class="col-sm-6">
+                  <label style="font-size: 14px">Customer Notes</label>
+                  <textarea class="form-control form-control-sm" style="height: 50px" formControlName="notes"
+                    placeholder="Enter any notes to be displayed in your transaction"
+                    [(ngModel)]="notes">{{notes}} </textarea>
+
+                  <span class="help-block text-danger"
+                    *ngIf="Edit_invoice.get('notes').touched && Edit_invoice.get('notes').hasError('required')">Enter
+                    Notes !</span>
+                </div>
+
+                <div class="col-sm-3 mt-5">
+                  <h2>Total</h2>
+                </div>
+
+                <div class="col-sm-2 mt-5">
+                  <input type="text" style="text-align: end"
+                    class="form-control form-control-sm" readonly formControlName="total" />
+                </div>
+                <div class="col-sm-1"></div>
+              </div>
+
+              <div class="row mt-3">
+
+                <div class="col-sm-8">
+                  <label style="font-size: 14px">Terms & Conditions</label>
+                  <textarea formControlName="terms_condition" class="form-control form-control-sm"
+                    style="height: 100px"
+                    placeholder="Enter the terms and conditions of your business to be displayed in your transaction"
+                    [(ngModel)]="terms_condition">{{terms_condition}}</textarea>
+                  <span class="help-block text-danger"
+                    *ngIf="Edit_invoice.get('terms_condition').touched && Edit_invoice.get('terms_condition').hasError('required')">Enter
+                    Terms & Conditions !</span>
+                </div>
+              </div>
+
+              <div class="row mt-3 mb-3">
+                <div class="col-sm-6">
+                  <button [disabled]="loading" style="background-color: #d64830; border-color: #d64830; color: #fff; " type="button"
+                    class="btn btn-outline-secondary" (click)="edit_onSubmit(Edit_invoice.value)">
+                    <i class="fa fa-spinner fa-spin" *ngIf="loading"></i>
+                    Submit
+                  </button>
+                  <button type="button" style=" background-color: #f5f5f5; color: #212529; border-color: #ddd;"
+                    class="btn btn-outline-secondary ml-2"  (click)="cancel()">
+                    <i class="fa fa-spinner fa-spin" *ngIf="loading"></i>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+ </div>
+</div>
+
+ <ng-template #addPayment let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Add Payment</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="invoice_payment" (ngSubmit)="AddNewTrans(invoice_payment.value)">
+
+      <div class="form-group">
+        <label for="input-12">Receipt No</label>
+        <input type="text" formControlName="receipt_no" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="exampleSelect3">Mode of Transfer</label>
+        <select formControlName="tran_mode" class="form-control custom-select">
+            <option value = "0" selected>Select Mode</option>
+            <option value = "1">Wire</option>
+            <option value = "2">Cash</option>
+            <option value = "3">Cheque</option>
+        </select>
+        <span class="help-block text-danger" *ngIf="invoice_payment.get('tran_mode').touched && invoice_payment.get('tran_mode').hasError('required')">Must Select !</span>
+        <span class="help-block text-danger" *ngIf="invoice_payment.get('tran_mode').touched && invoice_payment.get('tran_mode').hasError('min')">Select One Type</span>
+      </div>
+      <!-- <div class="form-group">
+          <label for="exampleSelect3">Transfer From</label>
+          <span >
+            <input formControlName="from_bank" type="text" class="form-control">
+          </span>
+      </div> -->
+      <div class="form-group">
+        <label for="exampleSelect3">Transfer To</label>
+        <span>
+          <select formControlName="to_bank" class="form-control custom-select">
+            <optgroup label="Bank">
+              <option *ngFor= "let view of company_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+            </optgroup>
+            <optgroup label="Cash">
+              <option *ngFor= "let view of cash_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+            </optgroup>
+            <optgroup label="Internal User">
+              <option *ngFor= "let view of all_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+            </optgroup>
+            <optgroup label="GST">
+              <option *ngFor= "let view of gst_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+            </optgroup>
+          </select>
+        </span>
+
+        <span class="help-block text-danger" *ngIf="invoice_payment.get('to_bank').touched && invoice_payment.get('to_bank').hasError('required')">Must Select Bank!</span>
+      </div>
+      <div class="form-group">
+        <div>
+          <label for="input-12">Amount</label>
+        </div>
+        <div class="input-group">
+          <div class="input-group-prepend">
+              <span class="input-group-text">₹</span>
+          </div>
+          <input formControlName="amount" type="number" class="form-control">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="input-12">Transaction  Date</label>
+        <input type="date" formControlName="tran_date" class="form-control" id="input-12">
+      </div>
+      <div class="form-group">
+        <label for="input-1">Reference</label>
+        <input type="text" formControlName="reference" class="form-control" id="input-1">
+        <span class="help-block text-danger" *ngIf="invoice_payment.get('reference').touched && invoice_payment.get('reference').hasError('required')">Reference Required !</span>
+        <span class="help-block text-danger" *ngIf="invoice_payment.get('reference').touched && invoice_payment.get('reference').hasError('minlength')">Minimum 3 Letters</span>
+      </div>
+      <div class="form-group">
+        <label for="input-1">Description</label>
+        <input type="text" formControlName="description" class="form-control" id="input-1">
+        <span class="help-block text-danger" *ngIf="invoice_payment.get('description').touched && invoice_payment.get('description').hasError('required')">Description Required !</span>
+        <span class="help-block text-danger" *ngIf="invoice_payment.get('description').touched && invoice_payment.get('description').hasError('minlength')">Minimum 3 Letters</span>
+      </div>
+      <div class="form-group">
+        <button [disabled]="loading" class="btn btn-info btn-block" type="submit">Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i> </button>
+    </div>
+  </form>
+  </div>
+ </ng-template>
+ &nbsp;
+
+<div  *ngIf=" show" >
+  <ngx-datatable
+  #table
+  class="custom_table"
+  [headerHeight]="50"
+  [limit]="10"
+  [columnMode]="'force'"
+  [footerHeight]="50"
+  [rowHeight]="50"
+  [rows]="payment_transaction">
+
+  <ngx-datatable-column prop="tran_date"  [width]="200"  name="TRANSACTION DATE" >
+      <ng-template ngx-datatable-cell-template let-row = "row">
+          {{row.tran_date | date: 'dd-MM-yyyy'}}
+      </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column [width]="100" name="MODE">
+      <ng-template ngx-datatable-cell-template let-row="row">
+            <span *ngIf="row.tran_mode === 1 " >
+              Wire
+          </span>
+          <span *ngIf="row.tran_mode === 2 " >
+              Cash
+          </span>
+          <span *ngIf="row.tran_mode === 3 " >
+              Cheque
+          </span>
+      </ng-template>
+    </ngx-datatable-column>
+
+  <ngx-datatable-column  [width]="200" name="REFERENCE">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.reference}}
+      </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column [width]="110" name="CREDIT">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        <span style="font-weight:bold;"> {{row.credit | indianCurrency}} </span>
+        </ng-template>
+    </ngx-datatable-column>
+
+  <ngx-datatable-column [width]="110" name="DEBIT">
+    <ng-template ngx-datatable-cell-template let-row="row">
+      <span style="font-weight:bold;"> {{row.debit | indianCurrency}} </span>
+      </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column name="BALANCE">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        <span style="font-weight:bold;"> {{row.balance | indianCurrency}} </span>
+        </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column name="DESCRIPTION">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.tran_details}}
+      </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column  [width]="200" name="COMMAND">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.notes}}
+        </ng-template>
+    </ngx-datatable-column>
+
+ </ngx-datatable>
+ </div>
+
+<div *ngIf="clone_invoice_show">
+  <div  class="row">
+    <div class="col">
+      <div widget class="card">
+        <div class="card-header">
+          <span class="text-uppercase">NEW INVOICE</span>
+          <div class="widget-controls">
+            <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+            <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+            <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+            <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+            <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+          </div>
+        </div>
+
+        <div class="header" style="height: auto; ">
+          <form class="mt-3" [formGroup]="Edit_invoice">
+            <div class="col">
+              <div class="row mb-1">
+                <div class="col-md-4">
+                  <div class="ml-1">
+                      <span>Vendor Name</span>
+                  </div>
+                  <div class="position-absolute fixed-bottom mb-5">
+                  </div>
+                </div>
+                <div class="col-md-8">
+                  <div class="row">
+                    <h4 class="ml-6">{{name}}</h4>
+                  </div>
+                </div>
+                </div>
+
+              <div>
+                <div class="row">
+                  <div class="col-md-2"></div>
+                  <div class="row col-md-10">
+                    <div class="col-md-3">
+                      <div class="row">
+                        <h5 class="ml-2" style="color:gray;">BILL FROM ADDRESS</h5>
+                        <!-- <i class="fa fa-pencil ml-2 mt-1" data-toggle="modal1" data-target="#nofooter-modal"
+                        style="cursor:pointer;" aria-hidden="true" data-toggle="modal" data-target="#lg-modal"></i> -->
+                      </div>
+                      <div>
+                        <input type="hidden">
+                        <p>
+                        <strong>{{billAttention}}</strong><br>
+                        {{billAddress_line_1}}<br>
+                        {{billAddress_line_2}}<br>
+                        {{billCity}}<br>
+                        {{billState}} -
+                        {{billZipcode}}
+                      </p>
+                      </div>
+                    </div>
+
+                    <div class="col-md-2">
+                      <div class="mt-5">
+                      </div>
+                      <div class="position-absolute fixed-bottom mb-5">
+                      </div>
+                    </div>
+
+                    <div class="col-md-5">
+                      <div class="row">
+                        <h5 class="ml-2" style="color:gray;">SHIP FROM ADDRESS</h5>
+                        <!-- <i class="fa fa-pencil ml-2 mt-1" data-toggle="modal2" data-target="#nofooter-modal"
+                            style="cursor:pointer;" aria-hidden="true" data-toggle="modal"
+                            data-target="#ship-address"></i> -->
+                      </div>
+                      <div>
+                        <input type="hidden">
+                        <p>
+                        <strong>{{shipAttention}}</strong><br>
+                        {{shipAddress_line_1}}<br>
+                        {{shipAddress_line_2}}<br>
+                        {{shipCity}}<br>
+                        {{shipState}} -
+                        {{shipZipcode}}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label style="color: #e54643" class="col-sm-2 col-form-label col-form-label-sm">Invoice Number*</label>
+                  <div class="col-sm-4">
+                    <input type="text" formControlName="invoiceNo" [(ngModel)]="inv_no"
+                    class="form-control form-control-sm"  />
+                    <span class="help-block text-danger"
+                      *ngIf="Edit_invoice.get('invoiceNo').touched && Edit_invoice.get('invoiceNo').hasError('required')">Enter
+                      INVOICE Number !</span>
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label class="col-sm-2 col-form-label col-form-label-sm">Reff Number</label>
+                  <div class="col-sm-4">
+                    <input type="text" formControlName="reference_number" placeholder="Enter Reff number"
+                      class="form-control form-control-sm" />
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label style="color:#d64830" class="col-sm-2 col-form-label col-form-label-sm">Invoice Date*</label>
+                  <div class="col-sm-4">
+                    <input type="date" #BillDate (change)="Billdate(BillDate.value)" formControlName="billDate"
+                      class="form-control form-control-sm" />
+                  </div>
+
+                  <div class="row col-sm-3">
+                    <label class="col-sm-5 col-form-label col-form-label-sm">Terms</label>
+                    <div class="col-sm-7">
+                      <!-- <select formControlName="paymentTerms" class="form-control" (change)="dueDates($event.target.value , BillDate.value)" placeholder="Due on Receipt">
+
+                        <option *ngFor="let term of payment_terms " [value]="term.terms_value">{{term.terms}}
+                        </option>
+                      </select> -->
+
+                      <ng-select formControlName="paymentTerms"  class=" form-control custom-select"  (change)="dueDates($event , BillDate.value)" [clearable]="false" >
+                        <ng-option *ngFor="let term of payment_terms " [value]="term.terms_value" class="form-control">
+                          {{term.terms}}
+                        </ng-option>
+                     </ng-select>
+                    </div>
+                  </div>
+
+                  <div class="row col-sm-3">
+                    <label class="col-sm-5 col-form-label col-form-label-sm">Due Date</label>
+                    <div class="col-sm-7">
+                      <input type="date" [(ngModel)]="fullDate" (change)="dueDateChange()" formControlName="dueDate"
+                        class="form-control form-control-sm">
+                    </div>
+                  </div>
+                </div>
+                <div class="row" >
+                  <div class="col-md-10" style="text-align: right;">
+                   <label for="size">Zoom</label></div>
+                   <div  class="col-md-2" style="text-align: left;" >
+                    <input type="range" min="100" max="200" formControlName="size" [(ngModel)]="tableWidth" (input)="changeTableWidth()" value="100">
+                    <span style="text-align: center; padding-left: 10px;">{{ tableWidth }}%</span>
+
+                  </div>
+                </div>
+                &nbsp;
+
+                 <div class="row mb-3" style="border: 1px solid #c9c9c9 !important;padding-top: 5px;padding-bottom: 5px;">
+                    <label *ngIf="invoice_type == 'project'" class="col-sm-2 col-form-label col-form-label-sm">Project <span style="font-size: smaller;color: rgb(39, 39, 143);"> ( for dc list ) </span></label>
+                          <div class="col-sm-4" *ngIf="invoice_type == 'project'">
+
+                                          <ng-select   class=" form-control custom-select"
+                                              (change)="Project_DctoInvoice($event)" [clearable]="false">
+                                                    <ng-option *ngFor="let item of edit_ItemList"  [value]="item.id" class="form-control">
+                                                        {{item.name}}
+                                                      </ng-option>
+                                              </ng-select>
+
+                          </div>
+
+                           <label class="col-sm-2 col-form-label col-form-label-sm">Use DC</label>
+                          <div class="col-sm-4">
+                                      <ng-multiselect-dropdown
+                                          [placeholder]="'Select DCs'"
+                                          [data]="dc_list"
+                                          [(ngModel)]="selectedDCs"
+                                          [settings]="dropdownSettings"
+                                          (onSelect)="Dcitems($event)"
+                                          (onDeSelect)="RemoveDcitems($event)"
+                                          formControlName="dc_data" >
+                                        </ng-multiselect-dropdown>
+
+                          </div>
+                  </div>
+
+                <div  class="table-responsive">
+                  <div class="row">
+                   <div class="col-12 bottom-30" #tableResponsive>
+                     <table class="table table-striped resizable-table" id="wide-table">
+                       <thead>
+                         <tr>
+                           <th>ITEM NAME <div class="resizer"></div></th>
+                           <th>DESCRIPTION  <div class="resizer"></div></th>
+                           <th>QUANTITY <div class="resizer"></div></th>
+                           <th>UOM <div class="resizer"></div></th>
+                           <th>RATE <div class="resizer"></div></th>
+                           <th>TAX <div class="resizer"></div></th>
+                           <th>TOTAL <div class="resizer"></div></th>
+                             <th></th>
+                         </tr>
+                       </thead>
+                      <tbody *ngIf="invoice_type != 'items'" formArrayName="product">
+                        <tr *ngFor="let product of Edit_invoice.get('product')['controls']; let j = index;" [formGroupName]="j">
+                          <td style="min-width: 350px;">
+                            <!-- <select formControlName="items" class="form-control" >
+                              <option *ngFor="let item of edit_ItemList" [value]="item.id">{{item.name}}
+                            </option>
+                            </select> -->
+
+                            <ng-select  formControlName="items"
+                               class=" form-control custom-select" (change)="specProject($event, j)" [clearable]="false" (click)="adjustTableHeight()">
+                             <ng-option *ngFor="let item of edit_ItemList" [value]="item.id" class="form-control">
+                               {{item.name}}
+                             </ng-option>
+                           </ng-select>
+                          </td>
+                          <td style="min-width: 350px;">
+                            <textarea type="text" class="form-control form-control-sm" formControlName="descriptions"></textarea>
+                          </td>
+                          <td >
+                            <input type="number" #qtys (change)="edit_qty(qtys.value, price.value, j)" class="form-control form-control-sm" formControlName="quantity" />
+                          </td>
+                          <td >
+                            <input type="text" class="form-control form-control-sm" readonly formControlName="uom"/>
+                          </td>
+                          <td >
+                            <input type="number" #price (change)="edit_priceChange(qtys.value, price.value, j)" class="form-control form-control-sm" formControlName="price" />
+                          </td>
+
+                          <td >
+                            <input type="number" class="form-control form-control-sm" readonly formControlName="taxes"/>
+                          </td>
+                          <!-- <td>
+                            <select formControlName="taxes" class="form-control"  (change)="GSTCalculation_tax($event.target.value)" >
+                              <option *ngFor="let item of editGST_Data" [value]="item.rate">{{item.name}}
+                            </option>
+                          </select>
+                          </td> -->
+                          <td style="min-width: 200px;">
+                            <input type="number" class="form-control form-control-sm" readonly formControlName="amount">
+                          </td>
+                        </tr>
+                      </tbody>
+
+                      <tbody *ngIf="invoice_type == 'items'" formArrayName="product">
+                        <tr *ngFor="let product of Edit_invoice.get('product')['controls']; let j = index;" [formGroupName]="j">
+                          <td style="min-width: 350px;">
+                            <!-- <select formControlName="items" class="form-control" (change)="edit_specItem($event.target.value, j)">
+                              <option *ngFor="let item of edit_ItemList" [value]="item.id">{{item.name}}
+                            </option>
+                            </select> -->
+
+                            <ng-select  formControlName="items"  style="text-align: left;"
+                            class=" form-control custom-select" (change)="edit_specItem($event, j)" [clearable]="false" (click)="adjustTableHeight()">
+                             <ng-option *ngFor="let item of edit_ItemList" [value]="item.id" class="form-control">
+                               {{item.name}}
+                             </ng-option>
+                           </ng-select>
+                          </td>
+                          <td style="min-width: 350px;">
+                            <textarea type="text" class="form-control form-control-sm" formControlName="descriptions" ></textarea>
+                          </td>
+                          <td>
+                            <input type="number" #qtys (change)="edit_qty(qtys.value, price.value, j)" class="form-control form-control-sm" formControlName="quantity" />
+                          </td>
+                          <td>
+                            <input type="text" class="form-control form-control-sm" readonly formControlName="uom"/>
+                          </td>
+                          <td>
+                            <input type="number" #price (change)="edit_priceChange(qtys.value, price.value, j)" class="form-control form-control-sm" formControlName="price" />
+                          </td>
+                          <td>
+                            <input type="number" class="form-control form-control-sm" readonly formControlName="taxes"/>
+                          </td>
+                          <td style="min-width: 200px;">
+                            <input type="number" class="form-control form-control-sm" readonly formControlName="amount">
+                          </td>
+                          <td *ngIf="product.get('dc_id')?.value == 0" class="col-sm-1 mt-2 " (click)="onDeleteRow(j)" [disabled]="Edit_invoice.controls.product.controls.length === 1">
+                            <i style="color: red;" class="far fa-times-circle"></i>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+            </div>
+                <div *ngIf="invoice_type == 'items'" class="row">
+                  <div  class="col-sm-12">
+                    <Button type="button" (click)="edit_initProduct()" class="btn btn-primary">+</Button>
+                  </div>
+                </div>
+
+                <div class="row mb-2">
+                  <div class="col-sm-5"></div>
+                  <div class="col-sm-2">
+                    <div style="text-align: right">Sub Total</div>
+                  </div>
+                  <div class="col-sm-2"></div>
+                  <div style="color: gray;" class="col-sm-2">
+                    <input type="text" style="text-align: end"
+                      class="form-control form-control-sm" readonly formControlName="subTotal"/>
+                  </div>
+                  <div class="col-sm-1"></div>
+                </div>
+                <span *ngFor="let gst of editGST_Data">
+                  <div class="row mb-2" *ngIf="gst.amount != 0">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-3">
+                      <div style="text-align: right">{{gst.name}}</div>
+                    </div>
+                    <div class="col-sm-2"></div>
+                    <div style="color: gray;" class="col-sm-2">
+                      <input type="text" style="text-align: end"
+                        class="form-control form-control-sm" readonly [value]="gst.amount"/>
+                    </div>
+                    <div class="col-sm-1"></div>
+                  </div>
+                </span>
+
+                <div class="row  mb-2">
+                  <div class="col-sm-5"></div>
+                  <div class="col-sm-2">
+                    <div style="text-align: right">Shipping Charges</div>
+                  </div>
+                  <div class="col-sm-2 ">
+                  </div>
+                  <div class="col-sm-2" style="color: gray;">
+                    <input type="number" (change)="edit_FinalTotalCalculation()" formControlName="shippingCharge" style="text-align: end"
+                      class="form-control form-control-sm" />
+                  </div>
+                  <div class="col-sm-1"></div>
+                </div>
+
+                <div class="row mb-2">
+                  <div class="col-sm-5"> </div>
+                  <div class="col-sm-2">
+                    <div class="mt-2" style="text-align: right">TDS</div>
+                  </div>
+                  <div class="col-sm-2">  <input type="number" (input)="tdsCalculation()" [(ngModel)]="tds_percent" style="text-align: end" formControlName="tds_percentage" class="form-control form-control-sm" > </div>
+                  <div style="color: gray;" class="col-sm-2">
+                    <input type="number" (change)="edit_FinalTotalCalculation()" style="text-align: end" formControlName="TDS"
+                      class="form-control form-control-sm" />
+                  </div>
+                  <div class="col-sm-1"></div>
+                </div>
+
+                <div class="row mb-2">
+                  <div class="col-sm-5"> </div>
+                  <div class="col-sm-2">
+                    <div class="mt-2" style="text-align: right">TCS</div>
+                  </div>
+                  <div class="col-sm-2"> <input type="number" (input)="tcsCalculation()" [(ngModel)]="tcs_percent" style="text-align: end" formControlName="tcs_percentage" class="form-control form-control-sm" > </div>
+                  <div style="color: gray;" class="col-sm-2">
+                    <input type="number" (change)="edit_FinalTotalCalculation()" style="text-align: end" formControlName="TCS"
+                      class="form-control form-control-sm" />
+                  </div>
+                  <div class="col-sm-1"></div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-sm-5"></div>
+                  <div class="col-sm-2">
+                    <div class="mt-2" style="text-align: right">Round Off</div>
+                  </div>
+                  <div class="col-sm-2"> </div>
+                  <div style="color: gray;" class="col-sm-2">
+                    <input type="number" style="text-align: end" (change)="edit_FinalTotalCalculation()" formControlName="roundOff"
+                      class="form-control form-control-sm" />
+                  </div>
+                  <div class="col-sm-1"></div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-sm-6">
+                    <label style="font-size: 14px">Customer Notes</label>
+                    <textarea class="form-control form-control-sm" style="height: 50px" formControlName="notes"
+                      placeholder="Enter any notes to be displayed in your transaction"
+                      [(ngModel)]="notes">{{notes}} </textarea>
+
+                    <span class="help-block text-danger"
+                      *ngIf="Edit_invoice.get('notes').touched && Edit_invoice.get('notes').hasError('required')">Enter
+                      Notes !</span>
+                  </div>
+
+                  <div class="col-sm-3 mt-5">
+                    <h2>Total</h2>
+                  </div>
+
+                  <div class="col-sm-2 mt-5">
+                    <input type="text" style="text-align: end"
+                      class="form-control form-control-sm" readonly formControlName="total" />
+                  </div>
+                  <div class="col-sm-1"></div>
+                </div>
+
+                <div class="row mt-3">
+
+                  <div class="col-sm-8">
+                    <label style="font-size: 14px">Terms & Conditions</label>
+                    <textarea formControlName="terms_condition" class="form-control form-control-sm"
+                      style="height: 100px"
+                      placeholder="Enter the terms and conditions of your business to be displayed in your transaction"
+                      [(ngModel)]="terms_condition">{{terms_condition}}</textarea>
+                    <span class="help-block text-danger"
+                      *ngIf="Edit_invoice.get('terms_condition').touched && Edit_invoice.get('terms_condition').hasError('required')">Enter
+                      Terms & Conditions !</span>
+                  </div>
+                </div>
+
+                <div class="row mt-3 mb-3">
+                  <div class="col-sm-6">
+                    <button [disabled]="loading" style="background-color: #d64830; border-color: #d64830; color: #fff; " type="button"
+                      class="btn btn-outline-secondary" (click)="onSubmit(Edit_invoice.value)">
+                      <i class="fa fa-spinner fa-spin" *ngIf="loading"></i>
+                      Submit
+                    </button>
+                    <button type="button" style=" background-color: #f5f5f5; color: #212529; border-color: #ddd;"
+                      class="btn btn-outline-secondary ml-2"  (click)="cancel()">
+                      <i class="fa fa-spinner fa-spin" *ngIf="loading"></i>
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #ewayBill let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">E Way Bill</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="e_way_bill" (ngSubmit)="billSubmit(e_way_bill.value)">
+      <div class="row">
+
+      <div class="form-group col-md-3">
+        <label>E Way BillNo</label>
+      </div>
+      <div class="form-group col-md-9">
+        <input formControlName="bill_no"  placeholder="Enter E_Way BillNo" type="text"
+          class="form-control">
+        <span class="help-block text-danger" *ngIf="e_way_bill.get('bill_no').touched && e_way_bill.get('bill_no').hasError('required')">E way Bill Number Required !</span>
+      </div>
+
+      <div class="form-group col-md-3">
+        <label>Vehicle No</label>
+      </div>
+      <div class="form-group col-md-9">
+        <input formControlName="vehicle_no"  placeholder="Enter Vehicle No" type="text"
+          class="form-control">
+        <span class="help-block text-danger" *ngIf="e_way_bill.get('vehicle_no').touched && e_way_bill.get('vehicle_no').hasError('required')">Bill Required !</span>
+      </div>
+
+      <div class="form-group col-md-3">
+        <label>Shipment Mode</label>
+      </div>
+      <div class="form-group col-md-9">
+        <input formControlName="shipment_mode"  placeholder="Enter Shipment Mode" type="text"
+          class="form-control">
+        <span class="help-block text-danger" *ngIf="e_way_bill.get('shipment_mode').touched && e_way_bill.get('shipment_mode').hasError('required')">Shipment Mode Required !</span>
+      </div>
+      <div class="col-md-12">
+        <div class="row justify-content-center">
+          <button  [disabled]="loading" class="btn btn-success" type="submit">Submit<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+        </div>
+      </div>
+
+    </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #delete let-modal>
+  <div class="modal-header state modal-danger">
+    <h2 class="modal-title" id="modal-primary-label">Delete Confirmation</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    Are you sure to delete this Invoice!
+  </div>
+  <div class="modal-footer">
+      <button [disabled]="loading" type="button" class="btn btn-danger" data-dismiss="modal" (click)="ReqDelete()">Delete<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      <button type="button" class="btn btn-success" data-dismiss="modal" (click)="modal.dismiss('Cross click')">Close</button>
+  </div>
+</ng-template>
+
+<div class="modal fade" id="lg-modal" tabindex="-1" role="dialog" aria-labelledby="modal-large-label"
+  style="display: none;">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header state modal-primary">
+          <h4 class="modal-title" id="modal-large-label">Select Your Bill Address</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">×</span></button>
+        </div>
+        <div class="modal-body">
+          <select  class="form-control w-500 col-md-12" (click)="ReloadBillAddr($event.target.value)">
+            <option *ngFor=" let addr of alldata" [value]="addr.cust_addr_id">
+              {{addr.attention + " "+ addr.address_line_1 +" "+ addr.address_line_2 +" "+
+              addr.city +" "+ addr.state +" "+ addr.zip_code }}</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ship-address" tabindex="-1" role="dialog"
+aria-labelledby="modal-large-label" style="display: none;">
+<div class="modal-dialog modal-lg" role="document">
+  <div class="modal-content">
+    <div class="modal-header state modal-primary">
+      <h4 class="modal-title" id="modal-large-label">Select Your Ship Address</h4>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+          aria-hidden="true">×</span></button>
+    </div>
+    <div class="modal-body">
+      <select  class="form-control w-500 col-md-12" (click)="ReloadShippAddr($event.target.value)">
+        <option *ngFor=" let addr of alldata1" value="{{addr.cust_addr_id}}">
+          {{addr.attention + " "+ addr.address_line_1 +" "+ addr.address_line_2 +" "+
+          addr.city +" "+ addr.state +" "+ addr.zip_code }}</option>
+      </select>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+    </div>
+  </div>
+</div>
+</div>
+
+
+
+<ng-template #use_advancePayment let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Use Advance Payment</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="advance" (ngSubmit)="Add_advance(advance.value)">
+
+      <div class="form-group">
+        <label for="exampleSelect3">Mode of Transfer</label>
+        <!-- <select formControlName="advance_id" class="form-control custom-select">
+            <option value = "0" selected>Select Mode</option>
+            <option *ngFor= "let list of advance_list" value="{{list.id}}" >{{list.debit | indianCurrency}} | {{list.date}}</option>
+        </select> -->
+
+          <ng-select  formControlName="advance_id"  style="text-align: left;" class=" form-control custom-select"  [clearable]="false">
+              <ng-option *ngFor="let item of advance_list" [value]="item.id" class="form-control">
+              {{item.debit| indianCurrency}} | {{item.date}}
+              </ng-option>
+          </ng-select>
+        <span class="help-block text-danger" *ngIf="advance.get('advance_id').touched && advance.get('advance_id').hasError('required')">Must Select !</span>
+        <span class="help-block text-danger" *ngIf="advance.get('advance_id').touched && advance.get('advance_id').hasError('min')">Select One Type</span>
+      </div>
+
+      <div class="form-group">
+        <label for="input-1">Description</label>
+        <input type="text" formControlName="description" class="form-control" id="input-1">
+        <span class="help-block text-danger" *ngIf="advance.get('description').touched && advance.get('description').hasError('required')">Description Required !</span>
+        <span class="help-block text-danger" *ngIf="advance.get('description').touched && advance.get('description').hasError('minlength')">Minimum 3 Letters</span>
+      </div>
+      <div class="form-group">
+        <button [disabled]="loading" class="btn btn-info btn-block" type="submit">Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i> </button>
+    </div>
+  </form>
+  </div>
+ </ng-template>
+
+  <ng-template #delete_item let-modal>
+  <div class="modal-header state modal-danger">
+    <h2 class="modal-title" id="modal-primary-label">Delete Confirmation</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    Are you sure to delete this Item!
+  </div>
+  <div class="modal-footer">
+      <button [disabled]="loading" type="button" class="btn btn-danger" data-dismiss="modal" (click)="Delete()">Delete<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      <button type="button" class="btn btn-success" data-dismiss="modal" (click)="modal.dismiss('Cross click')">Close</button>
+  </div>
+</ng-template>
+
+  <ng-template #delete_item_dc let-modal>
+  <div class="modal-header state modal-danger">
+    <h2 class="modal-title" id="modal-primary-label">Delete Confirmation</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    Are you sure to delete this Item!
+  </div>
+  <div class="modal-footer">
+      <button [disabled]="loading" type="button" class="btn btn-danger" data-dismiss="modal" (click)="DC_itemDelete()">Delete<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+     <button type="button" class="btn btn-success" (click)="Cancel()">Close</button>
+
+  </div>
+</ng-template>
+
+

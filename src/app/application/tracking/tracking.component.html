@@ -1,0 +1,613 @@
+<div *ngIf="selected.length == 0 && !asso_detail_show && !byproduct_detail_show && !product_detail_show">
+  <div class="col-md-12">
+    <table>
+      <tr>
+        <td style="width: 10px;">
+          <h1><small></small></h1>
+        </td>
+        <td style="width: 250px;">
+          <h5>TRACKING</h5>
+        </td>
+        <td style="width: 1100px;">
+          <div class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input class="form-control" type="text" placeholder="Search Project by Project Name or Customer Name..." (keyup)="updateFilter($event)"/>
+          </div>
+        </td>
+        <td style="width: 100px;"> </td>
+        <td style="width: 100px; text-align: center; vertical-align: center;">
+        </td>
+        <td style="width: 200px; text-align: center; vertical-align: center;">
+          <div class="btn-group" role="group" aria-label="Basic example">
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+      <ngx-datatable
+          #table
+          class="custom_table"
+          [headerHeight]="50"
+          [limit]="10"
+          [columnMode]="'force'"
+          [footerHeight]="50"
+          [rowHeight]="'auto'"
+          [rows]="projects"
+          [selected]="selected"
+          [selectionType]="'single'"
+          (activate)="onActivate($event)">
+
+          <ngx-datatable-column prop="type"  name="TYPE">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.type}}
+              </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="name"  name="NAME">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                  <span style="font-weight:bold;">{{row.name}}</span>
+              </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column  prop="capacity" alig name="CAPACITY">
+              <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.capacity}}
+              </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="customer" name="CUSTOMER">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.customer}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="start"  [sortable] = "false" name="START">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.start |date:'dd-MM-YYYY'}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="end" [sortable] = "false" name="END">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.end|date:'dd-MM-YYYY'}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="level"  name="STATUS" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              <label *ngIf="row.level == 0" style="color:red"><strong>New</strong></label>
+              <label *ngIf="row.level == 1" style="color:blue"><strong>Production</strong></label>
+              <label *ngIf="row.level == 2" style="color:orange"><strong>Process</strong></label>
+              <label *ngIf="row.level == 3" style="color:green"><strong>Process</strong></label>
+              <label *ngIf="row.level == 4" style="color:gray"><strong>Completed</strong></label>
+            </ng-template>
+          </ngx-datatable-column>
+      </ngx-datatable>
+  </div>
+
+
+  <div *ngIf="selected.length > 0 && !asso_detail_show && !byproduct_detail_show && !product_detail_show">
+    <div  style=" display: flex;flex-wrap: wrap;justify-content: space-between;">
+      <div>
+            <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero()"> Back</button>
+      </div>
+
+    </div>
+    &nbsp;
+    <div class="row">
+      <div class="col-lg-12">
+        <div widget class="card">
+          <div class="card-header">
+            <span>Project Detailed View</span>
+
+          </div>
+          <div class="card-body widget-body">
+            <div class="row">
+              <table class="table col-md-6">
+                <tbody>
+                    <tr>
+                        <th>Project Name</th>
+                        <td>{{detail_view.name}}</td>
+                    </tr>
+                    <tr>
+                      <th>Customer</th>
+                      <td>{{detail_view.customer}}</td>
+                    </tr>
+                    <tr>
+                      <th> Project Type</th>
+                      <td>{{detail_view.type}}</td>
+                    </tr>
+                    <tr>
+                      <th> Project Created at</th>
+                      <td>{{track_data.project_created_at  |date:'dd-MM-YYYY'}}</td>
+                    </tr>
+                    <tr>
+                      <th>Capacity</th>
+                      <td>  {{track_data.project_capacity}}  </td>
+                    </tr>
+                </tbody>
+              </table>
+              <table class="table col-md-6">
+                <tbody>
+                  <tr>
+                    <th>Project Value</th>
+                    <td>{{track_data.project_value| indianCurrency}}</td>
+                  </tr>
+
+                  <tr>
+                    <th>Project Association Cost</th>
+                    <td *ngIf="track_data.project_asso_cost" >{{track_data.project_asso_cost| indianCurrency}}</td>
+                    <td *ngIf="!track_data.project_asso_cost" >{{0| indianCurrency}}</td>
+                  </tr>
+                  <tr>
+                    <th> Item Cost (Without Association)</th>
+                    <td>{{track_data.project_items_cost| indianCurrency }}</td>
+                  </tr>
+                  <tr>
+                    <th> Expense</th>
+                    <td>{{track_data.expense_total_amount| indianCurrency }}</td>
+                  </tr>
+                  <tr>
+                    <th>Project Cost</th>
+                    <td>{{total_projectCost| indianCurrency}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    &nbsp;
+
+    <h5 style="text-align: center;" *ngIf="association_list " > <b>Association List</b></h5>
+        <ngx-datatable *ngIf="association_list"
+          #table
+          class="custom_table"
+          [headerHeight]="50"
+          [limit]="8"
+          [columnMode]="'force'"
+          [footerHeight]="50"
+          [rowHeight]="'auto'"
+          [rows]="association_list"
+          [selected]="selected"
+          [selectionType]="'single'"
+          (activate)="asso_select($event)">
+
+        <ngx-datatable-column prop="association_category"  name="TYPE">
+            <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.association_category}}
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="association_date_time"  name="CREATED DATE">
+            <ng-template ngx-datatable-cell-template let-row="row">
+                <span style="font-weight:bold;">{{ row.association_date_time | date:'dd-MM-YYYY' }}
+                </span>
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column  prop="association_description" alig name="DESCRIPTION">
+            <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.association_description}}
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column  prop="total_byproduct_cost" alig name="ASSOCIATION COST">
+          <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.total_byproduct_cost| indianCurrency}}
+          </ng-template>
+      </ngx-datatable-column>
+      </ngx-datatable>
+       &nbsp;
+
+       <h5 style="text-align: center;" *ngIf="itemWithoutAsso_length >0" > <b>Item List(Without Association)</b></h5>
+        <ngx-datatable *ngIf="itemWithoutAsso_length >0"
+              #table
+              class="custom_table"
+              [headerHeight]="50"
+              [limit]="8"
+              [columnMode]="'force'"
+              [footerHeight]="50"
+              [rowHeight]="'auto'"
+              [rows]="itemWithoutAsso"
+              [selected]="selected"
+              [selectionType]="'single'" >
+
+        <ngx-datatable-column prop="name"  name="ITEM NAME">
+            <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.name }}
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="hsnsac" name="HSN">
+            <ng-template ngx-datatable-cell-template let-row="row">
+                <span style="font-weight:bold;">{{ row.hsnsac  }}
+                </span>
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column  prop="value" alig name="QUANTITY">
+            <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.value}} {{row.uom}}
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column  prop="price" alig name="PRICE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.price| indianCurrency}}
+          </ng-template>
+      </ngx-datatable-column>
+        <ngx-datatable-column   name="TOTAL AMOUNT">
+          <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.value*row.price | indianCurrency}}
+          </ng-template>
+      </ngx-datatable-column>
+
+
+
+      </ngx-datatable>
+       &nbsp;
+
+      <h5 style="text-align: center;" *ngIf="expense_list" > <b>Expension List</b></h5>
+        <ngx-datatable *ngIf="expense_list"
+        #table
+        class="custom_table"
+        [headerHeight]="50"
+        [limit]="8"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="expense_list"
+        [selected]="selected"
+        [selectionType]="'single'"
+        (activate)="expense_select($event)">
+
+        <ngx-datatable-column prop="exp_account_name"  name="TYPE">
+            <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.exp_account_name }}
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="exp_date"  name="TRANSACTION DATE">
+            <ng-template ngx-datatable-cell-template let-row="row">
+                <span style="font-weight:bold;">{{ row.exp_date |date:'dd-MM-YYYY' }}
+                </span>
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column  prop="bank_name" alig name="BANK">
+            <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.bank_name}}
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column  prop="mode_of_transfer" alig name="MODE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.mode_of_transfer}}
+          </ng-template>
+      </ngx-datatable-column>
+
+        <ngx-datatable-column  prop="amount" alig name="AMOUNT">
+          <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.amount|indianCurrency}}
+          </ng-template>
+      </ngx-datatable-column>
+
+      </ngx-datatable>
+  </div>
+
+
+<div *ngIf="asso_detail_show ">
+  <div>
+    <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero()"> Back</button>
+    <h6></h6>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div widget class="card">
+        <div class="card-header">
+          <span>Association Detailed View</span>
+
+        </div>
+        <div class="card-body widget-body">
+          <div class="row">
+            <table class="table col-md-6">
+              <tbody>
+
+                  <tr>
+                      <th>Association Name</th>
+                      <td>{{asso_details.association_category}}</td>
+                  </tr>
+                  <tr>
+                    <th>Description</th>
+                    <td>{{asso_details.association_description}}</td>
+                  </tr>
+
+
+
+              </tbody>
+            </table>
+            <table class="table col-md-6">
+              <tbody>
+                    <tr>
+                      <th>Association Value</th>
+                      <td>{{asso_details.total_byproduct_cost| indianCurrency}}</td>
+                  </tr>
+
+                  <tr>
+                    <th> Association Created</th>
+                    <td>{{asso_details.association_date_time | date:'dd-MM-YYYY'}}</td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  &nbsp;
+
+  <h5 style="text-align: center;" *ngIf="byproduct_list" > <b>ByProduct List</b></h5>
+      <ngx-datatable *ngIf="byproduct_list"
+        #table
+        class="custom_table"
+        [headerHeight]="50"
+        [limit]="8"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="byproduct_list"
+        [selected]="selected"
+        [selectionType]="'single'"
+        (activate)="bypro_select($event)">
+
+      <ngx-datatable-column prop="byproduct_category"  name="TYPE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.byproduct_category}}
+          </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="byproduct_date_time"  name="CREATED DATE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              <span style="font-weight:bold;">{{ row.byproduct_date_time | date:'dd-MM-YYYY' }}
+              </span>
+          </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column  prop="byproduct_description"  name="DESCRIPTION">
+          <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.byproduct_description}}
+          </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column  prop="total_production_cost"  name="ASSOCIATION COST">
+        <ng-template ngx-datatable-cell-template let-row="row">
+        {{row.total_production_cost| indianCurrency}}
+        </ng-template>
+    </ngx-datatable-column>
+    </ngx-datatable>
+
+</div>
+
+<div *ngIf="byproduct_detail_show ">
+  <div>
+    <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero()"> Back</button>
+    <h6></h6>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div widget class="card">
+        <div class="card-header">
+          <span>ByProduct Detailed View</span>
+
+        </div>
+        <div class="card-body widget-body">
+          <div class="row">
+            <table class="table col-md-6">
+              <tbody>
+
+                  <tr>
+                      <th>ByProduct Name</th>
+                      <td>{{byproduct_details.byproduct_category}}</td>
+                  </tr>
+                  <tr>
+                    <th>Description</th>
+                    <td>{{byproduct_details.byproduct_description}}</td>
+                  </tr>
+
+
+
+              </tbody>
+            </table>
+            <table class="table col-md-6">
+              <tbody>
+                    <tr>
+                      <th>ByProduct Value</th>
+                      <td>{{byproduct_details.total_production_cost| indianCurrency}}</td>
+                  </tr>
+
+                  <tr>
+                    <th> ByProduct Created</th>
+                    <td>{{byproduct_details.byproduct_date_time | date:'dd-MM-YYYY'}}</td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  &nbsp;
+
+  <h5 style="text-align: center;" *ngIf="product_list" > <b>Product List</b></h5>
+      <ngx-datatable *ngIf="product_list"
+        #table
+        class="custom_table"
+        [headerHeight]="50"
+        [limit]="8"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="product_list"
+        [selected]="selected"
+        [selectionType]="'single'"
+        (activate)="pro_select($event)">
+
+      <ngx-datatable-column prop="name"  name="ITEM NAME">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.name}}
+          </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="hsnsac"  name="HSN">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              <span style="font-weight:bold;">{{ row.hsnsac }}
+              </span>
+          </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column  prop="qty"  name="QUANTITY">
+          <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.qty}} {{row.uom}}
+          </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column  prop="total"  name="AMOUNT">
+        <ng-template ngx-datatable-cell-template let-row="row">
+        {{row.total| indianCurrency}}
+        </ng-template>
+    </ngx-datatable-column>
+    </ngx-datatable>
+
+</div>
+
+<div *ngIf="product_detail_show ">
+  <div>
+    <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero()"> Back</button>
+    <h6></h6>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div widget class="card">
+        <div class="card-header">
+          <span>Product Detailed View</span>
+        </div>
+        <div class="card-body widget-body">
+          <div class="row">
+            <table class="table col-md-6">
+              <tbody>
+
+                  <tr>
+                      <th>Item Name</th>
+                      <td>{{product_details.name}}</td>
+                  </tr>
+                  <tr>
+                    <th>Description</th>
+                    <td>{{product_details.description}}</td>
+                  </tr>
+
+                  <tr>
+                    <th>Batch</th>
+                    <td>{{product_details.batch}}</td>
+                  </tr>
+
+                  <tr>
+                    <th>Bill Number</th>
+                    <td>{{product_details.bill_number}}</td>
+                  </tr>
+
+                  <tr>
+                    <th>Inward By</th>
+                    <td>{{product_details.inward_by}}</td>
+                  </tr>
+
+              </tbody>
+            </table>
+            <table class="table col-md-6">
+              <tbody>
+                    <tr>
+                      <th>Item Rate</th>
+                      <td>{{product_details.price| indianCurrency}}</td>
+                  </tr>
+
+                  <tr>
+                    <th>Quantity</th>
+                    <td>{{product_details.qty}} {{product_details.uom}}</td>
+                  </tr>
+                  <tr>
+                    <th>Total </th>
+                    <td>{{product_details.total| indianCurrency}}</td>
+                  </tr>
+                  <tr>
+                    <th>Vendor </th>
+                    <td>{{product_details.vendor}}</td>
+                  </tr>
+                  <tr>
+                    <th>Bill Date </th>
+                    <td>{{product_details.bill_date | date:'dd-MM-YYYY'}}</td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+<!-- <div *ngIf="selected.length > 0">
+  <div class="modal-header">
+    <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero($event)"> Back</button>
+  </div>
+  <div widget class="card">
+    <div class="card-header">
+      <span class="text-uppercase">Tracking</span>
+    </div>
+    <div class="card-body">
+      <div>
+        <i class="fas fa-angle-right"> </i>
+        <strong>{{track_data.project_name}}</strong> Created on {{track_data.project_created_at}} by {{track_data.project_created_by}} for <strong>{{track_data.project_customer_name}}</strong> at the material cost of <strong>{{track_data.project_asso_cost+track_data.project_asso_con_cost | indianCurrency}}</strong> , expense cost of <strong>{{track_data.expense_total_amount | indianCurrency}}</strong> and the total cost of <strong>{{track_data.project_asso_cost + track_data.project_asso_con_cost + track_data.expense_total_amount | indianCurrency}}</strong>
+        . It is <strong>{{value}} % </strong>of your project value excluding labor. This project starts on {{track_data.project_start_date}} and ends on or before {{track_data.project_end_date}} with in the cost of <strong>{{track_data.project_value | indianCurrency}}</strong>.
+        <br>
+        <br>
+        <span class="card card-outline-info">
+          <span *ngFor= "let asso_list of track_data.project_asso_list; let i = index;">
+            <p style="margin-left:1em"> <i class="fa fa-check"> ( {{i+1}} ) </i>  The Association <strong>{{asso_list.association_category}}</strong> Created on {{asso_list.association_date_time}} by {{asso_list.association_created_by}} at the cost of <span *ngIf="asso_list.association_has_sub_item == 1"> <strong>{{asso_list.total_byproduct_cost | indianCurrency}}</strong></span><span *ngIf="asso_list.association_has_sub_item == 0"> {{asso_list.con_amount | indianCurrency}}</span></p>
+            <span *ngIf="asso_list.association_has_sub_item === 1">
+              <span  *ngFor= "let by_product_list of asso_list.byproduct_list; let j = index;">
+                <p style="margin-left:2em"> <i class="fa fa-book"> ( {{i+1}}.{{j+1}} ) </i> The By product <strong> {{by_product_list.byproduct_category}}</strong> was created on {{by_product_list.byproduct_date_time}} by {{by_product_list.byproduct_created_by}} with the description of : {{by_product_list.byproduct_description}}; at the cost of <strong>{{by_product_list.total_production_cost | indianCurrency}} .</strong> </p>
+                <span *ngFor= "let production_list of by_product_list.production_list; let k = index;">
+                  <p style="margin-left:3em"> <i class="fa fa-bookmark-o"> ( {{i+1}}.{{j+1}}.{{k+1}} ) </i> The Production material <strong> {{production_list.production_product_name}}</strong> was created on {{production_list.production_date_time}} by {{production_list.production_created_by}}, batch number {{production_list.production_batch}}, assign to Mr.{{production_list.production_assign_name}} and the work started at {{production_list.production_start_datetime}} ended at {{production_list.production_end_datetime}} at the cost of {{production_list.total_outward_cost | indianCurrency}} using the below raw materials.</p>
+                </span>
+              </span>
+            </span>
+            <span style="margin-left:2em" *ngIf="asso_list.association_has_sub_item === 0 && asso_list.association_connection != null">
+                <i class="fa fa-book"> </i> The Readymade product <strong> {{asso_list.con_item_name}}</strong> with discription of :{{asso_list.con_item_description}} ; and the hsn code : {{asso_list.con_hsn}}, batch number : {{asso_list.con_batch}}, amount : <strong>{{asso_list.con_amount | indianCurrency}}</strong>
+            </span>
+            <span style="margin-left:2em" *ngIf="asso_list.association_has_sub_item === 0 && asso_list.association_connection == null">
+              <i class="fa fa-book"> </i> No Readymade product added with this association
+            </span>
+          </span>
+        </span>
+        <br>
+        <span class="card card-outline-warning">
+          <span *ngFor= "let exp_list of track_data.expense_list">
+            <p style="margin-left:1em"> <i class="fa fa-fighter-jet"> </i> {{exp_list.exp_account_name}} made by Mr.{{exp_list.creater_name}} at {{exp_list.exp_date}} as a {{exp_list.exp_type}}. The amount of <strong>{{exp_list.amount | indianCurrency}}</strong>.</p>
+          </span>
+        </span>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+
+
+
+
+

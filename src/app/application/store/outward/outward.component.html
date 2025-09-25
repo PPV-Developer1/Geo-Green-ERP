@@ -1,0 +1,327 @@
+<div *ngIf="selected.length === 0" >
+  <div class="col-md-12">
+    <table>
+      <tr>
+        <td style="width: 10px;">
+          <h1><small></small></h1>
+        </td>
+        <td style="width: 300px;">
+          <h5>OUTWARD</h5>
+        </td>
+        <td style="width: 900px;">
+          <div class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input class="form-control" type="text" placeholder="Search Project Name or Product Name or Assign Name..." (keyup)="updateFilter($event)"/>
+          </div>
+        </td>
+        <td style="width: 100px;"> </td>
+        <td style="width: 100px; text-align: center; vertical-align: center;">
+        </td>
+        <td style="width: 200px; text-align: center; vertical-align: center;">
+          <div class="btn-group" role="group" aria-label="Basic example">
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+
+  <ngx-datatable
+    #table
+    class="custom_table"
+    [headerHeight]="50"
+    [limit]="20"
+    [columnMode]="'force'"
+    [footerHeight]="50"
+    [rowHeight]="'auto'"
+    [rows]="product_details"
+    [selected]="selected"
+    [selectionType]="'single'"
+    (activate)="onActivate($event)">
+
+    <!-- <ngx-datatable-column  name="ID" >
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.id}}
+        </ng-template>
+    </ngx-datatable-column> -->
+
+    <ngx-datatable-column prop="start_datetime"   name="STARTED AT">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.start_datetime | date: 'dd-MM-yyyy HH:mm:ss'}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="assign_name" name="ASSIGN TO">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.assign_name}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="project_name" name="PROJECT NAME">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        <span *ngIf="row.type == 1">{{row.project_name}}</span>
+        <span *ngIf="row.type == 2"> <strong>For Store</strong></span>
+      </ng-template>
+    </ngx-datatable-column>
+
+
+       <ngx-datatable-column prop="by_product_no" name="PRODUCT NO">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.by_product_no}}
+      </ng-template>
+    </ngx-datatable-column>
+    
+    <ngx-datatable-column prop="product_name" name="PRODUCT NAME">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.product_name}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="level" name="LEVEL">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        <span *ngIf="row.level === 1">Created</span>
+        <span *ngIf="row.level === 2">Waiting For Approval</span>
+        <span *ngIf="row.level === 3">Move to Production</span>
+        <span *ngIf="row.level === 4">Completed</span>
+      </ng-template>
+    </ngx-datatable-column>
+  </ngx-datatable>
+</div>
+
+
+<div *ngIf="selected.length > 0">
+  <div class="modal-header">
+    <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero($event)"> Back</button>
+    <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true"
+        aria-expanded="false">
+        Action
+      </button>
+      <div class="dropdown-menu">
+        <a class="dropdown-item" href="javascript:void(0);" (click)="AddOutwardButton($event)">Add Outward Item</a>
+
+        <a class="dropdown-item" href="javascript:void(0);" (click)="OpenStatusUpdate($event)">Complete The Product</a>
+      </div>
+  </div>
+  <ngx-datatable
+    #table
+    class="custom_table"
+    [headerHeight]="50"
+    [limit]="10"
+    [columnMode]="'force'"
+    [footerHeight]="50"
+    [rowHeight]="'auto'"
+    [rows]="outwardList"
+    [selected]="selected"
+    [selectionType]="'single'"
+    (activate)="onIntActive($event)">
+
+    <!-- <ngx-datatable-column name="ID" >
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.id}}
+        </ng-template>
+    </ngx-datatable-column> -->
+
+    <ngx-datatable-column prop="date_time" name="DATE & TIME">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.date_time | date: 'dd-MM-yyyy HH:mm:ss'}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="batch" name="BATCH NUMBER">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.batch}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="item_name" name="ITEM NAME">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.item_name}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="qty" name="QUANTITY">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.qty}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="notes" name="NOTES">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.notes}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column>
+      <ng-template ngx-datatable-cell-template let-row="row">
+        <button class="btn btn-danger btn-sm fa fa-trash" (click)="delete_item(row)"> Delete</button>
+             &nbsp;
+        <button  class="btn btn-info btn-sm fa fa-pencil" (click)="edit(row)" > Edit</button>
+
+    </ng-template>
+    </ngx-datatable-column>
+  </ngx-datatable>
+</div>
+
+
+<ng-template #AddOutward let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">OUTWARD ENTRY</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="Outward" (ngSubmit)="OutwardSubmit(Outward.value)">
+      <div class="row">
+        <div class="form-group col-4">
+          Outward Date & Time
+        </div>
+        <div class="form-group col-6">
+          <input formControlName="outward_at" type="datetime-local" class="form-control" format="MM-DD-YYYY HH:mm" id="input-11">
+          <span class="help-block text-danger" *ngIf="Outward.get('outward_at').touched && Outward.get('outward_at').hasError('required')">Inward Date Time Required !</span>
+        </div>
+
+        <div class="form-group col-4">
+          <label for="input-15">Select Item</label>
+        </div>
+        <div class="form-group col-6">
+
+          <!-- <select formControlName ="item_id" class="form-control custom-select" id="batch" (change)="LoadBatch($event.target.value)">
+            <option value="0">select Item</option>
+            <option *ngFor= "let item of category_list" [value] = "item.item_id" >{{item.name}}</option>
+          </select> -->
+
+
+          <ng-select formControlName="item_id"  class=" form-control custom-select" id="batch" (change)="LoadBatch($event)"  [clearable]="false" >
+            <ng-option *ngFor="let item of category_list" value ="{{item.item_id}}" class="form-control">
+              {{item.name}}
+            </ng-option>
+          </ng-select>
+
+          <span class="help-block text-danger" *ngIf="Outward.get('item_id').touched && Outward.get('item_id').hasError('required')">Item Required !</span>
+        </div>
+
+        <div class="form-group col-4" *ngIf="batchList != null">
+
+          <label for="input-15">Select Batch</label>
+        </div>
+        <div class="form-group col-6" *ngIf="batchList != null">
+          <!-- <select formControlName ="batch_id" class="form-control custom-select" id="exampleSelect3" (change)="LoadQty($event.target.value)">
+            <option value="0">Select Batch</option>
+            <option *ngFor= "let item of batchList" value={{item.stock_id}}>{{item.batch}}</option>
+          </select> -->
+
+          <ng-select formControlName="batch_id"  class=" form-control custom-select" id="exampleSelect3" (change)="LoadQty($event)"  [clearable]="false" >
+            <ng-option *ngFor= "let item of batchList" [value]="item.stock_id" class="form-control">
+              {{item.batch}}
+            </ng-option>
+          </ng-select>
+          <span class="help-block text-danger" *ngIf="Outward.get('batch_id').touched && Outward.get('batch_id').hasError('required')"> Required !</span>
+        </div>
+
+        <div class="form-group col-4" *ngIf="batchQty != null && batchList!= null ">
+          <label for="input-15">Enter Quantity</label>
+        </div>
+        <div class="form-group col-6" *ngIf="batchQty != null && batchList != null">
+          <input formControlName ="quantity" type="number" class="form-control" id="input-10" (click)="ClearError()">
+          <span class="help-block text-danger" *ngIf="Outward.get('quantity').touched && Outward.get('quantity').hasError('required')"> Required !</span>
+          <span class="help-block text-danger" *ngIf="QtyError === true">Grater than Stock</span>
+        </div>
+
+        <div class="form-group col-4" *ngIf="batchQty != null && batchList != null">
+          <label for="input-15">Notes</label>
+        </div>
+        <div class="form-group col-6" *ngIf="batchQty != null && batchList != null">
+          <input formControlName ="notes" type="text" class="form-control" id="input-10" placeholder=" Enter Outward Notes">
+        </div>
+
+        <div class="col-12" *ngIf="batchQty != null && batchList != null">
+          <div class="row justify-content-center">
+            <button [disabled]="loading" type="submit" class="btn btn-success">Enter Line Items <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+
+<ng-template #UpdateOutward let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">PRODUCT COMPLETED ENTRY</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="UpdateStatus" (ngSubmit)="Complete(UpdateStatus.value)">
+      <div class="row">
+        <div class="form-group col-4">
+          Completed Date & Time
+        </div>
+        <div class="form-group col-6">
+          <input formControlName="date_time" type="datetime-local" class="form-control" format="MM-DD-YYYY HH:mm" id="input-11">
+          <span class="help-block text-danger" *ngIf="UpdateStatus.get('date_time').touched && UpdateStatus.get('date_time').hasError('required')">Completed Date Time Required !</span>
+        </div>
+        <div class="col-12">
+          <div class="row justify-content-center">
+            <button [disabled]="loading" type="submit" class="btn btn-success"> Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+
+<ng-template #delete let-modal>
+  <div class="modal-header state modal-danger">
+    <h2 class="modal-title" id="modal-primary-label">Delete Confirmation</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    Are you sure to delete this Outward Item!
+  </div>
+  <div class="modal-footer">
+      <button [disabled]="loading" type="button" class="btn btn-danger" data-dismiss="modal" (click)="ReqDelete()">Delete<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      <button type="button" class="btn btn-success" data-dismiss="modal" (click)="modal.dismiss('Cross click')">Close</button>
+  </div>
+</ng-template>
+
+
+
+
+<ng-template #editOutward let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">OUTWARD ITEM EDIT</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="edit_Outward" (ngSubmit)="update(edit_Outward.value)">
+      <div class="row">
+        <div class="form-group col-4">
+         Quantity
+        </div>
+        <div class="form-group col-6">
+          <input formControlName="quantity" type="number" class="form-control"  id="input-11">
+          <span class="help-block text-danger" *ngIf="edit_Outward.get('quantity').touched && edit_Outward.get('quantity').hasError('required')"> Required !</span>
+        </div>
+
+        <div class="form-group col-4">
+           Notes
+         </div>
+         <div class="form-group col-6">
+           <input formControlName="notes" type="text" class="form-control"  id="input-11">
+           <span class="help-block text-danger" *ngIf="edit_Outward.get('notes').touched && edit_Outward.get('notes').hasError('required')"> Required !</span>
+         </div>
+
+        <div class="col-12">
+          <div class="row justify-content-center">
+            <button [disabled]="loading" type="submit" class="btn btn-success"> Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>

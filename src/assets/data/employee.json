@@ -1,0 +1,26 @@
+[
+    {
+        "name"	        : "User 23",
+        "designation"	: "Manager"
+    },
+    {
+        "name"	        : "User 33",
+        "designation"	: "Manager"
+    },
+	{
+        "name"	        : "User 32",
+        "designation"	: "Manager"
+    },
+	{
+        "name"	        : "User 43",
+        "designation"	: "Manager"
+    },
+	{
+        "name"	        : "User 12",
+        "designation"	: "Manager"
+    },
+	{
+        "name"	        : "User 21",
+        "designation"	: "Manager"
+    }   
+]

@@ -1,0 +1,150 @@
+<div class="col-md-12">
+  <table>
+    <tr>
+      <td style="width: 10px;">
+        <h1><small></small></h1>
+      </td>
+      <td style="width: 250px;">
+        <h1>REQUIREMENT</h1>
+      </td>
+      <td style="width: 1100px;">
+        <div class="input-group input-group-sm my-3">
+          <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-search"></i></span>
+          </div>
+          <input class="form-control" type="text" placeholder="Search Item Name or Description or Notes..." (keyup)="updateFilter($event)"/>
+        </div>
+      </td>
+      <td style="width: 100px;"> </td>
+      <td style="width: 100px; text-align: center; vertical-align: center;">
+      </td>
+      <td style="width: 200px; text-align: center; vertical-align: center;">
+        <button type="submit" class="btn btn-success fa fa-plus" (click)="AddRequBtn()"> Add Requirement</button>
+      </td>
+    </tr>
+  </table>
+</div>
+<ngx-datatable
+  #table
+  class="custom_table"
+  [headerHeight]="50"
+  [limit]="10"
+  [columnMode]="'force'"
+  [footerHeight]="50"
+  [rowHeight]="'auto'"
+  [rows]="requirement_list"
+  [selected]="selected"
+  [selectionType]="'single'"
+  (activate)="onActivate($event)">
+  
+  <ngx-datatable-column name="ID" >
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.id}}  
+      </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column name="CREATED BY">
+    <ng-template ngx-datatable-cell-template let-row="row">
+        {{row.creater_name}}  
+    </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column name="NAME">
+    <ng-template ngx-datatable-cell-template let-row="row">
+        {{row.item_name}}
+    </ng-template>
+  </ngx-datatable-column>
+  
+  <ngx-datatable-column name="DESCRIPTION">
+    <ng-template ngx-datatable-cell-template let-row="row">
+        {{row.item_description}}
+    </ng-template>
+  </ngx-datatable-column>
+  
+  <ngx-datatable-column name="QUANTITY">
+    <ng-template ngx-datatable-cell-template let-row="row">
+        {{row.qty}}
+    </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column name="NOTES">
+    <ng-template ngx-datatable-cell-template let-row="row">
+        {{row.notes}}  
+    </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column name="STATUS">
+    <ng-template ngx-datatable-cell-template let-row="row">
+      <label *ngIf="row.status == 1" style="color:blue"><strong>Created</strong></label>
+      <label *ngIf="row.status == 2" style="color:green"><strong>Accepted</strong></label>
+    </ng-template>
+  </ngx-datatable-column>
+
+</ngx-datatable>  
+<ng-template #AddReq let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">ADD REQUIREMENT</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="AddReqForm" (ngSubmit)="OnSubmit(AddReqForm.value)">
+      <div class="row"> 
+
+        <div class="form-group col-4">
+          <label for="input-15">Select Item</label>
+        </div>
+        <div class="form-group col-6">
+          <select formControlName ="item_id" class="form-control custom-select" id="batch">
+            <option *ngFor= "let item of item_list" value = {{item.item_id}} >{{item.name}}</option>
+          </select>
+          <span class="help-block text-danger" *ngIf="AddReqForm.get('item_id').touched && AddReqForm.get('item_id').hasError('required')">Select Item</span>
+        </div>
+
+        <div class="form-group col-4">
+          <label for="input-15">Description</label>
+        </div>
+        <div class="form-group col-6">
+          <input formControlName ="description" type="text" class="form-control" id="input-10" placeholder="Description">
+          <span class="help-block text-danger" *ngIf="AddReqForm.get('description').touched && AddReqForm.get('description').hasError('required')">Enter Description</span>
+          <span class="help-block text-danger" *ngIf="AddReqForm.get('description').touched && AddReqForm.get('description').hasError('minlength')">Minimum Length 3</span>
+        </div>
+
+        <div class="form-group col-4">
+          <label for="input-15">Quantity</label>
+        </div>
+        <div class="form-group col-6">
+          <input formControlName ="qty" type="number" class="form-control" id="input-10" placeholder="Enter Quantity">
+          <span class="help-block text-danger" *ngIf="AddReqForm.get('qty').touched && AddReqForm.get('qty').hasError('required')">Enter No.of Quantity</span>
+        </div>
+
+        <div class="form-group col-4">
+          <label for="input-15">Notes</label>
+        </div>
+        <div class="form-group col-6">
+          <input formControlName ="notes" type="text" class="form-control" id="input-10" placeholder="Requirement Notes">
+          <span class="help-block text-danger" *ngIf="AddReqForm.get('notes').touched && AddReqForm.get('notes').hasError('required')">Notes Required!</span>
+        </div>
+
+        <div class="col-12">
+          <div class="row justify-content-center">
+            <button type="submit" class="btn btn-success">Submit Request</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>
+<ng-template #delete let-modal>
+  <div class="modal-header state modal-danger">
+    <h2 class="modal-title" id="modal-primary-label">Delete Confirmation</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    Are you sure to delete this request!
+  </div>
+  <div class="modal-footer">
+      <button type="button" class="btn btn-danger" data-dismiss="modal" (click)="ReqDelete()">Delete</button>
+      <button type="button" class="btn btn-success" data-dismiss="modal" (click)="modal.dismiss('Cross click')">Close</button>
+  </div> 
+</ng-template>

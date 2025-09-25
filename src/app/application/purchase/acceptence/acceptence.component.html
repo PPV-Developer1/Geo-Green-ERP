@@ -1,0 +1,122 @@
+
+  <div *ngIf="!show">
+    <div class="col-md-12">
+      <div class="row">
+        <div class="col-md-2">
+          <h5 class="ml-5 mt-1">Acceptence</h5>
+        </div>
+        <div class="col-md-8">
+          <div class="input-group input-group-sm my-1">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input class="form-control" type="text" placeholder="Search Bills Number and Vendor Name..."
+              (keyup)="updateFilter($event)" />
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="col-md-12">
+      <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+        [headerHeight]="50"
+        [limit]="25"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="acceptence_list"
+        [selectionType]="'single'"
+        (activate)="onActivate($event)">
+
+        <ngx-datatable-column prop="bill_date" name="DATE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.bill_date  | date: 'dd-MM-yyyy'}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="bill_number" name="BILL NO">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span style="font-weight:bold;"> {{row.bill_number}}</span>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column prop="reference_number" name="REFF NUMBER">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span *ngIf="row.reference_number != ''"> {{row.reference_number}}</span>
+            <span *ngIf="row.reference_number == ''"> Nill</span>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="name" name="VENDOR NAME">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span style="font-weight:bold;"> {{row.name}}</span>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="bill_due_date" name="DUE DATE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.bill_due_date  | date: 'dd-MM-yyyy'}}
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </div>
+<!-- Starting -->
+<!-- Ending-->
+
+  </div>
+
+  <div *ngIf="show">
+
+    <div>
+      <button type="submit" class="btn btn-info fa fa-arrow-left mb-3" (click)="ReturnToList()">
+        Back
+      </button>
+
+      <button type="submit" class="btn btn-success  mb-3  pull-right" (click)="popup()">
+        Accepted to List
+      </button>
+    </div>
+  <div class="col-md-12">
+    <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+      [headerHeight]="50"
+      [limit]="15"
+      [columnMode]="'force'"
+      [footerHeight]="50"
+      [rowHeight]="'auto'"
+      [rows]="bill_list"
+      [selectionType]="'single'"
+      (activate)="onActivate_1($event)">
+
+      <ngx-datatable-column prop="item_name" name="ITEM">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.item_name}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="bill_amount" name="BILL AMOUNT">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          <span style="font-weight:bold;"> {{row.bill_amount}}</span>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column prop="actual_amount" name="ACTUAL AMOUNT">
+        <ng-template ngx-datatable-cell-template let-row="row">
+           {{row.actual_amount}}
+        </ng-template>
+      </ngx-datatable-column>
+
+    </ngx-datatable>
+  </div>
+</div>
+
+<ng-template #Add_list let-modal>
+  <div class="modal-header state modal-success">
+    <h2 class="modal-title" id="modal-primary-label"> Confirmation</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    Are you sure to accept this Bill Item!
+  </div>
+  <div class="modal-footer">
+      <button [disabled]="loading" type="button" class="btn btn-danger" data-dismiss="modal" (click)="AcceptToList()">Accept<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      <button type="button" class="btn btn-success" data-dismiss="modal" (click)="modal.dismiss('Cross click')">Close</button>
+  </div>
+</ng-template>

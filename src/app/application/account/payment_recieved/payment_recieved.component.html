@@ -1,0 +1,233 @@
+<div *ngIf="selected.length == 0">
+  <div class="col-md-12">
+    <table>
+      <tr>
+        <td style="width: 10px;">
+          <h1><small></small></h1>
+        </td>
+        <td style="width: 250px;">
+          <h5>PAYMENT RECIEVED</h5>
+        </td>
+
+        <td style="width: 900px;">
+          <div class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input class="form-control" type="text" placeholder="Search Bills Number and Customer Name and Transaction Date..." (keyup)="updateFilter($event)"/>
+          </div>
+        </td>
+        <td style="width: 100px;"> </td>
+        <td style="width: 100px; text-align: center; vertical-align: center;">
+        </td>
+        <td>
+          <button type="submit"  class="btn btn-success fa fa-pluspull-right" (click)="advance()"> Customer Advance </button>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+<div>
+  <ngx-datatable
+  #table
+  class="custom_table"
+  [headerHeight]="50"
+  [limit]="10"
+  [columnMode]="'force'"
+  [footerHeight]="50"
+  [rowHeight]="50"
+  [selected]="selected"
+  [selectionType]="'single'"
+  [rows]="payment_transaction"
+  (activate)="Onclick($event)">
+
+  <ngx-datatable-column prop="tran_date" [width]="80"  name=" DATE" >
+      <ng-template ngx-datatable-cell-template let-row = "row">
+          {{row.tran_date  | date: 'dd-MM-yyyy'}}
+      </ng-template>
+  </ngx-datatable-column>
+
+      <ngx-datatable-column  prop="customer_name" name="CUSTOMER" >
+        <ng-template ngx-datatable-cell-template let-row = "row">
+            {{row.customer_name}}
+        </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column  prop="reference" name="REFERENCE" >
+      <ng-template ngx-datatable-cell-template let-row = "row">
+          {{row.reference}}
+      </ng-template>
+  </ngx-datatable-column>
+
+    <ngx-datatable-column  prop="invoice_number"   name="INVOICE" >
+      <ng-template ngx-datatable-cell-template let-row = "row">
+          {{row.invoice_number}}
+      </ng-template>
+    </ngx-datatable-column>
+
+  <ngx-datatable-column [width]="80" name="MODE">
+      <ng-template ngx-datatable-cell-template let-row="row">
+            <span *ngIf="row.tran_mode === 1 " >
+              Wire
+          </span>
+          <span *ngIf="row.tran_mode === 2 " >
+              Cash
+          </span>
+          <span *ngIf="row.tran_mode === 3 " >
+              Cheque
+          </span>
+      </ng-template>
+    </ngx-datatable-column>
+
+  <!-- <ngx-datatable-column  name="REFERENCE">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.reference}}
+      </ng-template>
+  </ngx-datatable-column> -->
+
+ <ngx-datatable-column prop="debit" [width]="80" name="RECIEVED">
+    <ng-template ngx-datatable-cell-template let-row="row">
+      <span style="font-weight:bold;"> {{row.debit | indianCurrency}} </span>
+      </ng-template>
+  </ngx-datatable-column>
+
+
+  <ngx-datatable-column prop="balance" [width]="80" name="BALANCE">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        <span style="font-weight:bold;"> {{row.balance | indianCurrency}} </span>
+        </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column prop="tran_details" name="DESCRIPTION">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.tran_details}}
+      </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column prop="notes"  name="COMMAND">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.notes}}
+        </ng-template>
+    </ngx-datatable-column>
+
+  </ngx-datatable>
+  </div>
+</div>
+<div *ngIf="selected.length > 0">
+  <div>
+    <button type="submit" class="btn btn-info fa fa-arrow-left mb-3" (click)="setzero()">
+      Back
+    </button>
+  </div>
+
+  <app-payment_view></app-payment_view>
+</div>
+
+
+<ng-template #Add_advance let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Add Advance</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="customer_advance" (ngSubmit)="advance_submit(customer_advance.value)" class="row">
+      <div class="form-group col-12">
+        <label for="input-12">Receipt No</label>
+        <input type="text" formControlName="receipt_no" class="form-control">
+      </div>
+      <div class="form-group col-12">
+        <label for="exampleSelect3">Mode of Transfer</label>
+        <select formControlName="tran_mode" class="form-control custom-select">
+            <option value = "0" selected>Select Mode</option>
+            <option value = "1">Wire</option>
+            <option value = "2">Cash</option>
+            <option value = "3">Cheque</option>
+        </select>
+        <span class="help-block text-danger" *ngIf="customer_advance.get('tran_mode').touched && customer_advance.get('tran_mode').hasError('required')">Must Select !</span>
+        <span class="help-block text-danger" *ngIf="customer_advance.get('tran_mode').touched && customer_advance.get('tran_mode').hasError('min')">Select One Type</span>
+      </div>
+
+      <div class="form-group col-12">
+        <label for="exampleSelect3">Transfer From Customer</label>
+        <span>
+            <!-- <select formControlName="from_bank" class="form-control custom-select">
+              <option *ngFor= "let view of customer_list" value="{{view.customer_id}}">{{view.company_name}}</option>
+            </select> -->
+
+
+        <ng-select formControlName="from_bank" class=" form-control custom-select" [clearable]="false">
+          <ng-option *ngFor="let item of customer_list" [value]="item.customer_id" class="form-control">
+            {{ item.company_name}}
+          </ng-option>
+        </ng-select>
+
+        </span>
+        <span class="help-block text-danger" *ngIf="customer_advance.get('from_bank').touched && customer_advance.get('from_bank').hasError('required')">Must Select Customer!</span>
+      </div>
+
+      <div class="form-group col-12">
+        <label for="exampleSelect3">Transfer To</label>
+        <span>
+          <!-- <select formControlName="to_bank" class="form-control custom-select">
+            <optgroup label="Bank">
+              <option *ngFor= "let view of company_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+            </optgroup>
+            <optgroup label="Cash">
+              <option *ngFor= "let view of cash_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+            </optgroup>
+            <optgroup label="Internal User">
+              <option *ngFor= "let view of all_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+            </optgroup>
+            <optgroup label="GST">
+              <option *ngFor= "let view of gst_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+            </optgroup>
+          </select> -->
+
+          <ng-select formControlName="to_bank" [items]="bankData" bindLabel="account_name" bindValue="bank_id"   groupBy="mode"
+             class=" form-control custom-select" [clearable]="false">
+           <ng-template ng-optgroup-tmp let-item="item" class="form-control">
+               <span *ngIf="item.mode == 1" style="padding: 20px;"><b>Bank</b></span>
+               <span *ngIf="item.mode == 2" style="padding: 20px;"><b>Cash</b></span>
+               <span *ngIf="item.mode == 3" style="padding: 20px;"><b>Internal User</b></span>
+               <span *ngIf="item.mode == 4" style="padding: 20px;"><b>GST</b></span>
+           </ng-template>
+        </ng-select>
+        </span>
+
+        <span class="help-block text-danger" *ngIf="customer_advance.get('to_bank').touched && customer_advance.get('to_bank').hasError('required')">Must Select Bank!</span>
+      </div>
+      <div class="form-group col-12">
+        <div>
+          <label for="input-12">Amount</label>
+        </div>
+        <div class="input-group">
+          <div class="input-group-prepend">
+              <span class="input-group-text">₹</span>
+          </div>
+          <input formControlName="amount" type="number" class="form-control">
+        </div>
+      </div>
+      <div class="form-group col-12">
+        <label for="input-12">Transaction  Date</label>
+        <input type="date" formControlName="tran_date" class="form-control" id="input-12">
+      </div>
+      <div class="form-group col-12">
+        <label for="input-1">Reference</label>
+        <input type="text" formControlName="reference" class="form-control" id="input-1">
+        <span class="help-block text-danger" *ngIf="customer_advance.get('reference').touched && customer_advance.get('reference').hasError('required')">Reference Required !</span>
+        <span class="help-block text-danger" *ngIf="customer_advance.get('reference').touched && customer_advance.get('reference').hasError('minlength')">Minimum 3 Letters</span>
+      </div>
+      <div class="form-group col-12">
+        <label for="input-1">Description</label>
+        <input type="text" formControlName="description" class="form-control" id="input-1">
+        <span class="help-block text-danger" *ngIf="customer_advance.get('description').touched && customer_advance.get('description').hasError('required')">Description Required !</span>
+        <span class="help-block text-danger" *ngIf="customer_advance.get('description').touched && customer_advance.get('description').hasError('minlength')">Minimum 3 Letters</span>
+      </div>
+
+      <div class="col-md-7">
+      <button [disabled]="loading" class="btn btn-primary pull-right" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+    </div>
+    </form>
+  </div>
+</ng-template>

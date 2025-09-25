@@ -1,0 +1,186 @@
+<div class="col-md-12">
+  <table>
+    <tr>
+      <td style="width: 10px;">
+        <h1><small></small></h1>
+      </td>
+      <td style="width: 250px;">
+        <h5>ITEM CATEGORY</h5>
+      </td>
+      <td style="width: 1000px;">
+        <div class="input-group input-group-sm my-3">
+          <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-search"></i></span>
+          </div>
+          <input class="form-control" type="text" placeholder="Search Category Name..." (keyup)="updateFilter($event)"/>
+        </div>
+      </td>
+      <td style="width: 100px;"> </td>
+      <td style="width: 300px; text-align: center; vertical-align: center;">
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <button type="button" class="btn btn-success fa fa-plus" (click)="OpenAddCat()"> Add New Category</button>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>
+<ngx-datatable
+    #table
+    class="custom_table"
+    [headerHeight]="50"
+    [limit]="15"
+    [columnMode]="'force'"
+    [footerHeight]="50"
+    [rowHeight]="'auto'"
+    [rows]="rows"
+    [selected]="selected"
+    [selectionType]="'single'"
+    (activate)="onActivate($event)">
+
+    <!-- <ngx-datatable-column [width]="10" name="ID" >
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.id}}
+        </ng-template>
+    </ngx-datatable-column> -->
+
+    <ngx-datatable-column prop="level" [width]="100" name="LEVEL" >
+      <ng-template ngx-datatable-cell-template let-row="row">
+        <span *ngIf="row.level == 1">Association</span>
+        <span *ngIf="row.level == 2">Byproduct</span>
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="name" [width]="300" [sortable] = "false" name="NAME">
+        <ng-template ngx-datatable-cell-template let-row="row">
+            <span style="font-weight:bold;">{{row.name}}</span>
+        </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="has_sub_item" [width]="300" [sortable] = "false" name="HAS BYPRODUCT">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        <span *ngIf="row.has_sub_item == 1" style="color: green;"><strong>YES</strong></span>
+        <span *ngIf="row.has_sub_item == 0" style="color: red;"><strong>NO</strong></span>
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="status" [width]="50" alig name="STATUS">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          <span *ngIf="row.status == 1" style="color: green;"><strong>Active</strong></span>
+          <span *ngIf="row.status == 0" style="color: red;"><strong>Disabled</strong></span>
+        </ng-template>
+    </ngx-datatable-column>
+</ngx-datatable>
+
+<ng-template #add_category let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Add Category</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="CategoryForm" (ngSubmit)="Submit(CategoryForm.value)" class="row">
+
+      <div class="form-group col-md-4">
+        Category Name
+      </div>
+      <div class="form-group col-md-8">
+        <input formControlName="name" type="text" class="form-control" placeholder="Enter Category Name">
+        <span class="help-block text-danger" *ngIf="CategoryForm.get('name').touched && CategoryForm.get('name').hasError('required')">Name Required !</span>
+        <span class="help-block text-danger" *ngIf="CategoryForm.get('name').touched && CategoryForm.get('name').hasError('minlength')">Minimum 3 Letters</span>
+      </div>
+
+      <div class="form-group col-md-4">
+        Level
+      </div>
+      <div class="form-group col-md-8">
+        <select formControlName="level" class="form-control">
+          <option value = 1>Association</option>
+          <option value = 2>Byproduct</option>
+        </select>
+      </div>
+
+      <div class="form-group col-md-4">
+        Has Byproduct
+      </div>
+      <div class="form-group col-md-8">
+        <div class="custom-control custom-switch">
+          <input type="checkbox" formControlName="byproduct" class="custom-control-input"
+            style="width: 100px" id="customSwitch1" />
+          <label class="custom-control-label" for="customSwitch1"></label>
+        </div>
+      </div>
+
+      <div class="form-group col-md-4">
+        Status
+      </div>
+      <div class="form-group col-md-8">
+        <div class="custom-control custom-switch">
+          <input type="checkbox" formControlName="status" class="custom-control-input"
+            style="width: 100px" id="customSwitch2" />
+          <label class="custom-control-label" for="customSwitch2"></label>
+        </div>
+      </div>
+
+      <div class="form-group col-md-8">
+        <button [disabled]="loading" type="submit" class="btn btn-info pull-right">Add Category<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+        <span class="lo"></span>
+      </div>
+    </form>
+  </div>
+</ng-template>
+<ng-template #edit_category let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Edit Category</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="CategoryForm" (ngSubmit)="Update(CategoryForm.value)" class="row">
+
+      <div class="form-group col-md-4">
+        Category Name
+      </div>
+      <div class="form-group col-md-8">
+        <input formControlName="name" type="text" class="form-control" placeholder="Enter Category Name">
+        <span class="help-block text-danger" *ngIf="CategoryForm.get('name').touched && CategoryForm.get('name').hasError('required')">Name Required !</span>
+        <span class="help-block text-danger" *ngIf="CategoryForm.get('name').touched && CategoryForm.get('name').hasError('minlength')">Minimum 3 Letters</span>
+      </div>
+
+      <div class="form-group col-md-4">
+        Level
+      </div>
+      <div class="form-group col-md-8">
+        <select formControlName="level" class="form-control">
+          <option value = 1>Association</option>
+          <option value = 2>Byproduct</option>
+        </select>
+      </div>
+
+      <div class="form-group col-md-4">
+        Has Byproduct
+      </div>
+      <div class="form-group col-md-8">
+        <div class="custom-control custom-switch">
+          <input type="checkbox" formControlName="byproduct" class="custom-control-input"
+            style="width: 100px" id="customSwitch1" />
+          <label class="custom-control-label" for="customSwitch1"></label>
+        </div>
+      </div>
+
+      <div class="form-group col-md-4">
+        Status
+      </div>
+      <div class="form-group col-md-8">
+        <div class="custom-control custom-switch">
+          <input type="checkbox" formControlName="status" class="custom-control-input"
+            style="width: 100px" id="customSwitch2" />
+          <label class="custom-control-label" for="customSwitch2"></label>
+        </div>
+      </div>
+
+      <div class="form-group col-md-8">
+        <button [disabled]="loading" type="submit" class="btn btn-info pull-right">Update Category <i class="fa fa-spinner fa-spin" *ngIf="loading"></i> </button>
+      </div>
+    </form>
+  </div>
+</ng-template>

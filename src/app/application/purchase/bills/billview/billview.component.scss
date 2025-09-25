@@ -1,0 +1,402 @@
+/* Invoice List */
+.customer
+{
+    overflow:hidden;
+    text-overflow: ellipsis;
+
+}
+
+/* Scroll Bar */
+::-webkit-scrollbar {
+    width: 10px;
+    overflow-y: scroll;
+    background: rgb(255, 255, 255);
+    box-shadow: inset 0 0 4px #707070;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgb(202, 202, 204);
+}
+
+
+/* only for Invoice */
+.full_border
+{
+    border: 1px solid rgb(43, 41, 41);
+}
+.no_border
+{
+    border: 0px solid rgb(26, 25, 25);
+}
+.else_top
+{
+    border: 1px solid black;
+    border-top: 0px solid rgb(255, 255, 255);
+}
+.else_bottom
+{
+    border: 1px solid black;
+    border-bottom: 0px solid rgb(255, 255, 255);
+}
+.else_right
+{
+    border: 1px solid black;
+    border-right: 0px solid rgb(255, 255, 255);
+}
+.else_left
+{
+    border: 1px solid black;
+    border-left: 0px solid rgb(255, 255, 255);
+}
+.else_bottom_top
+{
+    border: 1px solid black;
+    border-top: 0px solid rgb(255, 255, 255);
+    border-bottom: 0px solid rgb(255, 255, 255);
+}
+.else_top_left
+{
+    border: 1px solid black;
+    border-collapse: collapse;
+    text-align: left;
+    border-top: 0px solid rgb(255, 255, 255);
+    border-left: 0px solid rgb(255, 255, 255);
+}
+.right_only
+{
+    border: 1px solid black;
+    border-top: 0px solid rgb(255, 255, 255);
+    border-bottom: 0px solid rgb(255, 255, 255);
+    border-left: 0px solid rgb(255, 255, 255);
+}
+.left_only
+{
+    border: 1px solid black;
+    border-top: 0px solid rgb(255, 255, 255);
+    border-bottom: 0px solid rgb(255, 255, 255);
+    border-right: 0px solid rgb(255, 255, 255);
+}
+.bottom_only
+{
+    border: 1px solid black;
+    border-top: 0px solid rgb(255, 255, 255);
+    border-right: 0px solid rgb(255, 255, 255);
+    border-left: 0px solid rgb(255, 255, 255);
+}
+.top_only
+{
+    border: 1px solid black;
+    border-bottom: 0px solid rgb(255, 255, 255);
+    border-right: 0px solid rgb(255, 255, 255);
+    border-left: 0px solid rgb(255, 255, 255);
+}
+
+.color_cell
+{
+    text-align: center;
+    border: 1px solid black;
+    border-collapse: collapse;
+    text-align: center;
+    background-color: rgb(119, 180, 58);
+    border-top: 0px solid rgb(255, 255, 255);
+}
+/* Invoice table */
+.table,
+.inv_td {
+  border: solid 1px black;
+  text-align: center;
+  border-collapse: collapse;
+  padding: 0.5em;
+}
+.table,
+.inv_td_1 {
+    border: solid 1px black;
+    border-top: 0px solid rgb(255, 255, 255);
+    text-align: center;
+    border-collapse: collapse;
+    padding: 0.5em;
+    text-align: right;
+}
+.table,
+.inv_td_21 {
+    border: solid 1px black;
+    text-align: center;
+    border-collapse: collapse;
+    padding: 0.5em;
+    text-align: left;
+    vertical-align: top;
+    width: 50%;
+    border-right: 0px solid rgb(255, 255, 255);
+    border-bottom: 0px solid rgb(255, 255, 255);
+  }
+.table,
+.inv_td_22 {
+  border: solid 1px black;
+  text-align: center;
+  border-collapse: collapse;
+  padding: 0.5em;
+  text-align: left;
+  vertical-align: top;
+  width: 50%;
+  border-left: 0px solid rgb(255, 255, 255);
+  border-bottom: 0px solid rgb(255, 255, 255);
+}
+.table,
+.inv_td_bottom {
+  border: solid 1px black;
+  text-align: center;
+  border-collapse: collapse;
+  padding: 0.5em;
+  border-bottom: 0px solid rgb(255, 255, 255);
+}
+
+
+#table1 table{
+    width: 100%;
+}
+#table2 table{
+    width: 100%;
+}
+#table3 table{
+    width: 100%;
+}
+#table4 table{
+    width: 100%;
+}
+#table5 table{
+    width: 100%;
+}
+
+#table1 table,td,th{
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+#table2 table,td,th {
+    border:1px solid black ;
+    border-top: 0px solid white;
+    border-collapse: collapse;
+}
+
+#table3 table,td,th {
+
+    border:1px solid black ;
+    border-top: 0px solid white;
+    border-collapse: collapse;
+}
+
+.tb .tbl{
+    border: transparent;
+    border-left: 1px solid black;
+    width: 150px;
+}
+
+.tb .tbr{
+    border: transparent;
+    border-right: 1px solid black;
+
+}
+
+.space{
+    width: 53.5%
+}
+
+#table4 .tb1{
+    border: transparent;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+}
+
+#table4 .tb:last-child{
+    border-bottom: 1px solid black;
+}
+
+#table5 .tb1{
+
+    border: transparent;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+}
+
+.pos{
+    text-align: right;
+}
+
+.bottom td{
+    border: transparent;
+    border-right: 1px solid black;
+}
+
+
+.noborder td:nth-child(8)
+{
+    border: 1px solid black;
+
+}
+.noborder td:nth-child(9)
+{
+    border: 1px solid black;
+
+}
+.noborder td:nth-child(10)
+{
+    border: 1px solid black;
+
+}
+.noborder td:nth-child(11)
+{
+    border: 1px solid black;
+
+}
+
+.img_border{
+    border: 1px solid black;
+
+}
+
+#table4 table,
+#table5 table {
+    width: 100%;
+}
+
+.tb .tbl {
+    border: transparent;
+    border-left: 1px solid black;
+    width: 150px;
+}
+
+.tb .tbr {
+    border: transparent;
+    border-right: 1px solid black;
+}
+
+#table4 .tb1 {
+    border: transparent;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+}
+
+#table5 .tb1 {
+    border: transparent;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+}
+
+
+/* Default table styles */
+
+.my-custom-table th,
+.my-custom-table td {
+  border: none; /* Hide all borders */
+  padding: 8px;
+}
+
+.my-custom-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.my-custom-table tbody tr.even-row {
+  background-color: #e6e6e6; /* Background color for even rows */
+}
+.my-custom-table td {
+  text-align: center;
+}
+
+.my-custom-table tbody tr:nth-child(even) {
+  background-color: #f1ecec;
+}
+
+.my-custom-table tbody tr:hover {
+  background-color: #e6e6e6;
+}
+
+.my-custom-table i {
+  color: red;
+}
+
+.my-custom-table tbody tr.even-row:hover {
+  background-color: #f9f9f9 !important;
+}
+
+.btn-space {
+  margin-right: 10px; /* Adjust the spacing as needed */
+}
+
+
+
+/* Adjusting the dropdown panel */
+::ng-deep .ng-dropdown-panel {
+  background-color: #fffdfd;
+  position: absolute;
+  top: calc(100% + 5px); /* Ensure proper positioning relative to the input field */
+  left: 0;
+  right: 0;
+  font-size: 14px;
+  text-align: left;
+  border: 1px solid #969696;
+  white-space: normal;
+  height: fit-content;
+}
+
+/* Styling the options */
+::ng-deep .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
+  background-color: rgb(30, 89, 201) !important;
+  color: #f7f5f5 !important;
+}
+
+::ng-deep .ng-dropdown-panel .ng-option.ng-option-selected {
+  background-color: rgb(30, 89, 201) !important;
+  color: #f7f5f5 !important;
+}
+
+/* Styling the option labels */
+::ng-deep .ng-dropdown-panel .ng-option .ng-option-label {
+  padding: 10px;
+}
+
+::ng-deep .ng-value-container .ng-value {
+  font-size: 14px; /* Adjust the font size as needed */
+}
+
+::ng-deep .ng-select {
+  height: 30px; /* Adjust the height as needed */
+  display: flex;
+  align-items: center;
+}
+::ng-deep .ng-select-container {
+  text-align: left;
+}
+
+#wide-table {
+  width: var(--table-width); /* Increase this value to make the table wider */
+  min-width: 100%;
+}
+
+
+.resizable-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.resizable-table th,
+.resizable-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  position: relative;
+}
+
+.resizable-table th {
+  background-color: #f4f4f4;
+  cursor: pointer;
+}
+
+.resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 10px;
+  height: 100%;
+  cursor: col-resize;
+  background: rgba(0, 0, 0, 0.1);
+}

@@ -1,0 +1,251 @@
+<div *ngIf="selected.length === 0">
+  <div class="col-md-12">
+    <table>
+      <tr>
+        <td style="width: 10px;">
+          <h1><small></small></h1>
+        </td>
+        <td style="width: 450px;">
+          <h5>INWARD ENTRY</h5>
+        </td>
+        <td style="width: 900px;">
+          <div class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input class="form-control" type="text" placeholder="Search Vendor Name or Item Name or Bill Number..." (keyup)="updateFilter($event)"/>
+          </div>
+        </td>
+        <td style="width: 100px;"> </td>
+        <td style="width: 100px; text-align: center; vertical-align: center;">
+        </td>
+        <td style="width: 200px; text-align: center; vertical-align: center;">
+        </td>
+      </tr>
+    </table>
+  </div>
+  <ngx-datatable
+    #table
+    class="custom_table"
+    [headerHeight]="50"
+    [limit]="20"
+    [columnMode]="'force'"
+    [footerHeight]="50"
+    [rowHeight]="'auto'"
+    [rows]="item_list"
+    [selected]="selected"
+    [selectionType]="'single'"
+    (activate)="onActivate($event)">
+
+    <!-- <ngx-datatable-column name="ID" >
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.bill_item_id}}
+        </ng-template>
+    </ngx-datatable-column> -->
+
+    <ngx-datatable-column prop="bill_vendor_name" name="VENDOR NAME">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.company_name}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="bill_number" name="BILL NUMBER">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.bill_number}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="item_list_name" name="ITEM NAME">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.item_name}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="item_description" name="ITEM DESCRIPTION">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.item_description}}
+      </ng-template>
+    </ngx-datatable-column>
+
+
+    <ngx-datatable-column prop="qty" name="ITEM QTY">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.qty}}
+      </ng-template>
+    </ngx-datatable-column>
+
+  </ngx-datatable>
+</div>
+<div *ngIf="selected.length > 0" >
+  <div class="modal-header">
+    <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero()"> Back</button>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div widget class="card">
+        <div class="card-header">
+          <span>INWARD ENTRY FORM</span>
+          <div class="widget-controls">
+              <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+              <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+              <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+              <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+              <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+          </div>
+        </div>
+        <div class="card-body widget-body">
+          <div class="row">
+            <table class="table col-md-6">
+              <tbody>
+                  <tr>
+                    <th>Bill Date</th>
+                    <td>{{detail_view.bill_date | date: 'dd-MM-yyyy '}}</td>
+                  </tr>
+                  <tr>
+                    <th>Vendor ID</th>
+                    <td>{{detail_view.vendor_id}}</td>
+                  </tr>
+                  <tr>
+                      <th>Item Name</th>
+                      <td>{{detail_view.item_name}}</td>
+                  </tr>
+                  <tr>
+                    <th>Item Category</th>
+                    <td>{{detail_view.item_category_title}}</td>
+                  </tr>
+                  <tr>
+                    <th>Quantity</th>
+                    <td>{{detail_view.qty}}</td>
+                  </tr>
+                  <tr>
+                    <th>HSN CODE</th>
+                    <td>{{detail_view.hsn}}</td>
+                  </tr>
+              </tbody>
+            </table>
+            <table class="table col-md-6">
+              <tbody>
+                <tr>
+                  <th>Bill Number</th>
+                  <td>{{detail_view.bill_number}}</td>
+                </tr>
+                <tr>
+                  <th>Vendor Name</th>
+                  <td>{{detail_view.company_name}}</td>
+                </tr>
+                <tr>
+                  <th>Description</th>
+                  <td>{{detail_view.item_description}}</td>
+                </tr>
+                <tr>
+                  <th>Item Type</th>
+                  <td *ngIf="detail_view.item_type === 1" >Raw Material</td>
+                  <td *ngIf="detail_view.item_type === 2" >Product</td>
+                </tr>
+                <tr>
+                  <th>UOM</th>
+                  <td>{{detail_view.uom}}</td>
+                </tr>
+                <tr>
+                  <th>Bill Enter By</th>
+                  <td>{{detail_view.creater_name}}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="col-12">
+              <div class="card card-outline-primary">
+                  <div class="card-body">
+                    <form [formGroup]="InwardEntry" (ngSubmit)="InwardSubmit(InwardEntry.value)" class="row">
+                    <div class="col-3">
+                      <div class="form-group">
+                        <label for="input-15">Batch</label>
+                        <input formControlName="batch" class="form-control" placeholder="Enter Batch Code" (click)="clearError()">
+                        <span class="help-block text-danger" *ngIf="InwardEntry.get('batch').touched && InwardEntry.get('batch').hasError('required')">Batch Required !</span>
+                        <span class="help-block text-danger" *ngIf="batchError == true">Batch Number Already Exist!</span>
+                      </div>
+                    </div>
+                    <div class="col-3">
+                      <div class="form-group">
+                        <label for="input-15">Inward Date & Time</label>
+                        <input formControlName="inward_at" type="datetime-local" class="form-control"  id="input-11">
+                        <span class="help-block text-danger" *ngIf="InwardEntry.get('inward_at').touched && InwardEntry.get('inward_at').hasError('required')">Inward Date Time Required !</span>
+                      </div>
+                    </div>
+                    <div class="col-3">
+                      <div class="form-group">
+                        <label for="input-15">Inward Quantity</label>
+                        <input formControlName="inward_qty"  type = "number" [(ngModel)]="qty" (change)="seriel_box()" class="form-control" placeholder="Enter Inward Quantity">
+                        <span class="help-block text-danger" *ngIf="InwardEntry.get('inward_qty').touched && InwardEntry.get('inward_qty').hasError('required')">Quantity Required !</span>
+                      </div>
+                    </div>
+                    <div class="col-3">
+                      <div class="form-group">
+                        <label for="input-15">Notes</label>
+                        <input formControlName="notes"  type = "text" class="form-control" placeholder="Enter Notes for your refference">
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div *ngIf="has_serial == 0" class="row justify-content-center">
+                        <button [disabled]="loading" type="submit" class="btn btn-success">Inward<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+                      </div>
+                    </div>
+                  </form>
+                  </div>
+              </div>
+              &nbsp;
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div *ngIf="has_serial == 1" >
+  <div class="modal-header">
+
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div widget class="card">
+        <div class="card-header">
+          <span>Serial Number</span>
+          <div class="widget-controls">
+              <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+              <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+              <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+              <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+              <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+          </div>
+        </div>
+        <div class="card-body widget-body">
+          <div class="row">
+            <form [formGroup]="InwardEntry" (ngSubmit)="InwardSubmit(InwardEntry.value)" >
+                  <table>
+                      <tbody formArrayName="seriel_no">
+                          <div class="row">
+                              <div class="col-md-push" *ngFor="let seriel_no of InwardEntry.get('seriel_no')['controls']; let i = index;" [formGroupName]="i">
+                                  <div class="col-12">
+                                    <input type="text" style="width: 300px;" placeholder="Enter the Serial Number" class="form-control form-control-sm"  formControlName="seriel_number"/>
+                                     <span class="help-block text-danger" *ngIf="seriel_no.get('seriel_number').touched && seriel_no.get('seriel_number').hasError('required')"> Required !</span>
+                                  </div>
+
+
+                                   &nbsp;
+                              </div>
+                              <div class="col-12">
+                                <div *ngIf="has_serial == 1" class="row justify-content-center">
+                                  <button [disabled]="loading" type="submit" class="btn btn-success">Inward<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+                                </div>
+                              </div>
+                          </div>
+                        </tbody>
+                  </table>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

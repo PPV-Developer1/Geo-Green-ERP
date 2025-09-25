@@ -1,0 +1,29 @@
+[
+    {
+        "name": "Lancaster Patel",
+        "companyName": "male",
+        "email": "Krog",
+		"workPhone" : "546454",
+		"placeOfSupply": "TN",
+		"receivables" : "₹2,050.00",
+		"unUsedCredits" : "₹0.00"
+    },
+	    {
+        "name": "Lancaster Patel",
+        "companyName": "male",
+        "email": "Krog",
+		"workPhone" : "546454",
+		"placeOfSupply": "TN",
+		"receivables" : "₹2,050.00",
+		"unUsedCredits" : "₹0.00"
+    },
+	    {
+        "name": "Lancaster Patel",
+        "companyName": "male",
+        "email": "Krog",
+		"workPhone" : "546454",
+		"placeOfSupply": "TN",
+		"receivables" : "₹2,050.00",
+		"unUsedCredits" : "₹0.00"
+    }
+]

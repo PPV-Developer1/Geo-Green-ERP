@@ -1,0 +1,241 @@
+<div *ngIf="this.user_type == 'super_admin'" class="row">
+
+  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30">
+    <div class="card small-info-box rounded">
+      <div class="media">
+        <span class="media-left">
+            <i class="fa fa-list-alt"></i>
+        </span>
+        <div class="media-body text-right">
+          <h6 class="media-heading no-margin">Total Invoices</h6>
+          <span>{{invoice_count}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30">
+    <div class="card small-info-box rounded">
+      <div class="media">
+        <span class="media-left">
+            <i class="fa fa-pencil-square-o"></i>
+        </span>
+        <div class="media-body text-right">
+          <h6 class="media-heading no-margin">Total Bills</h6>
+          <span>{{bill_count}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30">
+    <div class="card small-info-box rounded">
+      <div class="media">
+        <span class="media-left">
+            <i class="fa fa-flask"></i>
+        </span>
+        <div class="media-body text-right">
+          <h6 class="media-heading no-margin">Total Projects</h6>
+          <span>{{project_count}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30">
+    <div class="card small-info-box rounded">
+      <div class="media">
+        <span class="media-left">
+            <i class="fa fa-download"></i>
+        </span>
+        <div class="media-body text-right">
+          <h6 class="media-heading no-margin">Ready to Dispatch</h6>
+          <span>{{yet_to_dispatch_count}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30">
+    <div class="card small-info-box rounded">
+      <div class="media">
+        <span class="media-left">
+            <i class="fa fa-users"></i>
+        </span>
+        <div class="media-body text-right">
+          <h6 class="media-heading no-margin">Total Customers</h6>
+          <span>{{customer_count}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30">
+    <div class="card small-info-box rounded">
+      <div class="media">
+        <span class="media-left">
+            <i class="fa fa-group"></i>
+        </span>
+        <div class="media-body text-right">
+          <h6 class="media-heading no-margin">Total Vendors</h6>
+          <span>{{vendor_count}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="this.user_type != 'super_admin'" class="row">
+  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30">
+    <div class="card small-info-box rounded">
+      <div class="media">
+        <span class="media-left">
+            <i class="fa fa-flask"></i>
+        </span>
+        <div class="media-body text-right">
+          <h6 class="media-heading no-margin">Ongoing Projects</h6>
+          <span>{{project_count}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30">
+    <div class="card small-info-box rounded">
+      <div class="media">
+        <span class="media-left">
+            <i class="fa fa-download"></i>
+        </span>
+        <div class="media-body text-right">
+          <h6 class="media-heading no-margin">Ready to Dispatch</h6>
+          <span>{{yet_to_dispatch_count}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div *ngIf="this.user_type == 'super_admin'" class="row">
+
+  <div class="col-xl-3 col-lg-6 col-md-6 bottom-30">
+    <div class="card card-primary text-center info-box rounded">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-3">
+            <span class="info-box-icon">
+              <i class="fa fa-globe"></i>
+            </span>
+          </div>
+          <div class="col-9">
+            <h6 class="no-margin">Total Receivables</h6>
+            <h5>{{total_receivables | indianCurrency}}</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-3 col-lg-6 col-md-6 bottom-30">
+     <div class="card card-danger text-center info-box rounded">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-3">
+            <span class="info-box-icon">
+              <i class="fa fa-user"></i>
+            </span>
+          </div>
+          <div class="col-9">
+            <h6 class="no-margin">Total Payables</h6>
+            <h5>{{total_payables | indianCurrency}}</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-lg-6 col-md-6 bottom-30">
+    <div class="card card-warning text-center info-box rounded">
+     <div class="card-body">
+       <div class="row">
+         <div class="col-3">
+           <span class="info-box-icon">
+             <i class="fa fa-user"></i>
+           </span>
+         </div>
+         <div class="col-9">
+           <h6 class="no-margin">Store Worth</h6>
+           <h5>{{total_store_worth | indianCurrency}}</h5>
+         </div>
+       </div>
+     </div>
+   </div>
+ </div>
+ <div class="col-xl-3 col-lg-6 col-md-6 bottom-30">
+  <div class="card card-success text-center info-box rounded">
+   <div class="card-body">
+     <div class="row">
+       <div class="col-3">
+         <span class="info-box-icon">
+           <i class="fa fa-user"></i>
+         </span>
+       </div>
+       <div class="col-9">
+         <h6 class="no-margin">Bank Balance</h6>
+         <h5>{{total_bank_worth | indianCurrency}}</h5>
+       </div>
+     </div>
+   </div>
+  </div>
+  </div>
+</div>
+<span *ngIf="this.user_type == 'super_admin'">
+  <div class="row" *ngIf="chart_disp == 1">
+    <div class="col">
+      <div widget class="card">
+            <div class="card-header">
+              <span>Cash Flow</span>
+              <div class="widget-controls">
+                  <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+                  <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+                  <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+                  <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+                  <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+              </div>
+            </div>
+            <div class="card-body widget-body">
+              <div class="row">
+                <div class="col-xl-8 col-lg-8 col-md-6 col-sm-6 bottom-30">
+                  <canvas baseChart
+                    [type]="lineChartType"
+                    [data]="lineChartData"
+                    [options]="lineChartOptions"
+                    (chartHover)="chartHovered($event)"
+                    (chartClick)="chartClicked($event)">
+                  </canvas>
+                </div>
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 bottom-30">
+                  <div>
+                    <h5 class="no-margin" style="color: rgb(1, 58, 1);">Total Sales</h5>
+                    <h5>{{total_invoice_value | indianCurrency}}</h5>
+                  </div>
+                  <div><br></div>
+                  <div><br></div>
+                  <div><br></div>
+                  <div>
+                    <h5 class="no-margin" style="color: rgb(219, 12, 12);">Total Purchase</h5>
+                    <h5>{{total_bill_value | indianCurrency}}</h5>
+                  </div>
+                  <div><br></div>
+                  <div><br></div>
+                  <div><br></div>
+                  <div>
+                    <h5 class="no-margin" style="color: rgb(8, 190, 23);">Balance</h5>
+                    <h5>{{total_balance_value | indianCurrency}}</h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+  </div>
+</span>

@@ -1,0 +1,56 @@
+[
+    {
+        "name": "Lancaster Patel",
+        "companyName": "fert",
+        "email": "Krog@gmail.com",
+		"workPhone" : "546454",
+		"sourceOfSupply": "TN",
+		"payables" : "₹2,050.00",
+		"unUsedCredits" : "₹0.00"
+    },
+ {
+        "name": "Patel",
+        "companyName": "male",
+        "email": "jerg@gmail.com",
+		"workPhone" : "546454",
+		"sourceOfSupply": "KL",
+		"payables" : "₹2,050.00",
+		"unUsedCredits" : "₹0.00"
+    },
+	 {
+        "name": "jerry",
+        "companyName": "male",
+        "email": "arg@gmail.com",
+		"workPhone" : "546454",
+		"sourceOfSupply": "KR",
+		"payables" : "₹2,050.00",
+		"unUsedCredits" : "₹0.00"
+    },
+	{
+        "name": "Lancaster Patel",
+        "companyName": "fert",
+        "email": "Krog@gmail.com",
+		"workPhone" : "546454",
+		"sourceOfSupply": "TN",
+		"payables" : "₹2,050.00",
+		"unUsedCredits" : "₹0.00"
+    },
+ {
+        "name": "Patel",
+        "companyName": "male",
+        "email": "jerg@gmail.com",
+		"workPhone" : "546454",
+		"sourceOfSupply": "KL",
+		"payables" : "₹2,050.00",
+		"unUsedCredits" : "₹0.00"
+    },
+	 {
+        "name": "jerry",
+        "companyName": "male",
+        "email": "arg@gmail.com",
+		"workPhone" : "546454",
+		"sourceOfSupply": "KR",
+		"payables" : "₹2,050.00",
+		"unUsedCredits" : "₹0.00"
+    }
+]

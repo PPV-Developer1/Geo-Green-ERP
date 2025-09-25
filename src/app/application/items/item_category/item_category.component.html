@@ -1,0 +1,199 @@
+<div>
+  <div class="col-md-12">
+    <table>
+      <tr>
+        <td style="width: 10px;">
+          <h1><small></small></h1>
+        </td>
+        <td style="width: 200px;">
+          <h5>CATEGORY LIST</h5>
+        </td>
+        <td style="width: 1150px;">
+          <div class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input class="form-control" type="text" placeholder="Search Category by Key words - Category Name " (keyup)="updateFilter($event)" />
+          </div>
+        </td>
+        <td style="width: 100px;"> </td>
+        <td style="width: 100px; text-align: center; vertical-align: center;">
+        </td>
+        <td style="width: 200px; text-align: center; vertical-align: center;">
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-success fa fa-plus" (click)="OpenCatAdd()"> Add Category</button>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="row">
+    <div class="col">
+      <ngx-datatable
+      #table
+      class="custom_table"
+      [headerHeight]="50"
+      [limit]="18"
+      [columnMode]="'force'"
+      [footerHeight]="50"
+      [rowHeight]="'auto'"
+      [rows]="category_list"
+      [selected]="selected"
+      (activate)="onActivate($event)">
+
+        <ngx-datatable-column prop="title" name="NAME">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.title}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="type" name="TYPE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <label *ngIf="row.type == 1">Raw Material</label>
+            <label *ngIf="row.type == 2">Product</label>
+            <label *ngIf="row.type == 3">Service</label>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="have_seriel_number" name="HAVE SERIAL NUMBER">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <label *ngIf="row.have_seriel_number == 0"><strong>No</strong></label>
+            <label *ngIf="row.have_seriel_number == 1"><strong>Yes</strong></label>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="status" name="STATUS">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <label *ngIf="row.status == 0" style="color:red"><strong>Inactive</strong></label>
+            <label *ngIf="row.status == 1" style="color:green"><strong>Active</strong></label>
+          </ng-template>
+        </ngx-datatable-column>
+
+      </ngx-datatable>
+    </div>
+  </div>
+</div>
+
+<ng-template #update_categogy let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Edit  Category</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="EditCategory" (ngSubmit)="EditSubmit(EditCategory.value)">
+      <div class="row">
+
+        <div class="form-group col-md-6">
+          <label>NAME</label>
+        </div>
+        <div class="form-group col-md-6">
+          <input formControlName="name" placeholder="Enter Category Name" type="text" class="form-control">
+          <span class="help-block text-danger" *ngIf="EditCategory.get('name').touched && EditCategory.get('name').hasError('required')">Name Required !</span>
+          <span class="help-block text-danger" *ngIf="EditCategory.get('name').touched && EditCategory.get('name').hasError('minlength')">Minimum Length 3</span>
+        </div>
+
+        <div class="form-group col-md-6">
+          <label>TYPE</label>
+        </div>
+        <div class="form-group col-md-6">
+          <select formControlName="type" class="form-control">
+            <option value = 1>Raw Material</option>
+            <option value = 2>Product</option>
+            <option value = 3>Service</option>
+          </select>
+          <span class="help-block text-danger" *ngIf="EditCategory.get('type').touched && EditCategory.get('type').hasError('required')">Selection Required !</span>
+        </div>
+
+        <div class="form-group col-md-6">
+          <label>HAVE SERIAL NUMBER?</label>
+        </div>
+        <div class="form-group col-md-6">
+          <div class="custom-control custom-switch">
+            <input type="checkbox" formControlName="HaveSerialNumber" class="custom-control-input" id="customSwitch1" />
+            <label class="custom-control-label" for="customSwitch1"></label>
+          </div>
+        </div>
+
+        <div class="form-group col-md-6">
+          <label>STATUS</label>
+        </div>
+        <div class="form-group col-md-6">
+          <div class="custom-control custom-switch">
+            <input type="checkbox" formControlName="status" class="custom-control-input" id="customSwitch2" />
+            <label class="custom-control-label" for="customSwitch2"></label>
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <div class="row justify-content-center">
+            <button [disabled]="loading" class="btn btn-success" type="submit">Update <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+          </div>
+        </div>
+
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #new_category let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Add New Category</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="AddCategory" (ngSubmit)="AddSubmit(AddCategory.value)">
+      <div class="row">
+
+      <div class="form-group col-md-6">
+        <label>NAME</label>
+      </div>
+      <div class="form-group col-md-6">
+        <input formControlName="name" placeholder="Enter Category Name" type="text" class="form-control">
+        <span class="help-block text-danger" *ngIf="AddCategory.get('name').touched && AddCategory.get('name').hasError('required')">Name Required !</span>
+        <span class="help-block text-danger" *ngIf="AddCategory.get('name').touched && AddCategory.get('name').hasError('minlength')">Minimum Length 3</span>
+      </div>
+
+      <div class="form-group col-md-6">
+        <label>TYPE</label>
+      </div>
+      <div class="form-group col-md-6">
+        <select formControlName="type" class="form-control">
+          <option value = 1>Raw Material</option>
+          <option value = 2>Product</option>
+          <option value = 3>Service</option>
+        </select>
+        <span class="help-block text-danger" *ngIf="AddCategory.get('type').touched && AddCategory.get('type').hasError('required')">Selection Required !</span>
+      </div>
+
+      <div class="form-group col-md-6">
+        <label>HAVE SERIAL NUMBER?</label>
+      </div>
+      <div class="form-group col-md-6">
+        <div class="custom-control custom-switch">
+          <input type="checkbox" formControlName="HaveSerialNumber" class="custom-control-input" id="customSwitch1" />
+          <label class="custom-control-label" for="customSwitch1"></label>
+        </div>
+      </div>
+
+      <div class="form-group col-md-6">
+        <label>STATUS</label>
+      </div>
+      <div class="form-group col-md-6">
+        <div class="custom-control custom-switch">
+          <input type="checkbox" formControlName="status" class="custom-control-input" id="customSwitch2" />
+          <label class="custom-control-label" for="customSwitch2"></label>
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <div class="row justify-content-center">
+          <button [disabled]="loading" class="btn btn-success" type="submit">Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+        </div>
+      </div>
+
+    </div>
+    </form>
+  </div>
+</ng-template>

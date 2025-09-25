@@ -1,0 +1,43 @@
+/* Adjusting the dropdown panel */
+ .ng-dropdown-panel {
+  background-color: #fffdfd;
+  // padding-left: 10px;
+  position: absolute;
+  top: calc(100% + 5px); /* Ensure proper positioning relative to the input field */
+  left: 0;
+  right: 0;
+  font-size: 15px;
+  text-align: left;
+  border: 1px solid #969696;
+}
+
+ .ng-dropdown-panel .ng-option.ng-option-marked {
+  background-color: rgb(30, 89, 201) !important;
+  color: #f7f5f5 !important;
+}
+
+ .ng-dropdown-panel .ng-option.ng-option-selected {
+  background-color: rgb(30, 89, 201) !important;
+  color: #f7f5f5 !important;
+}
+
+/* Styling the option labels */
+ .ng-dropdown-panel .ng-option .ng-option-label {
+  padding: 30px;
+}
+
+/* Adjusting the font size of selected values */
+ .ng-value-container .ng-value {
+  font-size: 16px;
+}
+
+/* Adjusting the height and alignment of the ng-select component */
+ .ng-select {
+  height: 38px;
+  display: flex;
+  align-items: center;
+}
+
+ .ng-select-container {
+  text-align: left;
+}

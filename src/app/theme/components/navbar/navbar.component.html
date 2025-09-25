@@ -1,0 +1,34 @@
+<nav class="nav az-navbar fixed-top">
+    <a class="navbar-brand" routerLink="/" (click)="closeSubMenus()">
+        <img src="{{logo_call}}" alt="" class="d-md-block d-none"> 
+        <img src="{{icon_call}}" alt="" class="d-md-none">
+    </a>
+    <div id="lines" class="transition" (click)="toggleMenu()"></div>
+
+    <ul class="nav right-section">
+        <li class="nav-item">
+           <az-messages></az-messages>
+        </li>
+        <li class="nav-item">
+          <div class="dropdown float-right user-menu">
+              <a class="dropdown-toggle user-link" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                  <img src="{{img_call}}" alt="user-img" class="img-circle user-img">
+                  <span class="d-lg-inline d-none">{{user_prefix+'. '+user_name}}</span>
+              </a>
+
+              <ul class="dropdown-menu">
+                  <li class="user-info">
+                      <img src="{{img_call}}" alt="user-img" class="img-circle user-img">                    
+                      <p>
+                        {{user_prefix+'. '+user_name}} - {{designation}}
+                          <small>Last Login : {{last_login}}</small>
+                      </p>
+                  </li>
+                  <!-- <div class="dropdown-divider"></div> -->
+                  <a class="dropdown-item" style="text-align:center;" (click)="logout()"  ><i class="fa fa-power-off"></i>Log out</a>
+              </ul>
+          </div>
+        </li>
+    </ul>
+
+</nav>

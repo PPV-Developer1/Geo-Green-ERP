@@ -1,0 +1,93 @@
+[
+    {
+        "account"	: "HDFC",
+        "type"		: "BANK",
+        "name"		: "Company 1",
+        "balance"   : "100000.00",
+		"details"   : "2156465156484"
+    },
+    {
+        "account"	: "SBI",
+        "type"		: "BANK",
+        "name"		: "Company 2",
+        "balance"   : "1000000.00",
+		"details"   : "00036524548415"
+    },
+	{
+        "account"	: "Petty Cash",
+        "type"		: "CASH",
+        "name"		: "Company 3",
+        "balance"   : "10000000.00",
+		"details"   : "cash"
+    },
+	{
+        "account"	: "User Account",
+        "type"		: "INTERNAL",
+        "name"		: "Idul 1",
+        "balance"   : "10000.00",
+		"details"   : "Employee"
+    },
+	{
+        "account"	: "User 2",
+        "type"		: "INTERNAL",
+        "name"		: "User",
+        "balance"   : "1000.00",
+		"details"   : "Employee"
+    },
+	{
+        "account"	: "User 3",
+        "type"		: "INTERNAL",
+        "name"		: "User 3",
+        "balance"   : "100.00",
+		"details"   : "Employee"
+    },
+	{
+        "account"	: "User 4",
+        "type"		: "INTERNAL",
+        "name"		: "User 4",
+        "balance"   : "100.00",
+		"details"   : "Employee"
+    },
+	{
+        "account"	: "User 5",
+        "type"		: "INTERNAL",
+        "name"		: "User 5",
+        "balance"   : "100.00",
+		"details"   : "Employee"
+    },
+	{
+        "account"	: "User 6",
+        "type"		: "INTERNAL",
+        "name"		: "User 6",
+        "balance"   : "100.00",
+		"details"   : "Employee"
+    },
+	{
+        "account"	: "User 7",
+        "type"		: "INTERNAL",
+        "name"		: "User 7",
+        "balance"   : "100.00",
+		"details"   : "Employee"
+    },
+	{
+        "account"	: "User 8",
+        "type"		: "INTERNAL",
+        "name"		: "User 8",
+        "balance"   : "100.00",
+		"details"   : "Employee"
+    },
+	{
+        "account"	: "User 9",
+        "type"		: "INTERNAL",
+        "name"		: "User 9",
+        "balance"   : "100.00",
+		"details"   : "Employee"
+    },
+	{
+        "account"	: "User 10",
+        "type"		: "INTERNAL",
+        "name"		: "User 10",
+        "balance"   : "100.00",
+		"details"   : "Employee"
+    }
+]

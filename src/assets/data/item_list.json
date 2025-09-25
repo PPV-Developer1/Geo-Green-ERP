@@ -1,0 +1,47 @@
+[
+    {
+        "name": "250821",
+        "sku": "Mate",
+        "description": "XYZ",
+        "rate": "ABC",
+        "stockOnHand": "XYZ",
+        "hsnSac": "ABC",
+        "usageUnit": "10"
+    },
+    {
+        "name": "250820",
+        "sku": "Mate",
+        "description": "XYZ",
+        "rate": "ABC",
+        "stockOnHand": "XYZ",
+        "hsnSac": "ABC",
+        "usageUnit": "10"
+    },
+    {
+        "name": "250823",
+        "sku": "Mate",
+        "description": "XYZ",
+        "rate": "ABC",
+        "stockOnHand": "XYZ",
+        "hsnSac": "ABC",
+        "usageUnit": "10"
+    },
+    {
+        "name": "250825",
+        "sku": "Mate",
+        "description": "XYZ",
+        "rate": "ABC",
+        "stockOnHand": "XYZ",
+        "hsnSac": "ABC",
+        "usageUnit": "10"
+    },
+    {
+        "name": "250856",
+        "sku": "Mate",
+        "description": "XYZ",
+        "rate": "ABC",
+        "stockOnHand": "XYZ",
+        "hsnSac": "ABC",
+        "usageUnit": "10"
+    }
+]

@@ -1,0 +1,468 @@
+
+<div *ngIf="add_po == false">
+<div  class="col-md-12">
+  <table>
+    <tr>
+      <td style="width: 10px;">
+        <h1><small></small></h1>
+      </td>
+      <td style="width: 250px;">
+        <h3><small>PURCHASE REQUEST</small></h3>
+      </td>
+      <td style="width: 1100px;">
+        <div class="input-group input-group-sm my-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text"><i class="fa fa-search"></i></span>
+          </div>
+          <input class="form-control" type="text" placeholder="Search Type or Item Name or Project..." (keyup)="updateFilter($event)" />
+        </div>
+      </td>
+      <td style="width: 100px;"> </td>
+      <td style="width: 100px; text-align: center; vertical-align: center;">
+      </td>
+      <td style="width: 200px; text-align: center; vertical-align: center;">
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <button type="button" class="btn btn-success " (click)="additem()">select vendor</button>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>
+<div class="row">
+  <div class="col">
+    <div widget class="card">
+      <div class="card-header">
+        <span class="text-uppercase">Purchase Request List</span>
+        <div class="widget-controls">
+          <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+          <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+          <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+          <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+          <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+        </div>
+      </div>
+      <div class="card-body widget-body">
+        <ngx-datatable
+        #table
+        class="custom_table2"
+        [headerHeight]="50"
+        [limit]="15"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="item_list"
+        [selected]="selected"
+        [selectionType]="'checkbox'"
+        >
+
+            <ngx-datatable-column
+              [width]="100"
+              [sortable]="false"
+              [canAutoResize]="false"
+              [draggable]="true"
+              [resizeable]="false"
+              [headerCheckboxable]="false"
+              name = "CHECK BOX"
+              [checkboxable]="true"
+              >
+            </ngx-datatable-column>
+
+          <ngx-datatable-column prop="type" name="TYPE">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.type}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="item_name" name="ITEM NAME">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.item_name}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="qty" name="QUANTITY">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.qty}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="description" name="DESCRIPTION">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.description}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="project_name" name="PROJECT ">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              <label  *ngIf="row.project_name != null">{{row.project_name}}</label>
+              <label  *ngIf="row.project_name == null">Store</label>
+            </ng-template>
+          </ngx-datatable-column>
+
+        </ngx-datatable>
+      </div>
+    </div>
+  </div>
+  </div>
+ </div>
+
+<div *ngIf="add_po" >
+  <div>
+    <button type="submit" class="btn btn-info fa fa-arrow-left mb-3" (click)="ReturnToList()">
+      Back
+    </button>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div widget class="card">
+        <div class="card-header">
+          <span class="text-uppercase">New PO</span>
+          <div class="widget-controls">
+            <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+            <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+            <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+            <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+            <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+          </div>
+        </div>
+
+              <div class="header" style="height: auto; ">
+                <form class="mt-3" [formGroup]="po">
+                  <div class="col">
+                    <div class="row mb-1">
+                      <label style="color: red" class="col-sm-2 mt-2 col-form-label col-form-label-sm">VendorName*</label>
+                      <div class="col-sm-7 mb-5">
+                        <!-- <select formControlName="vendorId" class="form-control" (change)="VendorSelection($event.target.value)"
+                          placeholder="Select Vendor name" placeholder="Enter vendor name">
+                          <option *ngFor="let vendor of vendorDetails" value="{{vendor.vendor_id}}">
+                            {{vendor.company_name}}</option>
+                        </select> -->
+
+                        <ng-select formControlName="vendorId"  class=" form-control" (change)="VendorSelection($event)"
+                          [clearable]="false" [appendTo]="isDropdownAppendedToBody ? 'body' : null">
+                              <ng-option *ngFor="let vendor of vendorDetails" value="{{vendor.vendor_id}}" class="form-control">
+                                  {{vendor.company_name}}
+                              </ng-option>
+                        </ng-select>
+
+                        <span class="help-block text-danger"
+                          *ngIf="po.get('vendorId').touched && po.get('vendorId').hasError('required')">Select
+                          vendor name !</span>
+                      </div>
+                    </div>
+
+                    <div *ngIf="!formShow">
+                      <div class="row">
+                        <div class="col-md-2"></div>
+                        <div class="row col-md-10">
+                          <div class="col-md-3">
+                            <div class="row">
+                              <h5 class="ml-2" style="color:gray;">BILL FROM ADDRESS</h5>
+                            </div>
+                            <div>
+                              <input type="hidden">
+                              <p>
+                              <strong>{{billAttention}}</strong><br>
+                              {{billAddress_line_1}}<br>
+                              {{billAddress_line_2}}<br>
+                              {{billCity}}<br>
+                              {{billState}} -
+                              {{billZipcode}}
+                            </p>
+                            </div>
+                          </div>
+
+                          <div class="col-md-2">
+                            <div class="mt-5">
+                            </div>
+                            <div class="position-absolute fixed-bottom mb-5">
+                            </div>
+                          </div>
+
+                          <div class="col-md-5">
+                            <div class="row">
+                              <h5 class="ml-2" style="color:gray;">SHIP FROM ADDRESS</h5>
+                            </div>
+                            <div>
+                              <input type="hidden">
+                              <p>
+                              <strong>{{shipAttention}}</strong><br>
+                              {{shipAddress_line_1}}<br>
+                              {{shipAddress_line_2}}<br>
+                              {{shipCity}}<br>
+                              {{shipState}} -
+                              {{shipZipcode}}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row mb-3">
+                        <label style="color: #e54643"  class="col-sm-2 col-form-label col-form-label-sm">PO Number *</label>
+                        <div class="col-sm-4">
+                          <input type="text" formControlName="poNo"  [(ngModel)]="po_no"  (ngModelChange)="onInputChange()" placeholder="Enter PO Number" class="form-control form-control-sm" />
+                          <span class="help-block text-danger"
+                            *ngIf="po.get('poNo').touched && po.get('poNo').hasError('required')">Enter
+                            PO Number !</span>
+                        </div>
+                      </div>
+
+                      <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label col-form-label-sm">Reff Number</label>
+                        <div class="col-sm-4">
+                          <input type="text" formControlName="reference_number" placeholder="Enter order number"
+                            class="form-control form-control-sm" />
+
+                            <span class="help-block text-danger"
+                            *ngIf="po.get('reference_number').touched && po.get('reference_number').hasError('required')">Enter
+                            Reference Number !</span>
+                        </div>
+                      </div>
+
+                      <div class="row mb-3">
+                        <label style="color:#d64830" class="col-sm-2 col-form-label col-form-label-sm">Bill Date*</label>
+                        <div class="col-sm-4">
+                          <input type="date" #BillDate (change)="Billdate(BillDate.value)" formControlName="billDate"
+                            class="form-control form-control-sm" />
+                        </div>
+
+                        <div class="row col-sm-3">
+                          <label class="col-sm-5 col-form-label col-form-label-sm">Terms</label>
+                          <div class="col-sm-7">
+
+                            <ng-select formControlName="paymentTerms"  class=" form-control custom-select"  (change)="dueDates($event , BillDate.value)"
+                                [clearable]="false" >
+                                <ng-option *ngFor="let term of payment_terms " [value]="term.terms_value" class="form-control">
+                                  {{term.terms}}
+                                </ng-option>
+                            </ng-select>
+
+                            <span class="help-block text-danger" *ngIf="po.get('paymentTerms').touched && po.get('paymentTerms').hasError('required')">Required !</span>
+                          </div>
+                        </div>
+
+                        <div class="row col-sm-3">
+                          <label class="col-sm-5 col-form-label col-form-label-sm">Due Date</label>
+                          <div class="col-sm-7">
+                            <input type="date" [(ngModel)]="fullDate" (change)="dueDateChange()" formControlName="dueDate"
+                              class="form-control form-control-sm">
+
+
+                            <span class="help-block text-danger"
+                            *ngIf="po.get('dueDate').touched && po.get('dueDate').hasError('required')">Enter
+                            due date !</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row" >
+                        <div class="col-md-10" style="text-align: right;">
+                         <label for="size">Zoom</label></div>
+                         <div  class="col-md-2" style="text-align: left;" >
+                          <input type="range" min="100" max="200" formControlName="size" [(ngModel)]="tableWidth" (input)="changeTableWidth()" value="100">
+                          <span style="text-align: center; padding-left: 10px;">{{ tableWidth }}%</span>
+
+                        </div>
+                      </div>
+
+                      <div class="table-responsive">
+                        <div class="row">
+                          <div #tableResponsive class="col-12 bottom-30">
+                            <table class="table table-striped resizable-table" id="wide-table">
+                              <thead>
+                                <tr>
+                                  <th>ITEM NAME <div class="resizer"></div></th>
+                                  <th>DESCRIPTION  <div class="resizer"></div></th>
+                                  <th>QUANTITY <div class="resizer"></div></th>
+                                  <th>UOM <div class="resizer"></div></th>
+                                  <th>RATE <div class="resizer"></div></th>
+                                  <th>DISC % <div class="resizer"></div></th>
+                                  <th>ATD % <div class="resizer"></div></th>
+                                  <th>TAX <div class="resizer"></div></th>
+                                  <th>TOTAL <div class="resizer"></div></th>
+                                  <th>
+                                    </th>
+                                </tr>
+                              </thead>
+                              <tbody formArrayName="product">
+                                <tr *ngFor="let product of po.get('product')['controls']; let i = index;" [formGroupName]="i">
+                                  <td style="width: 350px;" class="dropdown-wrapper">
+                                    <ng-select formControlName="items" class="form-control custom-select " (click)="adjustTableHeight()" 
+                                     style=" text-align: left;" (change)="specItem($event, i)" [clearable]="false">
+                                      <ng-option *ngFor="let item of ItemList" [value]="item.item_id" class="form-control">
+                                        {{item.name}}
+                                      </ng-option>
+                                    </ng-select>
+                                  </td>
+                                  <td style="width: 350px;">
+                                    <textarea type="text" class="form-control form-control-sm" formControlName="descriptions"></textarea>
+                                  </td>
+                                  <td style="width: 200px;">
+                                    <input type="number" #qtys (change)="qty(qtys.value, price.value, discount_1.value, discount_2.value, i)" class="form-control form-control-sm" formControlName="quantity" />
+                                  </td>
+                                  <td style="width: 200px;">
+                                    <input type="text" class="form-control form-control-sm" readonly formControlName="uom"/>
+                                  </td>
+                                  <td style="width: 200px;">
+                                    <input type="number" #price (change)="priceChange(qtys.value, price.value, discount_1.value, discount_2.value, i)" class="form-control form-control-sm" formControlName="price" />
+                                  </td>
+                                  <td style="width: 200px;">
+                                    <input type="number" #discount_1 (change)="discount_Change(qtys.value, price.value, discount_1.value, discount_2.value, i)" class="form-control form-control-sm" formControlName="discount_1" />
+                                  </td>
+                                  <td style="width: 200px;">
+                                    <input type="number" #discount_2 (change)="discount_Change(qtys.value, price.value, discount_1.value, discount_2.value, i)" class="form-control form-control-sm" formControlName="discount_2" />
+                                  </td>
+                                  <td style="width: 200px;">
+                                    <input type="number" class="form-control form-control-sm" readonly formControlName="taxes"/>
+                                  </td>
+                                  <td style="width: 200px;">
+                                    <input type="number" class="form-control form-control-sm" readonly formControlName="amount">
+                                  </td>
+                                <td class="col-sm-1 mt-2 " (click)="onDeleteRow(i)" [disabled]="po.controls.product.controls.length === 1">
+                                  <i style="color: red;" class="far fa-times-circle"></i>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                     </div>
+                      <div class="row">
+                        <div class="col-sm-12">
+                          <Button type="button" (click)="initProduct()" class="btn btn-primary">+</Button>
+                        </div>
+                      </div>
+
+                      <div class="row mb-2">
+                        <div class="col-sm-5"></div>
+                        <div class="col-sm-2">
+                          <div style="text-align: right">Sub Total</div>
+                        </div>
+                        <div class="col-sm-2"></div>
+                        <div style="color: gray;" class="col-sm-2">
+                          <input type="text" style="text-align: end"
+                            class="form-control form-control-sm" readonly formControlName="subTotal"/>
+                        </div>
+                        <div class="col-sm-1"></div>
+                      </div>
+                      <span *ngFor="let gst of GST_Data">
+                        <div class="row mb-2" *ngIf="gst.amount != 0">
+                          <div class="col-sm-4"></div>
+                          <div class="col-sm-3">
+                            <div style="text-align: right">{{gst.name}}</div>
+                          </div>
+                          <div class="col-sm-2"></div>
+                          <div style="color: gray;" class="col-sm-2">
+                            <input type="text" style="text-align: end"
+                              class="form-control form-control-sm" readonly value="{{gst.amount}}"/>
+                          </div>
+                          <div class="col-sm-1"></div>
+                        </div>
+                      </span>
+
+                      <div class="row  mb-2">
+                        <div class="col-sm-5"></div>
+                        <div class="col-sm-2">
+                          <div style="text-align: right">Shipping Charges</div>
+                        </div>
+                        <div class="col-sm-2 ">
+                        </div>
+                        <div class="col-sm-2" style="color: gray;">
+                          <input type="number" (click)="FinalTotalCalculation()" formControlName="shippingCharge" style="text-align: end"
+                            class="form-control form-control-sm" />
+                        </div>
+                        <div class="col-sm-1"></div>
+                      </div>
+
+                      <div class="row mb-2">
+                        <div class="col-sm-5"></div>
+                        <div class="col-sm-2">
+                          <div class="mt-2" style="text-align: right">TDS</div>
+                        </div>
+                        <div class="col-sm-2"> <input type="number" (input)="tdsCalculation()" [(ngModel)]="tds_percent" style="text-align: end" formControlName="tds_percentage" class="form-control form-control-sm" > </div>
+                        <div style="color: gray;" class="col-sm-2">
+                          <input type="number" (click)="FinalTotalCalculation()" style="text-align: end" formControlName="TDS"
+                            class="form-control form-control-sm" />
+                        </div>
+                        <div class="col-sm-1"></div>
+                      </div>
+
+                      <div class="row mb-2">
+                        <div class="col-sm-5"></div>
+                        <div class="col-sm-2">
+                          <div class="mt-2" style="text-align: right">TCS</div>
+                        </div>
+                        <div class="col-sm-2"> <input type="number" (input)="tcsCalculation()" [(ngModel)]="tcs_percent" style="text-align: end" formControlName="tcs_percentage" class="form-control form-control-sm" > </div>
+                        <div style="color: gray;" class="col-sm-2">
+                          <input type="number" (click)="FinalTotalCalculation()" style="text-align: end" formControlName="TCS"
+                            class="form-control form-control-sm" />
+                        </div>
+                        <div class="col-sm-1"></div>
+                      </div>
+                      <div class="row mb-2">
+                        <div class="col-sm-5"></div>
+                        <div class="col-sm-2">
+                          <div class="mt-2" style="text-align: right">Round Off</div>
+                        </div>
+                        <div class="col-sm-2"> </div>
+                        <div style="color: gray;" class="col-sm-2">
+                          <input type="number" style="text-align: end" (click)="FinalTotalCalculation()" formControlName="roundOff"
+                            class="form-control form-control-sm" />
+                        </div>
+                        <div class="col-sm-1"></div>
+                      </div>
+                      <div class="row mt-3">
+                        <div class="col-sm-6">
+                          <label style="font-size: 14px">Customer Notes</label>
+                          <textarea class="form-control form-control-sm" style="height: 50px" formControlName="notes"
+                            placeholder="Enter any notes to be displayed in your transaction"
+                            [(ngModel)]="notes">{{notes}} </textarea>
+
+                          <span class="help-block text-danger"
+                            *ngIf="po.get('notes').touched && po.get('notes').hasError('required')">Enter
+                            Notes !</span>
+                        </div>
+
+                        <div class="col-sm-3 mt-5">
+                          <h2>Total</h2>
+                        </div>
+
+                        <div class="col-sm-2 mt-5">
+                          <input type="text" style="text-align: end"
+                            class="form-control form-control-sm" readonly formControlName="total" />
+                        </div>
+                        <div class="col-sm-1"></div>
+                      </div>
+
+                      <div class="row mt-3">
+                        <div class="col-sm-8">
+                          <label style="font-size: 14px">Terms & Conditions</label>
+                          <textarea formControlName="terms_condition" class="form-control form-control-sm"
+                            style="height: 100px"
+                            placeholder="Enter the terms and conditions of your business to be displayed in your transaction"
+                            [(ngModel)]="terms_condition">{{terms_condition}}</textarea>
+                          <span class="help-block text-danger"
+                            *ngIf="po.get('terms_condition').touched && po.get('terms_condition').hasError('required')">Enter
+                            Terms & Conditions !</span>
+                        </div>
+                      </div>
+
+                      <div class="row mt-3 mb-3">
+                        <div class="col-sm-6">
+                          <button [disabled]="loading" style="background-color: #d64830; border-color: #d64830; color: #fff; " type="button"
+                            class="btn btn-outline-secondary" (click)="onSubmit(po.value)">
+                            <i class="fa fa-spinner fa-spin" *ngIf="loading"></i>
+                            Submit
+                          </button>
+                          <button type="button" style=" background-color: #f5f5f5; color: #212529; border-color: #ddd;"
+                            class="btn btn-outline-secondary ml-2" (click)="ReturnToList()">
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+    </div>
+  </div>
+</div>

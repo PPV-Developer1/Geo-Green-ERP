@@ -1,0 +1,435 @@
+
+  <div *ngIf="!show && !show_new_note" >
+
+    <div class="col-md-12">
+      <table>
+        <tr>
+          <!-- <td style="width: 10px">
+            <h1><small></small></h1>
+          </td> -->
+          <td style="width: 200px">
+            <h5 class="mt-2 ml-2">DEBIT NOTES</h5>
+          </td>
+          <td style="width: 1100px">
+            <div class="input-group input-group-sm my-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
+              </div>
+              <input class="form-control" type="text" placeholder="Search ...."
+                (keyup)="updateFilter($event)" />
+            </div>
+          </td>
+          <td style="width: 100px"></td>
+          <td style="width: 100px; text-align: center; vertical-align: center"></td>
+          <td style="width: 200px; text-align: center; vertical-align: center">
+            <div class="btn-group" role="group" aria-label="Basic example">
+                    <button class="btn btn-success fa fa-plus dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    New Debit Note
+                  </button>
+                  <div class="dropdown-menu">
+
+                      <a  class="dropdown-item" href="javascript:void(0);" (click)="addNote('vendor')">Vendor</a>
+                      <a  class="dropdown-item" href="javascript:void(0);" (click)="addNote('customer')">Customer</a>
+
+                  </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <div widget class="card">
+          <div class="card-body widget-body">
+            <ngx-datatable style="cursor: pointer;" #table class="custom_table" [headerHeight]="50" [limit]="20"
+              [columnMode]="'force'" [footerHeight]="50" [rowHeight]="'auto'" [rows]="List" [selected]="selected"
+              [selectionType]="'single'" (activate)="onActivate($event)">
+
+               <ngx-datatable-column prop="generate_date" name="DATE">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  {{ row.generate_date | date:'dd-MM-yyyy'}}
+                </ng-template>
+              </ngx-datatable-column>
+
+               <ngx-datatable-column prop="note_type" name="TYPE">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  {{ row.note_type }}
+                </ng-template>
+              </ngx-datatable-column>
+
+                 <ngx-datatable-column prop="credit_note_no" name="DEBIT NOTE NO">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  {{ row.credit_note_no }}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="company_name" name="NAME">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  <span style="font-weight:bold;">{{ row.company_name }}</span>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="terms_condition" name="BILL">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  {{ row.bill_number }}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="terms_condition" name="INVOICE">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  {{ row.invoice_no }}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="terms_condition" name="AMOUNT">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                 <b>{{ row.total_amount| indianCurrency }}</b>
+                </ng-template>
+              </ngx-datatable-column>
+
+            </ngx-datatable>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div *ngIf="show_new_note">
+
+    <div>
+      <button type="submit" class="btn btn-info fa fa-arrow-left mb-3" (click)="ReturnToList()">
+        Back
+      </button>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div widget class="card">
+          <div class="card-header">
+            <span class="text-uppercase">New Debit Note</span>
+            <div class="widget-controls">
+              <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+              <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+              <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+              <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+              <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+            </div>
+          </div>
+
+          <div class="header" style="height: auto; ">
+            <form class="mt-3" [formGroup]="DebitNoteForm">
+
+              <div class="col" >
+                  <div class="row mb-1"  *ngIf="type =='vendor'">
+                     <label style="color: red" class="col-sm-2 mt-2 col-form-label col-form-label-sm">Vendor *</label>
+                      <div class="col-sm-7 mb-5">
+                        <ng-select formControlName="vendor_id"  class=" form-control " (change)="Selection($event)"
+                              [clearable]="false" [appendTo]="isDropdownAppendedToBody ? 'body' : null">
+                            <ng-option *ngFor="let vendor of vendor_list" value="{{vendor.vendor_id}}" class="form-control">
+                                {{vendor.company_name}}
+                            </ng-option>
+                        </ng-select>
+                      </div>
+                   </div>
+
+                  <div class="row mb-1"  *ngIf="type =='customer'">
+                     <label style="color: red" class="col-sm-2 mt-2 col-form-label col-form-label-sm">Customer *</label>
+                      <div class="col-sm-7 mb-5">
+                        <ng-select formControlName="vendor_id"  class=" form-control " (change)="Selection($event)"
+                              [clearable]="false" [appendTo]="isDropdownAppendedToBody ? 'body' : null">
+                            <ng-option *ngFor="let customer of Customer_list" value="{{customer.customer_id}}" class="form-control">
+                                {{customer.company_name}}
+                            </ng-option>
+                        </ng-select>
+                      </div>
+                   </div>
+              </div>
+
+              <div class="col">
+                <div class="row mb-1"  *ngIf="type =='vendor'">
+                  <label style="color: red" class="col-sm-2 mt-2 col-form-label col-form-label-sm">Bill *</label>
+                  <div class="col-sm-7 mb-5">
+
+                    <ng-select formControlName="bill_number"  class=" form-control " (change)="VendorSelection($event)"
+                    [clearable]="false" [appendTo]="isDropdownAppendedToBody ? 'body' : null">
+                        <ng-option *ngFor="let bill of Bill_list" value="{{bill.bill_id}}" class="form-control">
+                            {{bill.bill_number}}
+                        </ng-option>
+                   </ng-select>
+
+                    <span class="help-block text-danger"
+                      *ngIf="DebitNoteForm.get('bill_number').touched && DebitNoteForm.get('bill_number').hasError('required')">Select
+                      bill !</span>
+                  </div>
+                </div>
+
+                <div class="row mb-1" *ngIf="type =='customer'" >
+                  <label style="color: red" class="col-sm-2 mt-2 col-form-label col-form-label-sm">Invoice *</label>
+                  <div class="col-sm-7 mb-5">
+
+                    <ng-select formControlName="bill_number"  class=" form-control " (change)="VendorSelection($event)"
+                    [clearable]="false" [appendTo]="isDropdownAppendedToBody ? 'body' : null">
+                        <ng-option *ngFor="let bill of Bill_list" value="{{bill.invoice_id}}" class="form-control">
+                            {{bill.invoice_number}}
+                        </ng-option>
+                   </ng-select>
+
+                    <span class="help-block text-danger"
+                      *ngIf="DebitNoteForm.get('bill_number').touched && DebitNoteForm.get('bill_number').hasError('required')">Select
+                      invoice !</span>
+                  </div>
+                </div>
+
+
+                <div *ngIf="!formShow">
+                   <!-- <div class="row">
+                     <label style="color: red" class="col-sm-2 mt-2 col-form-label col-form-label-sm">Company Name</label>
+                        <div class="col-sm-7 mt-2" >
+                          <h5>{{Bill_vendor_name}}</h5>
+                        </div>
+
+                   </div> -->
+
+                  <div class="row">
+                    <div class="col-sm-2"></div>
+                    <div class="row col-sm-7">
+                      <div class="col-md-5">
+
+                          <h5  style="color:rgb(32, 102, 148);">  To Address :</h5>
+
+                        <div>
+                          <input type="hidden">
+                          <p>
+                          <strong>{{billAttention}}</strong><br>
+                          {{billAddress_line_1}}<br>
+                          {{billAddress_line_2}}<br>
+                          {{billCity}}<br>
+                          {{billState}} -
+                          {{billZipcode}}
+                        </p>
+                        </div>
+                      </div>
+
+                      <div class="col-md-2">
+                        <div class="mt-5">
+                        </div>
+                        <div class="position-absolute fixed-bottom mb-5">
+                        </div>
+                      </div>
+
+                      <div class="col-md-5">
+                        <!-- <div class="row">
+                          <h5 class="ml-2" style="color:gray;">SHIP FROM ADDRESS</h5>
+                        </div>
+                        <div>
+                          <input type="hidden">
+                          <p>
+                          <strong>{{shipAttention}}</strong><br>
+                          {{shipAddress_line_1}}<br>
+                          {{shipAddress_line_2}}<br>
+                          {{shipCity}}<br>
+                          {{shipState}} -
+                          {{shipZipcode}}</p>
+                        </div> -->
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row mb-3">
+                    <label style="color: #e54643"  class="col-sm-2 col-form-label col-form-label-sm">Debit Note Number *</label>
+                    <div class="col-sm-4">
+                      <input type="text" formControlName="note_no"  [(ngModel)]="note_no" placeholder="Enter Credit Note Number" class="form-control form-control-sm"/>
+                      <span class="help-block text-danger" *ngIf="DebitNoteForm.get('note_no').touched && DebitNoteForm.get('note_no').hasError('required')">Enter Credit Note Number !</span>
+                    </div>
+                  </div>
+
+
+                  <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label col-form-label-sm">Message </label>
+                    <div class="col-sm-4">
+                      <textarea type="text" formControlName="message" placeholder="Enter Message" class="form-control form-control-sm"> </textarea>
+                      <span class="help-block text-danger" *ngIf="DebitNoteForm.get('message').touched && DebitNoteForm.get('message').hasError('required')">Enter Message !</span>
+                    </div>
+                  </div>
+
+                  <div class="row mb-3">
+                    <label  class="col-sm-2 col-form-label col-form-label-sm">Reference </label>
+                    <div class="col-sm-4">
+                      <textarea type="text" formControlName="reference" placeholder="Enter Reference" class="form-control form-control-sm"> </textarea>
+                      <span class="help-block text-danger" *ngIf="DebitNoteForm.get('reference').touched && DebitNoteForm.get('reference').hasError('required')">Enter Reference !</span>
+                    </div>
+                  </div>
+
+                  <!-- <div class="row" >
+                    <div class="col-md-10" style="text-align: right;">
+                     <label for="size">Zoom</label></div>
+                     <div  class="col-md-2" style="text-align: left;" >
+                      <input type="range" min="100" max="200" formControlName="size" [(ngModel)]="tableWidth" (input)="changeTableWidth()" value="100">
+                      <span style="text-align: center; padding-left: 10px;">{{ tableWidth }}%</span>
+
+                    </div>
+                  </div> -->
+
+                  <div class="table-responsive">
+                    <div class="row">
+                      <div #tableResponsive class="col-12 bottom-30">
+                        <table class="table table-striped resizable-table" id="wide-table">
+                          <thead>
+                            <tr>
+                              <th>ITEM NAME <div class="resizer"></div></th>
+                              <th>DESCRIPTION  <div class="resizer"></div></th>
+                              <th>QUANTITY <div class="resizer"></div></th>
+                              <th>UOM <div class="resizer"></div></th>
+                              <th>RATE <div class="resizer"></div></th>
+                              <th>Tax <div class="resizer"></div></th>
+                              <th>TOTAL <div class="resizer"></div></th>
+                              <th>
+                                </th>
+                            </tr>
+                          </thead>
+                          <tbody formArrayName="product">
+                            <tr  *ngFor="let product of productControls; let i = index"  [formGroupName]="i">
+                              <td style="width: 350px;" class="dropdown-wrapper">
+                                <ng-select formControlName="items" (click)="adjustTableHeight()"  class="form-control custom-select "
+                                   style=" text-align: left;" (change)="specItem($event, i)" [clearable]="false">
+                                  <ng-option *ngFor="let item of ItemList" [value]="item.item_list_id" class="form-control">
+                                    {{item.name}}
+                                  </ng-option>
+                                </ng-select>
+                              </td>
+                              <td style="width: 350px;">
+                                <textarea type="text" class="form-control form-control-sm" formControlName="descriptions"></textarea>
+                              </td>
+                              <td style="width: 200px;">
+
+                                 <input type="number" #qtys (change)="qty(qtys.value, price.value,i)" min="0" class="form-control form-control-sm" formControlName="quantity" />
+                              </td>
+                              <td style="width: 200px;">
+                                <input type="text" class="form-control form-control-sm" readonly formControlName="uom"/>
+                              </td>
+                              <td style="width: 200px;">
+
+                                 <input type="number" #price (change)="priceChange(qtys.value, price.value, i)" class="form-control form-control-sm" formControlName="price" />
+                              </td>
+
+                              <td style="width: 200px;">
+                                <input type="number" class="form-control form-control-sm" readonly formControlName="taxes"/>
+                              </td>
+
+                              <td style="width: 200px;">
+                                <input type="number" class="form-control form-control-sm" readonly formControlName="amount">
+                              </td>
+                              <td class="col-sm-1 mt-2" (click)="onDeleteRow(i)" [disabled]="DebitNoteForm.controls.product.controls.length === 1">
+                                <i style="color: red;" class="far fa-times-circle"></i>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <Button type="button" (click)="initProduct()" class="btn btn-primary">+</Button>
+                    </div>
+                  </div>
+
+                  <div class="row mb-2">
+                    <div class="col-sm-5"></div>
+                    <div class="col-sm-2">
+                      <div style="text-align: right">Sub Total</div>
+                    </div>
+                    <div class="col-sm-2"></div>
+                    <div style="color: gray;" class="col-sm-2">
+                      <input type="text" style="text-align: end"
+                        class="form-control form-control-sm" readonly formControlName="subTotal"/>
+                    </div>
+                    <div class="col-sm-1"></div>
+                  </div>
+
+                  <span *ngFor="let gst of GST_Data">
+                    <div class="row mb-2" *ngIf="gst.amount != 0">
+                      <div class="col-sm-4"></div>
+                      <div class="col-sm-3">
+                        <div style="text-align: right">{{gst.name}}</div>
+                      </div>
+                      <div class="col-sm-2"></div>
+                      <div style="color: gray;" class="col-sm-2">
+                        <input type="text" style="text-align: end"
+                          class="form-control form-control-sm" readonly value="{{gst.amount}}"/>
+                      </div>
+                      <div class="col-sm-1"></div>
+                    </div>
+                  </span>
+
+                  <div class="row mt-3">
+                    <div class="col-sm-6">
+                      <label style="font-size: 14px">Vendor Notes</label>
+                      <textarea class="form-control form-control-sm" style="height: 50px" formControlName="notes"
+                        placeholder="Enter any notes to be displayed in your transaction"
+                        [(ngModel)]="notes">{{notes}} </textarea>
+
+                      <span class="help-block text-danger"
+                        *ngIf="DebitNoteForm.get('notes').touched && DebitNoteForm.get('notes').hasError('required')">Enter
+                        Notes !</span>
+                    </div>
+
+                    <div class="col-sm-3 mt-5">
+                      <h2>Total</h2>
+                    </div>
+
+                    <div class="col-sm-2 mt-5">
+                      <input type="text" style="text-align: end"
+                        class="form-control form-control-sm" readonly formControlName="total" />
+                    </div>
+                    <div class="col-sm-1"></div>
+                  </div>
+
+
+                  <div class="row mt-3 mb-3">
+                    <div class="col-sm-6">
+                      <button [disabled]="loading" style="background-color: #d64830; border-color: #d64830; color: #fff; " type="button"
+                        class="btn btn-outline-secondary" (click)="onSubmit(DebitNoteForm.value)">
+                        <i class="fa fa-spinner fa-spin" *ngIf="loading"></i>
+                        Submit
+                      </button>
+                      <button type="button" style=" background-color: #f5f5f5; color: #212529; border-color: #ddd;"
+                        class="btn btn-outline-secondary ml-2" (click)="ReturnToList()">
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+
+  <ng-template #Confirmation_return let-modal>
+  <div class="modal-header state modal-primary">
+    <h2 class="modal-title" id="modal-primary-label"> Confirmation !</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+   Are you sure you want to go back to this form ?
+  </div>
+  <div class="modal-footer">
+      <button [disabled]="loading" type="button" class="btn btn-success" data-dismiss="modal" (click)="Confirm_back()">Confirm<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      <button type="button" class="btn btn-danger" data-dismiss="modal" (click)="modal.dismiss('Cross click')">Close</button>
+  </div>
+</ng-template>
+
+<div *ngIf="show">
+  <div>
+    <button type="submit" class="btn btn-info fa fa-arrow-left mb-3" (click)="back()">
+      Back
+    </button>
+  </div>
+
+  <app-debit_note_view></app-debit_note_view>
+</div>

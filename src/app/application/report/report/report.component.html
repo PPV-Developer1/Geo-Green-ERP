@@ -1,0 +1,2386 @@
+<div *ngIf="show" class="row bottom-15 grid">
+  <div class="col-md-3 col-md-pull-9" >
+      <div class="card">
+          <div class="card-body">
+            <div class="ml-2 mt-3">
+              <h6 style="font-weight: 500; font-size: large"><i class="fa fa-thumbs-o-up"></i> My Favorites</h6>
+            </div>
+            <table class="table text-info">
+              <tbody>
+                  <tr *ngFor="let list of report_list">
+                    <span *ngIf="list.starred == true">
+                      <td style="width: 5%">
+                          <i class="fa" style="cursor: pointer" [ngClass]="{'fa-star': list.starred, 'fa-star-o': !list.starred}" (click)="changeStarStatus(list)"></i>
+                      </td>
+                      <td (click)="goToDetail(list)" style="cursor: pointer"><a>{{ list.title }}</a></td>
+                    </span>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+      </div>
+  </div>
+  <div  class="col-md-9 col-md-push-3">
+      <div class="card">
+          <div class="row card-body">
+            <div class="col-4" *ngFor="let group of report_group">
+              <div class="ml-2 mt-3">
+                <h6 style="font-weight: 500; font-size: large"><i class="{{group.icon}}"></i> {{group.name}}</h6>
+              </div>
+              <table class="table text-info">
+                <tbody>
+                    <tr *ngFor="let list of report_list">
+                      <span *ngIf="list.report_group == group.id">
+                        <td style="width: 5%">
+                            <i class="fa" style="cursor: pointer" [ngClass]="{'fa-star': list.starred, 'fa-star-o': !list.starred}" (click)="changeStarStatus(list)"></i>
+                        </td>
+                        <td (click)="goToDetail(list)" style="cursor: pointer" >{{ list.title }}</td>
+                      </span>
+                    </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div *ngIf="id !=null">
+    <button type="submit" *ngIf="!customer_payment" class="btn btn-info fa fa-arrow-left"  (click)="set_zero()"> Back </button>
+    <button type="submit" *ngIf="customer_payment && !purchase_list_view" class="btn btn-info fa fa-arrow-left" (click)="set_zero1()"> Back </button>
+<div class="row" >
+ <div class="col-4"></div>
+ <div ><h5><span class="text-uppercase"><b>{{title}}</b></span></h5></div>
+</div>
+
+  <div *ngIf="!customer_payment">
+        <form class="row" [formGroup]="date" >
+            <div class="form-group col-md-1">
+            </div>
+            <div class="form-group row text-sm-right col-md-4">
+                <label class="col-sm-2 form-control-label m-t-5">From</label>
+                <div class="col-sm-10">
+                    <input type="date" formControlName="fromdate" class="form-control">
+                </div>
+            </div>
+            <div class="form-group row text-sm-right col-md-4">
+                <label class="col-sm-2 form-control-label m-t-5">To</label>
+                <div class="col-sm-10">
+                    <input type="date" formControlName="todate" class="form-control">
+                </div>
+            </div>
+            <div class="form-group col-md-2">
+                <button class="btn btn-main" class="btn btn-success fa fa-print"  type="submit" (click)="download(date.value)" > Report</button>
+              </div>
+              <div *ngIf="id !='tax_report'" class=" form-group pull-right">
+                <button *ngIf="id !='tds_tcs'" class="btn btn-main"  class="btn btn-success fa fa-download pull-right" type="submit" (click)="print()" > Download</button>
+              </div>
+        </form>
+        &nbsp;
+
+     <div *ngIf="id=='invoice_details'">
+
+      <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+            [headerHeight]="50"
+            [limit]="15"
+            [columnMode]="'force'"
+            [footerHeight]="50"
+            [rowHeight]="'auto'"
+            [rows]="transeaction_det"
+            [sortable]="true"
+            [selectionType]="'single'"
+            (activate)="onActivate($event)">
+
+           <ngx-datatable-column prop="Date" name="DATE">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.Date | date: 'dd-MM-yyyy'}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="Invoice_No" name="Invoice No">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.Invoice_No}}
+            </ng-template>
+          </ngx-datatable-column>
+
+
+            <ngx-datatable-column prop="Due_date" name="Due Date">
+              <ng-template ngx-datatable-cell-template let-row="row">
+               {{row.Due_date | date: 'dd-MM-yyyy'}}
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column  prop="Reference_number" name=" Reference">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.Reference_number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column  prop="Customer_name" name="Customer Name">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                 {{row.Customer_name}}
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="Status" name="Status">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                  <span *ngIf="row.Status !='Total'"> {{row.Status}}</span>
+                  <span *ngIf="row.Status =='Total'"><b>{{row.Status}}</b></span>
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="Total" name="Amount">
+              <ng-template ngx-datatable-cell-template let-row="row">
+
+                  <span *ngIf="row.Status !='Total'">  {{row.Total|indianCurrency}}</span>
+                  <span *ngIf="row.Status =='Total'"><b>{{row.Total|indianCurrency}}</b></span>
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="Balance" name="Balance">
+              <ng-template ngx-datatable-cell-template let-row="row">
+
+                  <span *ngIf="row.Status !='Total'">  {{row.Balance|indianCurrency}}</span>
+                  <span *ngIf="row.Status =='Total'"><b>{{row.Balance|indianCurrency}}</b></span>
+              </ng-template>
+            </ngx-datatable-column>
+            </ngx-datatable>
+  </div>
+
+
+      <div *ngIf="id=='sales_by_customer'">
+                <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+                [headerHeight]="50"
+                [limit]="15"
+                [columnMode]="'force'"
+                [footerHeight]="50"
+                [rowHeight]="'auto'"
+                [rows]="sale_by_cust"
+                [sortable]="true"
+                [selectionType]="'single'"
+                (activate)="onActivate($event)">
+
+               <ngx-datatable-column prop="Customer_Name" name="CUSTOMER NAME">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.Customer_Name}}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="Invoice_Count" name="INVOICE COUNT">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.Invoice_Count}}
+                </ng-template>
+              </ngx-datatable-column>
+
+
+                <ngx-datatable-column prop="Without_Tax" name="WITHOUT TAX">
+                  <ng-template ngx-datatable-cell-template let-row="row">
+                   {{row.Without_Tax|indianCurrency}}
+                  </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column prop="Tax" name="TAX">
+                  <ng-template ngx-datatable-cell-template let-row="row">
+                   {{row.Tax|indianCurrency}}
+                  </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column  prop="Sales" name=" SALES">
+                  <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.Sales|indianCurrency}}
+                  </ng-template>
+                </ngx-datatable-column>
+
+            </ngx-datatable>
+      </div>
+
+          <div *ngIf="id=='customer_balances'">
+
+            <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+                [headerHeight]="50"
+                [limit]="15"
+                [columnMode]="'force'"
+                [footerHeight]="50"
+                [rowHeight]="'auto'"
+                [rows]="sale_by_cust"
+                [sortable]="true"
+                [selectionType]="'single'"
+                (activate)="onActivate($event)">
+
+           <ngx-datatable-column prop="Customer_Name" name="CUSTOMER NAME">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.Customer_Name}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="Sales" name="INVOICE AMOUNT">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.Sales|indianCurrency}}
+            </ng-template>
+          </ngx-datatable-column>
+
+
+            <ngx-datatable-column prop="Received" name="AMOUNT RECEIVED">
+              <ng-template ngx-datatable-cell-template let-row="row">
+               {{row.Received|indianCurrency}}
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column  prop="Balance" name="CLOSING BALANCE">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.Balance|indianCurrency}}
+              </ng-template>
+            </ngx-datatable-column>
+            </ngx-datatable>
+          </div>
+
+      <div *ngIf="id=='sales_by_item'">
+            <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+            [headerHeight]="50"
+            [limit]="15"
+            [columnMode]="'force'"
+            [footerHeight]="50"
+            [rowHeight]="'auto'"
+            [rows]="sale_by_cust"
+            [sortable]="true"
+            [selectionType]="'single'"
+            (activate)="onActivate($event)" >
+
+
+       <ngx-datatable-column prop="Item_Name" name="ITEM NAME">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.Item_Name}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="Qunatity_Sold" name="QUANTITY SOLD">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.Qunatity_Sold}}
+        </ng-template>
+      </ngx-datatable-column>
+
+
+        <ngx-datatable-column prop="Amount" name="AMOUNT">
+          <ng-template ngx-datatable-cell-template let-row="row">
+           {{row.Amount|indianCurrency}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column  prop="Average_Price" name="AVERAGE PRICE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.Average_Price|indianCurrency}}
+          </ng-template>
+        </ngx-datatable-column>
+        </ngx-datatable>
+      </div>
+
+       <div *ngIf="id =='payments_received'">
+            <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+            [headerHeight]="50"
+            [limit]="20"
+            [columnMode]="'force'"
+            [footerHeight]="50"
+            [rowHeight]="'auto'"
+            [rows]="sale_by_cust"
+            [sortable]="true"
+            [selectionType]="'single'"
+            (activate)="onActivate($event)">
+
+
+       <ngx-datatable-column prop="Customer_Name" name="CUSTOMER NAME">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.Customer_Name}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="Reference_Number" name="REFERENCE NUMBER">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.Reference_Number}}
+        </ng-template>
+      </ngx-datatable-column>
+
+
+        <ngx-datatable-column prop="Payment_Mode" name="PAYMENT MODE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+           {{row.Payment_Mode}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column  prop="Invoive_No" name="INVOICE NUMBER">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.Invoive_No}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="Deposited_To" name="DEPOSITED TO">
+          <ng-template ngx-datatable-cell-template let-row="row">
+           {{row.Deposited_To}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column  prop="Amount" name="AMOUNT">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.Amount|indianCurrency}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column  prop="reference" name="REFERENCE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.reference}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column  prop="reference" name="NOTES">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.notes}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        </ngx-datatable>
+    </div>
+
+
+          <div *ngIf="id =='inventory_summary'">
+            <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+            [headerHeight]="50"
+            [limit]="20"
+            [columnMode]="'force'"
+            [footerHeight]="50"
+            [rowHeight]="'auto'"
+            [rows]="sale_by_cust"
+            [sortable]="true"
+            [selectionType]="'single'"
+            (activate)="onActivate($event)" >
+
+
+       <ngx-datatable-column prop="Item_Name" name="ITEM NAME">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.Item_Name}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="Batch_Number" name="BATCH">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.Batch_Number}}
+        </ng-template>
+      </ngx-datatable-column>
+
+
+        <ngx-datatable-column prop="Quantity_Ordered" name="QUANTITY OREDERED">
+          <ng-template ngx-datatable-cell-template let-row="row">
+           {{row.Quantity_Ordered}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column  prop="Quantity_In" name="QUANTITY IN">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.Quantity_In}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="Quantity_Out" name="QUANTITY OUT">
+          <ng-template ngx-datatable-cell-template let-row="row">
+           {{row.Quantity_Out}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column  prop="Stock_on_Hand" name="STOCK ON HAND">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.Stock_on_Hand}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        </ngx-datatable>
+          </div>
+
+
+    <div *ngIf="id =='stock_summary_report'">
+
+                    <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+                    [headerHeight]="50"
+                    [limit]="20"
+                    [columnMode]="'force'"
+                    [footerHeight]="50"
+                    [rowHeight]="'auto'"
+                    [rows]="sale_by_cust"
+                    [sortable]="true"
+                    [selectionType]="'single'"
+                    (activate)="onActivate($event)">
+
+
+                    <ngx-datatable-column prop="Item_Name" name="ITEM NAME">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.Item_Name}}
+                    </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="Batch_Number" name="BATCH">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.Batch_Number}}
+                    </ng-template>
+                    </ngx-datatable-column>
+
+
+                    <ngx-datatable-column  prop="Quantity_in" name="QUANTITY IN">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.Quantity_in}}
+                    </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="Quantity_Out" name="QUANTITY OUT">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.Quantity_Out}}
+                    </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column  prop="Balance" name="BALANCE AMOUNT">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.Balance}}
+                    </ng-template>
+                    </ngx-datatable-column>
+                    </ngx-datatable>
+
+          </div>
+
+      <div *ngIf="id =='bills_details'">
+
+            <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+            [headerHeight]="50"
+            [limit]="20"
+            [columnMode]="'force'"
+            [footerHeight]="50"
+            [rowHeight]="'auto'"
+            [rows]="sale_by_cust"
+            [sortable]="true"
+            [selectionType]="'single'"
+            (activate)="onActivate($event)">
+
+
+            <ngx-datatable-column prop="Status" name="STATUS">
+            <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.Status}}
+            </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="Bill_Date" name="BILL DATE">
+            <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.Bill_Date | date: 'dd-MM-yyyy'}}
+            </ng-template>
+            </ngx-datatable-column>
+
+
+            <ngx-datatable-column  prop="Due_Date" name="DUE DATE">
+            <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.Due_Date | date: 'dd-MM-yyyy'}}
+            </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="Bill" name="BILL">
+            <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.Bill}}
+            </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column  prop="Vendor_Name" name="VENDOR NAME">
+            <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.Vendor_Name}}
+            </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column  prop="Bill_Amount" name="BILL AMOUNT">
+              <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.Bill_Amount|indianCurrency}}
+              </ng-template>
+              </ngx-datatable-column>
+
+            <ngx-datatable-column  prop="Balance_Amount" name="BALANCE AMOUNT">
+              <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.Balance_Amount|indianCurrency}}
+              </ng-template>
+              </ngx-datatable-column>
+
+            </ngx-datatable>
+
+          </div>
+
+          <div *ngIf="id =='payments_made'">
+            <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+            [headerHeight]="50"
+            [limit]="20"
+            [columnMode]="'force'"
+            [footerHeight]="50"
+            [rowHeight]="'auto'"
+            [rows]="sale_by_cust"
+            [sortable]="true"
+            [selectionType]="'single'"
+            (activate)="onActivate($event)">
+
+
+            <ngx-datatable-column prop="Date" name="DATE">
+            <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.Date | date: 'dd-MM-yyyy'}}
+            </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="Reference" name="REFERENCE">
+            <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.Reference}}
+            </ng-template>
+            </ngx-datatable-column>
+
+
+            <ngx-datatable-column  prop="Bill" name="BILL">
+            <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.Bill}}
+            </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="Vendor_Name" name="VENDOR NAME">
+            <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.Vendor_Name}}
+            </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column  prop="Payment_Mode" name="PAYMENT MODE">
+            <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.Payment_Mode}}
+            </ng-template>
+            </ngx-datatable-column>
+
+
+            <ngx-datatable-column  prop="Notes" name="NOTES">
+              <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.Notes}}
+              </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="Paid_Through" name="PAID THROUGH">
+              <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.Paid_Through}}
+              </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column  prop="Amount" name="AMOUNT">
+              <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.Amount|indianCurrency}}
+              </ng-template>
+              </ngx-datatable-column>
+
+            </ngx-datatable>
+          </div>
+
+          <div *ngIf="id =='vendor_balances'">
+            <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+                [headerHeight]="50"
+                [limit]="15"
+                [columnMode]="'force'"
+                [footerHeight]="50"
+                [rowHeight]="'auto'"
+                [rows]="sale_by_cust"
+                [sortable]="true"
+                [selectionType]="'single'"
+                (activate)="onActivate($event)">
+
+
+           <ngx-datatable-column prop="Vendor_Name" name="VENDOR NAME">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.Vendor_Name}}
+            </ng-template>
+          </ngx-datatable-column>
+
+
+          <ngx-datatable-column prop="Bill_Count" name="BILL COUNT">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.Bill_Count}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="Bill_Amount" name="BILL AMOUNT">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.Bill_Amount|indianCurrency}}
+            </ng-template>
+          </ngx-datatable-column>
+
+
+            <ngx-datatable-column prop="Paid_Amount" name="PAID AMOUND">
+              <ng-template ngx-datatable-cell-template let-row="row">
+               {{row.Paid_Amount|indianCurrency}}
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column  prop="Balance" name="BALANCE">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.Balance|indianCurrency}}
+              </ng-template>
+            </ngx-datatable-column>
+            </ngx-datatable>
+        </div>
+
+        <div *ngIf="id =='purchase_order_details'">
+
+          <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+          [headerHeight]="50"
+          [limit]="15"
+          [columnMode]="'force'"
+          [footerHeight]="50"
+          [rowHeight]="'auto'"
+          [rows]="sale_by_cust"
+          [sortable]="true"
+          [selectionType]="'single'"
+          (activate)="onActivate($event)">
+
+
+                  <ngx-datatable-column prop="Date" name="DATE">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      {{row.Date | date: 'dd-MM-yyyy'}}
+                    </ng-template>
+                  </ngx-datatable-column>
+
+
+                  <ngx-datatable-column prop="PO_Number" name="PO NUMBER">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      {{row.PO_Number}}
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column prop="Vendor_Name" name="VENDOR NAME">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      {{row.Vendor_Name}}
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="Amount" name="AMOUND">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                      {{row.Amount|indianCurrency}}
+                      </ng-template>
+                    </ngx-datatable-column>
+                    </ngx-datatable>
+
+             </div>
+
+
+      <div *ngIf="id =='delivery_challan_details'">
+
+        <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+        [headerHeight]="50"
+        [limit]="15"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="sale_by_cust"
+        [sortable]="true"
+        [selectionType]="'single'"
+        (activate)="onActivate($event)">
+
+                <ngx-datatable-column prop="Date" name="DATE">
+                  <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.Date | date: 'dd-MM-yyyy'}}
+                  </ng-template>
+                </ngx-datatable-column>
+
+
+                <ngx-datatable-column prop="DC_Number" name="DC NUMBER">
+                  <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.DC_Number}}
+                  </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column prop="Customer_Name" name="CUSTOMER NAME">
+                  <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.Customer_Name}}
+                  </ng-template>
+                </ngx-datatable-column>
+
+
+                  <ngx-datatable-column prop="Amount" name="AMOUNT">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.Amount|indianCurrency}}
+                    </ng-template>
+                  </ngx-datatable-column>
+                  </ngx-datatable>
+         </div>
+
+</div>
+
+
+    <div *ngIf="customer_payment && id=='sales_by_customer' && view">
+      <div class="row">
+          <div class=" form-group col-11">
+
+            <button class="btn btn-main" class="btn btn-success fa fa-download pull-right" type="submit" (click)="print_tran()" > Download</button>
+          </div>
+     <div class="col-12">
+
+      <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+                [headerHeight]="50"
+                [limit]="15"
+                [columnMode]="'force'"
+                [footerHeight]="50"
+                [rowHeight]="'auto'"
+                [rows]="cust_tran_data"
+                [sortable]="true"
+                [selectionType]="'single'" >
+
+               <ngx-datatable-column prop="Date" name="DATE">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.Date | date: 'dd-MM-yyyy'}}
+                </ng-template>
+              </ngx-datatable-column>
+
+               <ngx-datatable-column prop="Customer_Name" name="CUSTOMER NAME">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.Customer_Name}}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="Reference_Number" name="REFERENCE NUMBER">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.Reference_Number}}
+                </ng-template>
+              </ngx-datatable-column>
+
+
+                <ngx-datatable-column prop="Payment_Mode" name="PAYMENT MODE">
+                  <ng-template ngx-datatable-cell-template let-row="row">
+                   {{row.Payment_Mode}}
+                  </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column prop="Invoive_No" name="INVOICE NO">
+                  <ng-template ngx-datatable-cell-template let-row="row">
+                   {{row.Invoive_No}}
+                  </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column  prop="Deposited_To" name="DEPOSITED TO">
+                  <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.Deposited_To}}
+                  </ng-template>
+                </ngx-datatable-column>
+
+
+                <ngx-datatable-column  prop="Amount" name="AMOUNT">
+                  <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.Amount|indianCurrency}}
+                  </ng-template>
+                </ngx-datatable-column>
+            </ngx-datatable>
+          </div>
+    </div>
+  </div>
+
+ <div *ngIf="customer_payment && id=='customer_balances' && view">
+  <div class="row">
+  <!-- <input class="form-control" type="text" placeholder="Search Vendor Name...."
+  (keyup)="updateFilter($event)" /> -->
+
+  <div class=" form-group col-12">
+<!-- <span>Opening Balance: {{opening_balance| indianCurrency}}</span> -->
+    <button class="btn btn-main" class="btn btn-success fa fa-download pull-right" type="submit" (click)="print_tran()" > Download</button>
+  </div>
+
+  <div class="col-12">
+          <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+          [headerHeight]="50"
+          [limit]="15"
+          [columnMode]="'force'"
+          [footerHeight]="50"
+          [rowHeight]="'auto'"
+          [rows]="cust_tran_data"
+          [selectionType]="'single'"  >
+
+         <ngx-datatable-column prop="date" name="DATE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.date | date: 'dd-MM-yyyy'}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="transaction" name="TRANSACTION">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.transaction}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+          <ngx-datatable-column prop="description" name="DESCRIPTION">
+            <ng-template ngx-datatable-cell-template let-row="row">
+             {{row.description}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="amount"  name=" AMOUNT">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.amount?(row.amount| indianCurrency):''}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="payments" name="PAYMENTS">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              <span *ngIf="row.payments !='Opening Balance'|| row.payments !='Closing Balance'">,<b>{{row.payments | indianCurrency}}</b> </span>
+              <span *ngIf="row.payments =='Opening Balance' || row.payments =='Closing Balance'"><b>{{row.payments}}</b></span>
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="balance"  name="BALANCE">
+            <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.balance|indianCurrency}}
+            </ng-template>
+          </ngx-datatable-column>
+          </ngx-datatable>
+    </div>
+  </div>
+ </div>
+
+<div *ngIf=" customer_payment && id=='vendor_balances'" >
+<div class="row">
+        <div class=" form-group col-11">
+              <button class="btn btn-main" class="btn btn-success fa fa-download pull-right" type="submit" (click)="print_tran()" > Download</button>
+        </div>
+       &nbsp;
+
+          <div class="col-12">
+              <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+              [headerHeight]="50"
+              [limit]="15"
+              [columnMode]="'force'"
+              [footerHeight]="50"
+              [rowHeight]="'auto'"
+              [rows]="cust_tran_data"
+              [selectionType]="'single'">
+
+            <ngx-datatable-column prop="date" name="DATE">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.date | date: 'dd-MM-yyyy'}}
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="transaction" name="TRANSACTION">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.transaction}}
+              </ng-template>
+            </ngx-datatable-column>
+
+
+              <ngx-datatable-column prop="description" name="DETAILS">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.description}}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="amount" name="BILL AMOUNT">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.amount?(row.amount| indianCurrency):''}}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="payments"  name="PAYMENTS">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  <span *ngIf="row.payments !='Opening Balance'|| row.payments !='Closing Balance'"> <b>{{row.payments | indianCurrency}}</b></span>
+                  <span *ngIf="row.payments =='Opening Balance' || row.payments =='Closing Balance'"><b>{{row.payments}}</b></span>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="balance"  name="BALANCE">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.balance|indianCurrency}}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="bank" name="TRANSFER">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.bank}}
+                </ng-template>
+              </ngx-datatable-column>
+              </ngx-datatable>
+          </div>
+
+    </div>
+</div>
+
+
+<div *ngIf=" id=='individual_customer_balance'">
+
+  <div class="card-body widget-body">
+    <div class=" form-group">
+      <!-- <button type="submit" class="btn btn-info fa fa-arrow-left pull-left" (click)="set_zero()"> Back</button>
+      <button class="btn btn-main"  class="btn btn-success pull-right" type="submit" (click)="print_balan()" >Download</button> -->
+
+      <div class=" form-group">
+        <form [formGroup]="customer" (ngSubmit)="onSubmit_customer(customer.value)" class="row">
+          <div class="col-md-3">
+            <lable for="customer_id">Select Customer</lable>
+            <!-- <select formControlName="customer_id"  class="form-control">
+              <option [disabled]="statehide" *ngFor="let state of customer_list"
+                value="{{state.customer_id}}"> {{state.company_name}}
+              </option>
+            </select> -->
+
+            <ng-select formControlName="customer_id"  class=" form-control custom-select" [clearable]="false" >
+              <ng-option [disabled]="statehide" *ngFor="let state of customer_list" value="{{state.customer_id}}" class="form-control">
+                {{state.company_name}}
+              </ng-option>
+            </ng-select>
+
+            <span class="help-block text-danger" *ngIf="customer.get('customer_id').touched && customer.get('customer_id').hasError('required')">select Expense Required !</span>
+          </div>
+         <div class="col-md-3">
+          <lable for="customer_id">From Date</lable>
+          <input type="date"  formControlName="from_date"  class="form-control" ></div>
+
+         <div class="col-md-3">
+          <lable for="customer_id">To Date</lable>
+          <input type="date"  formControlName="to_date"  class="form-control" ></div>
+          <div class="col-md-2">
+            <label></label>
+            <button [disabled]="loading" class="btn btn-info btn-block" type="submit">Load <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+          </div>
+
+          <div class="col-md-1" style="padding-top: 20PX;">
+            <label></label>
+            <button *ngIf="id !='tds_tcs'"  class="btn btn-main form-control"  class="btn btn-success fa fa-download  pull-right" type="submit" (click)="print_balan()" > Download</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+          <div class="col-12">
+            <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+            [headerHeight]="50"
+            [limit]="15"
+            [columnMode]="'force'"
+            [footerHeight]="50"
+            [rowHeight]="'auto'"
+            [rows]="cust_tran_data"
+            [selectionType]="'single'">
+
+           <ngx-datatable-column prop="date" name="DATE">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.date | date: 'dd-MM-yyyy'}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="transaction" name="TRANSACTION">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.transaction}}
+            </ng-template>
+          </ngx-datatable-column>
+
+
+          <ngx-datatable-column prop="transaction" name="REFERENCE">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.Reference}}
+            </ng-template>
+          </ngx-datatable-column>
+
+
+            <ngx-datatable-column prop="description" name="DETAILS">
+              <ng-template ngx-datatable-cell-template let-row="row">
+               {{row.description}}
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="amount" name="INVOICE AMOUNT">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.amount?(row.amount| indianCurrency):''}}
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="payments"  name="PAYMENTS">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                <span *ngIf="row.payments !='Opening Balance'|| row.payments !='Closing Balance'"><b> {{row.payments | indianCurrency}}</b></span>
+                <span *ngIf="row.payments =='Opening Balance' || row.payments =='Closing Balance'"><b>{{row.payments}}</b></span>
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="balance"  name="BALANCE">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.balance|indianCurrency}}
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="bank" name="RECEIVE FROM">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.bank}}
+              </ng-template>
+            </ngx-datatable-column>
+            </ngx-datatable>
+        </div>
+    </div>
+</div>
+
+<div *ngIf=" id=='individual_vendor_balance'">
+  <div class="card-body widget-body">
+    <div class=" form-group">
+
+        <form [formGroup]="customer" (ngSubmit)="onSubmit_customer(customer.value)" class="row">
+          <div class="col-md-3">
+            <lable for="customer_id">Select Vendor</lable>
+            <!-- <select formControlName="customer_id"  class="form-control">
+              <option [disabled]="statehide" *ngFor="let state of vendor_list"
+                value="{{state.vendor_id}}"> {{state.company_name}}
+              </option>
+            </select> -->
+
+            <ng-select formControlName="customer_id"  class=" form-control custom-select" [clearable]="false" >
+              <ng-option [disabled]="statehide" *ngFor="let state of vendor_list" value="{{state.vendor_id}}" class="form-control">
+                {{state.company_name}}
+              </ng-option>
+            </ng-select>
+
+            <span class="help-block text-danger" *ngIf="customer.get('customer_id').touched && customer.get('customer_id').hasError('required')">select Vendor Required !</span>
+          </div>
+         <div class="col-md-3">
+          <lable for="customer_id">From Date</lable>
+          <input type="date"  formControlName="from_date"  class="form-control" ></div>
+
+         <div class="col-md-3">
+          <lable for="customer_id">To Date</lable>
+          <input type="date"  formControlName="to_date"  class="form-control" ></div>
+          <div class="col-md-2">
+            <label></label>
+            <button [disabled]="loading" class="btn btn-info btn-block" type="submit">Load <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+          </div>
+
+          <div class="col-md-1" style="padding-top: 20PX;">
+            <label></label>
+            <button *ngIf="id !='tds_tcs'"  class="btn btn-main form-control"  class="btn btn-success fa fa-download pull-right" type="submit" (click)="print_balan()" > Download</button>
+          </div>
+        </form>
+  </div>
+
+
+        <div>
+            <div class="col-12">
+              <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+              [headerHeight]="50"
+              [limit]="15"
+              [columnMode]="'force'"
+              [footerHeight]="50"
+              [rowHeight]="'auto'"
+              [rows]="cust_tran_data"
+              [selectionType]="'single'"   >
+
+            <ngx-datatable-column prop="date" name="DATE">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.date | date: 'dd-MM-yyyy'}}
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="transaction" name="TRANSACTIONS">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.transaction}}
+              </ng-template>
+            </ngx-datatable-column>
+
+            <!-- <ngx-datatable-column prop="transaction" name="REFERENCE">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.Reference}}
+              </ng-template>
+            </ngx-datatable-column> -->
+
+              <ngx-datatable-column prop="description" name="DETAILS">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.description}}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="amount" name="BILL AMOUNT">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.amount?(row.amount| indianCurrency):''}}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="payments"  name="PAYMENTS">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  <span *ngIf="row.payments !='Opening Balance'|| row.payments !='Closing Balance'"> <b> {{row.payments | indianCurrency}}</b></span>
+                  <span *ngIf="row.payments =='Opening Balance' || row.payments =='Closing Balance'"><b>{{row.payments}}</b></span>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="balance"  name="BALANCE">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.balance|indianCurrency}}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="bank" name="RECEIVE FROM">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.bank}}
+                </ng-template>
+              </ngx-datatable-column>
+              </ngx-datatable>
+       </div>
+    </div>
+  </div>
+</div>
+
+
+ <div *ngIf="customer_payment && id =='inventory_summary' && view">
+    <div class="row">
+        <div class="col-md-11">
+
+          <button class="btn btn-main" class="btn btn-success fa fa-download pull-right" type="submit" (click)="print_balan()" > Download</button>
+        </div>
+        &nbsp;
+        &nbsp;
+        &nbsp;
+        &nbsp;
+        <div class="col-md-12">
+
+          <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+          [headerHeight]="50"
+          [limit]="20"
+          [columnMode]="'force'"
+          [footerHeight]="50"
+          [rowHeight]="'auto'"
+          [rows]="cust_tran_data"
+          [sortable]="true"
+          [selectionType]="'single'"
+          (activate)="onActivate($event)" >
+
+
+     <ngx-datatable-column prop="Item_Name" name="ITEM NAME">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        {{row.Item_Name}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="Batch_Number" name="BATCH">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        {{row.Batch_Number}}
+      </ng-template>
+    </ngx-datatable-column>
+
+      <ngx-datatable-column prop="Quantity_Ordered" name="QUANTITY OREDERED">
+        <ng-template ngx-datatable-cell-template let-row="row">
+         {{row.Quantity_Ordered}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column  prop="Quantity_In" name="QUANTITY IN">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.Quantity_In}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="Quantity_Out" name="QUANTITY OUT">
+        <ng-template ngx-datatable-cell-template let-row="row">
+         {{row.Quantity_Out}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column  prop="Stock_on_Hand" name="STOCK ON HAND">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.Stock_on_Hand}}
+        </ng-template>
+      </ngx-datatable-column>
+      </ngx-datatable>
+        </div>
+    </div>
+ </div>
+
+ <div *ngIf=" id=='price_trend'">
+
+    <button type="submit" *ngIf="purchase_list_view" class="btn btn-info fa fa-arrow-left"  (click)="set_zero2()"> Back </button>
+
+  <div *ngIf="!purchase_list_view" class="card-body widget-body">
+
+          <div class="col-12">
+            <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+            [headerHeight]="50"
+            [limit]="15"
+            [columnMode]="'force'"
+            [footerHeight]="50"
+            [rowHeight]="'auto'"
+            [rows]="item_list"
+            [selectionType]="'single'"
+            (activate)="PriceChecking($event)">
+
+           <ngx-datatable-column prop="name" name="ITEM NAME">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.name}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="description" name="DISCRIPTION">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.description}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="hsnsac" name="HSNSAC">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.hsnsac}}
+            </ng-template>
+          </ngx-datatable-column>
+
+
+          <ngx-datatable-column prop="uom" name="UOM">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.uom}}
+            </ng-template>
+          </ngx-datatable-column>
+
+            <ngx-datatable-column prop="last_price" name="AMOUNT">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.last_price?(row.last_price| indianCurrency):''}}
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="tax_percent" name="TAX">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.tax_percent}}
+              </ng-template>
+            </ngx-datatable-column>
+
+            </ngx-datatable>
+        </div>
+    </div>
+
+    <div *ngIf="purchase_list_view" class="card-body widget-body">
+
+
+      <div class="col-12">
+        <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+        [headerHeight]="50"
+        [limit]="15"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="purchase_list"
+        [selectionType]="'single'"
+       >
+
+       <ngx-datatable-column prop="bill_date" name="BILL DATE">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.bill_date | date: 'dd-MM-yyyy'}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="vendor" name="VENDOR">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.vendor}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="qty" name="QUANTITY">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.qty}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="uom" name="UOM">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.uom}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="tax_percent" name="TAX">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.tax_percent}}
+        </ng-template>
+      </ngx-datatable-column>
+
+        <ngx-datatable-column prop="amount" name="AMOUNT">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.amount?(row.amount| indianCurrency):''}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="tax_amount" name="TAX AMOUNT">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.tax_amount?(row.tax_amount| indianCurrency):''}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="total" name="TOTAL">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.total+(row.tax_amount*row.qty)| indianCurrency}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        </ngx-datatable>
+    </div>
+</div>
+</div>
+
+ <div *ngIf="!customer_payment && id =='tax_report'">
+  <div class="row">
+    <div class="col-lg-12">
+      <div widget class="card">
+        <div class="card-header">
+          <span>ITEM TAX</span>
+        </div>
+        <div class="card-body widget-body">
+          <div class="row">
+            <table class="table col-md-12">
+              <tbody >
+                  <tr>
+                    <th>TAX %</th>
+                    <th>Input GST</th>
+                    <th>Input IGST</th>
+                    <th>Output GST</th>
+                    <th>Output IGST</th>
+                  </tr>
+                  <tr>
+                    <td>5%</td>
+                    <td>{{sgst_5|indianCurrency}}</td>
+                    <td>{{op_igst_5|indianCurrency}}</td>
+                    <td>{{cgst_5|indianCurrency}}</td>
+                    <td>{{igst_5|indianCurrency}}</td>
+                  </tr>
+
+                  <tr>
+                    <td>12%</td>
+                    <td>{{sgst_12|indianCurrency}}</td>
+                    <td>{{op_igst_12|indianCurrency}}</td>
+                    <td>{{cgst_12|indianCurrency}}</td>
+                    <td>{{igst_12|indianCurrency}}</td>
+                  </tr>
+
+                  <tr>
+                    <td>18%</td>
+                    <td>{{sgst_18|indianCurrency}}</td>
+                    <td>{{op_igst_18|indianCurrency}}</td>
+                    <td>{{cgst_18|indianCurrency}}</td>
+                    <td>{{igst_18|indianCurrency}}</td>
+                  </tr>
+
+                  <tr>
+                    <td>28%</td>
+                    <td>{{sgst_28|indianCurrency}}</td>
+                    <td>{{op_igst_28|indianCurrency}}</td>
+                    <td>{{cgst_28|indianCurrency}}</td>
+                    <td>{{igst_28|indianCurrency}}</td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  &nbsp;
+  &nbsp;
+  &nbsp;
+  &nbsp;
+
+   <div class="row">
+    <div class="col-md-12">
+        <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+            [headerHeight]="50"
+            [limit]="15"
+            [columnMode]="'force'"
+            [footerHeight]="50"
+            [rowHeight]="'auto'"
+            [rows]="tax_list"
+            [sortable]="true"
+            [selectionType]="'single'"
+            (activate)="onActivate($event)">
+
+                  <ngx-datatable-column prop="Date" name="DATE">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      {{row.Date | date: 'dd-MM-yyyy'}}
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <!-- <ngx-datatable-column prop="Invoice_No" name="INVOICE NO">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      {{row.Invoice_No}}
+                    </ng-template>
+                  </ngx-datatable-column> -->
+
+
+                    <ngx-datatable-column prop="Bill_No" name="BILL NO">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                        {{row.Bill_No}}
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column prop="Po_No" name="PO NO">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                        {{row.Po_No}}
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column prop="without_tax" name="WITHOUT TAX">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                        {{row.without_tax| indianCurrency}}
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column prop="total_tax" name="TAX">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                        {{row.total_tax| indianCurrency}}
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column prop="total" name="TOTAL">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                        {{row.total| indianCurrency}}
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column prop="cgst" name="CGST">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      {{row.cgst | indianCurrency}}
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column prop="sgst" name="SGST">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      {{row.sgst | indianCurrency}}
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="igst" name="IGST">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      {{row.igst | indianCurrency}}
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column prop="payment_status" name="STATUS">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      <span *ngIf="row.payment_status == 'Paid'" style="color: green;"> <b>Paid</b></span>
+                      <span *ngIf="row.payment_status == 'Pending'" style="color: red;"> <b>Pending</b></span>
+                    </ng-template>
+                  </ngx-datatable-column>
+            </ngx-datatable>
+    </div>
+   </div>
+</div>
+
+
+<div *ngIf="customer_payment && id =='tax_report' && view">
+
+  <div class="row">
+    <div class="col-md-11">
+      <button class="btn btn-main" class="btn btn-success pull-right" type="submit" (click)="tax_paid()" >Mark as Paid</button>
+    </div>
+    <div class="col-md-12"></div>
+
+        <div class="col-md-12">
+          <ngx-datatable
+          #table
+          class="custom_table2"
+          [headerHeight]="50"
+          [limit]="15"
+          [columnMode]="'force'"
+          [footerHeight]="50"
+          [rowHeight]="'auto'"
+          [rows]="cust_tran_data"
+          [selected]="selected"
+          [selectionType]="'checkbox'"
+          (activate)="OnSelect($event)"
+            >
+
+            <ngx-datatable-column
+            [width]="30"
+            [sortable]="false"
+            [canAutoResize]="false"
+            [draggable]="true"
+            [resizeable]="false"
+            [headerCheckboxable]="false"
+            name = "CHECK BOX"
+            [checkboxable]="true">
+        </ngx-datatable-column>
+
+                  <ngx-datatable-column prop="date" name="DATE">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      {{row.date | date: 'dd-MM-yyyy'}}
+                    </ng-template>
+                  </ngx-datatable-column>
+
+
+                  <ngx-datatable-column prop="name" name="NAME">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      {{row.item_name}}
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column prop="tax_percent" name="PERCENTAGE">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      {{row.tax_percent}}%
+                    </ng-template>
+                  </ngx-datatable-column>
+
+
+                    <ngx-datatable-column prop="cgst" name="CGST">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                      {{row.cgst|indianCurrency}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="sgst" name="SGST">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                      {{row.sgst|indianCurrency}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="igst" name="IGST">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                      {{row.igst|indianCurrency}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="status" name="STATUS">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                      <span *ngIf="row.status ==1" style="color: red;"><b>Pending</b></span>
+                      <span *ngIf="row.status ==2" style="color: green"><b>Paid</b></span>
+                      </ng-template>
+                    </ngx-datatable-column>
+                    </ngx-datatable>
+        </div>
+  </div>
+</div>
+
+
+<div *ngIf=" id =='tds_tcs'">
+
+  <div class="modal-header">
+    <!-- <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero($event)"> Back</button>
+    <button type="submit" class="btn btn-success fa fa-plus pull-right" (click)="call_add($event)"> Add New Association</button> -->
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div widget class="card">
+        <div class="card-header">
+          <span>REPORT</span>
+        </div>
+        <div class="card-body widget-body">
+          <div class="row">
+            <table class="table col-md-12">
+              <tbody >
+                  <tr>
+                    <th></th>
+                    <th>Input TDS</th>
+                    <th>Output TDS</th>
+                    <th>Input TCS</th>
+                    <th>Output TCS</th>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td>{{this.input_tds|indianCurrency}}</td>
+                    <td>{{this.output_tds|indianCurrency}}</td>
+                    <td>{{this.input_tcs|indianCurrency}}</td>
+                    <td>{{this.output_tcs|indianCurrency}}</td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+
+  &nbsp;
+  &nbsp;
+  &nbsp;
+  &nbsp;
+
+   <div class="row">
+    <div class="col-md-12">
+      <button type="submit" class="btn btn-success  pull-right" (click)="tds_tcs_pay()">Mark as Paid</button>
+    </div>
+    &nbsp;
+
+      <div class="col-md-12">
+        <ngx-datatable
+        #table
+        class="custom_table2"
+        [headerHeight]="50"
+        [limit]="15"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="sale_by_cust"
+        [selected]="selected"
+        [selectionType]="'checkbox'"
+        (activate)="OnSelect($event)"
+        (select)="onSelect_all($event)"
+        >
+
+        <ngx-datatable-column
+          [width]="30"
+          [sortable]="false"
+          [canAutoResize]="false"
+          [draggable]="true"
+          [resizeable]="false"
+          [headerCheckboxable]="true"
+          [checkboxable]="true">
+        </ngx-datatable-column>
+
+            <ngx-datatable-column prop="date" name="DATE">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.date | date: 'dd-MM-yyyy'}}
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="invoice_no" name="INVOICE NO">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.invoice_no}}
+              </ng-template>
+            </ngx-datatable-column>
+
+
+              <ngx-datatable-column prop="bill_no" name="BILL NO">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.bill_no}}
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="bill_no" name="PO NO">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.po_no}}
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="tds_percentage" name="TDS %">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.tds_percentage}}%
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="tds_amount" name="TDS AMOUNT">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.tds_amount|indianCurrency}}
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="tcs_percentage" name="TCS %">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.tcs_percentage}}%
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="tcs_amount" name="TCS AMOUNT">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.tcs_amount|indianCurrency}}
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="status" name="STATUS">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                <span *ngIf="row.status == 1" style="color: red;"><b>Pending</b></span>
+                <span *ngIf="row.status == 2" style="color:green"><b>Paid</b></span>
+              </ng-template>
+            </ngx-datatable-column>
+      </ngx-datatable>
+   </div>
+  </div>
+</div>
+
+  <div *ngIf=" id =='epf_report'">
+    <div widget class="card">
+      <div class="card-header">
+        <span class="text-uppercase">EPF List</span>
+        <div class="widget-controls">
+          <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+          <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+          <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+          <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+          <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+        </div>
+      </div>
+      <div class="card-body widget-body">
+    <div class="row">
+      <div class="col-md-12">
+        <button type="submit" class="btn btn-success  pull-right" (click)="epf_pay()">Mark as Paid</button>
+      </div>
+      &nbsp;
+      <div class="col-md-12">
+    <ngx-datatable
+      #table
+      class="custom_table2"
+      [headerHeight]="50"
+      [limit]="15"
+      [columnMode]="'force'"
+      [footerHeight]="50"
+      [rowHeight]="'auto'"
+      [rows]="sale_by_cust"
+      [selected]="selected"
+      [selectionType]="'checkbox'"
+      (activate)="OnSelect($event)"
+      (select)='onSelect_all($event)'
+      >
+
+      <ngx-datatable-column
+      [width]="30"
+      [sortable]="false"
+      [canAutoResize]="false"
+      [draggable]="true"
+      [resizeable]="false"
+      [headerCheckboxable]="true"
+      [checkboxable]="true">
+      </ngx-datatable-column>
+
+               <ngx-datatable-column prop="Date" name="DATE">
+                 <ng-template ngx-datatable-cell-template let-row="row">
+                   {{row.Date | date: 'dd-MM-yyyy'}}
+                 </ng-template>
+               </ngx-datatable-column>
+
+
+               <ngx-datatable-column prop="Name" name="NAME">
+                 <ng-template ngx-datatable-cell-template let-row="row">
+                   {{row.Name}}
+                 </ng-template>
+               </ngx-datatable-column>
+
+               <ngx-datatable-column prop="Employee" name="EMPLOYEE EPF">
+                 <ng-template ngx-datatable-cell-template let-row="row">
+                   {{row.Employee|indianCurrency}}
+                 </ng-template>
+               </ngx-datatable-column>
+
+
+                 <ngx-datatable-column prop="Employer" name="EMPLOYER EPF">
+                   <ng-template ngx-datatable-cell-template let-row="row">
+                   {{row.Employer|indianCurrency}}
+                   </ng-template>
+                 </ngx-datatable-column>
+
+                 <ngx-datatable-column prop="Employer" name="TOTAL">
+                   <ng-template ngx-datatable-cell-template let-row="row">
+                   {{row.Total|indianCurrency}}
+                   </ng-template>
+                 </ngx-datatable-column>
+
+                 <ngx-datatable-column prop="Employer" name="STATUS">
+                  <ng-template ngx-datatable-cell-template let-row="row">
+                  <span *ngIf="row.status ==1" style="color: red;"><b>Pending</b></span>
+                  <span *ngIf="row.status ==2" style="color: green"><b>Paid</b></span>
+                  </ng-template>
+                </ngx-datatable-column>
+                 </ngx-datatable>
+             </div>
+       </div>
+   </div>
+     </div>
+</div>
+
+
+     <div *ngIf="id =='esi_report'">
+
+      <div widget class="card">
+        <div class="card-header">
+          <span class="text-uppercase">ESI List</span>
+          <div class="widget-controls">
+            <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+            <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+            <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+            <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+            <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+          </div>
+        </div>
+        <div class="card-body widget-body">
+      <div class="row">
+        <div class="col-md-12">
+          <button type="submit" class="btn btn-success pull-right" (click)="esi_pay()">Mark as Paid</button>
+        </div>
+        &nbsp;
+        <div class="col-md-12">
+      <ngx-datatable
+        #table
+        class="custom_table2"
+        [headerHeight]="50"
+        [limit]="15"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="sale_by_cust"
+        [selected]="selected"
+        [selectionType]="'checkbox'"
+        (activate)="OnSelect($event)"
+        (select)='onSelect_all($event)'
+        >
+
+        <ngx-datatable-column
+        [width]="30"
+        [sortable]="false"
+        [canAutoResize]="false"
+        [draggable]="true"
+        [resizeable]="false"
+        [headerCheckboxable]="true"
+        [checkboxable]="true">
+        </ngx-datatable-column>
+
+                 <ngx-datatable-column prop="Date" name="DATE">
+                   <ng-template ngx-datatable-cell-template let-row="row">
+                     {{row.Date | date: 'dd-MM-yyyy'}}
+                   </ng-template>
+                 </ngx-datatable-column>
+
+
+                 <ngx-datatable-column prop="Name" name="NAME">
+                   <ng-template ngx-datatable-cell-template let-row="row">
+                     {{row.Name}}
+                   </ng-template>
+                 </ngx-datatable-column>
+
+                 <ngx-datatable-column prop="Employee" name="EMPLOYEE ESI">
+                   <ng-template ngx-datatable-cell-template let-row="row">
+                     {{row.Employee|indianCurrency}}
+                   </ng-template>
+                 </ngx-datatable-column>
+
+
+                   <ngx-datatable-column prop="Employer" name="EMPLOYER ESI">
+                     <ng-template ngx-datatable-cell-template let-row="row">
+                     {{row.Employer|indianCurrency}}
+                     </ng-template>
+                   </ngx-datatable-column>
+
+                   <ngx-datatable-column prop="Employer" name="TOTAL">
+                     <ng-template ngx-datatable-cell-template let-row="row">
+                     {{row.Total|indianCurrency}}
+                     </ng-template>
+                   </ngx-datatable-column>
+
+
+                   <ngx-datatable-column prop="Employer" name="STATUS">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                    <span *ngIf="row.status ==1" style="color: red;"><b>Pending</b></span>
+                    <span *ngIf="row.status ==2" style="color: green"><b>Paid</b></span>
+                    </ng-template>
+                  </ngx-datatable-column>
+                   </ngx-datatable>
+               </div>
+         </div>
+     </div>
+  </div>
+</div>
+
+
+<div *ngIf="id =='attendance_report'">
+
+  <div class=" form-group">
+    <form [formGroup]="customer" (ngSubmit)="onSubmit_customer(customer.value)" class="row">
+      <div class="col-md-3">
+        <lable for="customer_id">Select Employee</lable>
+        <!-- <select formControlName="customer_id"  class="form-control">
+          <option value="0">All Employees</option>
+          <option [disabled]="statehide" *ngFor="let state of employee_list"
+            value="{{state.emp_id}}"> {{state.name}}
+          </option>
+        </select> -->
+
+            <ng-select formControlName="customer_id"  class=" form-control custom-select" [clearable]="false" >
+              <ng-option value="0">All Employees</ng-option>
+              <ng-option  *ngFor="let state of employee_list" value="{{state.emp_id}}" class="form-control">
+                {{state.name}}
+              </ng-option>
+            </ng-select>
+
+        <span class="help-block text-danger" *ngIf="customer.get('customer_id').touched && customer.get('customer_id').hasError('required')">select Employee Required !</span>
+      </div>
+     <div class="col-md-3">
+      <lable for="customer_id">From Date</lable>
+      <input type="date"  formControlName="from_date"  class="form-control" ></div>
+
+     <div class="col-md-3">
+      <lable for="customer_id">To Date</lable>
+      <input type="date"  formControlName="to_date"  class="form-control" ></div>
+      <div class="col-md-2">
+        <label></label>
+        <button [disabled]="loading" class="btn btn-info btn-block" type="submit">Load <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      </div>
+
+      <div class="col-md-1" style="padding-top: 20PX;">
+        <label></label>
+        <button *ngIf="id !='tds_tcs'"  class="btn btn-main form-control"  class="btn btn-success fa fa-download pull-right" type="submit" (click)="print_balan()" > Download</button>
+      </div>
+    </form>
+  </div>
+
+  <div widget class="card">
+    <div class="card-header">
+      <span class="text-uppercase">Attendance Report</span>
+      <div class="widget-controls">
+        <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+        <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+        <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+        <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+        <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+      </div>
+    </div>
+    <div class="card-body widget-body">
+
+      <div class="row">
+        <table class="table col-md-12">
+          <tbody>
+              <tr>
+                <th></th>
+                <th>Total Worked Hours</th>
+                <th>Total OverTime</th>
+                <th>Total PL</th>
+                <th>Total SickLeave</th>
+              </tr>
+              <tr *ngIf="this.total_attedance != null">
+                <td></td>
+                <td>{{this.total_attedance.worked_hours}}hrs / {{this.total_attedance.worked_days}}days</td>
+                <td>{{this.total_attedance.ot_hours}}hrs / {{this.total_attedance.ot_days}}days</td>
+                <td>{{this.total_attedance.pl_hours}}hrs / {{this.total_attedance.pl_days}}days</td>
+                <td>{{this.total_attedance.cl_hours}}hrs / {{this.total_attedance.cl_days}}days</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+
+  <div class="row">
+    <div class="col-md-12">
+
+        <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+        [headerHeight]="50"
+        [limit]="20"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="sale_by_cust"
+        [selectionType]="'single'">
+
+       <ngx-datatable-column prop="Date" name="DATE">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.Date | date: 'dd-MM-yyyy'}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="Employee_Name" name="NAME">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.Employee_Name}}
+        </ng-template>
+      </ngx-datatable-column>
+
+
+        <ngx-datatable-column prop="Hours" name="HOURS">
+          <ng-template ngx-datatable-cell-template let-row="row">
+           {{row.Hours}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="ot" name="OVER TIME">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.ot}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="pl"  name="PERSONAL LEAVE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+           {{row.pl}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="sl"  name="SICK LEAVE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.sl}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="cl" name="COM_OFF">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.cl}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="Notes" name="NOTES">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.Notes}}
+          </ng-template>
+        </ngx-datatable-column>
+        </ngx-datatable>
+           </div>
+     </div>
+ </div>
+</div>
+</div>
+
+
+<div *ngIf=" id=='expense_report'">
+
+  <div class="card-body widget-body">
+    <div class=" form-group">
+          <form [formGroup]="customer" (ngSubmit)="onSubmit_customer(customer.value)" class="row">
+            <div class="col-md-3">
+              <lable for="customer_id">Select Expense</lable>
+              <!-- <select formControlName="customer_id"  class="form-control">
+                <option [disabled]="statehide" *ngFor="let state of expense_account"
+                  value="{{state.id}}"> {{state.account_name}}
+                </option>
+              </select> -->
+
+              <ng-select formControlName="customer_id"  class=" form-control custom-select" [clearable]="false" >
+                <ng-option value="0">All Expense </ng-option>
+                <ng-option  *ngFor="let state of expense_account" value="{{state.id}}" class="form-control">
+                  {{state.account_name}}
+                </ng-option>
+              </ng-select>
+
+              <span class="help-block text-danger" *ngIf="customer.get('customer_id').touched && customer.get('customer_id').hasError('required')">select Expense Required !</span>
+            </div>
+           <div class="col-md-3">
+            <lable for="customer_id">From Date</lable>
+            <input type="date"  formControlName="from_date"  class="form-control" ></div>
+
+           <div class="col-md-3">
+            <lable for="customer_id">To Date</lable>
+            <input type="date"  formControlName="to_date"  class="form-control" ></div>
+            <div class="col-md-2">
+              <label></label>
+              <button [disabled]="loading" class="btn btn-info btn-block" type="submit">Load <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+            </div>
+
+            <div class="col-md-1" style="padding-top: 20PX;">
+              <label></label>
+              <button *ngIf="id !='tds_tcs'"  class="btn btn-main form-control"  class="btn btn-success fa fa-download pull-right" type="submit" (click)="print_balan()" > Download</button>
+            </div>
+          </form>
+
+      </div>
+    </div>
+
+          <div class="col-12">
+            <ngx-datatable
+            #table
+            class="custom_table"
+            [headerHeight]="50"
+            [limit]="10"
+            [columnMode]="'force'"
+            [footerHeight]="50"
+            [rowHeight]="50"
+            [rows]="cust_tran_data">
+
+            <ngx-datatable-column prop="Transaction_Date" name="TRANSACTION DATE" >
+                <ng-template ngx-datatable-cell-template let-row = "row">
+                    {{row.Transaction_Date | date: 'dd-MM-yyyy'}}
+                </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column  name="MODE">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  <span *ngIf="row.exp_mode == 'Closing Balance'||row.exp_mode == 'Opening Balance'" >
+                    {{row.exp_mode}}
+                 </span>
+                      <span *ngIf="row.exp_mode === 1 " >
+                        Wire
+                    </span>
+                    <span *ngIf="row.exp_mode === 2 " >
+                        Cash
+                    </span>
+                    <span *ngIf="row.exp_mode === 3 " >
+                        Cheque
+                    </span>
+                </ng-template>
+              </ngx-datatable-column>
+
+            <ngx-datatable-column prop="Amount" name="AMOUNT">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  <span style="font-weight:bold;"> {{(row.Amount?row.Amount:0) | indianCurrency}} </span>
+                  </ng-template>
+              </ngx-datatable-column>
+
+            <ngx-datatable-column name="SERVICE">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                <span *ngIf="row.exp_type === 1 " >
+                  Goods
+              </span>
+              <span *ngIf="row.exp_type === 2 " >
+                  Service
+              </span>
+          </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="tax_amount" name="TAX">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  <span  style="font-weight:bold;"> {{(row.tax_amount?row.tax_amount:0)| currency:'INR':'symbol'}} </span>
+                  </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="Expence_Account" name="EXPENSE">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.Expence_Account}}
+                </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="Notes" name="COMMAND">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.Notes}}
+                  </ng-template>
+              </ngx-datatable-column>
+
+        </ngx-datatable>
+        </div>
+    </div>
+</div>
+
+
+
+<div  *ngIf=" id =='employee_accounts_report' && customer_payment">
+
+  <div class="card-body widget-body">
+    <div class=" form-group">
+      <form [formGroup]="customer" (ngSubmit)="onSubmit_customer(customer.value)" class="row">
+        <div class="col-md-3">
+          <lable for="customer_id">Select Account</lable>
+          <!-- <select formControlName="customer_id"  class="form-control">
+            <option [disabled]="statehide" *ngFor="let state of emp_bank_account"
+              value="{{state.bank_id}}"> {{state.account_name}}
+            </option>
+          </select> -->
+
+          <ng-select formControlName="customer_id"  class=" form-control custom-select" [clearable]="false" >
+            <ng-option  *ngFor="let state of emp_bank_account" value="{{state.bank_id}}" class="form-control">
+              {{state.account_name}}
+            </ng-option>
+          </ng-select>
+
+          <span class="help-block text-danger" *ngIf="customer.get('customer_id').touched && customer.get('customer_id').hasError('required')">select Vendor Required !</span>
+        </div>
+       <div class="col-md-3">
+        <lable for="customer_id">From Date</lable>
+        <input type="date"  formControlName="from_date"  class="form-control" ></div>
+
+       <div class="col-md-3">
+        <lable for="customer_id">To Date</lable>
+        <input type="date"  formControlName="to_date"  class="form-control" ></div>
+        <div class="col-md-2">
+          <label></label>
+          <button [disabled]="loading" class="btn btn-info btn-block" type="submit">Load <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+        </div>
+
+        <div class="col-md-1" style="padding-top: 20PX;">
+          <label></label>
+          <button *ngIf="id !='tds_tcs'"  class="btn btn-main form-control"  class="btn btn-success fa fa-download pull-right" type="submit" (click)="print_balan()" > Download</button>
+        </div>
+      </form>
+
+    </div>
+
+          <div class="col-12">
+            <ngx-datatable
+            #table
+            class="custom_table"
+            [headerHeight]="50"
+            [limit]="10"
+            [columnMode]="'force'"
+            [footerHeight]="50"
+            [rowHeight]="50"
+            [rows]="cust_tran_data">
+
+            <ngx-datatable-column prop="tran_date"  [width]="120"  name="DATE" >
+                <ng-template ngx-datatable-cell-template let-row = "row">
+                    {{row.tran_date | date: 'dd-MM-yyyy'}}
+                </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column [width]="100" name="MODE">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                      <span *ngIf="row.tran_mode === 1 " >
+                        Wire
+                    </span>
+                    <span *ngIf="row.tran_mode === 2 " >
+                        Cash
+                    </span>
+                    <span *ngIf="row.tran_mode === 3 " >
+                        Cheque
+                    </span>
+                </ng-template>
+              </ngx-datatable-column>
+
+            <ngx-datatable-column  prop="reference" [width]="200" name="REFERENCE">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.reference}}
+                </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column  prop="credit" [width]="110" name="CREDIT">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  <span style="font-weight:bold;"> {{row.credit ? (row.credit | indianCurrency):''}} </span>
+                  </ng-template>
+              </ngx-datatable-column>
+
+            <ngx-datatable-column prop="debit" [width]="110" name="DEBIT">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                <span *ngIf="row.debit === 'Opening balance'||row.debit === 'Closing balance'" style="font-weight:bold;"><b> {{row.debit }}</b> </span>
+
+                <span *ngIf="row.debit !== 'Closing balance'&&row.debit !== 'Opening balance'" style="font-weight:bold;">
+                  {{ row.debit | indianCurrency  }}
+                </span>
+                </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="balance" name="BALANCE">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  <span style="font-weight:bold;"> {{(row.balance?row.balance:0) | indianCurrency}} </span>
+                  </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="tran_details" name="DESCRIPTION">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.tran_details}}
+                </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column  prop="notes" [width]="250" name="COMMAND">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.notes}}
+                  </ng-template>
+              </ngx-datatable-column>
+
+        </ngx-datatable>
+        </div>
+    </div>
+</div>
+
+
+<div class="row" *ngIf=" customer_payment && id =='invoice_details'">
+  <div class="col-md-12" ></div>&nbsp;
+    <div class="col-md-12" >
+          <ngx-datatable
+          #table
+          class="custom_table"
+          [headerHeight]="50"
+          [limit]="10"
+          [columnMode]="'force'"
+          [footerHeight]="50"
+          [rowHeight]="50"
+          [selected]="selected"
+          [rows]="cust_tran_data">
+
+          <ngx-datatable-column prop="tran_date" [width]="80"  name=" DATE" >
+              <ng-template ngx-datatable-cell-template let-row = "row">
+                  {{row.tran_date | date: 'dd-MM-yyyy'}}
+              </ng-template>
+          </ngx-datatable-column>
+
+            <ngx-datatable-column  prop="reference" name="REFERENCE" >
+              <ng-template ngx-datatable-cell-template let-row = "row">
+                  {{row.reference}}
+              </ng-template>
+          </ngx-datatable-column>
+
+
+          <ngx-datatable-column [width]="80" name="MODE">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                    <span *ngIf="row.tran_mode === 1 " >
+                      Wire
+                  </span>
+                  <span *ngIf="row.tran_mode === 2 " >
+                      Cash
+                  </span>
+                  <span *ngIf="row.tran_mode === 3 " >
+                      Cheque
+                  </span>
+              </ng-template>
+            </ngx-datatable-column>
+
+          <!-- <ngx-datatable-column  name="REFERENCE">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.reference}}
+              </ng-template>
+          </ngx-datatable-column> -->
+
+        <ngx-datatable-column prop="debit" [width]="80" name="RECIEVED">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              <span style="font-weight:bold;"> {{row.debit | indianCurrency}} </span>
+              </ng-template>
+          </ngx-datatable-column>
+
+
+          <ngx-datatable-column prop="balance" [width]="80" name="BALANCE">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                <span style="font-weight:bold;"> {{row.balance | indianCurrency}} </span>
+                </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="tran_details" name="DESCRIPTION">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.tran_details}}
+              </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="notes"  name="COMMAND">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.notes}}
+                </ng-template>
+            </ngx-datatable-column>
+
+          </ngx-datatable>
+      </div>
+</div>
+
+<div class="row" *ngIf=" customer_payment && id =='bills_details'">
+  <div class="col-md-12" ></div>&nbsp;
+    <div class="col-md-12" >
+          <ngx-datatable
+          #table
+          class="custom_table"
+          [headerHeight]="50"
+          [limit]="10"
+          [columnMode]="'force'"
+          [footerHeight]="50"
+          [rowHeight]="50"
+          [rows]="cust_tran_data">
+
+          <ngx-datatable-column prop="tran_date" [width]="80"  name=" DATE" >
+              <ng-template ngx-datatable-cell-template let-row = "row">
+                  {{row.tran_date | date: 'dd-MM-yyyy'}}
+              </ng-template>
+          </ngx-datatable-column>
+
+            <ngx-datatable-column  prop="reference" name="REFERENCE" >
+              <ng-template ngx-datatable-cell-template let-row = "row">
+                  {{row.reference}}
+              </ng-template>
+          </ngx-datatable-column>
+
+
+          <ngx-datatable-column [width]="80" name="MODE">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                    <span *ngIf="row.tran_mode === 1 " >
+                      Wire
+                  </span>
+                  <span *ngIf="row.tran_mode === 2 " >
+                      Cash
+                  </span>
+                  <span *ngIf="row.tran_mode === 3 " >
+                      Cheque
+                  </span>
+              </ng-template>
+            </ngx-datatable-column>
+
+          <!-- <ngx-datatable-column  name="REFERENCE">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.reference}}
+              </ng-template>
+          </ngx-datatable-column> -->
+
+        <ngx-datatable-column prop="credit" [width]="80" name="RECIEVED">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              <span style="font-weight:bold;"> {{row.credit | indianCurrency}} </span>
+              </ng-template>
+          </ngx-datatable-column>
+
+
+          <ngx-datatable-column prop="balance" [width]="80" name="BALANCE">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                <span style="font-weight:bold;"> {{row.balance | indianCurrency}} </span>
+                </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="tran_details" name="DESCRIPTION">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.tran_details}}
+              </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="notes"  name="COMMAND">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.notes}}
+                </ng-template>
+            </ngx-datatable-column>
+
+          </ngx-datatable>
+      </div>
+</div>

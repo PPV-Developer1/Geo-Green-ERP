@@ -1,0 +1,26 @@
+[
+    {
+        "component"	: "Component 1",
+        "type"		: "SMD",
+        "value"		: "3.3 K",
+        "mfg"       : "Atmel",
+        "pn"        : "3026",
+		"package"	: "1",
+        "price"     : "10",
+		"reference"	: "SMK",
+        "stock"	    : "22",
+        "location"  : "A1/21"
+    },
+    {
+        "component"	: "Component 2",
+        "type"		: "SMD",
+        "value"		: "100uf",
+        "mfg"       : "Atmel",
+        "pn"        : "2045",
+		"package"	: "1",
+        "price"     : "10",
+		"reference"	: "SMK",
+        "stock"	    : "22",
+        "location"  : "A1/21"
+    }
+]

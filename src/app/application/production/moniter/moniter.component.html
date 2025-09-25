@@ -1,0 +1,170 @@
+<div *ngIf="selected.length === 0" >
+  <div class="col-md-12">
+    <table>
+      <tr>
+        <td style="width: 10px;">
+          <h1><small></small></h1>
+        </td>
+        <td style="width: 300px;">
+          <h5>MONITER</h5>
+        </td>
+        <td style="width: 900px;">
+          <div class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input class="form-control" type="text" placeholder="Search Project Name or Product Name or Assign Name..." (keyup)="updateFilter($event)"/>
+          </div>
+        </td>
+        <td style="width: 100px;"> </td>
+        <td style="width: 100px; text-align: center; vertical-align: center;">
+        </td>
+        <td style="width: 200px; text-align: center; vertical-align: center;">
+          <div class="btn-group" role="group" aria-label="Basic example">
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+
+  <ngx-datatable
+    #table
+    class="custom_table"
+    [headerHeight]="50"
+    [limit]="20"
+    [columnMode]="'force'"
+    [footerHeight]="50"
+    [rowHeight]="'auto'"
+    [rows]="product_details"
+    [selected]="selected"
+    [selectionType]="'single'"
+    (activate)="onActivate($event)">
+
+    <!-- <ngx-datatable-column  name="ID" >
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.id}}
+        </ng-template>
+    </ngx-datatable-column> -->
+
+    <ngx-datatable-column prop="start_datetime"   name="STARTED AT">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.start_datetime | date: 'dd-MM-yyyy HH:mm:ss'}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="assign_name" name="ASSIGN TO">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.assign_name}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="project_name" name="PROJECT NAME">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        <span *ngIf="row.type == 1">{{row.project_name}}</span>
+        <span *ngIf="row.type == 2"> <strong>For Store</strong></span>
+      </ng-template>
+    </ngx-datatable-column>
+
+       <ngx-datatable-column prop="by_product_no" name="PRODUCT NO">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.by_product_no}}
+      </ng-template>
+    </ngx-datatable-column>
+    
+    <ngx-datatable-column prop="product_name" name="PRODUCT NAME">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.product_name}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="level" name="LEVEL">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        <span *ngIf="row.level === 1">Created</span>
+        <span *ngIf="row.level === 2">Waiting For Approval</span>
+        <span *ngIf="row.level === 3">Move to Production</span>
+        <span *ngIf="row.level === 4">Completed</span>
+      </ng-template>
+    </ngx-datatable-column>
+  </ngx-datatable>
+</div>
+
+
+<div *ngIf="selected.length > 0">
+  <div class="modal-header">
+     <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero($event)"> Back</button>
+   <!-- <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true"
+        aria-expanded="false">
+        Action
+      </button>
+      <div class="dropdown-menu">
+        <a class="dropdown-item" href="javascript:void(0);" (click)="AddOutwardButton($event)">Add Outward Item</a>
+
+        <a class="dropdown-item" href="javascript:void(0);" (click)="OpenStatusUpdate($event)">Complete The Product</a>
+      </div> -->
+  </div>
+  <ngx-datatable
+    #table
+    class="custom_table"
+    [headerHeight]="50"
+    [limit]="10"
+    [columnMode]="'force'"
+    [footerHeight]="50"
+    [rowHeight]="'auto'"
+    [rows]="outwardList"
+    [selected]="selected"
+    [selectionType]="'single'"
+    (activate)="onIntActive($event)">
+
+    <!-- <ngx-datatable-column name="ID" >
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.id}}
+        </ng-template>
+    </ngx-datatable-column> -->
+
+    <ngx-datatable-column prop="date_time" name="DATE & TIME">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.date_time}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="batch" name="BATCH NUMBER">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.batch}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="item_name" name="ITEM NAME">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.item_name}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="qty" name="QUANTITY">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.qty}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="notes" name="NOTES">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.notes}}
+      </ng-template>
+    </ngx-datatable-column>
+
+  </ngx-datatable>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

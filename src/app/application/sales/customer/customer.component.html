@@ -1,0 +1,1730 @@
+<div *ngIf="show">
+  <div *ngIf="selected.length == 0">
+
+    <div class="col-md-12">
+      <table>
+        <tr>
+          <td style="width: 10px">
+            <h1><small></small></h1>
+          </td>
+          <td style="width: 200px">
+            <h5 class="mt-2 ml-2">CUSTOMER</h5>
+          </td>
+          <td style="width: 1100px">
+            <div class="input-group input-group-sm my-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
+              </div>
+              <input class="form-control" type="text" placeholder="Customer Name or Pan Number"
+                (keyup)="updateFilter($event)" />
+            </div>
+          </td>
+          <td style="width: 100px"></td>
+          <td style="width: 100px; text-align: center; vertical-align: center"></td>
+          <td style="width: 200px; text-align: center; vertical-align: center">
+            <div class="btn-group" role="group" aria-label="Basic example">
+              <button type="button" (click)="addCustomer()" class="btn btn-success btn-sm fa fa-plus">
+                New Customer
+              </button>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+
+    <div class="row">
+      <div class="col">
+        <div widget class="card">
+          <div class="card-body widget-body">
+            <ngx-datatable style="cursor: pointer;" #table class="custom_table" [headerHeight]="50" [limit]="15"
+              [columnMode]="'force'" [footerHeight]="50" [rowHeight]="'auto'" [rows]="customers" [selected]="selected"
+              [selectionType]="'single'" (activate)="onActivate($event)">
+              <ngx-datatable-column prop="company_name" name="NAME">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  <span style="font-weight:bold;"> {{ row.company_name }}</span>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="customer_type" name="TYPE">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  {{ row.customer_type }}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="pan_number" name="PAN">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  {{ row.pan_number }}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="terms_condition" name="TERMS & CONDITIONS">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  {{ row.terms_condition }}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="opening_balance" name="OPENING BALANCE">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  {{ row.opening_balance | indianCurrency }}
+                </ng-template>
+              </ngx-datatable-column>
+            </ngx-datatable>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- edit customer start -->
+
+  <div *ngIf="edit_show == true">
+    <div class="modal-header">
+      <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero($event)">
+        Back
+      </button>
+      <h3 class="modal-title"><strong>Customer Details</strong></h3>
+    </div>
+    <div class="card-body widget-body">
+      <div class="row mbm-20">
+        <div class="col-lg-12 col-12 bottom-30">
+          <div class="clearfix">
+            <ul class="nav nav-tabs top pull-left w-100p">
+              <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#overview">Overview</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#comments">Address</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#contact">Contacts</a>
+              </li>
+            </ul>
+          </div>
+          <div class="tab-content top">
+            <div class="tab-pane active" id="overview">
+              <div class="row">
+
+                <div class="col-lg-3 col-md-5">
+                  <div class="card border-0 box-shadow mb-4">
+                    <img [src]="img_path" class="img-thumbnail img-fluid" style="height: 260px;" alt="...">
+                    <div class="mt-2" style="display:flex; align-items:center; justify-content:center;">
+                      <button [hidden]="imgStatus" (click)="uploadImg(editCustDetail.value)"
+                        class="btn btn-warning btn-sm">Upload image </button>
+                    </div>
+
+                    <div class="card-body">
+                      <h4 class="card-title text-center"> {{emp_name}}</h4>
+                      <h5 class="card-title text-center text-info">{{emp_designation}}</h5>
+                      <div class="dropdown-divider w-100"></div>
+                    </div>
+                  </div>
+                </div>
+
+
+
+                <div class="col-lg-9 col-md-8">
+                  <div class="card">
+                    <form [formGroup]="editCustDetail">
+                      <div class="card-body">
+                        <div class="row">
+                          <table class="table col-md-12">
+                            <tbody>
+                              <tr>
+                                <th>Name</th>
+                                <td>
+                                  <input type="text" style="border: none;" class="form-control "
+                                    [readonly]="change" [(ngModel)]="edit_name" (ngModelChange)="edit_cus_name()" formControlName="name"
+                                    placeholder="Enter Name ">
+                                </td>
+                              </tr>
+                              <tr>
+                                <input type="hidden" [(ngModel)]="customer_id" formControlName="customer_id">
+                                <th>Customer type</th>
+                                <td>
+                                  <input type="text" class="form-control col-md-5" style="border: none;"
+                                    [hidden]="!change" [readonly]="change" [(ngModel)]="customerType"
+                                    formControlName="customerType" placeholder="Enter customer type">
+
+                                  <select class="form-control col-md-5 " formControlName="customerType"
+                                    [(ngModel)]="customerType" [hidden]="change">
+                                    <option value="distributor">Distributor</option>
+                                    <option value="reseller">Reseller</option>
+                                    <option value="manufacturer">Manufacturer</option>
+                                    <option value="endUser">End User</option>
+                                  </select>
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Tax Exemption</th>
+                                <td>
+                                  <input type="text" style="border: none;" class="form-control col-md-5"
+                                    [readonly]="change" [(ngModel)]="tax_exemption" formControlName="tax_exemption"
+                                    placeholder="Enter Tax ">
+                                </td>
+                              </tr>
+
+                              <tr>
+                                <th>Tax Mode</th>
+                                <td>
+                                  <span *ngIf="tax_mode == '1'">
+                                    <input type="text" style="border: none;" class="form-control col-md-5"
+                                      [hidden]="!change" [readonly]="change" value="Taxable"
+                                      placeholder="Enter Tax mode">
+                                  </span>
+
+                                  <span *ngIf="tax_mode == '0'">
+                                    <input type="text" style="border: none;" class="form-control col-md-5"
+                                      [hidden]="!change" [readonly]="change" value="Non Taxable"
+                                      placeholder="Enter Tax mode">
+                                  </span>
+
+
+                                  <select class="form-control col-md-5" formControlName="tax_mode" [hidden]="change"
+                                    [(ngModel)]="tax_mode">
+                                    <option value="1">Taxable</option>
+                                    <option value="0">Non Taxable</option>
+                                  </select>
+
+                                </td>
+                              </tr>
+
+                              <tr>
+                                <th>GST No</th>
+                                <td>
+                                  <input type="text" class="form-control col-md-5" style="border: none;"
+                                    [readonly]="change" [(ngModel)]="gst_number" formControlName="gst_number"
+                                    placeholder="Enter GST number" (ngModelChange)="edit_gst()">
+
+                                  <span class="help-block text-danger"
+                                    *ngIf="editCustDetail.get('gst_number').touched && editCustDetail.get('gst_number').hasError('required')">GST
+                                    Number
+                                    Required !</span>
+                                  <span class="help-block text-danger"
+                                    *ngIf="editCustDetail.get('gst_number').touched && editCustDetail.get('gst_number').hasError('pattern')">Enter
+                                    uppercase and valid GST number!</span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>PAN No</th>
+                                <td>
+                                  <input type="text" class="form-control col-md-5" style="border: none;"
+                                    [readonly]="change" [(ngModel)]="pan_number" formControlName="pan_number"
+                                    placeholder="Enter Pan number" (ngModelChange)="edit_pan()">
+
+                                  <span class="help-block text-danger"
+                                    *ngIf="editCustDetail.get('pan_number').touched && editCustDetail.get('pan_number').hasError('required')">Pan Number Required !</span>
+                                  <span class="help-block text-danger"
+                                    *ngIf="editCustDetail.get('pan_number').touched && editCustDetail.get('pan_number').hasError('pattern')">Enter uppercase and valid pan number!</span>
+                                </td>
+                              </tr>
+
+                              <tr>
+                                <th>UDYAM Register</th>
+                                  <td>
+
+                                              <span *ngIf="udyam_registeration == '1'">
+                                                <input type="text" style="border: none;" class="form-control col-md-5"
+                                                  [hidden]="!change" [readonly]="change" value="Registered"
+                                                  placeholder="Enter Tax mode">
+                                              </span>
+
+                                              <span *ngIf="udyam_registeration == '0'">
+                                                <input type="text" style="border: none;" class="form-control col-md-5"
+                                                  [hidden]="!change" [readonly]="change" value="Non Registered"
+                                                  placeholder="Enter Tax mode">
+                                              </span>
+
+                                        <select class="form-control col-md-5" formControlName="udyam_register"  [hidden]="change"
+                                           [(ngModel)]="udyam_registeration">
+                                            <option value="1">MSME Registerd</option>
+                                            <option value="0">MSME Non Registerd</option>
+                                      </select>
+                                  </td>
+                               </tr>
+
+                               <tr>
+                                <tr>
+                                  <th>UDYAM Number</th>
+                                  <td>
+                                    <input type="text" style="border: none;" class="form-control"
+                                      [readonly]="change" [(ngModel)]="udyam_no" formControlName="udyam_no"
+                                      placeholder="Enter UDYAM number ">
+                                  </td>
+                               </tr>
+
+
+                              <tr>
+                                <th>Contact No</th>
+                                <td>
+                                  <input type="text" class="form-control col-md-5" style="border: none;"
+                                    [readonly]="change" [(ngModel)]="contact_no" formControlName="contact_no"
+                                    placeholder="Enter Contact"  onKeyPress="if(this.value.length==15) return false;">
+
+                                  <span class="help-block text-danger"
+                                    *ngIf="editCustDetail.get('contact_no').touched && editCustDetail.get('contact_no').hasError('required')"> Contact Required !</span>
+                                </td>
+                              </tr>
+
+                              <tr>
+                                <th>Mobile No</th>
+                                <td>
+                                  <input type="text" class="form-control col-md-5" style="border: none;"
+                                    [readonly]="change" [(ngModel)]="mobile_no" formControlName="mobile_no"
+                                    placeholder="Enter Mobile"  onKeyPress="if(this.value.length==10) return false;">
+
+                                  <span class="help-block text-danger"
+                                    *ngIf="editCustDetail.get('mobile_no').touched && editCustDetail.get('mobile_no').hasError('required')">
+                                    Contact Required !</span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Email</th>
+                                <td>
+
+                                  <input type="text" class="form-control col-md-5" style="border: none;"
+                                    [readonly]="change" [(ngModel)]="email" formControlName="email"
+                                    placeholder="Enter Email">
+
+                                  <span class="help-block text-danger"
+                                    *ngIf="editCustDetail.get('email').touched && editCustDetail.get('email').hasError('pattern')">
+                                    invalid Email  !</span>
+                                </td>
+                              </tr>
+
+                              <tr>
+                                <th>Website</th>
+                                <td>
+
+                                  <input type="text" class="form-control col-md-5" style="border: none;"
+                                    [readonly]="change" [(ngModel)]="web_site" formControlName="web_site"
+                                    placeholder="Enter Website">
+
+                                  <span class="help-block text-danger"
+                                    *ngIf="editCustDetail.get('web_site').touched && editCustDetail.get('web_site').hasError('required')">
+                                    website Required !</span>
+                                </td>
+                              </tr>
+
+                              <tr>
+                                <th>Place of supply</th>
+                                <td>
+
+                                  <input type="text" class="form-control col-md-5" style="border: none;"
+                                    [hidden]="!change" [readonly]="change" [(ngModel)]="place_of_supply"
+                                    formControlName="place_of_supply" placeholder="Enter Place of Supply">
+
+                                  <!-- <select formControlName="place_of_supply" class="form-control col-md-5"
+                                    [hidden]="change" [(ngModel)]="place_of_supply"
+                                    [ngClass]="{ 'is-invalid': submitted && f.placeOfSupply.errors }">
+                                    <option *ngFor="let state of stateName" value="{{state.state_name}}">
+                                      {{state.state_name}}
+                                    </option>
+                                  </select> -->
+
+                                  <ng-select formControlName="place_of_supply" class=" form-control custom-select col-md-5" [hidden]="change" [(ngModel)]="place_of_supply" [clearable]="false"
+                                  [ngClass]="{ 'is-invalid': submitted && f.placeOfSupply.errors }">
+                                    <ng-option *ngFor="let item of stateName" value="{{item.state_name}}" class="form-control">
+                                      {{ item.state_name}}
+                                    </ng-option>
+                                  </ng-select>
+
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Opening Balance</th>
+                                <td>
+
+                                  <input type="number" class="form-control col-md-5" style="border: none;"
+                                    [readonly]="change" [(ngModel)]="opening_balance" formControlName="opening_balance"
+                                    placeholder="Enter Opening Balance">
+
+                                  <span class="help-block text-danger"
+                                    *ngIf="editCustDetail.get('opening_balance').touched && editCustDetail.get('opening_balance').hasError('required')">
+                                    Opening Balance Required !</span>
+                                </td>
+                              </tr>
+
+                              <tr>
+                                <th>PaymentTerm</th>
+                                <td>
+
+                                  <input type="text" class="form-control col-md-5" style="border: none;"
+                                  [hidden]="!change" [readonly]="change" [(ngModel)]="payment_term_name"
+                                  formControlName="payment_term_name" placeholder="Enter PaymentTerm">
+
+                                <!-- <select formControlName="payment_term" class="form-control col-md-5"
+                                  [hidden]="change" [(ngModel)]="paymentterm"
+                                  [ngClass]="{ 'is-invalid': submitted && f.payment_term.errors }">
+                                  <option>SELECT ANY ONE</option>
+                                  <option *ngFor="let terms of paymentTerm" value="{{terms.id}}">
+                                    {{terms.terms}}
+                                  </option>
+                                </select> -->
+
+
+                                <ng-select  formControlName="payment_term" class="form-control col-md-5 custom-select"
+                                [hidden]="change" [(ngModel)]="paymentterm"
+                                [ngClass]="{ 'is-invalid': submitted && f.payment_term.errors }" [clearable]="false">
+                                  <ng-option *ngFor="let terms of paymentTerm" [value]="terms.id" class="form-control">
+                                    {{terms.terms}}
+                                  </ng-option>
+                                </ng-select>
+                                </td>
+                              </tr>
+
+                              <tr>
+                                <th>Terms & Conditions</th>
+                                <td>
+
+                                  <input type="text" class="form-control " style="border: none;"
+                                    [readonly]="change" [(ngModel)]="terms_condition" formControlName="terms_condition"
+                                    placeholder="Enter terms & conditions">
+                                  <span class="help-block text-danger"
+                                    *ngIf="editCustDetail.get('terms_condition').touched && editCustDetail.get('terms_condition').hasError('required')">
+                                    Terms & Conditions Required !</span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Remarks</th>
+                                <td>
+
+                                  <input type="text" class="form-control " style="border: none;"
+                                    formControlName="remarks" [readonly]="change" [(ngModel)]="remarks"
+                                    placeholder="Enter remarks">
+                                  <span class="help-block text-danger"
+                                    *ngIf="editCustDetail.get('remarks').touched && editCustDetail.get('remarks').hasError('required')">
+                                    Remarks Required !</span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>Notes</th>
+                                <td>
+                                  <input type="text" class="form-control " style="border: none;"
+                                    formControlName="notes" [readonly]="change" [(ngModel)]="notes"
+                                    placeholder="Enter Notes">
+                                  <span class="help-block text-danger"
+                                    *ngIf="editCustDetail.get('notes').touched && editCustDetail.get('notes').hasError('required')">
+                                    Notes Required !</span>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                          <div class="col-4"></div>
+                          <div style="display:flex; align-items:center; justify-content:center;">
+                            <button type="button" class="btn btn-danger btn-sm" (click)="editCust()" [hidden]="!stateShow">
+                              Edit
+                            </button>
+                            <button [disabled]="loading" [hidden]="stateShow" (click)="updateEmp(editCustDetail.value)"
+                              class="btn btn-warning btn-sm"> <i class="fa fa-spinner fa-spin" *ngIf="loading"></i>Update
+                            </button>
+                            &nbsp;
+                            <button [hidden]="stateShow" (click)="cancel()"
+                              class="btn btn-warning btn-sm">Cancel
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-pane" id="comments">
+              <div class="row">
+                <div class="col">
+                  <div class="card">
+
+                    <div>
+                      <button type="button" class="btn btn-warning fa fa-plus pull-right" (click)="add_newaddress()">Address</button>
+                    </div>
+                    &nbsp;
+                    <ngx-datatable style="cursor: pointer;" #table class="custom_table" [headerHeight]="50"
+                      [limit]="10" [columnMode]="'force'" [footerHeight]="50" [rowHeight]="'auto'"
+                      [rows]="customer_address" [selected]="selected" [selectionType]="'single'">
+                      <ngx-datatable-column prop="attention" name="NAME">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                          {{ row.attention }}
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="address_line_1" name="ADDRESS 1">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                          {{ row.address_line_1 }}
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="address_line_2" name="ADDRESS 2">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                          {{ row.address_line_2 }}
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="city" name="CITY">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                          {{ row.city }}
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="state" name="STATE">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                          {{ row.state }}
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="zip_code" name="PIN CODE">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                          {{ row.zip_code }}
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="phone" name="MOBILE">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                          {{ row.phone }}
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="type" name="TYPE">
+                          <ng-template ngx-datatable-cell-template let-row="row">
+                            <span *ngIf="row.type == 1"> Bill Address</span>
+                            <span *ngIf="row.type == 2"> Ship Address </span>
+                          </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="status" name="STATUS">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                          <span *ngIf="row.status == 0"> Inactive</span>
+                          <span *ngIf="row.status == 1"> Active </span>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column  name="ACTION">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                          <button type="button" class="btn btn-danger btn-sm ml-2"
+                            (click)="editCustomerAddress(row.cust_addr_id)">
+                            <i class="fa fa-pencil"></i>
+                          </button>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                    </ngx-datatable>
+                    <!-- </div> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-pane" id="contact">
+              <div class="row">
+                <div class="col">
+                  <div class="card">
+
+                    <div>
+                      <button type="button" class="btn btn-warning fa fa-plus pull-right" (click)="add_newcontact()">Contact</button>
+                    </div>
+                    &nbsp;
+                    <ngx-datatable style="cursor: pointer;" #table class="custom_table" [headerHeight]="50"
+                      [limit]="10" [columnMode]="'force'" [footerHeight]="50" [rowHeight]="'auto'"
+                      [rows]="customer_contact" [selected]="selected" [selectionType]="'single'">
+                      <ngx-datatable-column prop="prifix" name="PREFIX">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                          {{ row.prefix }}
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="first_name" name="FIRST NAME">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                          {{ row.first_name }}
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="last_name" name="LAST NAME">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                          {{ row.last_name }}
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="email" name="EMAIL">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                          {{ row.email }}
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="phone" name="WORK PHONE">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                          {{ row.phone }}
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="mobile" name="MOBILE">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                          {{ row.mobile }}
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="status" name="STATUS">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                          <span *ngIf="row.status == 0"> Inactive</span>
+                          <span *ngIf="row.status == 1"> Active </span>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="ACTION">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                          <button type="button" class="btn btn-danger btn-sm ml-2"
+                            (click)="editCustomerContact(row.cust_cont_id)">
+                            <i class="fa fa-pencil"></i>
+                          </button>
+                        </ng-template>
+                      </ngx-datatable-column>
+                    </ngx-datatable>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-pane" id="transactions">
+              <p>
+                Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus,
+                sem quam semper libero, sit amet adipiscing sem neque sed ipsum.
+                Nam quam nunc, blandit vel, luctus pulvinar.
+              </p>
+            </div>
+            <div class="tab-pane" id="statement">
+              <p>
+                Aliquam pulvinar lacinia euismod. Sed ante nisi, volutpat a ex
+                vel, dapibus lacinia lacus. Nam pellentesque, ligula nec aliquet
+                fermentum, lectus justo luctus mi.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- edit end -->
+
+<!-- popup -->
+<ng-template #edit_address let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Edit Address</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="updateAddress" (ngSubmit)="submit(updateAddress.value)" class="row">
+
+      <div class="form-group col-md-12">
+        <label for="name">Name</label>
+        <input formControlName="name" id="name" placeholder="Enter Name" type="text" class="form-control"
+          [(ngModel)]="name">
+        <span class="help-block text-danger"
+          *ngIf="updateAddress.get('name').touched && updateAddress.get('name').hasError('required')">Enter
+          Name !</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Address Line 1</label>
+        <input formControlName="addressline1" id="addressline1" placeholder="Enter Addressline 1" type="text"
+          class="form-control" [(ngModel)]="address_line_1">
+
+        <span class="help-block text-danger"
+          *ngIf="updateAddress.get('addressline1').touched && updateAddress.get('addressline1').hasError('required')">Enter
+          AddressLine 1 !</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Address Line 2</label>
+        <input formControlName="addressline2" id="addressline2" placeholder="Enter Addressline 2" type="text"
+          class="form-control" [(ngModel)]="address_line_2">
+
+        <span class="help-block text-danger"
+          *ngIf="updateAddress.get('addressline2').touched && updateAddress.get('addressline2').hasError('required')">Enter
+          Addressline 2 !</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">City</label>
+        <input formControlName="city" id="city" placeholder="Enter City" type="text" class="form-control"
+          [(ngModel)]="city">
+
+        <span class="help-block text-danger"
+          *ngIf="updateAddress.get('city').touched && updateAddress.get('city').hasError('required')">Enter
+          City !</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">State</label>
+        <input formControlName="state" id="state" placeholder="Enter State" type="text" class="form-control"
+          [(ngModel)]="state">
+
+        <!-- <span class="help-block text-danger"
+          *ngIf="updateAddress.get('state').touched && updateAddress.get('state').hasError('required')">Enter
+          State !</span> -->
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Pin Code</label>
+        <input formControlName="zipcode" id="zipcode" placeholder="Enter Pin Code" type="number" class="form-control"
+          [(ngModel)]="zipcode" onKeyPress="if(this.value.length==6) return false;">
+
+        <span class="help-block text-danger"
+          *ngIf="updateAddress.get('zipcode').touched && updateAddress.get('zipcode').hasError('required')">Enter
+          Pin Code !</span>
+        <span class="help-block text-danger"
+          *ngIf="updateAddress.get('zipcode').touched && updateAddress.get('zipcode').hasError('pattern')">Enter
+          6 Digit Pin Code!</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Contact Number</label>
+        <input formControlName="mobile" id="mobile" placeholder="Enter Contact number" type="number" class="form-control"
+          onKeyPress="if(this.value.length==10) return false;" [(ngModel)]="mobile">
+
+        <span class="help-block text-danger"
+          *ngIf="updateAddress.get('mobile').touched && updateAddress.get('mobile').hasError('required')">Enter
+          Mobile number !</span>
+        <span class="help-block text-danger"
+          *ngIf="updateAddress.get('mobile').touched && updateAddress.get('mobile').hasError('pattern')">Enter
+          1 Contact number!</span>
+      </div>
+
+      <div class="form-group col-md-12" >
+        <label for="name"> Type </label>
+        <select formControlName="type" class="form-control" [(ngModel)]="type">
+          <option value = "1">Bill Address</option>
+          <option value = "2">Ship Address</option>
+        </select>
+
+        <span class="help-block text-danger"
+        *ngIf="updateAddress.get('type').touched && updateAddress.get('type').hasError('required')">Select
+        Type !</span>
+      </div>
+
+      <!-- <div class="form-group">
+        <label for="name">Status</label>
+
+        <select formControlName="status" class="form-control" [(ngModel)]="status">
+          <option value="0">Disabled</option>
+          <option value="1">Enable</option>
+        </select>
+      </div> -->
+
+      <div class="col-md-1"></div>
+      <div class="form-group col-md-11">
+        <label for="name">Status</label>
+        <div class="custom-control custom-switch">
+          <input type="checkbox" formControlName="status" class="custom-control-input" id="customSwitch2" [(ngModel)]="status" />
+          <label class="custom-control-label" for="customSwitch2"></label>
+        </div>
+      </div>
+
+      <div class="col-md-7">
+      <button [disabled]="loading" class="btn btn-primary pull-right" type="submit">Submit<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+    </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #edit_contact let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Edit Contact</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="updateContact" (ngSubmit)="contact_submit(updateContact.value)" class="row">
+      <div class="form-group col-md-12">
+        <label for="name">Prefix</label>
+        <select formControlName="prefix" class="form-control" placeholder="Enter Salutation"
+        [(ngModel)]="prefix">
+        <option value="Mr.">Mr.</option>
+        <option value="Mrs.">Mrs.</option>
+        <option value="Ms.">Ms.</option>
+        <option value="Miss.">Miss.</option>
+        <option value="Dr.">Dr.</option>
+      </select>
+        <span class="help-block text-danger"
+          *ngIf="updateContact.get('prefix').touched && updateContact.get('prefix').hasError('required')">
+          Required !</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">First Name</label>
+        <input formControlName="fname"  placeholder="Enter FirstName " type="text"
+          class="form-control" [(ngModel)]="fname">
+
+        <span class="help-block text-danger"
+          *ngIf="updateContact.get('fname').touched && updateContact.get('fname').hasError('required')">Enter
+         First Name !</span>
+      </div>
+
+      <div class="form-group col-md-12 ">
+        <label for="name">Last Name</label>
+        <input formControlName="lname"  placeholder="Enter LastName" type="text"
+          class="form-control" [(ngModel)]="lname">
+
+        <span class="help-block text-danger"
+          *ngIf="updateContact.get('lname').touched && updateContact.get('lname').hasError('required')">Enter
+          Last Name!</span>
+      </div>
+
+      <div class="form-group col-md-12 ">
+        <label for="name">Email</label>
+        <input formControlName="email"  placeholder="Enter Email" type="text" class="form-control"
+          [(ngModel)]="email">
+
+        <span class="help-block text-danger"
+          *ngIf="updateContact.get('email').touched && updateContact.get('email').hasError('required')">Enter
+          Email !</span>
+      </div>
+
+      <div class="form-group  col-md-12  ">
+        <label for="name">Mobile</label>
+        <input formControlName="mobile"  placeholder="Enter Email" type="text" class="form-control"
+          [(ngModel)]="mobile"  onKeyPress="if(this.value.length==10) return false;">
+
+        <span class="help-block text-danger"
+          *ngIf="updateContact.get('mobile').touched && updateContact.get('mobile').hasError('required')">Enter
+          Mobile !</span>
+      </div>
+
+      <div class="form-group col-md-12 ">
+        <label for="name">WorkPhone</label>
+        <input formControlName="workphone"  placeholder="Enter Contact Number" type="number" class="form-control"
+          [(ngModel)]="workphone"  onKeyPress="if(this.value.length==10) return false;">
+
+        <span class="help-block text-danger"
+          *ngIf="updateContact.get('workphone').touched && updateContact.get('workphone').hasError('required')">Enter Mobile No!</span>
+        <span class="help-block text-danger"
+          *ngIf="updateContact.get('workphone').touched && updateContact.get('workphone').hasError('pattern')">Enter 10 Digit NO!</span>
+      </div>
+<!--
+      <div class="form-group">
+        <label for="name">Status</label>
+
+        <select formControlName="status" class="form-control" [(ngModel)]="status">
+          <option value="0">Disabled</option>
+          <option value="1">Enable</option>
+        </select>
+      </div> -->
+
+      <div class="col-md-1"></div>
+      <div class="form-group col-md-11">
+
+        <label for="name">Status</label>
+        <div class="custom-control custom-switch">
+          <input type="checkbox" formControlName="status" class="custom-control-input" id="customSwitch2" [(ngModel)]="status" />
+          <label class="custom-control-label" for="customSwitch2"></label>
+        </div>
+      </div>
+
+      <div class="col-md-5"></div>
+      <div>
+        <button [disabled]="loading" class="btn btn-primary" type="submit">Submit<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+    </div>
+    </form>
+  </div>
+</ng-template>
+
+
+<ng-template #upload_cust_img let-modal>
+  <div class="modal-header state modal-info">
+    <h5 class="modal-title" id="modal-primary-label">Upload Customer Image</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="myForm" (ngSubmit)="submitImg(myForm.value)">
+      <div class="form-group">
+        <div class="input-group file-upload">
+          <input type="file" formControlName="file" (change)="fileChange(input)" (change)="onFileChange($event)" #input
+            class="file-upload-btn" />
+          <input type="text" class="form-control" placeholder="Choose a file..." value="{{file}}">
+          <i class="fa fa-times delete-file" (click)="removeFile()" *ngIf="file"></i>
+          <span class="input-group-btn">
+            <button class="btn btn-primary" type="button"><i class="fa fa-upload"></i></button>
+          </span>
+        </div>
+      </div>
+      <button [disabled]="loading" class="btn btn-primary" type="submit">Submit<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+    </form>
+  </div>
+</ng-template>
+
+<div *ngIf="!show">
+  <button type="submit" class="btn btn-info fa fa-arrow-left mb-3" (click)="view()">
+    Back
+  </button>
+
+  <div class="row">
+    <div class="col-12">
+      <div widget class="card">
+          <div class="card-header">
+              <span>New Customer</span>
+              <div class="widget-controls">
+                  <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+                  <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+                  <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+                  <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+                  <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+              </div>
+          </div>
+          <div class="card-body widget-body">
+              <div class="row">
+                  <div *ngFor="let step of steps; let last = last" class="col-md-3 col-sm-6 col-12 step" [class.active]="step.active" [class.valid]="step.valid" [ngClass]="{'last' : last }">
+                      <div class="step-icon">
+                          <i class="fa {{ step.icon }}" aria-hidden="true"></i>
+                      </div>
+                      <span class="step-name" [class.active]="step.active" [class.valid]="step.valid">{{step.name}}</span>
+                  </div>
+              </div>
+
+             <div *ngFor="let step of steps" [hidden]="!step.active" class="col form-wizard">
+                  <!--  <div class="row form-title">
+                      <h4><i class="fa {{ step.icon }}"></i> {{step.name}}</h4>
+                  </div> -->
+
+                  <form *ngIf="step.name=='Customer Information'" class="mt-3" [formGroup]="customer_data">
+                    <div class="row mb-3">
+                      <label class="col-sm-2 col-form-label col-form-label-sm">Type</label>
+                       <div class="form-check form-check-inline ml-3">
+                         <input type="radio" formControlName="type" (change)="type1()" class="form-check-input" value="1" />
+                         <label class="form-check-label">Business</label>
+                       </div>
+                       <div class="form-check form-check-inline">
+                         <input type="radio" formControlName="type" (change)="type2()" class="form-check-input" value="0" />
+                         <label class="form-check-label">Individual</label>
+                       </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label class="col-sm-2 col-form-label col-form-label-sm">Customer Type</label>
+                      <div class="col-md-4">
+                        <select formControlName="customerType" class="form-control" placeholder=" select any One"
+                          [ngClass]="{ 'is-invalid': submitted && f.customerType.errors }">
+                          <option value="distributor">Distributor</option>
+                          <option value="reseller">    Reseller </option>
+                          <option value="manufacturer">Manufacturer</option>
+                          <option value="endUser">     End User</option>
+                        </select>
+                        <span class="help-block text-danger"
+                          *ngIf="customer_data.get('customerType').touched && customer_data.get('customerType').hasError('required')">Select
+                          Customer Type !</span>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label class="col-sm-2 col-form-label col-form-label-sm">Primary Contact</label>
+                      <div class="col-sm-2">
+                        <select formControlName="salutation" class="form-control" placeholder=" Select Salutation"
+                          [ngClass]="{ 'is-invalid': submitted && f.salutation.errors }">
+                          <option value="Mr">Mr.</option>
+                          <option value="Mrs">Mrs.</option>
+                          <option value="Ms.">Ms.</option>
+                          <option value="Miss.">Miss.</option>
+                          <option value="Dr.">Dr.</option>
+                        </select>
+                        <span class="help-block text-danger"
+                          *ngIf="customer_data.get('salutation').touched && customer_data.get('salutation').hasError('required')">Select
+                          your Salutation !</span>
+                      </div>
+
+                      <div class="col-sm-2">
+                        <input type="text" formControlName="firstName" class="form-control form-control-sm"
+                          placeholder="Enter Name" [ngClass]="{ 'is-invalid': submitted && f.firstName.errors }" />
+
+                        <span class="help-block text-danger"
+                          *ngIf="customer_data.get('firstName').touched && customer_data.get('firstName').hasError('required')"> Name
+                          Required !</span>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label class="col-sm-2 col-form-label col-form-label-sm">Company Name</label>
+                      <div class="col-sm-4">
+                        <input type="text" formControlName="companyName" [(ngModel)]="cus_name" class="form-control form-control-sm"
+                          placeholder="Enter Company Name" [ngClass]="{ 'is-invalid': submitted && f.companyName.errors }"  />
+                        <span class="help-block text-danger"
+                          *ngIf="customer_data.get('companyName').touched && customer_data.get('companyName').hasError('required')">Company
+                          Name Required !</span>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label class="col-sm-2 col-form-label col-form-label-sm">Email</label>
+                      <div class="col-sm-4">
+                        <input type="email" formControlName="email" class="form-control form-control-sm"
+                          placeholder="Enter Email" />
+                        <span class="help-block text-danger"
+                          *ngIf="customer_data.get('email').touched && customer_data.get('email').hasError('required')">Enter
+                          your email !</span>
+                        <span class="help-block text-danger"
+                          *ngIf="customer_data.get('email').touched && customer_data.get('email').hasError('pattern')">Invalid
+                          Email id !</span>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label class="col-sm-2 col-form-label col-form-label-sm">Contact Number</label>
+                      <div class="col-sm-2">
+                        <input type="number" formControlName="phone" onKeyPress="if(this.value.length==15) return false;" class="form-control form-control-sm" placeholder="  Enter Landline Number" />
+
+                        <span class="help-block text-danger"
+                        *ngIf="customer_data.get('phone').touched && customer_data.get('phone').hasError('required')">Enter contact number!</span>
+
+                      </div>
+
+                      <div class="col-sm-2">
+                        <input type="number" formControlName="mobile" onKeyPress="if(this.value.length==10) return false;"
+                          class="form-control form-control-sm" placeholder="Enter Mobile Number" />
+
+                          <span class="help-block text-danger"
+                          *ngIf="customer_data.get('mobile').touched && customer_data.get('mobile').hasError('required')">Enter contact number!
+                          ! </span>
+                        <span class="help-block text-danger"
+                          *ngIf="customer_data.get('mobile').touched && customer_data.get('mobile').hasError('pattern')">Enter contact number!</span>
+                      </div>
+                    </div>
+
+                    <div class="row mb-5">
+                      <label class="col-sm-2 col-form-label col-form-label-sm">Website</label>
+                      <div class="col-sm-4">
+                        <input type="url" formControlName="website" class="form-control form-control-sm"
+                          [ngClass]="{ 'is-invalid': submitted && f.website.errors }" placeholder="Enter Website" />
+                        <span class="help-block text-danger"
+                          *ngIf="customer_data.get('website').touched && customer_data.get('website').hasError('required')">Enter Website
+                          ! </span>
+                        <span class="help-block text-danger"
+                          *ngIf="customer_data.get('website').touched && customer_data.get('website').hasError('pattern')">Enter Valid
+                          website
+                          ! </span>
+                      </div>
+                    </div>
+                </form>
+
+                <form *ngIf="step.name=='Tax Information'"  [formGroup]="gst_details">
+                    <span *ngIf="customerType1">
+                      <div class="row mb-3">
+                        <label style="color: red" class="col-sm-2 col-form-label col-form-label-sm">GST Treatment*</label>
+                        <div class="col-sm-4">
+                          <select formControlName="gstTreatment" class="form-control"
+                            (change)="gstTreat($event.target.value)" placeholder="Select a GST Treatment">
+                            <option value="1">GST Registered</option>
+                            <option value="0">GST Unregistered</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="row mb-3" *ngIf="gstview">
+                        <label style="color: red" class="col-sm-2 col-form-label col-form-label-sm">GSTIN /
+                          UIN*</label>
+                        <div class="col-sm-4">
+                          <input type="text" #gst (change)="getGstNo(gst.value)" formControlName="gstin"
+                            placeholder="Enter GST Number" class="form-control form-control-sm" [(ngModel)]="gstin_number"  />
+                          <span class="help-block text-danger"
+                            *ngIf="gst_details.get('gstin').touched && gst_details.get('gstin').hasError('pattern')">Enter
+                            uppercase and Valid GST number
+                            ! </span>
+                        </div>
+                      </div>
+                    </span>
+
+                    <div class="row mb-3" *ngIf="customerType1">
+                      <label class="col-sm-2 col-form-label col-form-label-sm">PAN</label>
+                      <div class="col-sm-4">
+                        <input type="text" [readonly]="panhide" formControlName="pan"
+                          class="form-control form-control-sm" placeholder="Enter PAN Number" [(ngModel)]="pan"  />
+                        <span class="help-block text-danger"
+                          *ngIf="gst_details.get('pan').touched && gst_details.get('pan').hasError('required')">Enter first GST number! </span>
+
+                        <span class="help-block text-danger"
+                          *ngIf="gst_details.get('pan').touched && gst_details.get('pan').hasError('pattern')">Enter uppercase and valid pan number ! </span>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3" *ngIf="!customerType1">
+                      <label class="col-sm-2 col-form-label col-form-label-sm">PAN</label>
+                      <div class="col-sm-4">
+                        <input type="text" [readonly]="panhide" formControlName="pan"
+                          class="form-control form-control-sm" placeholder="Enter PAN Number" [(ngModel)]="pan" />
+                        <span class="help-block text-danger"
+                          *ngIf="gst_details.get('pan').touched && gst_details.get('pan').hasError('required')">Enter pan number! </span>
+
+                        <span class="help-block text-danger"
+                          *ngIf="gst_details.get('pan').touched && gst_details.get('pan').hasError('pattern')">Enter uppercase and valid pan number ! </span>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label style="color: red" class="col-sm-2 col-form-label col-form-label-sm">UDYAM Register*</label>
+                      <div class="col-sm-4">
+                        <select formControlName="udyam_register" class="form-control"
+                          (change)="udyam_register($event.target.value)" placeholder="Select a GST Treatment">
+                          <option value="">Select</option>
+                          <option value="1">MSME Registerd</option>
+                          <option value="0">MSME Non Registerd</option>
+                        </select>
+                        <span class="help-block text-danger"
+                      *ngIf="gst_details.get('udyam_register').touched && gst_details.get('udyam_register').hasError('required')"> select the anyone ! </span>
+                      </div>
+                  </div>
+
+
+                    <div class="row mb-3" *ngIf="udyamhide">
+                      <label class="col-sm-2 col-form-label col-form-label-sm  ">UDYAM No</label>
+                      <div class="col-sm-4">
+                        <input type="text" formControlName="udyam_no" placeholder="UDYAM Number" class="form-control form-control-sm" />
+                      </div>
+                    </div>
+
+                    <div class="row mb-3 mt-2" *ngIf="customerType1">
+                      <label class="col-sm-2 col-form-label col-form-label-sm  ">Place of Supply</label>
+                      <div class="col-sm-4">
+                        <!-- <select formControlName="placeOfSupply" [(ngModel)]="placeOfSupply" class="form-control">
+                          <option [disabled]="statehide" *ngFor="let state of stateName"
+                            value="{{state.state_code}}"> {{state.state_name}}
+                          </option>
+                        </select> -->
+
+                        <ng-select formControlName="placeOfSupply" [(ngModel)]="placeOfSupply" class=" form-control custom-select" [clearable]="false">
+                          <ng-option [disabled]="statehide" *ngFor="let state of stateName" value="{{state.state_code}}" class="form-control">
+                            {{state.state_name}}
+                          </ng-option>
+                        </ng-select>
+
+                        <span class="help-block text-danger"
+                          *ngIf="gst_details.get('placeOfSupply').touched && gst_details.get('placeOfSupply').hasError('required')">Enter
+                          first GST number ! </span>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3 mt-2" *ngIf="!customerType1">
+                      <label class="col-sm-2 col-form-label col-form-label-sm ">Place of Supply
+                      </label>
+                      <div class="col-sm-4">
+                        <!-- <select formControlName="placeOfSupply" [(ngModel)]="placeOfSupply" class="form-control">
+                          <option [disabled]="statehide" *ngFor="let state of stateName"
+                            value="{{state.state_code}}"> {{state.state_name}}
+                          </option>
+                        </select> -->
+
+                        <ng-select formControlName="placeOfSupply" [(ngModel)]="placeOfSupply" class=" form-control custom-select" [clearable]="false">
+                          <ng-option [disabled]="statehide" *ngFor="let state of stateName" value="{{state.state_code}}" class="form-control">
+                            {{state.state_name}}
+                          </ng-option>
+                        </ng-select>
+
+                        <span class="help-block text-danger"
+                          *ngIf="gst_details.get('placeOfSupply').touched && gst_details.get('placeOfSupply').hasError('required')">Enter
+                          place of supply ! </span>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label class="col-sm-2 col-form-label col-form-label-sm" style="color:red;">Tax
+                        Preference*</label>
+                      <div class="form-check form-check-inline ml-3">
+                        <input type="radio" formControlName="taxType" (click)="taxEmpty1()" class="form-check-input"
+                          value="1" />
+                        <label class="form-check-label">Taxable
+                        </label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input type="radio" formControlName="taxType" class="form-check-input" (click)="taxEmpty()"
+                          value="0" />
+                        <label class="form-check-label">Tax Exempt</label>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3" *ngIf="emptyTax">
+                      <div class="col-sm-2"></div>
+                      <div class="col-sm-4">
+                        <input type="text" formControlName="taxEmpty" class="form-control form-control-sm" />
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label class="col-sm-2 col-form-label col-form-label-sm">Payment Terms</label>
+                      <div class="col-sm-4">
+                        <!-- <select formControlName="paymentTerms" class="form-control" placeholder="Due on Receipt">
+                          <option *ngFor="let term of paymentTerm " value="{{term.id}}">{{term.terms}}
+                          </option>
+                        </select> -->
+
+                        <ng-select formControlName="paymentTerms" class=" form-control custom-select" [clearable]="false">
+                          <ng-option *ngFor="let term of paymentTerm " [value]="term.id" class="form-control">
+                            {{term.terms}}
+                          </ng-option>
+                        </ng-select>
+                        <span class="help-block text-danger"
+                          *ngIf="gst_details.get('paymentTerms').touched && gst_details.get('paymentTerms').hasError('required')">Select
+                          payment terms ! </span>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label class="col-sm-2 col-form-label col-form-label-sm">Opening Balance</label>
+                      <div class="col-sm-4">
+                        <input type="number" formControlName="opening_balance"
+                          class="form-control form-control-sm" />
+                        <span class="help-block text-danger"
+                          *ngIf="gst_details.get('opening_balance').touched && gst_details.get('opening_balance').hasError('required')">Enter
+                          Opening Balance! </span>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label class="col-sm-2 col-form-label col-form-label-sm mt-4">Terms and Conditions</label>
+                      <div class="col-sm-6">
+                        <textarea formControlName="terms_condition" class="form-control form-control-sm" cols="30"
+                          rows="4"
+                          placeholder="Enter the terms and conditions of your business to be displayed in your transaction"> </textarea>
+                        <span class="help-block text-danger"
+                          *ngIf="gst_details.get('terms_condition').touched && gst_details.get('terms_condition').hasError('required')">Enter
+                          Terms and Conditions
+                          ! </span>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label class="col-sm-2 col-form-label col-form-label-sm mt-4"> Remarks</label>
+                      <div class="col-sm-6">
+                        <textarea formControlName="remarks" class="form-control form-control-sm" cols="30" rows="3"
+                          placeholder="Enter Remarks"> </textarea>
+                        <span class="help-block text-danger"
+                          *ngIf="gst_details.get('remarks').touched && gst_details.get('remarks').hasError('required')">Enter
+                          Remarks
+                          ! </span>
+                      </div>
+                    </div>
+
+                    <div class="row mb-3">
+                      <label class="col-sm-2 col-form-label col-form-label-sm mt-4"> Notes</label>
+                      <div class="col-sm-6">
+                        <textarea formControlName="notes" class="form-control form-control-sm" cols="30" rows="4"
+                          placeholder="Enter the customer notes of your business to be displayed in your transaction"> </textarea>
+                        <span class="help-block text-danger"
+                          *ngIf="gst_details.get('notes').touched && gst_details.get('notes').hasError('required')">Enter
+                          Notes
+                          ! </span>
+                      </div>
+                    </div>
+                </form>
+
+                  <form *ngIf="step.name=='Address Information'" class="mt-3" [formGroup]="address_details">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="mb-4">
+                          <h3 style="color: gray">BILLING ADDRESS</h3>
+                        </div>
+                        <div class="row mb-3">
+                          <label class="col-sm-4 col-form-label col-form-label-sm">Attention</label>
+                          <div class="col-sm-8">
+                            <input type="text" formControlName="billAttention" class="form-control form-control-sm"
+                              placeholder="Enter Name" />
+                            <span class="help-block text-danger"
+                              *ngIf="address_details.get('billAttention').touched && address_details.get('billAttention').hasError('required')">Enter
+                              Name ! </span>
+
+                          </div>
+                        </div>
+
+                        <div class="row mb-3">
+                          <label class="col-sm-4 col-form-label col-form-label-sm">Address</label>
+                          <div class="col-sm-8">
+                            <div class="form-floating mb-3">
+                              <textarea formControlName="billAddress1" class="form-control" placeholder="Street 1"
+                                style="height: 50px"></textarea>
+                              <span class="help-block text-danger"
+                                *ngIf="address_details.get('billAddress1').touched && address_details.get('billAddress1').hasError('required')">Enter
+                                Addressline 1 ! </span>
+                            </div>
+                            <div class="form-floating">
+                              <textarea class="form-control" formControlName="billAddress2" placeholder="Street 2"
+                                style="height: 50px"></textarea>
+                              <span class="help-block text-danger"
+                                *ngIf="address_details.get('billAddress2').touched && address_details.get('billAddress2').hasError('required')">Enter
+                                Addressline 2 ! </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="row mb-3">
+                          <label class="col-sm-4 col-form-label col-form-label-sm">City</label>
+                          <div class="col-sm-8">
+                            <input type="text" formControlName="billCity" placeholder="Enter City"
+                              class="form-control form-control-sm" />
+                            <span class="help-block text-danger"
+                              *ngIf="address_details.get('billCity').touched && address_details.get('billCity').hasError('required')">Enter
+                              City ! </span>
+
+                          </div>
+                        </div>
+                        <div class="row mb-3">
+                          <label class="col-sm-4 col-form-label col-form-label-sm">State</label>
+                          <div class="col-sm-8">
+                            <!-- <select formControlName="billState" class="form-control">
+                              <option *ngFor="let state of stateName" value="{{state.state_name}}">
+                                {{state.state_name}}
+                              </option>
+                            </select> -->
+
+                            <ng-select formControlName="billState" class=" form-control custom-select" [clearable]="false">
+                              <ng-option *ngFor="let state of stateName" value="{{state.state_name}}" class="form-control">
+                                {{state.state_name}}
+                              </ng-option>
+                            </ng-select>
+
+                            <span class="help-block text-danger"
+                              *ngIf="address_details.get('billState').touched && address_details.get('billState').hasError('required')">Enter
+                              State ! </span>
+                          </div>
+                        </div>
+
+                        <div class="row mb-3">
+                          <label class="col-sm-4 col-form-label col-form-label-sm">Pin
+                            Code</label>
+                          <div class="col-sm-8">
+                            <input type="number" formControlName="billZip" placeholder="Enter Pincode"
+                              class="form-control form-control-sm" id="zip_code"
+                              onKeyPress="if(this.value.length==6) return false;" />
+                            <span class="help-block text-danger"
+                              *ngIf="address_details.get('billZip').touched && address_details.get('billZip').hasError('required')">Enter
+                              Pin code ! </span>
+
+                            <span class="help-block text-danger"
+                              *ngIf="address_details.get('billZip').touched && address_details.get('billZip').hasError('pattern')">Enter
+                              6 Digit pin code ! </span>
+
+                          </div>
+                        </div>
+
+                        <div class="row mb-3">
+                          <label class="col-sm-4 col-form-label col-form-label-sm">Contact Number</label>
+                          <div class="col-sm-8">
+                            <input type="number" placeholder="Enter Contact number" formControlName="billPhone"
+                              class="form-control form-control-sm"
+                              onKeyPress="if(this.value.length==10) return false;" />
+                            <span class="help-block text-danger"
+                              *ngIf="address_details.get('billPhone').touched && address_details.get('billPhone').hasError('required')">Enter
+                              Contact number ! </span>
+
+                            <span class="help-block text-danger"
+                              *ngIf="address_details.get('billPhone').touched && address_details.get('billPhone').hasError('pattern')">Enter
+                              Contact number !</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="col-md-7">
+                            <h3 style="color: gray">SHIPPING ADDRESS</h3>
+                          </div>
+                          <div class="col-md-4">
+                            <a (click)="copyAddress(address_details.value)"
+                              style="cursor: pointer; color: rgb(36, 167, 219);">Copy Billing Address </a>
+                          </div>
+                        </div>
+
+                        <div class="row mb-3">
+                          <label class="col-sm-4 col-form-label col-form-label-sm">Attention</label>
+                          <div class="col-sm-8">
+                            <input type="text" formControlName="shipAttention" [(ngModel)]="shipAttention"
+                              class="form-control form-control-sm" placeholder="Enter Name" />
+                            <span class="help-block text-danger"
+                              *ngIf="address_details.get('shipAttention').touched && address_details.get('shipAttention').hasError('required')">Enter
+                              Name ! </span>
+                          </div>
+                        </div>
+
+                        <div class="row mb-3">
+                          <label class="col-sm-4 col-form-label col-form-label-sm">Address</label>
+                          <div class="col-sm-8">
+                            <div class="form-floating mb-3">
+                              <textarea class="form-control" formControlName="shipAddress1" placeholder="Street 1"
+                                [(ngModel)]="shipAddress1" style="height: 50px"></textarea>
+                              <span class="help-block text-danger"
+                                *ngIf="address_details.get('shipAddress1').touched && address_details.get('shipAddress1').hasError('required')">Enter
+                                Addressline 1 ! </span>
+                            </div>
+                            <div class="form-floating">
+                              <textarea class="form-control" formControlName="shipAddress2" placeholder="Street 2"
+                                [(ngModel)]="shipAddress2" style="height: 50px"></textarea>
+                              <span class="help-block text-danger"
+                                *ngIf="address_details.get('shipAddress2').touched && address_details.get('shipAddress2').hasError('required')">Enter
+                                Addressline 2 ! </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="row mb-3">
+                          <label class="col-sm-4 col-form-label col-form-label-sm">City</label>
+                          <div class="col-sm-8">
+                            <input type="text" formControlName="shipCity" placeholder="Enter City"
+                              class="form-control form-control-sm" [(ngModel)]="shipCity" />
+                            <span class="help-block text-danger"
+                              *ngIf="address_details.get('shipCity').touched && address_details.get('shipCity').hasError('required')">Enter
+                              City ! </span>
+                          </div>
+                        </div>
+
+                        <div class="row mb-3">
+                          <label class="col-sm-4 col-form-label col-form-label-sm">State</label>
+                          <div class="col-sm-8">
+                            <!-- <select class="form-control" formControlName="shipState" [(ngModel)]="shipState">
+                              <option *ngFor="let state of stateName" value="{{state.state_name}}">
+                                {{state.state_name}}
+                              </option>
+                            </select> -->
+
+                            <ng-select formControlName="shipState" [(ngModel)]="shipState" class=" form-control custom-select" [clearable]="false">
+                              <ng-option *ngFor="let state of stateName" value="{{state.state_name}}" class="form-control">
+                                {{state.state_name}}
+                              </ng-option>
+                            </ng-select>
+                            <span class="help-block text-danger"
+                              *ngIf="address_details.get('shipState').touched && address_details.get('shipState').hasError('required')">Enter
+                              State ! </span>
+                          </div>
+                        </div>
+
+                        <div class="row mb-3">
+                          <label class="col-sm-4 col-form-label col-form-label-sm">Pin Code</label>
+                          <div class="col-sm-8">
+                            <input type="number" formControlName="shipZip" class="form-control form-control-sm"
+                              [(ngModel)]="shipZip" placeholder="Enter Pincode"
+                              onKeyPress="if(this.value.length==6) return false;" />
+                            <span class="help-block text-danger"
+                              *ngIf="address_details.get('shipZip').touched && address_details.get('shipZip').hasError('required')">Enter
+                              Pin code ! </span>
+                          </div>
+                        </div>
+
+                        <div class="row mb-3">
+                          <label class="col-sm-4 col-form-label col-form-label-sm">Contact Number</label>
+                          <div class="col-sm-8">
+                            <input type="number" formControlName="shipPhone" placeholder="Enter Contact number"
+                              class="form-control form-control-sm" [(ngModel)]="shipPhone"
+                              onKeyPress="if(this.value.length==10) return false;" />
+                            <span class="help-block text-danger"
+                              *ngIf="address_details.get('shipPhone').touched && address_details.get('shipPhone').hasError('required')">Enter
+                              Contact number ! </span>
+                            <span class="help-block text-danger"
+                              *ngIf="address_details.get('shipPhone').touched && address_details.get('shipPhone').hasError('pattern')">Enter
+                              Contact number !</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+              </form>
+
+
+                <form *ngIf="step.name=='Contact Details'"  [formGroup]="contact_details">
+
+                  <div class="row">
+                    <div class="col-1 ">
+                      <h5 class="text-center"><small>Prefix</small> </h5>
+                    </div>
+                    <div class="col-2">
+                      <h5 class="text-center"><small>First Name</small> </h5>
+                    </div>
+                    <div class="col-2">
+                      <h5 class="text-center"><small>Last Name</small></h5>
+                    </div>
+                    <div class="col-2">
+                      <h5 class="text-center"><small>Email Address</small></h5>
+
+                    </div>
+                    <div class="col-2">
+                      <h5 class="text-center"><small> Phone</small></h5>
+                    </div>
+                    <div class="col-2">
+                      <h5 class="text-center"><small>Mobile</small></h5>
+                    </div>
+                    <div class="col-1"></div>
+                  </div>
+
+                  <ul class="list-group">
+                    <li class="list-group-item" formArrayName="contacts"
+                      *ngFor="let contact of contact_details.get('contacts')['controls']; let i = index;">
+
+                      <div [formGroupName]="i" >
+                        <div class="row ">
+                          <div class="col-1 ">
+                            <select formControlName="prefix" class="form-control form-control-md">
+                              <option value="Mr.">Mr.</option>
+                              <option value="Mrs.">Mrs.</option>
+                              <option value="Miss.">Miss.</option>
+                              <option value="Dr.">Dr.</option>
+                            </select>
+                          </div>
+
+                          <div class="col-2">
+                            <input type="text" formControlName="fname" class="form-control" />
+                          </div>
+
+                          <div class="col-2">
+                            <input type="text" formControlName="lname" class="form-control" />
+                          </div>
+                          <div class="col-2">
+                            <input type="email" formControlName="contactEmail" class="form-control" />
+                            <span class="help-block text-danger"
+                              *ngIf="contact.get('contactEmail').touched && contact.get('contactEmail').hasError('pattern')">Enter Valid email address!</span>
+                          </div>
+                          <div class="col-2">
+                            <input type="number" formControlName="workPhone" class="form-control" id="phone" onKeyPress="if(this.value.length==10) return false;" />
+                            <span class="help-block text-danger"
+                              *ngIf="contact.get('workPhone').touched && contact.get('workPhone').hasError('pattern')">Enter 10 digits MobileNo!</span>
+                          </div>
+                          <div class="col-2">
+                            <input type="number" formControlName="mobile" class="form-control" onKeyPress="if(this.value.length==10) return false;" />
+                            <span class="help-block text-danger"
+                              *ngIf="contact.get('mobile').touched && contact.get('mobile').hasError('pattern')">Enter 10 digits MobileNo!</span>
+                          </div>
+                          <div class="col-1" (click)="removePerson_wizard(i)">
+                            <i class="far fa-times-circle mt-3"></i>
+                          </div>
+                        </div>
+                      </div>
+
+                    </li>
+                  </ul>
+
+                  <div style="cursor: pointer; color: rgb(13, 169, 231)" class="mb-3 mt-3" (click)="addPerson_wizard()">
+                    <span style="font-size: 10px; cursor: pointer"><i class="fas fa-plus"></i>
+                    </span>
+                    Add Contact Person
+                  </div>
+                </form>
+
+              </div>
+
+              <div class="row">
+                  <div class="col-12">
+                      <button class="btn btn-primary pull-left" (click)="prev()"><i class="fa fa-chevron-left arrow"></i>&nbsp; Prev Step</button>
+                      <button *ngIf="!steps[steps.length-1].active" class="btn btn-primary pull-right" (click)="next()">Next Step &nbsp;<i class="fa fa-chevron-right arrow"></i></button>
+                      <button [disabled]="loading" *ngIf="steps[steps.length-1].active" class="btn btn-primary pull-right" (click)="confirm()">Confirm<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #add_address let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Add Address</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="newaddress" (ngSubmit)="new_submit(newaddress.value)" class="row">
+
+      <div class="form-group col-md-12">
+        <label for="name">Name</label>
+        <input formControlName="name" id="name" placeholder="Enter name" type="text" class="form-control">
+        <span class="help-block text-danger"
+          *ngIf="newaddress.get('name').touched && newaddress.get('name').hasError('required')">Enter
+          Name !</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Address Line 1</label>
+        <input formControlName="addressline1" id="addressline1" placeholder="Enter Addressline 1" type="text"
+          class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="newaddress.get('addressline1').touched && newaddress.get('addressline1').hasError('required')">Enter
+          AddressLine 1 !</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Address Line 2</label>
+        <input formControlName="addressline2" id="addressline2" placeholder="Enter Addressline 2" type="text"
+          class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="newaddress.get('addressline2').touched && newaddress.get('addressline2').hasError('required')">Enter
+          Addressline 2 !</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">City</label>
+        <input formControlName="city" id="city" placeholder="Enter City" type="text" class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="newaddress.get('city').touched && newaddress.get('city').hasError('required')">Enter
+          City !</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">State</label>
+        <input formControlName="state" id="state" placeholder="Enter State" type="text" class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="newaddress.get('state').touched && newaddress.get('state').hasError('required')">Enter
+          State !</span>
+      </div>
+
+
+      <div class="form-group col-md-12">
+        <label for="name">Pin code</label>
+        <input formControlName="zipcode" id="zipcode" placeholder="Enter Pincode" type="number" class="form-control"
+         onKeyPress="if(this.value.length==6) return false;">
+
+        <span class="help-block text-danger"
+          *ngIf="newaddress.get('zipcode').touched && newaddress.get('zipcode').hasError('required')">Enter
+          Pin code !</span>
+        <span class="help-block text-danger"
+          *ngIf="newaddress.get('zipcode').touched && newaddress.get('zipcode').hasError('pattern')">Enter
+          6 Digit Pin code!</span>
+
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Contact Number</label>
+        <input formControlName="mobile" id="mobile" placeholder="Enter Contact number" type="number" class="form-control"
+          onKeyPress="if(this.value.length==10) return false;">
+
+        <span class="help-block text-danger"
+          *ngIf="newaddress.get('mobile').touched && newaddress.get('mobile').hasError('required')">Enter
+          Contact number !</span>
+        <span class="help-block text-danger"
+          *ngIf="newaddress.get('mobile').touched && newaddress.get('mobile').hasError('pattern')">Enter
+          Contact number!</span>
+      </div>
+
+
+      <div class="form-group col-md-12">
+        <label for="name"> Type </label>
+
+        <select formControlName="type" class="form-control" >
+          <option value="1">Bill Address</option>
+          <option value="2">Ship Address</option>
+        </select>
+        <span class="help-block text-danger"
+        *ngIf="newaddress.get('type').touched && newaddress.get('type').hasError('required')">Selection Required!</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Status</label>
+
+        <!-- <select formControlName="status" class="form-control" >
+          <option value="0">Disabled</option>
+          <option value="1">Enable</option>
+        </select> -->
+
+        <div class="custom-control custom-switch">
+          <input type="checkbox" formControlName="status" class="custom-control-input" id="customSwitch2" />
+          <label class="custom-control-label" for="customSwitch2"></label>
+        </div>
+        <span class="help-block text-danger"
+        *ngIf="newaddress.get('status').touched && newaddress.get('status').hasError('required')">Selection Required!</span>
+      </div>
+      <div class="col-md-5"></div>
+    <div >
+      <button class="btn btn-primary" type="submit">Submit</button>
+    </div>
+
+    </form>
+  </div>
+</ng-template>
+
+
+<ng-template #add_contact let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Add Contact</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="addcontact" (ngSubmit)="newcontact_submit(addcontact.value)" class="row">
+      <div class="form-group col-md-12">
+        <label for="name">Prefix</label>
+        <select formControlName="prefix" class="form-control" placeholder="Enter Salutation">
+        <option value="Mr.">Mr.</option>
+        <option value="Mrs.">Mrs.</option>
+        <option value="Ms.">Ms.</option>
+        <option value="Miss.">Miss.</option>
+        <option value="Dr.">Dr.</option>
+      </select>
+        <span class="help-block text-danger"
+          *ngIf="addcontact.get('prefix').touched && addcontact.get('prefix').hasError('required')">
+          Required !</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">First Name</label>
+        <input formControlName="fname"  placeholder="Enter FirstName " type="text"
+          class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="addcontact.get('fname').touched && addcontact.get('fname').hasError('required')">Enter
+          First Name !</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Last Name</label>
+        <input formControlName="lname"  placeholder="Enter LastName" type="text"
+          class="form-control" >
+
+        <span class="help-block text-danger"
+          *ngIf="addcontact.get('lname').touched && addcontact.get('lname').hasError('required')">Enter
+          Last Name!</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Email</label>
+        <input formControlName="email"  placeholder="Enter Email" type="text" class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="addcontact.get('email').touched && addcontact.get('email').hasError('required')">Enter Email !</span>
+
+          <span class="help-block text-danger"
+          *ngIf="addcontact.get('email').touched && addcontact.get('email').hasError('pattern')">Enter Valid Email !</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Mobile</label>
+        <input formControlName="mobile" onKeyPress="if(this.value.length==10) return false;" placeholder="Enter Number" type="text" class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="addcontact.get('mobile').touched && addcontact.get('mobile').hasError('required')">Enter
+          Mobile No !</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">WorkPhone</label>
+        <input formControlName="workphone" onKeyPress="if(this.value.length==10) return false;" placeholder="Enter Number" type="number" class="form-control">
+
+        <span class="help-block text-danger"
+          *ngIf="addcontact.get('workphone').touched && addcontact.get('workphone').hasError('required')">Enter Mobile No!</span>
+        <span class="help-block text-danger"
+          *ngIf="addcontact.get('workphone').touched && addcontact.get('workphone').hasError('pattern')">Enter  Mobile NO!</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Status</label>
+        <div class="custom-control custom-switch">
+          <input type="checkbox" formControlName="status" class="custom-control-input" id="customSwitch2" />
+          <label class="custom-control-label" for="customSwitch2"></label>
+        </div>
+
+        <span class="help-block text-danger"
+        *ngIf="addcontact.get('status').touched && addcontact.get('status').hasError('required')">Selection Required!</span>
+      </div>
+
+     <div class="col-md-5"></div>
+      <button [disabled]="loading" class="btn btn-primary" type="submit">Submit<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+    </form>
+  </div>
+</ng-template>

@@ -1,0 +1,31 @@
+<div class="row">
+  <div class="col-xl-8 col-lg-8 col-md-6 col-sm-6 bottom-30">
+    <canvas baseChart
+      [type]="lineChartType"
+      [data]="lineChartData"
+      [options]="lineChartOptions"
+      (chartHover)="chartHovered($event)"
+      (chartClick)="chartClicked($event)">
+    </canvas>
+  </div>
+  <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 bottom-30">
+    <div>
+      <h2 class="no-margin" style="color: rgb(1, 58, 1);">Total Sales</h2>
+      <h2>&#8377; 2,51,256.00</h2>
+    </div>
+    <div><br></div>
+    <div><br></div>
+    <div><br></div>
+    <div>
+      <h2 class="no-margin" style="color: rgb(219, 12, 12);">Total Purchase</h2>
+      <h2>&#8377; 1,21,265.00</h2>
+    </div>
+    <div><br></div>
+    <div><br></div>
+    <div><br></div>
+    <div>
+      <h2 class="no-margin" style="color: rgb(8, 190, 23);">Balance</h2>
+      <h2>&#8377; 2,35,265.00</h2>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,64 @@
+import { Component, OnInit ,ViewChild} from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
+import { ApiService } from 'src/app/service/api.service';
+import { environment } from 'src/environments/environment';
+import { DatatableComponent } from '@swimlane/ngx-datatable';
+@Component({
+  selector: 'app-credit_note',
+  templateUrl: './credit_note.component.html',
+  styleUrls: ['./credit_note.component.scss']
+})
+export class Credit_noteComponent implements OnInit {
+
+
+
+
+  temp : any;
+  List : any;
+  selected=[]
+  show:boolean=false
+    @ViewChild(DatatableComponent) table: DatatableComponent;
+  constructor(public toastrService: ToastrService, private api: ApiService) { }
+
+  ngOnInit() {
+    this.TableData()
+  }
+
+ async TableData()
+  {
+     await this.api.get('credit_note_debit_note_list.php?type=credit&authToken='+environment.authToken).then((data: any) =>
+        {
+           console.log(data)
+           this.List=data
+            this.temp=[...data];
+        }).catch(error => {this.toastrService.error('Something went wrong');});
+
+  }
+
+  updateFilter(event)
+  {
+        const val = event.target.value.toLowerCase();
+              const temp = this.temp.filter((d) => {
+                return Object.values(d).some(field =>
+                  field != null && field.toString().toLowerCase().indexOf(val) !== -1
+                );
+              });
+              this.List = temp;
+          this.table.offset = 0;
+  }
+
+  onActivate(event)
+  {
+      if(event.type =="click")
+      {
+        console.log(event.row)
+        localStorage.setItem("credit_note_id",event.row.id)
+        this.show = true
+      }
+  }
+
+  back()
+  {
+    this.show=false
+  }
+}

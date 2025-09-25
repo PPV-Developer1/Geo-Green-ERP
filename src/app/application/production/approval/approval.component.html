@@ -1,0 +1,97 @@
+<div class="col-md-12">
+  <table>
+    <tr>
+      <td style="width: 10px;">
+        <h1><small></small></h1>
+      </td>
+      <td style="width: 250px;">
+        <h5>APPROVAL</h5>
+      </td>
+      <td style="width: 1100px;">
+        <div class="input-group input-group-sm my-3">
+          <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-search"></i></span>
+          </div>
+          <input class="form-control" type="text" placeholder="Search Project Name or Product Name..." (keyup)="updateFilter($event)"/>
+        </div>
+      </td>
+      <td style="width: 100px;"> </td>
+      <td style="width: 100px; text-align: center; vertical-align: center;">
+      </td>
+      <td style="width: 200px; text-align: center; vertical-align: center;">
+      </td>
+    </tr>
+  </table>
+</div>
+<ngx-datatable
+  #table
+  class="custom_table"
+  [headerHeight]="50"
+  [limit]="10"
+  [columnMode]="'force'"
+  [footerHeight]="50"
+  [rowHeight]="'auto'"
+  [rows]="product_details"
+  [selected]="selected"
+  [selectionType]="'single'"
+  (activate)="onActivate($event)">
+  <ngx-datatable-column prop="id" name="ID" >
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.id}}
+      </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column prop="date_time" name="CREATED AT">
+    <ng-template ngx-datatable-cell-template let-row="row">
+        {{row.date_time | date: 'dd-MM-yyyy HH:mm:ss'}}
+    </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column prop="creater_name" name="CREATED BY">
+    <ng-template ngx-datatable-cell-template let-row="row">
+        {{row.creater_name}}
+    </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column prop="type" name="PROJECT NAME">
+    <ng-template ngx-datatable-cell-template let-row="row">
+      <span *ngIf="row.type == 1">{{row.project_name}}</span>
+      <span *ngIf="row.type == 2"> <strong>For Store</strong></span>
+    </ng-template>
+  </ngx-datatable-column>
+
+   <ngx-datatable-column prop="by_product_no" name="PRODUCT NO">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.by_product_no}}
+      </ng-template>
+    </ngx-datatable-column>
+    
+  <ngx-datatable-column prop="product_name" name="PRODUCT NAME">
+    <ng-template ngx-datatable-cell-template let-row="row">
+        {{row.product_name}}
+    </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column prop="level" name="LEVEL">
+    <ng-template ngx-datatable-cell-template let-row="row">
+      <span *ngIf="row.level === 1">Created</span>
+      <span *ngIf="row.level === 2">Waiting For Approval</span>
+      <span *ngIf="row.level === 3">Move to Production</span>
+      <span *ngIf="row.level === 4">Completed</span>
+    </ng-template>
+  </ngx-datatable-column>
+</ngx-datatable>
+
+<ng-template #approval let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Confirmation</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    Are you sure to approve this part for production !
+  </div>
+  <div class="modal-footer">
+      <button [disabled]="loading" type="button" class="btn btn-success" data-dismiss="modal" (click)="confirm()">Proceed <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      <button type="button" class="btn btn-danger" data-dismiss="modal" (click)="modal.dismiss('Cross click')">Close</button>
+  </div>
+</ng-template>

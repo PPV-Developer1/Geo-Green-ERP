@@ -1,0 +1,274 @@
+<div class="row">
+  <div class="col-12 bottom-30">
+    <div widget class="card">
+        <div class="card-header">
+            <span>ADD EXPENSE</span>
+            <div class="widget-controls">
+                <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+                <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+                <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+                <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+                <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+            </div>
+        </div>
+        <div class="card-body widget-body">
+          <form [formGroup]="addExpen" (ngSubmit)="AddNewExpen(addExpen.value)">
+            <div class="row">
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label style="color:red">Date *</label>
+                  </div>
+                  <div class="col-8">
+                    <input type="date" formControlName="exp_date" class="form-control">
+                    <span class="help-block text-danger" *ngIf="addExpen.get('exp_date').touched && addExpen.get('exp_date').hasError('required')">Date Required !</span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label style="color:red">Expense Type *</label>
+                  </div>
+                  <div class="col-8 bottom-15">
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input value="1" id="goods" type="radio" formControlName="exp_type" class="custom-control-input radio-success" checked>
+                        <label class="custom-control-label" for="goods">Goods</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input value="2" id="services" type="radio" formControlName="exp_type" class="custom-control-input radio-warning">
+                        <label class="custom-control-label" for="services">Services</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label style="color:red">Expense Account *</label>
+                  </div>
+                  <div class="col-8">
+                    <select formControlName="exp_account" class="form-control custom-select">
+                        <option *ngFor= "let view of exp_acc_info" value="{{view.id}}" >{{view.account_name}}</option>
+                    </select>
+                    <span class="help-block text-danger" *ngIf="addExpen.get('exp_account').touched && addExpen.get('exp_account').hasError('required')">Expense Account Required !</span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label for="input-12">HSN/SAC</label>
+                  </div>
+                  <div class="col-8">
+                    <input type="text" formControlName="gst_code" class="form-control" placeholder="If Available">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label style="color:red">Paid Through *</label>
+                  </div>
+                  <div *ngIf="this.balance_disp == 0" class="col-8">
+                    <span *ngIf="this.user_type == 'super_admin'">
+                      <select formControlName="paid_through" class="form-control custom-select" (ngModelChange)="balanceLoad()">
+                        <optgroup label="Bank">
+                          <option *ngFor= "let view of company_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+                        </optgroup>
+                        <optgroup label="Cash">
+                          <option *ngFor= "let view of cash_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+                        </optgroup>
+                        <optgroup label="Internal User">
+                          <option *ngFor= "let view of user_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+                        </optgroup>
+                      </select>
+                      <span class="help-block text-danger" *ngIf="addExpen.get('paid_through').touched && addExpen.get('paid_through').hasError('required')">Expense Account Required !</span>
+                    </span>
+                    <span *ngIf="this.user_type != 'super_admin'">
+                      <select formControlName="paid_through" class="form-control custom-select" (ngModelChange)="balanceLoad()">
+                          <option *ngFor= "let view of user_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+                      </select>
+                      <span class="help-block text-danger" *ngIf="addExpen.get('paid_through').touched && addExpen.get('paid_through').hasError('required')">Expense Account Required !</span>
+                    </span>
+                  </div>
+                  <div *ngIf="this.balance_disp == 1" class="col-4">
+                    <span *ngIf="this.user_type == 'super_admin'">
+                      <select formControlName="paid_through" class="form-control custom-select" (ngModelChange)="balanceLoad()">
+                        <optgroup label="Bank">
+                          <option *ngFor= "let view of company_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+                        </optgroup>
+                        <optgroup label="Cash">
+                          <option *ngFor= "let view of cash_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+                        </optgroup>
+                        <optgroup label="Internal User">
+                          <option *ngFor= "let view of user_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+                        </optgroup>
+                      </select>
+                      <span class="help-block text-danger" *ngIf="addExpen.get('paid_through').touched && addExpen.get('paid_through').hasError('required')">Expense Account Required !</span>
+                    </span>
+                    <span *ngIf="this.user_type != 'super_admin'">
+                      <select formControlName="paid_through" class="form-control custom-select" (ngModelChange)="balanceLoad()">
+                          <option *ngFor= "let view of user_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+                      </select>
+                      <span class="help-block text-danger" *ngIf="addExpen.get('paid_through').touched && addExpen.get('paid_through').hasError('required')">Expense Account Required !</span>
+                    </span>
+                  </div>
+                  <div *ngIf="this.balance_disp == 1" class="col-4">
+                    <span> <strong> <h6>Balance : {{onloadBalance | indianCurrency}}</h6></strong></span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label style="color:red">Payment Transfer Mode *</label>
+                  </div>
+                  <div class="col-8">
+                    <select formControlName="exp_mode" class="form-control custom-select">
+                        <option value="0">Select Mode</option>
+                        <option value="1">Wire</option>
+                        <option value="2">Cash</option>
+                        <option value="3">Cheque</option>
+                    </select>
+                    <span class="help-block text-danger" *ngIf="addExpen.get('exp_mode').touched && addExpen.get('exp_mode').hasError('required')">Payment Transfer Mode Required !</span>
+                    <span class="help-block text-danger" *ngIf="addExpen.get('exp_mode').touched && addExpen.get('exp_mode').hasError('minlength')">Select one mode of transfer !</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label style="color:red">Amount without Tax *</label>
+                  </div>
+                  <div class="col-8">
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">₹</span>
+                      </div>
+                      <input type="number" formControlName="amount" class="form-control" placeholder="Amount without Tax" (ngModelChange)="tax_calculate()">
+                      <span class="help-block text-danger" *ngIf="addExpen.get('amount').touched && addExpen.get('amount').hasError('required')">Amount Required !</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label style="color:red">Tax *</label>
+                  </div>
+                  <div class="col-8">
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">₹</span>
+                      </div>
+                      <input type="number" class="form-control" formControlName="tax_rate" placeholder="Tax Amount">
+                      <select formControlName="tax_percent" class="form-control custom-select" (ngModelChange)="tax_calculate()">
+                        <option value="0">0% Tax</option>
+                        <option *ngFor= "let view of gst_percent" value="{{view.rate}}" >{{view.name}} - {{view.rate}}</option>
+                      </select>
+                      <span class="help-block text-danger" *ngIf="addExpen.get('tax_rate').touched && addExpen.get('tax_rate').hasError('required')">Tax Rate Required !</span>
+                      <span class="help-block text-danger" *ngIf="addExpen.get('tax_percent').touched && addExpen.get('tax_percent').hasError('required')">Tax Percent Required !</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label for="input-1">Invoice / Bill Number</label>
+                  </div>
+                  <div class="col-8">
+                    <input type="text" class="form-control" formControlName="inv_number" placeholder="For Reference">
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label style="color:red">Name of the Expense *</label>
+                  </div>
+                  <div class="col-8">
+                    <input type="text" class="form-control" formControlName="exp_name" placeholder="Expense Name">
+                    <span class="help-block text-danger" *ngIf="addExpen.get('exp_name').touched && addExpen.get('exp_name').hasError('required')">Expense Name Required !</span>
+                    <span class="help-block text-danger" *ngIf="addExpen.get('exp_name').touched && addExpen.get('exp_name').hasError('minlength')">Minimum Length 3</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label for="exampleSelect3">Vendor Name</label>
+                  </div>
+                  <div class="col-8">
+                    <select formControlName="vendor" class="form-control custom-select">
+                        <option value="0">No Vendor Selected</option>
+                        <option *ngFor= "let view of vendor_list" value="{{view.vendor_id}}" >{{view.company_name}}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-6">
+
+              </div>
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label for="exampleSelect3">Customer Name</label>
+                  </div>
+                  <div class="col-8">
+                    <select formControlName="customer" class="form-control custom-select">
+                        <option value="0">No Customer Selected</option>
+                        <option *ngFor= "let view of customer_list" value="{{view.customer_id}}" >{{view.company_name}}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-6">
+
+              </div>
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label for="exampleSelect3">Project Name</label>
+                  </div>
+                  <div class="col-8">
+                    <select formControlName="project" class="form-control custom-select">
+                        <option value="0">No Project Selected</option>
+                        <option *ngFor= "let view of project_list" value="{{view.project_id}}" >{{view.name}}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label for="input-1">Notes</label>
+                  </div>
+                  <div class="col-8">
+                    <input type="text" formControlName="reference" class="form-control" placeholder="Only For Reference">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <button class="btn btn-info btn-block" type="submit">Submit</button>
+            </div>
+        </form>
+        </div>
+    </div>
+  </div>
+</div>
+

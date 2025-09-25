@@ -1,0 +1,325 @@
+<div>
+  <div class="col-md-12">
+    <table>
+      <tr>
+        <td style="width: 10px;">
+          <h1><small></small></h1>
+        </td>
+        <td style="width: 150px;">
+          <h5>ITEM LIST</h5>
+        </td>
+        <td style="width: 1100px;">
+          <div class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input class="form-control" type="text" placeholder="Search Items by Key words - Item Name (or) HSN/SAC (or) Description" (keyup)="updateFilter($event)" />
+          </div>
+        </td>
+        <td style="width: 100px;"> </td>
+        <td style="width: 100px; text-align: center; vertical-align: center;">
+        </td>
+        <td style="width: 200px; text-align: center; vertical-align: center;">
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-success fa fa-plus" (click)="NewSubmitBtn()"> Add Item</button>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="row">
+    <div class="col">
+      <ngx-datatable
+      #table
+      class="custom_table"
+      [headerHeight]="50"
+      [limit]="15"
+      [columnMode]="'force'"
+      [footerHeight]="50"
+      [rowHeight]="'auto'"
+      [rows]="item_list"
+      [selected]="selected"
+      (activate)="onActivate($event)">
+
+        <ngx-datatable-column prop="item_name" name="NAME" >
+          <ng-template ngx-datatable-cell-template let-row="row" >
+            {{row.item_name}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column  prop="item_cat" name="CATEGORY">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.item_cat}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="item_type" name="TYPE" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <label *ngIf="row.item_type == 1">Raw Material</label>
+            <label *ngIf="row.item_type == 2">Product</label>
+            <label *ngIf="row.item_type == 3">Service</label>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="hsnsac" name="HSN/SAC" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.hsnsac}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+
+        <ngx-datatable-column prop="price" name="RATE" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.price|indianCurrency}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column prop="uom"  name="UOM" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.uom}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="tax_percent" name="TAX %" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.tax_percent}} %
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="description" name="DESCRIPTION" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.description}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="purchase" name="PURCHASE " >
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <label *ngIf="row.purchase == 0" style="color:red"><strong>False</strong></label>
+            <label *ngIf="row.purchase == 1" style="color:green"><strong>True</strong></label>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="sales" name="SALE" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <label *ngIf="row.sales == 0" style="color:red"><strong>False</strong></label>
+            <label *ngIf="row.sales == 1" style="color:green"><strong>True</strong></label>
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        <ngx-datatable-column prop="status" name="STATUS" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <label *ngIf="row.status == 0" style="color:red"><strong>Inactive</strong></label>
+            <label *ngIf="row.status == 1" style="color:green"><strong>Active</strong></label>
+          </ng-template>
+        </ngx-datatable-column>
+
+      </ngx-datatable>
+    </div>
+  </div>
+</div>
+
+
+<!-- Model Open -->
+<ng-template #AddNew_item let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Add Item</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="NewItem" (ngSubmit)="NewSubmit(NewItem.value)" class="row">
+      <div class="form-group col-md-12">
+        <label for="name">Name</label>
+        <input formControlName="name" placeholder="Enter Name" type="text" class="form-control">
+        <span class="help-block text-danger" *ngIf="NewItem.get('name').touched && NewItem.get('name').hasError('required')">Required !</span>
+        <span class="help-block text-danger" *ngIf="NewItem.get('name').touched && NewItem.get('name').hasError('minlength')">Minimum 3 Letters</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Item Category</label>
+        
+        <ng-select formControlName="item_cat" class=" form-control custom-select" [clearable]="false">
+          <ng-option *ngFor="let item of category" value="{{item.cat_id}}" class="form-control">
+            {{ item.title}}
+          </ng-option>
+        </ng-select>
+
+
+        <span class="help-block text-danger" *ngIf="NewItem.get('item_cat').touched && NewItem.get('item_cat').hasError('required')">Required !</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">HSN / SAC</label>
+        <input formControlName="hsnsac"  type="number" class="form-control" placeholder="Enter HSN / SAC">
+        <span class="help-block text-danger" *ngIf="NewItem.get('hsnsac').touched && NewItem.get('hsnsac').hasError('required')">Required !</span>
+        <span class="help-block text-danger" *ngIf="NewItem.get('hsnsac').touched && NewItem.get('hsnsac').hasError('minlength')">Minimum 4 Codes</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Unit of Material</label>
+        <!-- <select formControlName="uom" class="form-control">
+          <option *ngFor= "let view of uom_list" value="{{view.name}}" >{{view.name}}</option>
+        </select> -->
+
+        <ng-select formControlName="uom" class=" form-control custom-select" [clearable]="false">
+          <ng-option *ngFor="let item of uom_list" value="{{item.name}}" class="form-control">
+            {{ item.name}}
+          </ng-option>
+        </ng-select>
+        <span class="help-block text-danger" *ngIf="NewItem.get('uom').touched && NewItem.get('uom').hasError('required')">Required !</span>
+      </div>
+
+
+      <div class="form-group col-md-12">
+        <label for="name">Price </label>
+        <input formControlName="price"  type="number" class="form-control" placeholder="Enter Selling Price">
+        <span class="help-block text-danger" *ngIf="NewItem.get('price').touched && NewItem.get('price').hasError('required')">Required !</span>
+        <span class="help-block text-danger" *ngIf="NewItem.get('price').touched && NewItem.get('price').hasError('minlength')">Minimum 4 Codes</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Tax %</label>
+        <!-- <select formControlName="tax_percent" class="form-control">
+          <option *ngFor= "let view of tax_list" value="{{view.rate}}" >{{view.name}}</option>
+        </select> -->
+
+        <ng-select formControlName="tax_percent" class=" form-control custom-select" [clearable]="false">
+          <ng-option *ngFor="let item of tax_list" value="{{item.rate}}" class="form-control">
+            {{ item.name}}
+          </ng-option>
+        </ng-select>
+        <span class="help-block text-danger" *ngIf="NewItem.get('tax_percent').touched && NewItem.get('tax_percent').hasError('required')">Required !</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Description</label>
+        <input formControlName="description"  type="text" class="form-control" placeholder="Enter Description">
+        <span class="help-block text-danger" *ngIf="NewItem.get('description').touched && NewItem.get('description').hasError('required')">Required !</span>
+        <span class="help-block text-danger" *ngIf="NewItem.get('description').touched && NewItem.get('description').hasError('minlength')">Minimum 5 Letters</span>
+      </div>
+
+      <div class="col-md-1"></div>
+      <div class="custom-control custom-switch col-md-11">
+        <input type="checkbox" formControlName="purchase" class="custom-control-input" id="customSwitch3" />
+        <label class="custom-control-label" for="customSwitch3">Purchase</label>
+      </div>
+
+      <div class="col-md-1"></div>
+      <div class="custom-control custom-switch col-md-11">
+        <input type="checkbox" formControlName="sale" class="custom-control-input" id="customSwitch4" />
+        <label class="custom-control-label" for="customSwitch4">Sales</label>
+      </div>
+
+      <div class="col-md-1"></div>
+      <div class="custom-control custom-switch col-md-11">
+        <input type="checkbox" formControlName="status" class="custom-control-input" id="customSwitch2" />
+        <label class="custom-control-label" for="customSwitch2">Status</label>
+      </div>
+      <div class="col-md-7">
+      <button [disabled]="loading" class="btn btn-primary pull-right" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+    </div>
+    </form>
+  </div>
+</ng-template>
+
+<!-- Edit Item start -->
+
+<ng-template #update_item let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Edit Item</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="EditItem" (ngSubmit)="EditSubmit(EditItem.value)" class="row">
+      <div class="form-group col-md-12">
+        <label for="name">Name</label>
+        <input formControlName="name" placeholder="Enter Name" type="text" class="form-control">
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Item Category</label>
+        <ng-select formControlName="item_cat" class=" form-control custom-select" [clearable]="false">
+          <ng-option *ngFor="let item of category" [value]="item.cat_id" class="form-control">
+            {{ item.title}}
+          </ng-option>
+        </ng-select>
+        <span class="help-block text-danger" *ngIf="EditItem.get('item_cat').touched && EditItem.get('item_cat').hasError('required')">Required !</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">HSN / SAC</label>
+        <input formControlName="hsnsac"  type="number" class="form-control" placeholder="Enter HSN / SAC">
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Unit of Material</label>
+        <!-- <select formControlName="uom" class="form-control">
+          <option *ngFor= "let view of uom_list" value="{{view.name}}" >{{view.name}}</option>
+        </select> -->
+
+        <ng-select formControlName="uom" class=" form-control custom-select" [clearable]="false">
+          <ng-option *ngFor="let item of uom_list" value="{{item.name}}" class="form-control">
+            {{ item.name}}
+          </ng-option>
+        </ng-select>
+
+      </div>
+
+
+      <div class="form-group col-md-12">
+        <label for="name"> Price </label>
+        <input formControlName="price"  type="number" class="form-control" placeholder="Enter Selling Price">
+        <span class="help-block text-danger" *ngIf="EditItem.get('price').touched && EditItem.get('price').hasError('required')">Required !</span>
+        <span class="help-block text-danger" *ngIf="EditItem.get('price').touched && EditItem.get('price').hasError('minlength')">Minimum 4 Codes</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Tax %</label>
+        <!-- <select formControlName="tax" class="form-control">
+          <option *ngFor= "let view of tax_list" value="{{view.rate}}" >{{view.name}}</option>
+        </select> -->
+
+        <ng-select formControlName="tax" class=" form-control custom-select" [clearable]="false">
+          <ng-option *ngFor="let item of tax_list" [value]="item.rate" class="form-control">
+            {{ item.name}}
+          </ng-option>
+        </ng-select>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Description</label>
+        <input formControlName="description"  type="text" class="form-control" placeholder="Enter Description">
+      </div>
+
+      <div class="col-md-1"></div>
+      <div class="custom-control custom-switch col-md-11">
+        <input type="checkbox" formControlName="purchase" class="custom-control-input" id="customSwitch3" />
+        <label class="custom-control-label" for="customSwitch3">Purchase</label>
+      </div>
+
+      <div class="col-md-1"></div>
+      <div class="custom-control custom-switch col-md-11">
+        <input type="checkbox" formControlName="sale" class="custom-control-input" id="customSwitch4" />
+        <label class="custom-control-label" for="customSwitch4">Sales</label>
+      </div>
+
+      <div class="col-md-1"></div>
+      <div class="custom-control custom-switch col-md-11">
+        <input type="checkbox" formControlName="status" class="custom-control-input" id="customSwitch2" />
+        <label class="custom-control-label" for="customSwitch2">Status</label>
+      </div>
+
+      <div class="col-md-7">
+      <button [disabled]="loading" class="btn btn-primary pull-right" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+    </div>
+    </form>
+  </div>
+</ng-template>
+
+
+
+
+
+

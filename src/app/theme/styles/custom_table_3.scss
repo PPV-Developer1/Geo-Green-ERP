@@ -1,0 +1,302 @@
+.ngx-datatable.custom_table3 
+{
+    background: #fff;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+.ngx-datatable.custom_table3.single-selection .datatable-body-row.active,
+.ngx-datatable.custom_table3.single-selection .datatable-body-row.active .datatable-row-group, .ngx-datatable.custom_table3.multi-selection .datatable-body-row.active,
+.ngx-datatable.custom_table3.multi-selection .datatable-body-row.active .datatable-row-group, .ngx-datatable.custom_table3.multi-click-selection .datatable-body-row.active,
+.ngx-datatable.custom_table3.multi-click-selection .datatable-body-row.active .datatable-row-group 
+{
+    background-color: rgb(217, 241, 250);
+    color: #fff; 
+}
+.ngx-datatable.custom_table3.single-selection .datatable-body-row.active:hover,
+.ngx-datatable.custom_table3.single-selection .datatable-body-row.active:hover .datatable-row-group, .ngx-datatable.custom_table3.multi-selection .datatable-body-row.active:hover,
+.ngx-datatable.custom_table3.multi-selection .datatable-body-row.active:hover .datatable-row-group, .ngx-datatable.custom_table3.multi-click-selection .datatable-body-row.active:hover,
+.ngx-datatable.custom_table3.multi-click-selection .datatable-body-row.active:hover .datatable-row-group 
+{
+    background-color: rgb(217, 241, 250);
+    color: #fff; 
+}
+.ngx-datatable.custom_table3.single-selection .datatable-body-row.active:focus,
+.ngx-datatable.custom_table3.single-selection .datatable-body-row.active:focus .datatable-row-group, .ngx-datatable.custom_table3.multi-selection .datatable-body-row.active:focus,
+.ngx-datatable.custom_table3.multi-selection .datatable-body-row.active:focus .datatable-row-group, .ngx-datatable.custom_table3.multi-click-selection .datatable-body-row.active:focus,
+.ngx-datatable.custom_table3.multi-click-selection .datatable-body-row.active:focus .datatable-row-group 
+{
+    background-color: rgb(217, 241, 250);
+    color: #fff; 
+}
+.ngx-datatable.custom_table3:not(.cell-selection) .datatable-body-row:hover,
+.ngx-datatable.custom_table3:not(.cell-selection) .datatable-body-row:hover .datatable-row-group 
+{
+    background-color: #ccf8fa; // Selection
+    transition-property: background;
+    transition-duration: 0.3s;
+    transition-timing-function: linear;    
+}
+.ngx-datatable.custom_table3:not(.cell-selection) .datatable-body-row:focus,
+.ngx-datatable.custom_table3:not(.cell-selection) .datatable-body-row:focus .datatable-row-group
+{
+    background-color: rgb(204, 19, 19); 
+}
+.ngx-datatable.custom_table3.cell-selection .datatable-body-cell:hover,
+.ngx-datatable.custom_table3.cell-selection .datatable-body-cell:hover .datatable-row-group 
+{
+    background-color: #eee;
+    transition-property: background;
+    transition-duration: 0.3s;
+    transition-timing-function: linear; 
+}
+.ngx-datatable.custom_table3.cell-selection .datatable-body-cell:focus,
+.ngx-datatable.custom_table3.cell-selection .datatable-body-cell:focus .datatable-row-group 
+{
+    background-color: #ddd; 
+}
+.ngx-datatable.custom_table3.cell-selection .datatable-body-cell.active,
+.ngx-datatable.custom_table3.cell-selection .datatable-body-cell.active .datatable-row-group 
+{
+    background-color: #dcdfec;
+    color: #fff; 
+}
+.ngx-datatable.custom_table3.cell-selection .datatable-body-cell.active:hover,
+.ngx-datatable.custom_table3.cell-selection .datatable-body-cell.active:hover .datatable-row-group 
+{
+    background-color: #dcdfec;
+    color: #fff; 
+}
+.ngx-datatable.custom_table3.cell-selection .datatable-body-cell.active:focus,
+.ngx-datatable.custom_table3.cell-selection .datatable-body-cell.active:focus .datatable-row-group 
+{
+    background-color: #dcdfec;
+    color: #fff; 
+}
+.ngx-datatable.custom_table3 .empty-row 
+{
+    height: 50px;
+    text-align: center;
+    padding: 0.5rem 1.2rem;
+    vertical-align: top;
+    border-top: 0; 
+}
+.ngx-datatable.custom_table3 .loading-row 
+{
+    text-align: center;
+    padding: 0.5rem 1.2rem;
+    vertical-align: top;
+    border-top: 0; 
+}
+.ngx-datatable.custom_table3 .datatable-header .datatable-row-left,
+.ngx-datatable.custom_table3 .datatable-body .datatable-row-left 
+{
+    background-color: #fff;
+    background-position: 100% 0;
+    background-repeat: repeat-y;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAABCAYAAAD5PA/NAAAAFklEQVQIHWPSkNeSBmJhTQVtbiDNCgASagIIuJX8OgAAAABJRU5ErkJggg==); 
+}
+.ngx-datatable.custom_table3 .datatable-header .datatable-row-right,
+.ngx-datatable.custom_table3 .datatable-body .datatable-row-right 
+{
+    background-position: 0 0;
+    background-color: #fff;
+    background-repeat: repeat-y;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAABCAYAAAD5PA/NAAAAFklEQVQI12PQkNdi1VTQ5gbSwkAsDQARLAIGtOSFUAAAAABJRU5ErkJggg==); 
+}
+.ngx-datatable.custom_table3 .datatable-header 
+{
+    border-bottom: 0px solid rgba(0, 0, 0); 
+}
+.ngx-datatable.custom_table3 .datatable-header .datatable-header-cell  // Top header
+{
+    text-align: center;
+    padding: 0.9rem 1.2rem;
+    font-weight: 400;
+    background-color: rgb(56, 84, 88);
+    color: rgb(255, 255, 255);
+    vertical-align: center;
+    border-left: 1px solid rgb(0, 0, 0);
+    font-size: 16px;
+    font-weight: 500; 
+}
+.ngx-datatable.custom_table3 .datatable-header .datatable-header-cell .datatable-header-cell-wrapper 
+{
+    position: relative; 
+}
+.ngx-datatable.custom_table3 .datatable-header .datatable-header-cell.longpress .draggable::after 
+{
+    transition: transform 400ms ease, opacity 400ms ease;
+    opacity: 0.5;
+    transform: scale(1); 
+}
+.ngx-datatable.custom_table3 .datatable-header .datatable-header-cell .draggable::after 
+{
+    content: ' ';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -30px 0 0 -30px;
+    height: 60px;
+    width: 60px;
+    background: #eee;
+    border-radius: 100%;
+    opacity: 1;
+    filter: none;
+    transform: scale(0);
+    z-index: 9999;
+    pointer-events: none; 
+}
+.ngx-datatable.custom_table3 .datatable-header .datatable-header-cell.dragging .resize-handle 
+{
+    border-right: none; 
+}
+.ngx-datatable.custom_table3 .datatable-header .resize-handle 
+{
+    border-right: solid 1px #eee; 
+}
+.ngx-datatable.custom_table3 .datatable-body 
+{
+position: relative; 
+}
+.ngx-datatable.custom_table3 .datatable-body .datatable-row-detail 
+{
+    background: #f5f5f5;
+    padding: 10px; 
+}
+.ngx-datatable.custom_table3 .datatable-body .datatable-group-header 
+{
+    background: #f5f5f5;
+    border-bottom: solid 1px #d9d8d9;
+    border-top: solid 1px #d9d8d9; 
+}
+.ngx-datatable.custom_table3 .datatable-body .datatable-body-row .datatable-body-cell 
+{
+    text-align: center;
+    padding: 0.9rem 1.2rem;
+    vertical-align: center;
+    border-top: 0;
+    color: rgb(0, 0, 0);
+    transition: width 0.3s ease;
+    font-size: 14px;
+    border-left: 1px solid rgb(110, 109, 109, 1);
+    border-bottom: 1px solid rgb(110, 109, 109, 1);
+    font-weight: 400; 
+}
+.ngx-datatable.custom_table3 .datatable-body .datatable-body-row .datatable-body-group-cell 
+{
+    text-align: center;
+    padding: 0.9rem 1.2rem;
+    vertical-align: top;
+    border-top: 0;
+    color: rgba(0, 0, 0, 0.87);
+    transition: width 0.3s ease;
+    font-size: 14px;
+    font-weight: 400; 
+}
+.ngx-datatable.custom_table3 .datatable-body .progress-linear 
+{
+    display: block;
+    position: sticky;
+    width: 100%;
+    height: 5px;
+    padding: 0;
+    margin: 0;
+    top: 0; 
+}
+.ngx-datatable.custom_table3 .datatable-body .progress-linear .container 
+{
+    display: block;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 5px;
+    -webkit-transform: translate(0, 0) scale(1, 1);
+    transform: translate(0, 0) scale(1, 1);
+    background-color: #aad1f9; 
+}
+.ngx-datatable.custom_table3 .datatable-body .progress-linear .container .bar 
+{
+    transition: all 0.2s linear;
+    -webkit-animation: query 0.8s infinite cubic-bezier(0.39, 0.575, 0.565, 1);
+    animation: query 0.8s infinite cubic-bezier(0.39, 0.575, 0.565, 1);
+    transition: -webkit-transform 0.2s linear;
+    transition: transform 0.2s linear;
+    background-color: #106cc8;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 5px; 
+}
+.ngx-datatable.custom_table3 .datatable-footer 
+{
+    border-top: 1px solid rgba(0, 0, 0);
+    background-color: rgb(56, 84, 88);
+    font-size: 12px;
+    font-weight: 400;
+    color: rgba(255, 255, 255); 
+}
+.ngx-datatable.custom_table3 .datatable-footer .page-count 
+{
+    line-height: 50px;
+    height: 50px;
+    padding: 0 1.2rem; 
+}
+.ngx-datatable.custom_table3 .datatable-footer .datatable-pager 
+{
+    margin: 0 10px; 
+}
+.ngx-datatable.custom_table3 .datatable-footer .datatable-pager li 
+{
+    vertical-align: middle; 
+}
+.ngx-datatable.custom_table3 .datatable-footer .datatable-pager li.disabled a 
+{
+    color: rgba(255, 255, 255, 0.26) !important;
+    background-color: transparent !important; 
+}
+.ngx-datatable.custom_table3 .datatable-footer .datatable-pager li.active a 
+{
+    background-color: rgba(255, 255, 255, 0.2);
+    font-weight: bold; 
+}
+.ngx-datatable.custom_table3 .datatable-footer .datatable-pager a 
+{
+    height: 22px;
+    min-width: 24px;
+    line-height: 22px;
+    padding: 0 6px;
+    border-radius: 3px;
+    margin: 6px 3px;
+    text-align: center;
+    vertical-align: top;
+    color: rgba(252, 249, 249);
+    text-decoration: none;
+    vertical-align: bottom; 
+}
+.ngx-datatable.custom_table3 .datatable-footer .datatable-pager a:hover 
+{
+    color: rgba(255, 251, 251, 0.75);
+    background-color: rgba(253, 253, 253, 0.2); 
+}
+.ngx-datatable.custom_table3 .datatable-footer .datatable-pager .datatable-icon-left,
+.ngx-datatable.custom_table3 .datatable-footer .datatable-pager .datatable-icon-skip,
+.ngx-datatable.custom_table3 .datatable-footer .datatable-pager .datatable-icon-right,
+.ngx-datatable.custom_table3 .datatable-footer .datatable-pager .datatable-icon-prev 
+{
+    font-size: 20px;
+    line-height: 20px;
+    padding: 0 3px; 
+}
+.ngx-datatable.custom_table3 .datatable-summary-row .datatable-body-row 
+{
+    background-color: #ddd; 
+}
+.ngx-datatable.custom_table3 .datatable-summary-row .datatable-body-row:hover 
+{
+    background-color: #ddd; 
+}
+.ngx-datatable.custom_table3 .datatable-summary-row .datatable-body-row .datatable-body-cell 
+{
+    font-weight: bold; 
+}

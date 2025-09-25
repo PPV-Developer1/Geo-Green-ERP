@@ -1,0 +1,194 @@
+<div class="row">
+  <div class="col-xl-6 col-lg-6 col-12 bottom-30">
+    <div widget class="card">
+        <div class="card-header">
+            <span>ADD NEW TRANSACTION</span>
+            <div class="widget-controls">
+                <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+                <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+                <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+                <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+                <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+            </div>
+        </div>
+        <div class="card-body widget-body">
+          <form [formGroup]="addTrans" (ngSubmit)="AddNewTrans(addTrans.value)">
+            <div class="form-group">
+              <label for="exampleSelect3">Mode of Transfer</label>
+              <select formControlName="tran_mode" class="form-control custom-select">
+                  <option value = "0" selected>Select Mode</option>
+                  <option value = "1">Wire</option>
+                  <option value = "2">Cash</option>
+                  <option value = "3">Cheque</option>
+              </select>
+              <span class="help-block text-danger" *ngIf="addTrans.get('tran_mode').touched && addTrans.get('tran_mode').hasError('required')">Must Select !</span>
+              <span class="help-block text-danger" *ngIf="addTrans.get('tran_mode').touched && addTrans.get('tran_mode').hasError('min')">Select One Type</span>
+            </div>
+            <div class="form-group">
+                <label for="exampleSelect3">Transfer From</label>
+                <span *ngIf="this.user_type == 'super_admin'">
+                 
+                  <ng-select formControlName="from_bank" (change)="selecct($event)" [items]="bankData" bindLabel="account_name" bindValue="bank_id"  groupBy="mode" class=" form-control custom-select" [clearable]="false">
+                      <ng-template ng-optgroup-tmp let-item="item" class="form-control">
+                          <span *ngIf="item.mode == 1" style="padding: 20px;"><b>Bank</b></span>
+                          <span *ngIf="item.mode == 2" style="padding: 20px;"><b>Cash</b></span>
+                          <span *ngIf="item.mode == 3" style="padding: 20px;"><b>Internal User</b></span>
+                          <span *ngIf="item.mode == 4" style="padding: 20px;"><b>GST</b></span>
+                      </ng-template>
+                  </ng-select>
+
+                </span>
+                <span *ngIf="this.user_type != 'super_admin'">
+                  <!-- <select formControlName="from_bank" class="form-control custom-select">
+                      <option value="">Select Account</option>
+                      <option *ngFor= "let view of all_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+                  </select> -->
+
+                  <ng-select formControlName="from_bank" (change)="selecct($event)"  class=" form-control custom-select" [clearable]="false" >
+                    <ng-option  *ngFor= "let view of all_account" [value]="view.bank_id" class="form-control">
+                      {{view.account_name}}
+                    </ng-option>
+                  </ng-select>
+                </span>
+            </div>
+
+            <div class="form-group">
+              <label for="exampleSelect3">Transfer To</label>
+              <span *ngIf="this.user_type == 'super_admin'" class="select-container">
+
+                 <!-- <select formControlName="to_bank" class="form-control custom-select">
+                  <optgroup label="Bank">
+                    <option *ngFor= "let view of company_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+                  </optgroup>
+                  <optgroup label="Cash">
+                    <option *ngFor= "let view of cash_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+                  </optgroup>
+                  <optgroup label="Internal User">
+                    <option *ngFor= "let view of all_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+                  </optgroup>
+                  <optgroup label="GST">
+                    <option *ngFor= "let view of gst_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+                  </optgroup>
+               </select> -->
+
+               <ng-select formControlName="to_bank" (change)="selecct($event)" [items]="bankData" bindLabel="account_name" bindValue="bank_id"  groupBy="mode" class=" form-control custom-select" [clearable]="false">
+                      <ng-template ng-optgroup-tmp let-item="item" class="form-control">
+                          <span *ngIf="item.mode == 1" style="padding: 20px;"><b>Bank</b></span>
+                          <span *ngIf="item.mode == 2" style="padding: 20px;"><b>Cash</b></span>
+                          <span *ngIf="item.mode == 3" style="padding: 20px;"><b>Internal User</b></span>
+                          <span *ngIf="item.mode == 4" style="padding: 20px;"><b>GST</b></span>
+                      </ng-template>
+               </ng-select>
+
+              </span>
+              <span *ngIf="this.user_type != 'super_admin'" class="select-container">
+                <!-- <select formControlName="to_bank" class="form-control custom-select">
+                    <option value="">Select Account</option>
+                    <option *ngFor= "let view of all_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
+                </select> -->
+
+
+                <ng-select formControlName="to_bank"  class=" form-control custom-select" [clearable]="false" >
+                  <ng-option  *ngFor= "let view of all_account" [value]="view.bank_id" class="form-control">
+                    {{view.account_name}}
+                  </ng-option>
+                </ng-select>
+              </span>
+            </div>
+            <div class="form-group">
+              <div>
+                <label for="input-12">Amount</label>
+              </div>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">₹</span>
+                </div>
+                <input formControlName="amount" type="number" class="form-control">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="input-12">Transaction  Date</label>
+              <input type="date" formControlName="tran_date" class="form-control" id="input-12">
+            </div>
+            <div class="form-group">
+              <label for="input-1">Reference</label>
+              <input type="text" formControlName="reference" class="form-control" id="input-1" placeholder="Enter Reference">
+              <span class="help-block text-danger" *ngIf="addTrans.get('reference').touched && addTrans.get('reference').hasError('required')">Reference Required !</span>
+              <span class="help-block text-danger" *ngIf="addTrans.get('reference').touched && addTrans.get('reference').hasError('minlength')">Minimum 3 Letters</span>
+            </div>
+            <div class="form-group">
+              <label for="input-1">Description</label>
+              <input type="text" formControlName="description" class="form-control" id="input-1" placeholder="Enter Description">
+              <span class="help-block text-danger" *ngIf="addTrans.get('description').touched && addTrans.get('description').hasError('required')">Description Required !</span>
+              <span class="help-block text-danger" *ngIf="addTrans.get('description').touched && addTrans.get('description').hasError('minlength')">Minimum 3 Letters</span>
+            </div>
+            <div class="form-group">
+              <button [disabled]="loading" class="btn btn-info btn-block" type="submit">Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i> </button>
+          </div>
+        </form>
+        </div>
+    </div>
+  </div>
+  <div class="col-xl-6 col-lg-6 col-12 bottom-30">
+    <div widget class="card">
+        <div class="card-header">
+            <span>BANK BALANCE</span>
+            <div class="widget-controls">
+                <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+                <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+                <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+                <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+                <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+            </div>
+        </div>
+        <div class="card-body widget-body">
+
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Bank ID</th>
+                        <th>Bank</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody *ngIf="this.user_type === 'super_admin' || this.user_type === 'admin' || this.user_type === 'Admin_Purchase' ">
+
+
+                      <tr *ngFor= "let data of company_account" >
+
+                          <td *ngIf="this.user_type === 'super_admin'" scope="row">{{data.bank_id}}</td>
+                          <td *ngIf="this.user_type === 'super_admin'">{{data.account_name}}</td>
+                          <th *ngIf="this.user_type === 'super_admin'">{{data.balance | indianCurrency}}</th>
+
+                      </tr>
+
+                  <tr *ngFor= "let data of cash_account">
+                    <td scope="row">{{data.bank_id}}</td>
+                    <td>{{data.account_name}}</td>
+                    <th>{{data.balance | indianCurrency}}</th>
+                  </tr>
+                  <tr *ngFor= "let data of all_account">
+                    <td scope="row">{{data.bank_id}}</td>
+                    <td>{{data.account_name}}</td>
+                    <th>{{data.balance | indianCurrency}}</th>
+                  </tr>
+                  <tr *ngFor= "let data of gst_account">
+                    <td scope="row">{{data.bank_id}}</td>
+                    <td>{{data.account_name}}</td>
+                    <th>{{data.balance | indianCurrency}}</th>
+                  </tr>
+                </tbody>
+                <!-- <tbody *ngIf="this.user_type != 'super_admin'">
+                  <tr *ngFor= "let data of user_account">
+                    <td scope="row">{{data.bank_id}}</td>
+                    <td>{{data.account_name}}</td>
+                    <th>{{data.balance | indianCurrency}}</th>
+                  </tr>
+                </tbody> -->
+            </table>
+
+        </div>
+    </div>
+  </div>
+</div>

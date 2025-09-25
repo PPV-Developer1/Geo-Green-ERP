@@ -1,0 +1,1595 @@
+<div *ngIf="addnew_form === false && selected.length == 0 && editdispatch_form === false">
+  <div class="col-md-12">
+    <table>
+      <tr>
+        <td style="width: 10px;">
+          <h1><small></small></h1>
+        </td>
+        <td style="width: 250px;">
+          <h5>DISPATCH</h5>
+        </td>
+        <td style="width: 1100px;">
+          <div class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input class="form-control" type="text" placeholder="Search Invoice Number or DC Number or Project Name or Customer Name..." (keyup)="updateFilter($event)"/>
+          </div>
+        </td>
+        <td style="width: 100px;"> </td>
+        <td style="width: 100px; text-align: center; vertical-align: center;">
+        </td>
+        <td style="width: 200px; text-align: center; vertical-align: center;">
+          <button type="submit" class="btn btn-success fa fa-plus" (click)="AddButton()"> Add Dispatch</button>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <ngx-datatable
+    #table
+    class="custom_table"
+    [headerHeight]="50"
+    [limit]="20"
+    [columnMode]="'force'"
+    [footerHeight]="50"
+    [rowHeight]="'auto'"
+    [rows]="dispatch_list"
+    [selected]="selected"
+    [selectionType]="'single'"
+    (activate)="onActivate($event)">
+
+    <!-- <ngx-datatable-column name="ID" [width]="30">
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.id}}
+        </ng-template>
+    </ngx-datatable-column> -->
+
+    <ngx-datatable-column prop="dispatch_datetime" name="DISPATCH DATE" [width]="100">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.dispatch_datetime | date: 'dd-MM-yyyy HH:mm:ss'}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="invoice_number" name="INVOICE NUMBER" [width]="100">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.invoice_number}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="dc_number" name="DC NUMBER" [width]="100">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.dc_number}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="project_name" name="PROJECT NAME" [width]="200">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        <span style="font-weight:bold;">{{row.project_name}}</span>
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="customer_name" name="CUSTOMER NAME" [width]="200">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.customer_name}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="status" name="STATUS" [width]="50">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        <label *ngIf="row.status == 1" style="color:blue"><strong>Created</strong></label>
+        <label *ngIf="row.status == 2 && row.type =='project'" style="color:rgb(235, 155, 8)"><strong>Approved</strong></label>
+        <label *ngIf="row.status == 2 && row.type =='items'" style="color:rgb(235, 155, 8)"><strong>Move to Approve</strong></label>
+        <label *ngIf="row.status == 3" style="color:rgb(235, 155, 8)"><strong>Approved</strong></label>
+      </ng-template>
+    </ngx-datatable-column>
+
+  </ngx-datatable>
+</div>
+<div *ngIf="showdetails == true  && addnew_form == false && list_view == false">
+  <div class="modal-header">
+    <button type="submit" class="btn btn-info fa fa-arrow-left mb-3" (click)="set_zero()"> Back</button>
+
+    <button class="btn btn-success dropdown-toggle fa fa-tasks" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Take Action</button>
+    <div class="dropdown-menu">
+      <a class="dropdown-item" href="javascript:void(0);" (click)="Edit_Button($event)" *ngIf="detail_view.status == 1">Edit Dispatch</a>
+      <a class="dropdown-item" href="javascript:void(0);" (click)="approval_button($event)" *ngIf="user_type == 'super_admin' && detail_view.status == 1 && edit_type =='project'" >Approve</a>
+      <a class="dropdown-item" href="javascript:void(0);" (click)="approval_button($event)" *ngIf="user_type == 'super_admin' && detail_view.status == 1 && edit_type =='items'" >Move to outward</a>
+      <a class="dropdown-item" href="javascript:void(0);" (click)="packing_list()" *ngIf="detail_view.status == 2 ||detail_view.status == 3" >Print Packing List</a>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div widget class="card">
+        <div class="card-header">
+          <span>DISPATCH</span>
+          <div class="widget-controls">
+              <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+              <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+              <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+              <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+              <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+          </div>
+        </div>
+        <div class="card-body widget-body">
+          <div class="row">
+            <table class="table col-md-4">
+              <tbody>
+                  <tr>
+                    <th>Dispatch ID</th>
+                    <td>{{detail_view.id}}</td>
+                  </tr>
+                  <tr>
+                      <th>Delivery Against</th>
+                      <td>{{detail_view.delivery_against}}</td>
+                  </tr>
+                  <tr>
+                      <th>Customer Name</th>
+                      <td>{{detail_view.customer_name}}</td>
+                  </tr>
+                  <tr>
+                      <th>Transporter Name</th>
+                      <td>{{detail_view.tran_name}}</td>
+                  </tr>
+                  <tr>
+                      <th>Transport Scope</th>
+                      <td>{{detail_view.tran_scope}}</td>
+                  </tr>
+                  <tr>
+                    <th>Document Number</th>
+                    <td>{{detail_view.document_number}}</td>
+                  </tr>
+                  <tr>
+                    <th>Amount</th>
+                    <td>{{detail_view.amount}}</td>
+                  </tr>
+              </tbody>
+            </table>
+            <table class="table col-md-4">
+              <tbody>
+                  <tr>
+                      <th>Creater Name</th>
+                      <td>{{detail_view.creater_name}}</td>
+                  </tr>
+                  <tr>
+                      <th>Invoice Number</th>
+                      <td *ngIf="detail_view.invoice_number != null">{{detail_view.invoice_number}}</td>
+                      <td *ngIf="detail_view.invoice_number === null">-</td>
+                  </tr>
+                  <tr>
+                      <th>Project Name</th>
+                      <td>{{detail_view.project_name}}</td>
+                  </tr>
+                  <tr>
+                      <th>Vehicle Number</th>
+                      <td>{{detail_view.vehicle_number}}</td>
+                  </tr>
+                  <tr>
+                    <th>Transport Incharge Name</th>
+                    <td>{{detail_view.tran_inc_name}}</td>
+                  </tr>
+                  <tr>
+                    <th>Driver Name</th>
+                    <td>{{detail_view.tran_driver_name}}</td>
+                  </tr>
+                  <tr>
+                    <th>Tax Percent</th>
+                    <td>{{detail_view.tax_percent}}%</td>
+                  </tr>
+              </tbody>
+            </table>
+            <table class="table col-md-4">
+              <tbody>
+                  <tr>
+                      <th>Dispatch Date</th>
+                      <td>{{detail_view.dispatch_datetime | date: 'dd-MM-yyyy HH:mm:ss'}}</td>
+                  </tr>
+                  <tr>
+                      <th>DC Number</th>
+                      <td *ngIf="detail_view.dc_number != null">{{detail_view.dc_number}}</td>
+                      <td *ngIf="detail_view.dc_number === null">-</td>
+                  </tr>
+                  <tr>
+                      <th>Dispatch Incharge</th>
+                      <td>{{detail_view.dispatch_incharge}}</td>
+                  </tr>
+                  <tr>
+                      <th>Vehicle Type</th>
+                      <td>{{detail_view.vehicle_type}}</td>
+                  </tr>
+                  <tr>
+                    <th>Transport Incharge Mobile</th>
+                    <td>{{detail_view.tran_inc_mobile}}</td>
+                  </tr>
+                  <tr>
+                    <th>Driver Mobile</th>
+                    <td>{{detail_view.tran_driver_mobile}}</td>
+                  </tr>
+                  <tr>
+                    <th>Notes</th>
+                    <td>{{detail_view.note}}</td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+
+  <div *ngIf="edit_type =='project'" widget class="card">
+    <div class="card-header">
+      <span class="text-uppercase">Association List</span>
+    </div>
+    <div class="card-body">
+      <ngx-datatable
+        #table
+        class="custom_table"
+        [headerHeight]="50"
+        [limit]="10"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="project_asso_list"
+        [selected]="selected"
+        [selectionType]="'single'">
+
+        <ngx-datatable-column prop="id" name="ID" [width]="30">
+            <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.id}}
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="date_time" name="CREATED AT" [width]="150">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.date_time | date: 'dd-MM-yyyy HH:mm:ss'}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="created_by" name="CREATED BY" [width]="150">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.created_by}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="category_name" name="ITEM CATEGORY" [width]="150">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.category_name}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="description" name="DESCRIPTION" [width]="200">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.description}}
+          </ng-template>
+        </ngx-datatable-column>
+
+      </ngx-datatable>
+    </div>
+  </div>
+
+  <div *ngIf="edit_type =='project' &&  this.item_length > 0" widget class="card">
+    <div class="card-header">
+      <span class="text-uppercase">Project Item List</span>
+    </div>
+      <div class="card-body">
+        <ngx-datatable
+        #table
+        class="custom_table"
+        [headerHeight]="50"
+        [limit]="10"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="dispatch_pro_item_list"
+        [selected]="selected"
+        [selectionType]="'single'">
+
+        <ngx-datatable-column prop="id" name="ID">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.id}}
+          </ng-template>
+        </ngx-datatable-column>
+
+      <ngx-datatable-column prop="date_time" name="CREATED AT">
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.date_time | date: 'dd-MM-yyyy HH:mm:ss'}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="item_name" name="ITEM ">
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.item_name}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="item_name" name="ITEM CATEGORY">
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.category_name}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="item_description" name="QUANTITY" >
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.value}} {{row.uom}}
+        </ng-template>
+      </ngx-datatable-column>
+
+
+      <ngx-datatable-column prop="item_description" name="STATUS" >
+        <ng-template ngx-datatable-cell-template let-row="row">
+         <span *ngIf="row.status==0"> Approved</span>
+         <span *ngIf="row.status==1"> Not Approved</span>
+        </ng-template>
+      </ngx-datatable-column>
+       <ngx-datatable-column prop="reference" name="REFERENCE" >
+        <ng-template ngx-datatable-cell-template let-row="row">
+         {{row.reference}}
+        </ng-template>
+      </ngx-datatable-column>
+      </ngx-datatable>
+      </div>
+  </div>
+
+  <div  *ngIf="edit_type =='items'" widget class="card">
+    <div class="card-header">
+      <span class="text-uppercase">Item List</span>
+    </div>
+    <div class="card-body">
+      <ngx-datatable
+        #table
+        class="custom_table"
+        [headerHeight]="50"
+        [limit]="10"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="project_asso_list"
+        [selected]="selected"
+        [selectionType]="'single'">
+
+        <ngx-datatable-column prop="inv_OR_dc" name="ID" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+              <label *ngIf="inv_OR_dc =='Invoice'"> {{row.invoice_item_id}}</label>
+              <label *ngIf="inv_OR_dc =='DC'"> {{row.dc_item_id}}</label>
+          </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="date_time" name="CREATED AT">
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.date_time | date: 'dd-MM-yyyy HH:mm:ss'}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="item_name" name="ITEM CATEGORY">
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.item_name}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="item_description" name="DESCRIPTION" >
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.item_description}}
+        </ng-template>
+      </ngx-datatable-column>
+      </ngx-datatable>
+    </div>
+  </div>
+</div>
+
+<div class="row" *ngIf="addnew_form === true ">
+
+  <div class="col-12">
+    <button type="submit" class="btn btn-info fa fa-arrow-left mb-3" (click)="set_zero()"> Back</button>
+    <div widget class="card">
+        <div class="card-header">
+            <span>NEW DISPATCH</span>
+            <div class="widget-controls">
+                <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+                <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+                <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+                <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+                <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+            </div>
+        </div>
+        <div class="card-body widget-body">
+          <form [formGroup]="DispatchForm" (ngSubmit)="OnSubmit(DispatchForm.value)">
+            <div class="row">
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label>Dispatch Date & Time</label>
+                  </div>
+                  <div class="col-8">
+                    <input formControlName="datetime" type="datetime-local" class="form-control"  id="input-11">
+                    <span class="help-block text-danger" *ngIf="DispatchForm.get('datetime').touched && DispatchForm.get('datetime').hasError('required')">Date Required !</span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-6" *ngIf="LoadType == 1">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label>Invoice Number</label>
+                  </div>
+                  <div class="col-8">
+                    <input type="text" formControlName="invoice_id" class="form-control" readonly>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-6" *ngIf="LoadType == 2">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label>DC Number</label>
+                  </div>
+                  <div class="col-8">
+                    <input type="text" formControlName="dc_id" class="form-control" readonly>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div  class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label for="input-1">Project Name</label>
+                  </div>
+                  <div class="col-8">
+                    <input type="text" formControlName="projectname" class="form-control" readonly>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label for="input-1">Customer Name</label>
+                  </div>
+                  <div class="col-8">
+                    <input type="text" formControlName="customername" class="form-control" readonly>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label>Transport Scope</label>
+                  </div>
+                  <div class="col-8">
+                    <select formControlName="transport_type" class="form-control custom-select">
+                        <option value="Company" >Company</option>
+                        <option value="Customer" >Customer</option>
+                    </select>
+                    <span class="help-block text-danger" *ngIf="DispatchForm.get('transport_type').touched && DispatchForm.get('transport_type').hasError('required')">Required !</span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-6">
+
+              </div>
+            </div>
+            <div class="row">
+              <div class="col bottom-30 typography">
+                <div class="card card-outline-info">
+                  &nbsp;
+                  <div class="row">
+                    <div class="form-group col-6">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label>Transport Name</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" formControlName="transporter_name" class="form-control" placeholder="Enter Transporter Name">
+                          <span class="help-block text-danger" *ngIf="DispatchForm.get('transporter_name').touched && DispatchForm.get('transporter_name').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DispatchForm.get('transporter_name').touched && DispatchForm.get('transporter_name').hasError('minlength')">Minimum 5 Character Required!</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group col-6">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label>Vehicle Type</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" formControlName="vehicle_type" class="form-control" placeholder="Enter Vehicle Type">
+                          <span class="help-block text-danger" *ngIf="DispatchForm.get('vehicle_type').touched && DispatchForm.get('vehicle_type').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DispatchForm.get('vehicle_type').touched && DispatchForm.get('vehicle_type').hasError('minlength')">Minimum 3 Character Required!</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="form-group col-6">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Vehicle Number</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" formControlName="vehicle_number" class="form-control" placeholder="Vehical Number">
+                          <span class="help-block text-danger" *ngIf="DispatchForm.get('vehicle_number').touched && DispatchForm.get('vehicle_number').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DispatchForm.get('vehicle_number').touched && DispatchForm.get('vehicle_number').hasError('minlength')">Minimum 5 Character Required!</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group col-6">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Document Number</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" formControlName="document_number" class="form-control" placeholder="Transporter Document Number">
+                          <span class="help-block text-danger" *ngIf="DispatchForm.get('document_number').touched && DispatchForm.get('document_number').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DispatchForm.get('document_number').touched && DispatchForm.get('document_number').hasError('minlength')">Minimum 3 Character Required!</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="form-group col-6">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Transport Incharge Name</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" formControlName="tran_in_name" class="form-control" placeholder="Incharge Name">
+                          <span class="help-block text-danger" *ngIf="DispatchForm.get('tran_in_name').touched && DispatchForm.get('tran_in_name').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DispatchForm.get('tran_in_name').touched && DispatchForm.get('tran_in_name').hasError('minlength')">Minimum 3 Character Required!</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group col-6">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Transport Incharge Mobile</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="number" formControlName="tran_in_mobile" onKeyPress="if(this.value.length==10) return false;" class="form-control" placeholder="Incharge Mobile Number" onKeyPress="if(this.value.length==10) return false;">
+                          <span class="help-block text-danger" *ngIf="DispatchForm.get('tran_in_mobile').touched && DispatchForm.get('tran_in_mobile').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DispatchForm.get('tran_in_mobile').touched && DispatchForm.get('tran_in_mobile').hasError('pattern')">Valid Mobile Number !</span>
+                          <span class="help-block text-danger" *ngIf="DispatchForm.get('tran_in_mobile').touched && DispatchForm.get('tran_in_mobile').hasError('minlength')">Minimum 10 Digit Required!</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="form-group col-6">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Driver Name</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" formControlName="driver_name" class="form-control" placeholder="Driver Name">
+                          <span class="help-block text-danger" *ngIf="DispatchForm.get('driver_name').touched && DispatchForm.get('driver_name').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DispatchForm.get('driver_name').touched && DispatchForm.get('driver_name').hasError('minlength')">Minimum 3 Character Required!</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group col-6">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Driver Mobile</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="number" formControlName="driver_mobile" onKeyPress="if(this.value.length==10) return false;" class="form-control" placeholder="Driver Mobile" onKeyPress="if(this.value.length==10) return false;">
+                          <span class="help-block text-danger" *ngIf="DispatchForm.get('driver_mobile').touched && DispatchForm.get('driver_mobile').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DispatchForm.get('driver_mobile').touched && DispatchForm.get('driver_mobile').hasError('pattern')">Valid Mobile Number !</span>
+                          <span class="help-block text-danger" *ngIf="DispatchForm.get('driver_mobile').touched && DispatchForm.get('driver_mobile').hasError('minlength')">Minimum 10 Digit Required!</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="form-group col-6">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Transport Cost</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="number" formControlName="amount" class="form-control" placeholder="Amount">
+                          <span class="help-block text-danger" *ngIf="DispatchForm.get('amount').touched && DispatchForm.get('amount').hasError('required')">Required !</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group col-6">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Tax Rate</label>
+                        </div>
+                        <div class="col-8">
+                          <!-- <select formControlName="tax_percent" class="form-control custom-select">
+
+                            <option *ngFor= "let list of tax_list" value="{{list.rate}}" >{{list.name}}</option>
+                          </select> -->
+
+                          <ng-select formControlName="tax_percent"  class=" form-control custom-select" [clearable]="false" appendTo="body">
+                            <ng-option *ngFor= "let list of tax_list" [value]="list.rate" class="form-control">
+                              {{list.name}}
+                            </ng-option>
+                          </ng-select>
+
+                          <span class="help-block text-danger" *ngIf="DispatchForm.get('amount').touched && DispatchForm.get('amount').hasError('required')">Required !</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label for="input-1">Dispatch Notes</label>
+                  </div>
+                  <div class="col-8">
+                    <input type="text" formControlName="notes" class="form-control" placeholder="Only For Reference">
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label>Dispatch Incharge</label>
+                  </div>
+                  <div class="col-8">
+                    <!-- <select formControlName="dispatch_incharge" class="form-control custom-select">
+                        <option *ngFor= "let list of employee_list" value="{{list.emp_id}}" >{{list.name}}</option>
+                    </select> -->
+
+                    <ng-select formControlName="dispatch_incharge"  class=" form-control custom-select" [clearable]="false" >
+                      <ng-option *ngFor= "let list of employee_list" value="{{list.emp_id}}" class="form-control">
+                        {{list.name}}
+                      </ng-option>
+                    </ng-select>
+
+                    <span class="help-block text-danger" *ngIf="DispatchForm.get('dispatch_incharge').touched && DispatchForm.get('dispatch_incharge').hasError('required')">Required !</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col bottom-30 typography">
+                <div *ngIf=" invoice_type === 'project' " class="card card-outline-info">
+
+                  <div class="input-group input-group-sm my-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-search"></i></span>
+                    </div>
+                    <input class="form-control" type="text" placeholder="Search Item Name or Description..." (keyup)="updateFilter_project($event)"/>
+                  </div>
+                  <ngx-datatable
+                    #table
+                    class="custom_table2"
+                    [headerHeight]="50"
+                    [limit]="10"
+                    [columnMode]="'force'"
+                    [footerHeight]="50"
+                    [rowHeight]="'auto'"
+                    [rows]="project_asso_list_edit"
+                    [selected]="selected"
+                    [selectionType]="'checkbox'"
+                    >
+
+                    <ngx-datatable-column
+                      [width]="100"
+                      [sortable]="false"
+                      [canAutoResize]="false"
+                      [draggable]="true"
+                      [resizeable]="false"
+                      [headerCheckboxable]="false"
+                       name = "CHECK BOX"
+                      [checkboxable]="true">
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="id" name="ID" >
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                            {{row.id}}
+                        </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="date" name="CREATED AT">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.date | date: 'dd-MM-yyyy'}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="creater_name" name="CREATED BY">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.creater_name}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="category_name" name="ITEM CATEGORY">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.category_name}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="description" name="DESCRIPTION" >
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.description}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="status" name="STATUS">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                        <label *ngIf="row.status == 1" style="color:blue"><strong>Created</strong></label>
+                        <label *ngIf="row.status == 2" style="color:red"><strong>Dispatched</strong></label>
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                  </ngx-datatable>
+                   &nbsp;
+                  <ngx-datatable *ngIf="length_item > 0"
+                    #table
+                    class="custom_table2"
+                    [headerHeight]="50"
+                    [limit]="10"
+                    [columnMode]="'force'"
+                    [footerHeight]="50"
+                    [rowHeight]="'auto'"
+                    [rows]="project_item_list"
+                    [selected]="selected_item"
+                    [selectionType]="'checkbox'"
+                    >
+
+                    <ngx-datatable-column
+                      [width]="100"
+                      [sortable]="false"
+                      [canAutoResize]="false"
+                      [draggable]="true"
+                      [resizeable]="false"
+                      [headerCheckboxable]="false"
+                       name = "CHECK BOX"
+                      [checkboxable]="true">
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="id" name="ID" >
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                            {{row.id}}
+                        </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="date" name="CREATED AT">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.inward_date | date: 'dd-MM-yyyy'}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="creater_name" name="CREATED BY">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.creater_name}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="category_name" name="ITEM CATEGORY">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.category_name}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="item_name" name="ITEM NAME">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.item_name}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="description" name="QUANTITY" >
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.value}} {{row.uom}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                  </ngx-datatable>
+                </div>
+
+                <div *ngIf="invoice_type ==='items'" class="card card-outline-info">
+                  <div class="input-group input-group-sm my-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-search"></i></span>
+                    </div>
+                    <input class="form-control" type="text" placeholder="Search Item Name or Description..." (keyup)="updateFilter_item($event)"/>
+                  </div>
+                  <ngx-datatable
+                    #table
+                    class="custom_table2"
+                    [headerHeight]="50"
+                    [limit]="10"
+                    [columnMode]="'force'"
+                    [footerHeight]="50"
+                    [rowHeight]="'auto'"
+                    [rows]="project_asso_list"
+                    [selected]="selected"
+                    [selectionType]="'checkbox'"
+                    >
+
+                    <ngx-datatable-column
+                      [width]="100"
+                      [sortable]="false"
+                      [canAutoResize]="false"
+                      [draggable]="true"
+                      [resizeable]="false"
+                      [headerCheckboxable]="false"
+                      name = "CHECK BOX"
+                      [checkboxable]="true">
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="LoadType" name="ID" >
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                            <label *ngIf="LoadType =='1'"> {{row.invoice_item_id}}</label>
+                            <label *ngIf="LoadType =='2'"> {{row.dc_item_id}}</label>
+                        </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="date_time" name="CREATED AT">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.date_time | date: 'dd-MM-yyyy HH:mm:ss'}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="item_name" name="ITEM CATEGORY">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.item_name}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="item_description" name="DESCRIPTION" >
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.item_description}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="status" name="STATUS">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                        <label *ngIf="row.status == 1" style="color:blue"><strong>Created</strong></label>
+                        <label *ngIf="row.status == 2" style="color:red"><strong>Dispatched</strong></label>
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                  </ngx-datatable>
+                </div>
+              </div>
+            </div>
+            &nbsp;
+            <div class="row justify-content-center">
+              <button [disabled]="loading" class="btn btn-info" type="submit">Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+            </div>
+        </form>
+        </div>
+    </div>
+  </div>
+</div>
+
+<div class="row" *ngIf="editdispatch_form == true ">
+  <div class="col-12">
+    <button type="submit" class="btn btn-info fa fa-arrow-left mb-3" (click)="set_zero()"> Back</button>
+    <div widget class="card">
+        <div class="card-header">
+            <span>EDIT DISPATCH</span>
+            <div class="widget-controls">
+                <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+                <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+                <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+                <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+                <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+            </div>
+        </div>
+        <div class="card-body widget-body">
+          <form [formGroup]="DispatchEditForm" (ngSubmit)="OnUpdate(DispatchEditForm.value)">
+            <div class="row">
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label>Dispatch Date & Time</label>
+                  </div>
+                  <div class="col-8">
+                    <input formControlName="datetime" type="datetime-local" class="form-control" format="MM-DD-YYYY HH:mm" id="input-11">
+                    <span class="help-block text-danger" *ngIf="DispatchEditForm.get('datetime').touched && DispatchEditForm.get('datetime').hasError('required')">Date Required !</span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-6" *ngIf="detail_view.delivery_against == 'Invoice'">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label>Invoice Number</label>
+                  </div>
+                  <div class="col-8">
+                    <input type="text" value="{{detail_view.invoice_number}}" class="form-control" readonly>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-6" *ngIf="detail_view.delivery_against == 'DC'">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label>DC Number</label>
+                  </div>
+                  <div class="col-8">
+                    <input type="text" value="{{detail_view.dc_number}}" class="form-control" readonly>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div *ngIf="detail_view.type ==='project'" class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label for="input-1">Project Name</label>
+                  </div>
+                  <div class="col-8">
+                    <input type="text" value="{{detail_view.project_name}}" class="form-control" readonly>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label for="input-1">Customer Name</label>
+                  </div>
+                  <div class="col-8">
+                    <input type="text" value="{{detail_view.customer_name}}" class="form-control" readonly>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label>Transport Scope</label>
+                  </div>
+                  <div class="col-8">
+                    <select formControlName="transport_type" class="form-control custom-select">
+                        <option value="Company" > Company</option>
+                        <option value="Customer" >Customer</option>
+                    </select>
+                    <span class="help-block text-danger" *ngIf="DispatchEditForm.get('transport_type').touched && DispatchEditForm.get('transport_type').hasError('required')">Required !</span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-6">
+
+              </div>
+            </div>
+            <div class="row">
+              <div class="col bottom-30 typography">
+                <div class="card card-outline-info">
+                  &nbsp;
+                  <div class="row">
+                    <div class="form-group col-6">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label>Transport Name</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" formControlName="transporter_name" class="form-control" placeholder="Enter Transporter Name">
+                          <span class="help-block text-danger" *ngIf="DispatchEditForm.get('transporter_name').touched && DispatchEditForm.get('transporter_name').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DispatchEditForm.get('transporter_name').touched && DispatchEditForm.get('transporter_name').hasError('minlength')">Minimum 5 Character Required!</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group col-6">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label>Vehicle Type</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" formControlName="vehicle_type" class="form-control" placeholder="Enter Vehicle Type">
+                          <span class="help-block text-danger" *ngIf="DispatchEditForm.get('vehicle_type').touched && DispatchEditForm.get('vehicle_type').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DispatchEditForm.get('vehicle_type').touched && DispatchEditForm.get('vehicle_type').hasError('minlength')">Minimum 3 Character Required!</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="form-group col-6">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Vehicle Number</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" formControlName="vehicle_number" class="form-control" placeholder="Enter Vehical Number">
+                          <span class="help-block text-danger" *ngIf="DispatchEditForm.get('vehicle_number').touched && DispatchEditForm.get('vehicle_number').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DispatchEditForm.get('vehicle_number').touched && DispatchEditForm.get('vehicle_number').hasError('minlength')">Minimum 5 Character Required!</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group col-6">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Document Number</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" formControlName="document_number" class="form-control" placeholder="Enter Transporter Document Number">
+                          <span class="help-block text-danger" *ngIf="DispatchEditForm.get('document_number').touched && DispatchEditForm.get('document_number').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DispatchEditForm.get('document_number').touched && DispatchEditForm.get('document_number').hasError('minlength')">Minimum 3 Character Required!</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="form-group col-6">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Transport Incharge Name</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" formControlName="tran_in_name" class="form-control" placeholder="Enter Incharge Name">
+                          <span class="help-block text-danger" *ngIf="DispatchEditForm.get('tran_in_name').touched && DispatchEditForm.get('tran_in_name').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DispatchEditForm.get('tran_in_name').touched && DispatchEditForm.get('tran_in_name').hasError('minlength')">Minimum 3 Character Required!</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group col-6">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Transport Incharge Mobile</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="number" formControlName="tran_in_mobile" onKeyPress="if(this.value.length==10) return false;" class="form-control" placeholder="Enter Incharge Mobile Number">
+                          <span class="help-block text-danger" *ngIf="DispatchEditForm.get('tran_in_mobile').touched && DispatchEditForm.get('tran_in_mobile').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DispatchEditForm.get('tran_in_mobile').touched && DispatchEditForm.get('tran_in_mobile').hasError('minlength')">Minimum 10 Digit Required!</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="form-group col-6">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Driver Name</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" formControlName="driver_name" class="form-control" placeholder="Enter Driver Name">
+                          <span class="help-block text-danger" *ngIf="DispatchEditForm.get('driver_name').touched && DispatchEditForm.get('driver_name').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DispatchEditForm.get('driver_name').touched && DispatchEditForm.get('driver_name').hasError('minlength')">Minimum 3 Character Required!</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group col-6">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Driver Mobile</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="number" formControlName="driver_mobile" onKeyPress="if(this.value.length==10) return false;" class="form-control" placeholder="Enter Driver Mobile">
+                          <span class="help-block text-danger" *ngIf="DispatchEditForm.get('driver_mobile').touched && DispatchEditForm.get('driver_mobile').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DispatchEditForm.get('driver_mobile').touched && DispatchEditForm.get('driver_mobile').hasError('minlength')">Minimum 10 Digit Required!</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="form-group col-6">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Transport Cost</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="number" formControlName="amount" class="form-control" placeholder="Enter Amount">
+                          <span class="help-block text-danger" *ngIf="DispatchEditForm.get('amount').touched && DispatchEditForm.get('amount').hasError('required')">Required !</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group col-6">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Tax Rate</label>
+                        </div>
+                        <div class="col-8">
+                          <!-- <select formControlName="tax_percent" class="form-control custom-select">
+
+                            <option *ngFor= "let list of tax_list" value="{{list.rate}}" >{{list.name}}</option>
+                          </select> -->
+
+                          <ng-select formControlName="tax_percent"  class=" form-control custom-select" [clearable]="false" >
+                              <ng-option *ngFor= "let list of tax_list" [value]="list.rate" class="form-control">
+                                {{list.name}}
+                              </ng-option>
+                          </ng-select>
+
+                          <span class="help-block text-danger" *ngIf="DispatchEditForm.get('amount').touched && DispatchEditForm.get('amount').hasError('required')">Required !</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label for="input-1">Dispatch Notes</label>
+                  </div>
+                  <div class="col-8">
+                    <input type="text" formControlName="notes" class="form-control" placeholder="Only For Reference">
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-6">
+                <div class="input-group">
+                  <div class="col-4">
+                    <label>Dispatch Incharge</label>
+                  </div>
+                  <div class="col-8">
+                    <!-- <select formControlName="dispatch_incharge" class="form-control custom-select">
+                        <option *ngFor= "let list of employee_list" value="{{list.emp_id}}" >{{list.name}}</option>
+                    </select> -->
+
+                    <ng-select formControlName="dispatch_incharge"  class=" form-control custom-select" [clearable]="false" >
+                        <ng-option *ngFor= "let list of employee_list" [value]="list.emp_id" class="form-control">
+                          {{list.name}}
+                        </ng-option>
+                    </ng-select>
+                    <span class="help-block text-danger" *ngIf="DispatchEditForm.get('dispatch_incharge').touched && DispatchEditForm.get('dispatch_incharge').hasError('required')">Required !</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col bottom-30 typography">
+                <div *ngIf="edit_type == 'project'" class="card card-outline-info">
+
+                  <div class="input-group input-group-sm my-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-search"></i></span>
+                    </div>
+                    <input class="form-control" type="text" placeholder="Search Item Name or Description..." (keyup)="updateFilter_project($event)"/>
+                  </div>
+                  <ngx-datatable
+                    #table
+                    class="custom_table2"
+                    [headerHeight]="50"
+                    [limit]="10"
+                    [columnMode]="'force'"
+                    [footerHeight]="50"
+                    [rowHeight]="'auto'"
+                    [rows]="project_asso_list_edit"
+                    [selected]="selected"
+                    [selectionType]="'checkbox'"
+                    (activate)="AssoEditOnActive($event)">
+
+                    <ngx-datatable-column
+                      [width]="100"
+                      [sortable]="false"
+                      [canAutoResize]="false"
+                      [draggable]="true"
+                      [resizeable]="false"
+                      [headerCheckboxable]="false"
+                      name = "CHECK BOX"
+                      [checkboxable]="true">
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="id" name="ID" >
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                            {{row.id}}
+                        </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column  prop="date" name="CREATED AT">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.date | date: 'dd-MM-yyyy'}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="creater_name" name="CREATED BY">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.creater_name}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="category_name" name="ITEM CATEGORY">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.category_name}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="description" name="DESCRIPTION" >
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.description}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="status" name="STATUS">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                        <label *ngIf="row.status == 1" style="color:blue"><strong>Created</strong></label>
+                        <label *ngIf="row.status == 2" style="color:red"><strong>Connected</strong></label>
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                  </ngx-datatable>
+                 &nbsp;
+                  <ngx-datatable *ngIf="project_dispatch_item != null"
+                    #table
+                    class="custom_table2"
+                    [headerHeight]="50"
+                    [limit]="10"
+                    [columnMode]="'force'"
+                    [footerHeight]="50"
+                    [rowHeight]="'auto'"
+                    [rows]="project_dispatch_item"
+                    [selected]="selected_item"
+                    [selectionType]="'checkbox'"
+                    (activate)="AssoItemEditOnActive($event)">
+
+                    <ngx-datatable-column
+                      [width]="100"
+                      [sortable]="false"
+                      [canAutoResize]="false"
+                      [draggable]="true"
+                      [resizeable]="false"
+                      [headerCheckboxable]="false"
+                      name = "CHECK BOX"
+                      [checkboxable]="true">
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="id" name="ID" >
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                            {{row.id}}
+                        </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column prop="creater_name" name="CREATED BY">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.creater_name}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="category_name" name="ITEM CATEGORY">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.category_name}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="item_name" name="ITEM">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.item_name}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="serial_no" name="QUANTITY" >
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                        {{row.value}} {{row.uom}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                  </ngx-datatable>
+                </div>
+
+                <div *ngIf="edit_type == 'items'" class="card card-outline-info">
+
+                  <div class="input-group input-group-sm my-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-search"></i></span>
+                    </div>
+                    <input class="form-control" type="text" placeholder="Search Item Name or Description..." (keyup)="updateFilter_item($event)"/>
+                  </div>
+                  <ngx-datatable
+                    #table
+                    class="custom_table2"
+                    [headerHeight]="50"
+                    [limit]="10"
+                    [columnMode]="'force'"
+                    [footerHeight]="50"
+                    [rowHeight]="'auto'"
+                    [rows]="project_asso_list"
+                    [selected]="selected"
+                    [selectionType]="'checkbox'"
+                    (activate)="AssoEditOnActive($event)">
+
+                    <ngx-datatable-column
+                      [width]="100"
+                      [sortable]="false"
+                      [canAutoResize]="false"
+                      [draggable]="true"
+                      [resizeable]="false"
+                      [headerCheckboxable]="false"
+                      name = "CHECK BOX"
+                      [checkboxable]="true">
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="inv_OR_dc" name="ID" >
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                        <label *ngIf="inv_OR_dc =='Invoice'"> {{row.invoice_item_id}}</label>
+                        <label *ngIf="inv_OR_dc =='DC'"> {{row.dc_item_id}}</label>
+                      </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column prop="date_time" name="CREATED AT">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                        {{row.date_time | date: 'dd-MM-yyyy HH:mm:ss'}}
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column prop="item_name" name="ITEM CATEGORY">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                        {{row.item_name}}
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column prop="item_description" name="DESCRIPTION" >
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                        {{row.item_description}}
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column prop="status" name="STATUS">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      <label *ngIf="row.status == 1" style="color:blue"><strong>Created</strong></label>
+                      <label *ngIf="row.status == 2" style="color:red"><strong>Dispatched</strong></label>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  </ngx-datatable>
+                </div>
+              </div>
+            </div>
+            &nbsp;
+            <div class="row justify-content-center">
+              <button [disabled]="loading" class="btn btn-info" type="submit">Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+            </div>
+        </form>
+        </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #AddDispatchModel_type let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Select Dispatch Type</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="DispatchType" (ngSubmit)="TypeLoad(DispatchType.value)" class="row">
+      <div class="form-group col-md-10">
+        <select formControlName="type" class="form-control">
+          <option value=1>By Invoice</option>
+          <option value=2>By Delivery Challan</option>
+        </select>
+      </div>
+      <div class="form-group col-md-2">
+        <button [disabled]="loading" type="submit" class="btn btn-info pull-right">Next <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #AddDispatchModel_Invoice let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Select Invoice</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="DispatchBy" (ngSubmit)="LoadFrom(DispatchBy.value)" class="row">
+      <div class="form-group col-md-10">
+        <!-- <select formControlName="dispatch_by" class="form-control">
+          <option *ngFor= "let view of invoice_data" value="{{view.invoice_id}}">{{view.invoice_number}}</option>
+        </select> -->
+
+
+        <ng-select formControlName="dispatch_by"  class=" form-control custom-select" [clearable]="false" >
+            <ng-option *ngFor= "let view of invoice_data" value="{{view.invoice_id}}" class="form-control">
+              {{view.invoice_number}}
+            </ng-option>
+        </ng-select>
+      </div>
+      <div class="form-group col-md-2">
+        <button [disabled]="loading" type="submit" class="btn btn-info pull-right">Next <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #AddDispatchModel_Dc let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Select Delivery Challan</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="DispatchBy" (ngSubmit)="LoadFrom(DispatchBy.value)" class="row">
+      <div class="form-group col-md-10">
+        <!-- <select formControlName="dispatch_by" class="form-control">
+          <option *ngFor= "let view of dc_list" value="{{view.dc_id}}">{{view.dc_number}}</option>
+        </select> -->
+
+        <ng-select formControlName="dispatch_by"  class=" form-control custom-select" [clearable]="false" >
+          <ng-option *ngFor= "let view of dc_list" value="{{view.dc_id}}" class="form-control">
+            {{view.dc_number}}
+          </ng-option>
+        </ng-select>
+
+      </div>
+      <div class="form-group col-md-2">
+        <button [disabled]="loading" type="submit" class="btn btn-info pull-right">Next <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+<ng-template #approval let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Confirmation</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+
+  <div class="modal-body">
+    Are you sure to approve this Dispatch !
+  </div>
+  <div class="modal-footer">
+      <button [disabled]="loading"  type="button" class="btn btn-success" data-dismiss="modal" (click)="approval_submit()">Proceed <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      <button type="button" class="btn btn-danger" data-dismiss="modal" (click)="modal.dismiss('Cross click')">Close</button>
+  </div>
+</ng-template>
+
+<ng-template #RemoveFromDispatch let-modal>
+  <div class="modal-header state modal-danger">
+    <h2 class="modal-title" id="modal-primary-label">Confirmation</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+
+  <div class="modal-body">
+    Are you sure, you want to remove this association for this dispatch !
+  </div>
+  <div class="modal-footer">
+      <button [disabled]="loading" type="button" class="btn btn-danger" data-dismiss="modal" (click)="RemoveAssoFromDispatch()">Remove <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      <button type="button" class="btn btn-success" data-dismiss="modal" (click)="modal.dismiss('Cross click')">Close</button>
+  </div>
+</ng-template>
+
+
+
+<ng-template #RemoveFromDispatch_item let-modal>
+  <div class="modal-header state modal-danger">
+    <h2 class="modal-title" id="modal-primary-label">Confirmation</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+
+  <div class="modal-body">
+    Are you sure, you want to remove this Item for this dispatch !
+  </div>
+  <div class="modal-footer">
+      <button [disabled]="loading" type="button" class="btn btn-danger" data-dismiss="modal" (click)="RemoveAssoFromDispatch_item()">Remove <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      <button type="button" class="btn btn-success" data-dismiss="modal" (click)="modal.dismiss('Cross click')">Close</button>
+  </div>
+</ng-template>
+
+
+
+
+<ng-template #approve_item_list let-modal>
+  <div class="modal-header state modal-success">
+    <h2 class="modal-title" id="modal-primary-label"> Dispatch Confirmation</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="close()"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    Are you sure to Approve this Outward Item!
+  </div>
+  <div class="col-4">
+    <label><b> Outward Quantity = {{outward_quantity}}</b> </label>
+  </div>
+<div class="row">
+  <div class="col-12">
+  <form  [formGroup]="update_stock">
+    <div class="col-mb-12 bottom-30" style="padding-left: 20px;">
+      <table class="my-custom-table " >
+        <thead>
+          <tr>
+              <th [width]="200"> ITEM NAME </th>
+              <th> BATCH       </th>
+              <th> DESCRIPTION </th>
+              <th> STOCK       </th>
+              <th> QUANTITY    </th>
+          </tr>
+        </thead>
+        <tbody  formArrayName="product" *ngIf="!have_serial_number">
+          <tr *ngFor="let product of update_stock.get('product')['controls']; let j = index;" [formGroupName]="j">
+            <td>
+              <input type="text" class="form-control form-control-sm" readonly formControlName="items" />
+            </td>
+            <td>
+              <input type="text" class="form-control form-control-sm" readonly formControlName="batch" />
+            </td>
+            <td>
+              <input type="text" class="form-control form-control-sm" readonly formControlName="descriptions" />
+            </td>
+            <td>
+              <input type="number" class="form-control form-control-sm" [readonly]="show" formControlName="stock"/>
+            </td>
+            <td >
+              <input type="number" class="form-control form-control-sm" formControlName="quantity" #quantity (input)="edit_quantity(quantity.value, j)" />
+
+              <span class="help-block text-danger" *ngIf="Outward.get('quantity').touched && Outward.get('quantity').hasError('required')">Required !</span>
+            </td>
+          </tr>
+        </tbody>
+
+        <tbody  formArrayName="product" *ngIf="have_serial_number">
+          <tr *ngFor="let product of update_stock.get('product')['controls']; let j = index;" [formGroupName]="j">
+            <td>
+              <input type="text" class="form-control form-control-sm" readonly formControlName="items" />
+            </td>
+            <td>
+              <input type="text" class="form-control form-control-sm" readonly formControlName="batch" />
+            </td>
+            <td>
+              <input type="text" class="form-control form-control-sm" readonly formControlName="descriptions" />
+            </td>
+            <td>
+              <input type="number" class="form-control form-control-sm" [readonly]="show" formControlName="stock"/>
+            </td>
+            <td style="min-width: 150px;  max-width: 200px;">
+              <ng-multiselect-dropdown #select formControlName="select" style="min-width: 150px;max-width: 200px;"
+                  [placeholder]="'Select Item'"
+                  [data]="batchList[j].serial_itemList"
+                  [settings]="dropdownSettings"
+                  (onSelect)="onItemSelect($event,j)"
+                  (onSelectAll)="onSelectAll($event)">
+              </ng-multiselect-dropdown>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </form>
+  </div>
+</div>
+
+<!-- <div class="form-group col-2" *ngIf="show_dropdown">
+  <label *ngFor="let a of item trackBy: trackByFn">
+    <input type="checkbox" [(ngModel)]="a.checked" [disabled]="isCheckboxDisabled(a.id)" (change)="getSelectValue($event.target.checked, a.id)" />
+    <span>{{a.batch}} | {{a.serial_no}}</span>
+  </label>
+</div> -->
+
+  <div class="modal-footer">
+      <button *ngIf="show && have_serial_number"  [disabled]="loading" type="button" class="btn btn-success" data-dismiss="modal" (click)="ReqApprove_serial()">Approved<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      <button *ngIf="show && !have_serial_number"  [disabled]="loading" type="button" class="btn btn-success" data-dismiss="modal" (click)="ReqApprove()">Approved <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      <button  type="button" class="btn btn-success" data-dismiss="modal" (click)="clear()">Clear<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      <button  type="button" class="btn btn-warning" data-dismiss="modal" (click)="close()">Close</button>
+  </div>
+
+</ng-template>
+
+    <div *ngIf="list_view" >
+      <button type="submit" class="btn btn-info fa fa-arrow-left mb-3" (click)="set_zero_2()"> Back</button>
+      <div style="text-align: center;" ><h5><b>Item List</b></h5></div>
+        &nbsp;
+              <ngx-datatable
+              #table
+              class="custom_table2"
+              [headerHeight]="50"
+              [limit]="10"
+              [columnMode]="'force'"
+              [footerHeight]="50"
+              [rowHeight]="'auto'"
+              [rows]="project_dispatch_item"
+              [selected]="selected_item"
+              [selectionType]="'checkbox'"
+              (activate)="quantity_select($event)">
+
+              <ngx-datatable-column prop="id" name="ID" >
+                  <ng-template ngx-datatable-cell-template let-row="row">
+                      {{row.id}}
+                  </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column prop="creater_name" name="CREATED BY">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.creater_name}}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="category_name" name="ITEM CATEGORY">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.category_name}}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="item_name" name="ITEM">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.item_name}}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="serial_no" name="QUANTITY" >
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.value}} {{row.uom}}
+                </ng-template>
+              </ngx-datatable-column>
+
+            </ngx-datatable>
+    </div>

@@ -1,0 +1,1512 @@
+<div *ngIf="show_page === 0">
+  <div *ngIf="selected.length === 0 && salary_credit == false">
+    <div class="col-md-12">
+      <table>
+        <tr>
+          <td style="width: 10px;">
+            <h1><small></small></h1>
+          </td>
+          <td style="width: 250px;">
+            <h1><small>PAY ROLL LIST</small></h1>
+          </td>
+
+          <td style="width: 900px;">
+            <div class="input-group input-group-sm my-3">
+              <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="fa fa-search"></i></span>
+              </div>
+              <input class="form-control" type="text" placeholder="Search Employee Name or From Date or To Date..." (keyup)="updateFilter($event)"/>
+            </div>
+          </td>
+          <td style="width: 100px;"> </td>
+          <!-- <td style="width: 100px; text-align: center; vertical-align: center;">
+          </td> -->
+          <td style="width: 200px; text-align: center; vertical-align: center;">
+            <div class="btn-group  col-md-5" role="group" aria-label="Basic example">
+              <button type="button" value="show" class="btn btn-outline-success fa fa-plus" (click)="PageAction('show')"> Generate Salary</button>
+              <button type="button" value="show" class="btn btn-outline-success fa fa-money" (click)="open_pop()"> Salary advance</button>
+            </div>
+          </td>
+          <td style="width: 100px;"> </td>
+        </tr>
+      </table>
+    </div>
+    <div class="col" >
+      <div class="card-body widget-body">
+        <ngx-datatable
+            #table
+            class="custom_table"
+            [headerHeight]="50"
+            [limit]="20"
+            [columnMode]="'force'"
+            [footerHeight]="50"
+            [rowHeight]="'auto'"
+            [rows]="SalaryList"
+            [selected]="selected"
+            [selectionType]="'single'"
+            (activate)="onActivate($event)">
+
+            <!-- <ngx-datatable-column name="EMPLOYEE ID" >
+              <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.emp_id}}
+              </ng-template>
+            </ngx-datatable-column> -->
+
+            <ngx-datatable-column prop="name" name="EMPLOYEE NAME" >
+                <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.employee_name}}
+                </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="from_date" name="FROM">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.from_date  | date: 'dd-MM-yyyy'}}
+                </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="to_date" name="TO">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.to_date  | date: 'dd-MM-yyyy'}}
+              </ng-template>
+            </ngx-datatable-column>
+
+            <!-- <ngx-datatable-column prop="salary" name="SALARY">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                <span style="font-weight:bold;"> {{row.salary | indianCurrency}} </span>
+                </ng-template>
+            </ngx-datatable-column> -->
+            <ngx-datatable-column prop="status" name="STATUS">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                  <span *ngIf="row.status == 1">Generated</span>
+                  <span *ngIf="row.status == 2">Done</span>
+              </ng-template>
+          </ngx-datatable-column>
+        </ngx-datatable>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="salary_credit">
+    <div class="modal-header">
+      <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero()">Back</button>
+      <h1><small>EMPLOYEE SALARY DETAILS</small></h1>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col">
+                <div class="card-body">
+                  <div class="row">
+                    <table class="table col-md-3 card card-outline-info">
+                      <tbody>
+                          <tr>
+                            <th>Employee Name</th>
+                              <td>{{detail_view.name}}</td>
+                          </tr>
+                          <tr>
+                              <th>Total Worked Days</th>
+                              <td>{{detail_view.total_hours}}</td>
+                          </tr>
+                          <tr>
+                              <th>Number of Worked Days</th>
+                              <td>{{detail_view.working_hours}}</td>
+                          </tr>
+                          <tr>
+                            <th>Number of Salary Paid Days For</th>
+                            <td>{{final_data.salary_paid_days}}</td>
+                        </tr>
+                          <tr>
+                              <th>Over Time (Hours)</th>
+                              <td>{{detail_view.over_time}}</td>
+                          </tr>
+                          <tr>
+                              <th>Fixed Salary</th>
+                              <td>{{salary_dtails.fixed_salary | indianCurrency}}</td>
+                          </tr>
+                          <tr>
+                            <th>EPF</th>
+                            <td>{{salary_dtails.epf_deduction | indianCurrency}}</td>
+                        </tr>
+                          <tr>
+                            <th>ESI</th>
+                            <td>{{salary_dtails.esi_deduction | indianCurrency}}</td>
+                        </tr>
+                          <tr>
+                            <th>Advance</th>
+                            <td>{{salary_dtails.salary_advance | indianCurrency}}</td>
+                        </tr>
+
+                      <tr>
+                        <th>OT Amount</th>
+                        <td>{{salary_dtails.ot_amount_paid | indianCurrency}}</td>
+                    </tr>
+                          <tr>
+                            <th>Salary Paid</th>
+                            <td>
+                              {{salary_dtails.salary_paid}}
+                              </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div class="table col-md-6 offset-md-2 card card-outline-info">
+                      <br>
+                      <h5 class="table-title text-center "><strong>Bank Transaction Details</strong></h5>
+                      <br>
+                      <form class="form-horizontal" [formGroup]="form_salary" (ngSubmit)="salaryUpdate(form_salary.value)">
+                        <div class="form-group row text-sm-right">
+                            <label for="email-h-f" class="col-sm-3 form-control-label m-t-5">Amount</label>
+                            <div class="col-sm-8">
+                              <div class="input-group">
+                                <input [formControl]="ip_salary" type="number" class="form-control">
+                                  <div class="input-group-prepend">
+                                    <span class="input-group-text"> ₹ </span>
+                                  </div>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group row text-sm-right">
+                          <label for="email-h-f" class="col-sm-3 form-control-label m-t-5">Paid Through</label>
+                          <div class="col-sm-8">
+                            <div class="input-group">
+                              <!-- <select [formControl]="ip_bank_id" class="form-control custom-select">
+                                <option value="" >Select Source Account</option>
+                                <option *ngFor= "let view of BankList" value="{{view.bank_id}}" >{{view.account_name}}</option>
+                              </select> -->
+
+                              <ng-select   formControlName="ip_bank_id" style="text-align: left;"  class="custom-select" [clearable]="false">
+                                <ng-option *ngFor="let item of BankList" [value]="item.bank_id"  style="align-content:center;">
+                                  {{ item.account_name}}
+                                </ng-option>
+                              </ng-select>
+                              <span class="help-block text-danger" *ngIf="form_salary.get('ip_bank_id').touched && form_salary.get('ip_bank_id').hasError('required')">select Bank Required !</span>
+                            </div>
+                          </div>
+                      </div>
+                      <div class="form-group row text-sm-right">
+                        <label for="email-h-f" class="col-sm-3 form-control-label m-t-5">Payment Mode</label>
+                        <div class="col-sm-8">
+                          <div class="input-group">
+                            <select [formControl]="ip_tran_mode" class="form-control custom-select">
+                              <option value = "0" selected>Select Mode</option>
+                              <option value = "1">Wire</option>
+                              <option value = "2">Cash</option>
+                              <option value = "3">Cheque</option>
+                            </select>
+
+                            <span class="help-block text-danger" *ngIf="form_salary.get('ip_tran_mode').touched && form_salary.get('ip_tran_mode').hasError('required')">select Payment Mode Required !</span>
+                          </div>
+                        </div>
+                    </div>
+                        <div class="form-group row text-sm-right">
+                          <label for="email-h-f" class="col-sm-3 form-control-label m-t-5">Transfer Number</label>
+                          <div class="col-sm-8">
+                            <div class="input-group">
+                              <input [formControl]="ip_utr" type="text" class="form-control">
+                              <div class="input-group-prepend">
+                                <span class="input-group-text">UTR</span>
+
+                                <span class="help-block text-danger" *ngIf="form_salary.get('ip_utr').touched && form_salary.get('ip_utr').hasError('required')">Required !</span>
+                            </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-group row text-sm-right">
+                          <label for="email-h-f" class="col-sm-3 form-control-label m-t-5">Reference</label>
+                          <div class="col-sm-8">
+                            <div class="input-group">
+                              <input [formControl]="ip_reff" type="text" class="form-control">
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-group row text-sm-right">
+                          <label for="email-h-f" class="col-sm-3 form-control-label m-t-5">Payment Date</label>
+                          <div class="col-sm-8">
+                            <div class="input-group">
+                              <input [formControl]="ip_tran_date" type="date" class="form-control">
+
+                              <span class="help-block text-danger" *ngIf="form_salary.get('ip_tran_date').touched && form_salary.get('ip_tran_date').hasError('required')">select Date Required !</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="text-center">
+                          <button [disabled]="loading" type="submit" class="btn btn-info">Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+                        </div>
+                        <div class="text-center">
+                          <br>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <div class="card">
+
+                </div>
+                <div class="card card-outline-info">
+                  <div class="card-header">
+                    <h5 class="card-title">Detailed View</h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="row">
+                      <table class="table col-md-6">
+                        <thead>
+                            <tr>
+                                <th>Employee Name</th>
+                                <td>{{detail_view.name}}</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>Employee Code</th>
+                                <td>{{detail_view.emp_id}}</td>
+                            </tr>
+                            <tr>
+                                <th>PAN No</th>
+                                <td>{{detail_view.pan}}</td>
+                            </tr>
+                            <tr>
+                                <th>Aadhar No</th>
+                                <td>{{detail_view.aadhar}}</td>
+                            </tr>
+                        </tbody>
+                      </table>
+                      <table class="table col-md-6">
+                        <thead>
+                            <tr>
+                                <th>Bank Account Number</th>
+                                <td>{{detail_view.bank_acc}}</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>Bank Name</th>
+                                <td>{{detail_view.bank_name}}</td>
+                            </tr>
+                            <tr>
+                                <th>IFSC</th>
+                                <td>{{detail_view.bank_ifsc}}</td>
+                            </tr>
+                            <tr>
+                                <th>BRANCH</th>
+                                <td>{{detail_view.bank_branch}}</td>
+                            </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+              </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" >
+      <div class="col-md-12">
+        <div class="card-body widget-body">
+          <ngx-datatable #table
+          class="custom_table2"
+          [headerHeight]="50"
+          [limit]="10"
+          [columnMode]="'force'"
+          [footerHeight]="50"
+          [rowHeight]="50"
+          [rows]="salary_detail"
+          [selected]="selected"
+          [selectionType]="'single'"
+          (activate)="onAction1($event)">
+
+            <ngx-datatable-column prop="tran_date" name="TRANSACTION DATE">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                <span>{{row.tran_date  | date: 'dd-MM-yyyy'}}</span>
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="utr" name="UTR">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                <span>{{row.utr}}</span>
+              </ng-template>
+            </ngx-datatable-column>
+
+
+            <ngx-datatable-column prop="amount" name="AMOUNT">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                <span style="font-weight:bold;">{{row.amount | indianCurrency}}</span>
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column prop="reference" name="REFERENCE">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                <span>{{row.reference}}</span>
+              </ng-template>
+            </ngx-datatable-column>
+
+          </ngx-datatable>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<div *ngIf="show_page === 1 && !advance">
+  <div class="modal-header">
+    <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero()"> Back</button>
+    <h2 class="modal-title">SALARY GENERATION</h2>
+    <span></span>
+  </div>
+  <div class="row bottom-30">
+    <div class="col-md-12">
+      <div widget class="card">
+          <div class="card-header">
+              <span> Salary Period</span>
+              <div class="widget-controls">
+                  <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+                  <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+                  <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+                  <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+                  <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+              </div>
+          </div>
+          <div class="card-body widget-body">
+            <form [formGroup]="salary_load" class="row" (ngSubmit)="SalaryLoad(salary_load.value)">
+              <!-- <div class="form-group row text-sm-right col-md-3">
+                  <label class="col-sm-4 form-control-label m-t-5">From</label>
+                  <div class="col-sm-8">
+                      <input type="date" class="form-control" formControlName="from_date">
+                      <span class="help-block text-danger"
+                       *ngIf="salary_load.get('from_date').touched && salary_load.get('from_date').hasError('required')">Required !</span>
+                  </div>
+              </div> -->
+
+              <!-- <div class="form-group row text-sm-right col-md-3">
+                  <label class="col-sm-4 form-control-label m-t-5">To</label>
+                  <div class="col-sm-8">
+                      <input type="date" class="form-control" formControlName="to_date">
+
+                      <span class="help-block text-danger"
+                        *ngIf="salary_load.get('to_date').touched && salary_load.get('to_date').hasError('required')">Required !</span>
+                  </div>
+              </div> -->
+            <div class="form-group row text-sm-right col-md-3">
+                  <label class="col-sm-4 form-control-label m-t-5">Month</label>
+                  <div class="col-sm-8">
+                    <select  class="form-control" formControlName="month" >
+                      <option *ngFor="let month of months" [value]="month.monthValue">
+                        {{ month.display }}
+                      </option>
+                    </select>
+                     <span class="help-block text-danger"
+                        *ngIf="salary_load.get('month').touched && salary_load.get('month').hasError('required')">Required !</span>
+                  </div>
+              </div>
+
+              <div class="form-group row text-sm-right col-md-4">
+                <label class="col-sm-4 form-control-label m-t-5">Category</label>
+                <div class="col-sm-8">
+                  <select class="form-control" formControlName="category">
+                    <option *ngFor= "let view of salary_group" value="{{view.id}}" >{{view.type | uppercase}}</option>
+                  </select>
+
+                  <span class="help-block text-danger"
+                    *ngIf="salary_load.get('category').touched && salary_load.get('category').hasError('required')">Required !</span>
+                </div>
+              </div>
+
+              <div class="form-group col-md-2">
+                  <button [disabled]="loading" class="btn btn-main" class="btn btn-success" type="submit">Load Attendance <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+              </div>
+            </form>
+          </div>
+          <div class="row" *ngIf="show_page == 1 && show_Load == 1">
+            <div class="col-md-12">
+              <div class="card-body widget-body">
+                <ngx-datatable #table
+                class="custom_table2"
+                [headerHeight]="50"
+                [limit]="10"
+                [columnMode]="'force'"
+                [footerHeight]="50"
+                [rowHeight]="50"
+                [rows]="LoadSalaryData"
+                [selected]="selected"
+                [selectionType]="'single'"
+                (activate)="onAction($event)">
+
+                  <ngx-datatable-column  prop="emp_id" name="EMPLOYEE ID">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      {{row.emp_id}}
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column prop="name" name="EMPLOYEE NAME">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      <span>{{row.name}}</span>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column prop="hr" name="ATTENDANCE">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      <span>{{row.hr}} Hrs</span>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column prop="ot" name="OVER TIME">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      <span>{{row.ot}}  Hrs</span>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column prop="cl" name="COM-OFF LEAVE">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      <span>{{row.cl}}  Hrs</span>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <!-- <ngx-datatable-column prop="sl" name="SICK LEAVE">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      <span>{{row.sl}}  Hrs</span>
+                    </ng-template>
+                  </ngx-datatable-column> -->
+
+                  <ngx-datatable-column prop="pl" name="PERSONAL LEAVE">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      <span>{{row.pl}}  Hrs</span>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                </ngx-datatable>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #employee_salary_days let-modal>
+  <div class="modal-header state modal-info">
+    <h5 class="modal-title" id="modal-primary-label">Generate Salary</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <table class="table">
+      <tbody>
+        <tr>
+          <th>Employee Name</th>
+          <td>{{salary_details.name}}</td>
+        </tr>
+        <tr>
+          <th>Attendance From</th>
+          <td>{{salary_details.from_date  | date: 'dd-MM-yyyy'}}</td>
+        </tr>
+        <tr>
+          <th>Attendance To</th>
+          <td>{{salary_details.to_date  | date: 'dd-MM-yyyy'}}</td>
+        </tr>
+        <tr>
+          <th>Working Hours</th>
+          <td>{{salary_details.hr}}</td>
+        </tr>
+        <tr>
+          <th>Over Time</th>
+          <td>{{salary_details.ot}}</td>
+        </tr>
+        <tr>
+          <th>Sick Leave</th>
+          <td>{{salary_details.sl}}</td>
+        </tr>
+        <tr>
+          <th>Com-off Leave</th>
+          <td>{{salary_details.cl}}</td>
+          <th>Part 2</th>
+          <td colspan="2">{{ salary_details.part2 }}</td>
+
+          <th>Part 3</th>
+          <td>{{ salary_details.part3 }}</td>
+        </tr>
+
+        <tr>
+          <th>Personal Leave</th>
+          <td>{{salary_details.pl}}</td>
+        </tr>
+        <tr>
+          <th style="color:red">Total Hours*</th>
+          <td>
+            <form [formGroup]="salary_gen" (ngSubmit)="GenerateSalary(salary_gen.value)">
+              <div class="input-group">
+                <input type="number" class="form-control" formControlName="total_hr">
+                <button [disabled]="loading" class="btn btn-main" class="btn btn-info" type="submit">Generate<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+              </div>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</ng-template>
+
+
+<ng-template #employee_salary let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Worked Days</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="payroll_days" (ngSubmit)="submit_payroll_days(payroll_days.value)">
+
+      <div class="row">
+        <div class="form-group col-xl-3">
+          <label for="name"> From Date </label>
+          </div>
+          <div class="form-group col-xl-9">
+          <input formControlName="from_date" id="from_date"  (input)="onInputChange()" placeholder="Enter From Date" type="date" class="form-control input-size" >
+          <span class="help-block text-danger" *ngIf="payroll_days.get('from_date').touched && payroll_days.get('from_date').hasError('required')">Enter From Date !</span>
+        </div>
+
+        <div class="form-group col-xl-3">
+          <label for="name"> To Date </label>
+          </div>
+          <div class="form-group col-xl-9">
+          <input formControlName="to_date" id="to_date"  (input)="onInputChange()" placeholder="Enter To Date" type="date" class="form-control input-size" >
+          <span class="help-block text-danger"
+            *ngIf="payroll_days.get('to_date').touched && payroll_days.get('to_date').hasError('required')">Enter To Date !</span>
+        </div>
+
+       <div class="form-group col-xl-3">
+        <label for="name"> No of Days  </label>
+        </div>
+        <div class="form-group col-xl-4" style="display: flex; padding-left: 0;">
+          <div class="col-xl-6">
+             <input formControlName="no_of_days" id="no_of_days" [(ngModel)]="total_days" (input)="onInputChange()" min="0" placeholder="Enter No of days" type="number" class="form-control " >
+          </div>
+          <div class="col-xl-6" style="padding: 7px;">
+             <label for="name"> {{total_days*8}} (hrs) </label>
+             </div>
+        <span class="help-block text-danger"
+          *ngIf="payroll_days.get('no_of_days').touched && payroll_days.get('no_of_days').hasError('required')">Enter No of Days !</span>
+      </div>
+
+      <div class="form-group col-xl-2" style="text-align: center;padding: center;">
+                 <label  *ngIf="total_days*8 - total_workeddays <= 32 && pl_status == null" for="name"> Add PL  </label>
+          <div   *ngIf="total_days*8 - total_workeddays <= 32 && pl_status == null" >
+                <button  size="sm" class="btn btn-success rounded-circle btn-sm" type="button" (click)="onAddLeave()" title="Add PL"><i class="fa fa-plus"></i></button>
+        </div>
+      </div>
+        <div class="form-group col-xl-3" style="text-align: center;padding: center;">
+
+            <small *ngIf="total_days*8 - total_workeddays <= 32 && pl_status == null" style="color: #e0a225;" > * Not eligible for PL leave — you have missed more than 4 working days.</small>
+              <small *ngIf="total_days*8 - total_workeddays > 32 && pl_status == null" style="color:red;">* Not eligible for PL leave due to insufficient worked days!</small>
+              <small *ngIf="pl_status != null" style="color: #e0a225;" > * Already applied for PL leave</small>
+        </div>
+
+
+      <div class="form-group col-xl-3">
+        <label for="name">No of Worked (hrs)</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="no_of_workingdays" readonly id="no_of_workingdays" [(ngModel)]="total_workeddays" (input)="onInputChange()" placeholder="Enter No of Workingdays" type="number"
+          class="form-control input-size" >
+        <span class="help-block text-danger"
+          *ngIf="payroll_days.get('no_of_workingdays').touched && payroll_days.get('no_of_workingdays').hasError('required')">Enter Worked Days !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">No of CL (hrs)</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="no_of_cl" id="no_of_cl" readonly [(ngModel)]="cl_days" (input)="onInputChange()" placeholder="Enter No of CL"
+        type="number" class="form-control input-size" >
+        <span class="help-block text-danger"
+          *ngIf="payroll_days.get('no_of_cl').touched && payroll_days.get('no_of_cl').hasError('required')">Enter No of CL !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">No of PL (hrs)</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="no_of_pl" id="no_of_pl" readonly [(ngModel)]="pl_days" (input)="onInputChange()" placeholder="Enter No of PL"
+        type="number" class="form-control input-size" >
+        <span class="help-block text-danger"
+          *ngIf="payroll_days.get('no_of_pl').touched && payroll_days.get('no_of_pl').hasError('required')">Enter No of PL !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">No of OT (hrs)</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="no_of_ot" id="no_of_ot" readonly (input)="onInputChange()"  placeholder="Enter No of OT" type="number" class="form-control input-size" >
+        <span class="help-block text-danger"
+          *ngIf="payroll_days.get('no_of_ot').touched && payroll_days.get('no_of_ot').hasError('required')">Enter No of OT !</span>
+      </div>
+
+      <div class="form-group col-xl-2">
+        <label for="name">PL Available (hrs)</label>
+        </div>
+        <div class="form-group col-xl-2">
+        <input formControlName="pl_available" id="pl_available"  placeholder="Enter PL Available" readonly type="number" class="form-control " >
+        <span class="help-block text-danger"
+          *ngIf="payroll_days.get('pl_available').touched && payroll_days.get('pl_available').hasError('required')">Enter PL Available !</span>
+      </div>
+
+      <div class="form-group col-xl-2">
+        <label for="name">PL Use (hrs)</label>
+        </div>
+        <div class="form-group col-xl-2">
+        <input formControlName="pl_use" id="pl_use"  placeholder="Enter PL Use"  min="0" max="8" type="number" [(ngModel)]="plUseValue" (input)="onInputChange()" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="payroll_days.get('pl_use').touched && payroll_days.get('pl_use').hasError('required')">Enter PL Use !</span>
+      </div>
+
+      <div class="form-group col-xl-2">
+        <label for="name">PL Balance (hrs)</label>
+        </div>
+        <div class="form-group col-xl-2">
+        <input formControlName="pl_balance" id="pl_balance" placeholder="Enter PL Balance" min="0" type="number" readonly class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="payroll_days.get('pl_balance').touched && payroll_days.get('pl_balance').hasError('required')">Enter PL Balance !</span>
+      </div>
+
+      <div class="form-group col-xl-2">
+        <label for="name">Comp off Available (hrs)</label>
+        </div>
+        <div class="form-group col-xl-2">
+        <input formControlName="c_off_available" id="c_off_available" placeholder="Enter Comp off Available" readonly type="number" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="payroll_days.get('c_off_available').touched && payroll_days.get('c_off_available').hasError('required')">Enter Comp off Available !</span>
+      </div>
+
+      <div class="form-group col-xl-2">
+        <label for="name">Comp off Use (hrs)</label>
+        </div>
+        <div class="form-group col-xl-2">
+        <input formControlName="c_off_use" id="c_off_use"  placeholder="Enter Comp off Use" min="0" type="number" [(ngModel)]="clUseValue" (input)="onInputChange_cl()" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="payroll_days.get('c_off_use').touched && payroll_days.get('c_off_use').hasError('required')">Enter Comp off Use !</span>
+      </div>
+
+
+      <div class="form-group col-xl-2">
+        <label for="name">Comp off Balance (hrs)</label>
+        </div>
+        <div class="form-group col-xl-2">
+        <input formControlName="c_off_balance" id="c_off_balance" placeholder="Enter Comp off Balance" min="0" type="number" readonly class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="payroll_days.get('c_off_balance').touched && payroll_days.get('c_off_balance').hasError('required')">Enter Comp off Balance !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">LOP (hrs)</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="lop" id="lop" placeholder="Enter LOP" type="number" class="form-control input-size" >
+        <span class="help-block text-danger"
+          *ngIf="payroll_days.get('lop').touched && payroll_days.get('lop').hasError('required')">Enter LOP !</span>
+      </div>
+
+      <div class="form-group col-xl-3">
+        <label for="name">Salary Paid Hours</label>
+        </div>
+        <div class="form-group col-xl-9">
+        <input formControlName="salary_paid_day" id="salary_paid_day" placeholder="Enter Salary Paid Day" type="number" class="form-control input-size" >
+        <span class="help-block text-danger"
+          *ngIf="payroll_days.get('salary_paid_day').touched && payroll_days.get('salary_paid_day').hasError('required')">Enter Salary Paid Day !</span>
+      </div>
+        <div style="width: 100%; text-align: center;">
+          <button [disabled]="loading" class="btn btn-primary" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+         </div>
+      </div>
+
+    </form>
+  </div>
+</ng-template>
+
+
+<div *ngIf="show_table">
+  <div >
+    <button type="submit" class="btn btn-info fa fa-arrow-left mb-3" (click)="set_zero()"> Back</button>
+
+   <div widget class="card">
+    <div class="card-header">
+        <span>Salary Period</span>
+        <!-- <div class="widget-controls">
+            <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+            <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+            <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+            <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+            <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+        </div> -->
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <table class="table col-md-6">
+          <thead>
+              <tr>
+                  <th>Total Days</th>
+                  <td>{{final_data.no_of_days}}</td>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                  <th>Total Worked Days</th>
+                  <td>{{final_data.no_of_workeddays}}</td>
+              </tr>
+              <tr>
+                <th>Personal Leave</th>
+                <td>{{final_data.personal_leave}}</td>
+            </tr>
+
+              <tr>
+                  <th>Casual Leave</th>
+                  <td>{{final_data.com_off_leave}}</td>
+              </tr>
+          </tbody>
+        </table>
+        <table class="table col-md-6">
+          <thead>
+
+              <tr>
+                  <th>Sick Leave</th>
+                  <td>{{final_data.sick_leave}}</td>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <th>Com Off Use</th>
+                <td>{{final_data.com_off}}</td>
+            </tr>
+              <tr>
+                  <th>LOP</th>
+                  <td>{{final_data.lop}}</td>
+              </tr>
+              <tr>
+                  <th>Salary Paid Days</th>
+                  <td>{{final_data.salary_paid_days}}</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+   </div>
+
+    <div class="row" *ngIf="this.payment == null">
+      <div class="col-lg-12 col-md-7  ">
+        <form [formGroup]="payroll_amount">
+          <div class="card card-outline-info box-shadow">
+            <div class="card-header">
+              <span>Salary</span>
+            </div>
+            <div class="card-body">
+              <div class="row">
+
+                <div class="col-md-6">
+                  <div class="row">
+                    <div class="col-md-6 mt-2">
+                      <b>Salary Amount </b>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('salary_amount').touched && payroll_amount.get('salary_amount').hasError('required')">Salary Amount Required !</span>
+                        <span class="help-block text-danger" *ngIf="payroll_amount.get('salary_amount').touched && payroll_amount.get('salary_amount').hasError('minlength')">Salary Amount </span>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="input-group">
+                        <input type="number" class="form-control" [(ngModel)]="salary_Amount" [readonly]="status" formControlName="salary_amount" placeholder="Employee Name">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                  <div class="col-md-3 mt-2">
+                    <b>Salary Advance </b><spna></spna>
+                    <span class="help-block text-danger" *ngIf="payroll_amount.get('salary_advance').touched && payroll_amount.get('salary_advance').hasError('required')">Salary Advance  Required !</span>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('salary_advance').touched && payroll_amount.get('salary_advance').hasError('minlength')">Salary Advance</span>
+                  </div>
+                  <div class="col-md-3 mt-2">
+
+                      <span> <strong> <p>Balance : {{account_balance | indianCurrency}}</p></strong></span>
+
+                  </div>
+                  <div class="col-md-6">
+                    <div class="input-group">
+                      <input type="number" class="form-control" [(ngModel)]="salary_advance"   (input)="salary_amount_calculation()" formControlName="salary_advance" placeholder=" Enter Salary Advance">
+                    </div>
+                  </div>
+               </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Paid Amount </b>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('paid_amount').touched && payroll_amount.get('paid_amount').hasError('required')">Required !</span>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" formControlName="paid_amount" [(ngModel)]="salary_paid_amount" [readonly]="status" class="form-control" placeholder="Enter Paid Amount"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>OT Hours </b>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('ot_hours').touched && payroll_amount.get('ot_hours').hasError('required')">Required !</span>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" formControlName="ot_hours" [(ngModel)]="ot_hours" [readonly]="status" (input)="ot_amount_calculation()" class="form-control" placeholder="Enter OT Hours"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>OT Per Hour </b>
+
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('ot_per_hour').touched && payroll_amount.get('ot_per_hour').hasError('pattern')">Valid Aadhar no!</span>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('ot_per_hour').touched && payroll_amount.get('ot_per_hour').hasError('required')">Required !</span>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" formControlName="ot_per_hour"  [(ngModel)]="ot_per_hours" [readonly]="status" (input)="ot_amount_calculation()" class="form-control" placeholder="Enter OT Per Hour"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>OT Paid Amount</b>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" formControlName="ot_paid_amount" [(ngModel)]="ot_paid_amount" [readonly]="status" class="form-control" placeholder="Enter OT Paid Amount"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Total Amount </b>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('total_amount').touched && payroll_amount.get('total_amount').hasError('required')">Required !</span>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" formControlName="total_amount" [(ngModel)]="total_amount" [readonly]="status" class="form-control" placeholder="Enter Total Amount"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Fixed Salary</b>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('fixed_salary').touched && payroll_amount.get('fixed_salary').hasError('required')">Required !</span>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" formControlName="fixed_salary" [(ngModel)]="fixed_salary" [readonly]="status" class="form-control" placeholder="Enter DoB"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Fixed Payable Amount </b>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('fixed_payable_amount').touched && payroll_amount.get('fixed_payable_amount').hasError('required')">Required !</span>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" formControlName="fixed_payable_amount" [readonly]="status" [(ngModel)]="fixed_payable_salary" class="form-control" placeholder="Enter Fixed Payable Amount"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Basic + DA </b>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('basic_da').touched && payroll_amount.get('basic_da').hasError('required')"> Required !</span>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" formControlName="basic_da" [(ngModel)]="basic_da" [readonly]="status" class="form-control" placeholder="Enter Fixed Payable Amount"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b> HRA </b>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('hra').touched && payroll_amount.get('hra').hasError('required')"> Required !</span>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" formControlName="hra" [(ngModel)]="hra" [readonly]="status" class="form-control" placeholder=" Enter HRA"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b> Allowance </b>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('allowance').touched && payroll_amount.get('allowance').hasError('required')">Required !</span>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" formControlName="allowance" [(ngModel)]="allowance" [readonly]="status" class="form-control" placeholder=" Enter Email Id"/>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div class="col-md-6">
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>EPF Employee </b>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('epf_employee').touched && payroll_amount.get('epf_employee').hasError('required')">Required !</span>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" formControlName="epf_employee" [(ngModel)]="epf_deduction" [readonly]="status" class="form-control" placeholder="Enter EPF"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>ESI Employee </b>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('esi_employee').touched && payroll_amount.get('esi_employee').hasError('required')">Required !</span>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" formControlName="esi_employee"  [(ngModel)]="esi_deduction" [readonly]="status" class="form-control" placeholder="Enter ESI"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Total Deduction </b>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('total_deduction').touched && payroll_amount.get('total_deduction').hasError('required')">Required !</span>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" formControlName="total_deduction" [(ngModel)]="total_deduction" [readonly]="status" class="form-control" placeholder="Enter Total Deduction"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Pentrol/Food  Expenses </b>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('pertrol_food').touched && payroll_amount.get('pertrol_food').hasError('required')">Required !</span>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" formControlName="pertrol_food" [(ngModel)]="petrol_food_expenses"  (input)="salary_amount_calculation()" class="form-control" placeholder=" Enter Address">
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Incentive and Others</b>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('incentive_others').touched && payroll_amount.get('incentive_others').hasError('required')">Required !</span>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" formControlName="incentive_others"  [(ngModel)]="incentive_others"  (input)="salary_amount_calculation()" class="form-control" placeholder="Enter Address For Communication">
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Net Salary</b>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('net_salary').touched && payroll_amount.get('net_salary').hasError('required')">Required !</span>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" formControlName="net_salary" [(ngModel)]="net_salary" class="form-control" [readonly]="status" placeholder="Enter Bank Name"/>
+                    </div>
+                    </div>
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Salary Paid</b>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('salary_paid').touched && payroll_amount.get('salary_paid').hasError('required')">Required !</span>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" formControlName="salary_paid" [(ngModel)]="salary_paid" class="form-control" [readonly]="status" placeholder="Enter Bank Name"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Gross Salary</b>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('gross_salary').touched && payroll_amount.get('gross_salary').hasError('required')">Required !</span>
+
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" formControlName="gross_salary" [(ngModel)]="gross_salary" class="form-control" [readonly]="status" placeholder="Enter Bank IFSC"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>EPF Employer Contribution</b>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('epf_employer').touched && payroll_amount.get('epf_employer').hasError('required')">Required !</span>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" formControlName="epf_employer" [(ngModel)]="epf_employer_contribution" [readonly]="status" class="form-control" placeholder="Enter EPF Employer"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>ESI Employer Contribution</b>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('esi_employer').touched && payroll_amount.get('esi_employer').hasError('required')">Required !</span>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="text" formControlName="esi_employer"  [(ngModel)]="esi_employer_contribution" [readonly]="status" class="form-control" placeholder="Enter ESI Employer"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Company Total Expence </b>
+                      <span class="help-block text-danger" *ngIf="payroll_amount.get('company_total_expence').touched && payroll_amount.get('company_total_expence').hasError('required')">Required !</span>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" formControlName="company_total_expence" [(ngModel)]="company_total_expence" [readonly]="status" class="form-control"/>
+                    </div>
+                  </div>
+
+                </div>
+             </div>
+          </div>
+
+            <div class="col-12 mb-3">
+              <div class="row justify-content-center">
+
+                <button *ngIf="this.payment == null" [disabled]="loading" type="submit" (click)="onSubmit(payroll_amount.value)" class="btn btn-success">Submit<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+
+                <!-- <button  *ngIf="this.payment != null" [disabled]="loading"  (click)="make_transaction(payroll_amount.value)" class="btn btn-success">Make Transaction<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button> -->
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div *ngIf="this.payment != null && show_table">
+  <div class="modal-header">
+    <!-- <div>
+      <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero($event)"> Back</button>
+    </div> -->
+
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div widget class="card">
+        <div class="card-header">
+          <span>Salary Details</span>
+        </div>
+        <div class="card-body widget-body">
+          <div class="row">
+            <table class="table col-md-6">
+              <tbody>
+                  <tr>
+                    <th>Salary Amount</th>
+                    <td>{{payment?.salary_amount|indianCurrency}}</td>
+                  </tr>
+
+                  <tr>
+                    <th>Salary Advance</th>
+                    <td>{{payment?.salary_advance|indianCurrency}}</td>
+                  </tr>
+
+                  <tr>
+                      <th>Paid Amount</th>
+                      <td>{{payment?.salary_amount_paid|indianCurrency}}</td>
+                  </tr>
+
+                  <tr>
+                    <th>OT Amount</th>
+                    <td>{{payment?.ot_amount_paid|indianCurrency}}</td>
+                </tr>
+
+                <tr>
+                  <th>Total Amount</th>
+                  <td>{{payment?.total_amount|indianCurrency}}</td>
+                </tr>
+
+                <tr>
+                    <th>Fixed Salary</th>
+                    <td>{{payment?.fixed_salary|indianCurrency}}</td>
+                </tr>
+
+                <tr>
+                  <th>Fixed Payable Amount</th>
+                  <td>{{payment?.payable_salary|indianCurrency}}</td>
+              </tr>
+
+              <tr>
+                <th>Basic + DA</th>
+                <td>{{payment?.basic_da|indianCurrency}}</td>
+              </tr>
+              <tr>
+                <th>HRA</th>
+                <td>{{payment?.hra|indianCurrency}}</td>
+              </tr>
+              <tr>
+                  <th>Allowance</th>
+                  <td>{{payment?.allowance|indianCurrency}}</td>
+              </tr>
+
+              </tbody>
+            </table>
+            <table class="table col-md-6">
+              <tbody>
+
+                <tr>
+                  <th>EPF Employee</th>
+                  <td>{{payment?.epf_deduction|indianCurrency}}</td>
+                </tr>
+                <tr>
+                  <th>ESI Employee</th>
+                  <td>{{payment?.esi_deduction|indianCurrency}}</td>
+                </tr>
+                <tr>
+                  <th>Total Deduction</th>
+                  <td>{{payment?.total_deduction|indianCurrency}}</td>
+                </tr>
+                <tr>
+                  <th>Petrol and Food Expense</th>
+                  <td>{{payment?.petrol_food_expenses|indianCurrency}} </td>
+                </tr>
+
+                <!-- <tr>
+                  <th>Incentive and Others</th>
+                  <td>{{payment?.incentive_others|indianCurrency}} </td>
+                </tr> -->
+                <tr>
+                  <th>Net Salary</th>
+                  <td>{{payment?.net_salary_credit|indianCurrency}}</td>
+                </tr>
+                <tr>
+                  <th>Salary Paid</th>
+                  <td>{{payment?.salary_paid|indianCurrency}} </td>
+                </tr>
+                <tr>
+                  <th>Gross Salary</th>
+                  <td>{{payment?.gross_salary|indianCurrency}}</td>
+                </tr>
+
+                <tr>
+                  <th>ESI Employer Contribution</th>
+                  <td>{{payment?.esi_employer|indianCurrency}}</td>
+                </tr>
+                <tr>
+                  <th>EPF Employer Contribution</th>
+                  <td>{{payment?.epf_employer|indianCurrency}} </td>
+                </tr>
+                <tr>
+                  <th>Company Total Expense</th>
+                  <td>{{payment?.company_total_expense|indianCurrency}} </td>
+                </tr>
+              </tbody>
+            </table>
+            <table class="table col-md-12">
+              <tr>
+
+                <td class="center-button">
+                  <button *ngIf="this.payment != null" [disabled]="loading" (click)="make_transaction(payment)" class="btn btn-success">Make Transaction<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+                </td>
+              </tr>
+            </table>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div *ngIf="advance">
+  <div class="modal-header">
+    <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero()">Back</button>
+    <h1><small>EMPLOYEE SALARY ADVANCE DETAILS</small></h1>
+  </div>
+  <div class="modal-body">
+      <div class="row">
+          <div class="col">
+
+            <div class="card card-outline-info">
+              <div class="card-header">
+                <h5 class="card-title">Detailed View</h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <table class="table col-md-6">
+                    <thead>
+                        <tr>
+                            <th>Employee Name</th>
+                            <td>{{advance_emp.name}}</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>Employee Code</th>
+                            <td>{{advance_emp.emp_id}}</td>
+                        </tr>
+                        <tr>
+                            <th>PAN No</th>
+                            <td>{{advance_emp.pan}}</td>
+                        </tr>
+                        <tr>
+                            <th>Aadhar No</th>
+                            <td>{{advance_emp.aadhar}}</td>
+                        </tr>
+                    </tbody>
+                  </table>
+                  <table class="table col-md-6">
+                    <thead>
+                        <tr>
+                            <th>Bank Account Number</th>
+                            <td>{{advance_emp.sal_bank_acc}}</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>Bank Name</th>
+                            <td>{{advance_emp.sal_bank_name}}</td>
+                        </tr>
+                        <tr>
+                            <th>IFSC</th>
+                            <td>{{advance_emp.sal_bank_ifsc}}</td>
+                        </tr>
+                        <tr>
+                            <th>BRANCH</th>
+                            <td>{{advance_emp.sal_bank_branch}}</td>
+                        </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+          </div>
+              <div class="card-body">
+                <div class="row">
+                  <table class="table col-md-3 card card-outline-info">
+                    <tbody>
+                        <tr>
+                          <th>Employee Name</th>
+                            <td>{{advance_emp.name}}</td>
+                        </tr>
+                         <tr>
+                            <th>Employee Advance</th>
+                            <td>{{advance_emp.salary_advance}}</td>
+                        </tr>
+                    <!--    <tr>
+                            <th>Number of Worked Days</th>
+                            <td>{{detail_view.working_hours}}</td>
+                        </tr>
+                        <tr>
+                          <th>Number of Salary Paid Days For</th>
+                          <td>{{final_data.salary_paid_days}}</td>
+                      </tr>
+                        <tr>
+                            <th>Over Time (Hours)</th>
+                            <td>{{detail_view.over_time}}</td>
+                        </tr> -->
+                        <!-- <tr>
+                            <th>Fixed Salary</th>
+                            <td>{{salary_dtails.fixed_salary | indianCurrency}}</td>
+                        </tr> -->
+                        <!-- <tr>
+                          <th>EPF</th>
+                          <td>{{salary_dtails.epf_deduction | indianCurrency}}</td>
+                      </tr>
+                        <tr>
+                          <th>ESI</th>
+                          <td>{{salary_dtails.esi_deduction | indianCurrency}}</td>
+                      </tr> -->
+                        <!-- <tr>
+                          <th>Advance</th>
+                          <td>{{salary_dtails.salary_advance | indianCurrency}}</td>
+                      </tr>
+
+                    <tr>
+                      <th>OT Amount</th>
+                      <td>{{salary_dtails.ot_amount_paid | indianCurrency}}</td>
+                  </tr>
+                        <tr>
+                          <th>Salary Paid</th>
+                          <td>
+                            {{salary_dtails.salary_paid}}
+                            </td>
+                      </tr> -->
+                    </tbody>
+                  </table>
+                  <div class="table col-md-6 offset-md-2 card card-outline-info">
+                    <br>
+                    <h5 class="table-title text-center "><strong>Bank Transaction Details</strong></h5>
+                    <br>
+                    <form class="form-horizontal" [formGroup]="advance_salary" (ngSubmit)="salaryadvance(advance_salary.value)">
+                      <div class="form-group row text-sm-right">
+                          <label for="email-h-f" class="col-sm-3 form-control-label m-t-5">Amount</label>
+                          <div class="col-sm-8">
+                            <div class="input-group">
+                              <input formControlName="ip_salary" type="number" class="form-control">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text"> ₹ </span>
+                                </div>
+
+                                <span class="help-block text-danger" *ngIf="advance_salary.get('ip_salary').touched && advance_salary.get('ip_salary').hasError('required')">Amount Required !</span>
+                            </div>
+                          </div>
+                      </div>
+                      <div class="form-group row text-sm-right">
+                        <label for="email-h-f" class="col-sm-3 form-control-label m-t-5">Paid Through</label>
+                        <div class="col-sm-8">
+                          <div class="input-group">
+                            <!-- <select formControlName="ip_bank_id" class="form-control custom-select">
+                              <option value="" >Select Source Account</option>
+                              <option *ngFor= "let view of BankList" value="{{view.bank_id}}" >{{view.account_name}}</option>
+                            </select> -->
+
+
+                            <ng-select   formControlName="ip_bank_id" style="text-align: left;"  class="custom-select" [clearable]="false">
+                              <ng-option *ngFor="let item of BankList" [value]="item.bank_id"  style="align-content:center;">
+                                {{ item.account_name}}
+                              </ng-option>
+                            </ng-select>
+
+                            <span class="help-block text-danger" *ngIf="advance_salary.get('ip_bank_id').touched && advance_salary.get('ip_bank_id').hasError('required')">select Bank Required !</span>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="form-group row text-sm-right">
+                      <label for="email-h-f" class="col-sm-3 form-control-label m-t-5">Payment Mode</label>
+                      <div class="col-sm-8">
+                        <div class="input-group">
+                          <select formControlName="ip_tran_mode" class="form-control custom-select">
+                            <option value = "0" selected>Select Mode</option>
+                            <option value = "1">Wire</option>
+                            <option value = "2">Cash</option>
+                            <option value = "3">Cheque</option>
+                          </select>
+
+                          <span class="help-block text-danger" *ngIf="advance_salary.get('ip_tran_mode').touched && advance_salary.get('ip_tran_mode').hasError('required')">select Payment Mode Required !</span>
+                        </div>
+                      </div>
+                  </div>
+                      <div class="form-group row text-sm-right">
+                        <label for="email-h-f" class="col-sm-3 form-control-label m-t-5">Transfer Number</label>
+                        <div class="col-sm-8">
+                          <div class="input-group">
+                            <input formControlName="ip_utr" type="text" class="form-control">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text">UTR</span>
+
+                              <span class="help-block text-danger" *ngIf="advance_salary.get('ip_utr').touched && advance_salary.get('ip_utr').hasError('required')">Required !</span>
+                          </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group row text-sm-right">
+                        <label for="email-h-f" class="col-sm-3 form-control-label m-t-5">Reference</label>
+                        <div class="col-sm-8">
+                          <div class="input-group">
+                            <input formControlName="ip_reff" type="text" class="form-control">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group row text-sm-right">
+                        <label for="email-h-f" class="col-sm-3 form-control-label m-t-5">Payment Date</label>
+                        <div class="col-sm-8">
+                          <div class="input-group">
+                            <input formControlName="ip_tran_date" type="date" class="form-control">
+
+                            <span class="help-block text-danger" *ngIf="advance_salary.get('ip_tran_date').touched && advance_salary.get('ip_tran_date').hasError('required')">select Date Required !</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="text-center">
+                        <button [disabled]="loading" type="submit" class="btn btn-info">Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+                      </div>
+                      <div class="text-center">
+                        <br>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+
+              </div>
+
+          </div>
+      </div>
+  </div>
+
+  <!-- <div class="row" >
+    <div class="col-md-12">
+      <div class="card-body widget-body">
+        <ngx-datatable #table
+        class="custom_table2"
+        [headerHeight]="50"
+        [limit]="10"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="50"
+        [rows]="salary_detail"
+        [selected]="selected"
+        [selectionType]="'single'"
+        (activate)="onAction1($event)">
+
+          <ngx-datatable-column prop="tran_date" name="TRANSACTION DATE">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              <span>{{row.tran_date}}</span>
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="utr" name="UTR">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              <span>{{row.utr}}</span>
+            </ng-template>
+          </ngx-datatable-column>
+
+
+          <ngx-datatable-column prop="amount" name="AMOUNT">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              <span style="font-weight:bold;">{{row.amount | indianCurrency}}</span>
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="reference" name="REFERENCE">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              <span>{{row.reference}}</span>
+            </ng-template>
+          </ngx-datatable-column>
+
+        </ngx-datatable>
+      </div>
+    </div>
+  </div> -->
+</div>
+
+
+
+
+<ng-template #employee_advance let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Advance</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+
+      <div class="row">
+        <div class="form-group col-3">
+          <label for="name"> Employee </label>
+          </div>
+          <div class="form-group col-9">
+            <!-- <select class="form-control"  #emp (change)="employee_advan(emp.value)"  >
+              <option> Select </option>
+              <option *ngFor= "let view of employee"  value="{{view.emp_id}}"  >{{view.name | uppercase}}</option>
+            </select> -->
+
+            <ng-select   (change)="employee_advan($event)" class=" form-control custom-select" [clearable]="false">
+              <ng-option *ngFor="let item of employee" [value]="item.emp_id" class="form-control">
+                {{ item.name}}
+              </ng-option>
+            </ng-select>
+         </div>
+      </div>
+
+  </div>
+</ng-template>
+
+
+<ng-template #Confirmation let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Confirmation</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    Are you sure to add paid leave for this employee!
+  </div>
+  <div class="modal-footer">
+      <button [disabled]="loading" type="button" class="btn btn-success" data-dismiss="modal" (click)="confirm()">Proceed <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      <button type="button" class="btn btn-danger" data-dismiss="modal" (click)="modal.dismiss('Cross click')">Close</button>
+  </div>
+</ng-template>

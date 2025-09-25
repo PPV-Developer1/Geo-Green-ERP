@@ -1,0 +1,63 @@
+[
+    {
+      "date": "01/03/2022",
+      "branch": "Chennai",
+      "bill": "143",
+      "referenceNumber": "PO-001",
+      "vendorName": "PONNIE Electrical",
+      "status": "DRAFT",
+      "dueDate": "03/03/2022",
+      "balanceDue" : "1,000"
+    },
+    {
+      "date": "03/03/2022",
+      "branch": "Chennai",
+      "bill": "123",
+      "referenceNumber": "PO-123",
+      "vendorName": "SAI Foundation",
+      "status": "PAID",
+      "dueDate": "03/03/2022",
+      "balanceDue" : "1,000"
+    },
+    {
+      "date": "03/03/2022",
+      "branch": "Chennai",
+      "bill": "987",
+      "referenceNumber": "PO-987",
+      "vendorName": "SAI Foundation",
+      "status": "ISSUED",
+      "dueDate": "03/03/2022",
+      "balanceDue" : "1,000"
+    },
+    {
+        "date": "01/03/2022",
+        "branch": "Chennai",
+        "bill": "143",
+        "referenceNumber": "PO-001",
+        "vendorName": "PONNIE Electrical",
+        "status": "DRAFT",
+        "dueDate": "03/03/2022",
+        "balanceDue" : "1,000"
+      },
+      {
+        "date": "03/03/2022",
+        "branch": "Chennai",
+        "bill": "123",
+        "referenceNumber": "PO-123",
+        "vendorName": "SAI Foundation",
+        "status": "PAID",
+        "dueDate": "03/03/2022",
+        "balanceDue" : "1,000"
+      },
+      {
+        "date": "03/03/2022",
+        "branch": "Chennai",
+        "bill": "987",
+        "referenceNumber": "PO-987",
+        "vendorName": "SAI Foundation",
+        "status": "ISSUED",
+        "dueDate": "03/03/2022",
+        "balanceDue" : "1,000"
+      }
+  ]
+  

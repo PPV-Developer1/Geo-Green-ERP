@@ -1,0 +1,360 @@
+<div class="col-md-12">
+  <table>
+    <tr>
+      <td style="width: 10px;">
+        <h1><small></small></h1>
+      </td>
+      <td style="width: 250px;">
+        <h5>STOCK LIST</h5>
+      </td>
+      <td style="width: 1100px;">
+        <div class="input-group input-group-sm my-3">
+          <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-search"></i></span>
+          </div>
+          <input *ngIf="!Type" class="form-control" type="text" placeholder="Search Item Name or Batch or Description..." (keyup)="updateFilter($event)"/>
+           <input *ngIf="Type"class="form-control" type="text" placeholder="Search Item Name or Batch or Description..." (keyup)="updateFilter_group($event)"/>
+        </div>
+      </td>
+      <td style="width: 100px;"> </td>
+      <td style="width: 300px; text-align: right; vertical-align: center;">
+           <div class="btn-group pull-right" role="group" aria-label="Basic example">
+              <button class="btn btn-success dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+               Action
+             </button>
+            <div class="dropdown-menu">
+
+                <a  class="dropdown-item" href="javascript:void(0);" (click)="Order_by_Item()">Order by Item</a>
+                <a  class="dropdown-item" href="javascript:void(0);" (click)="Order_by_Group()">Order by Group</a>
+
+            </div>
+          </div>
+
+      </td>
+    </tr>
+  </table>
+</div>
+<div *ngIf="selected.length > 0">
+  <div class="modal-header">
+    <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero($event)"> Back</button>
+
+          <span><button type="submit" class="btn btn-warning fa fa-plus pull-right" (click)="create_pur_request()"> Create Purchase Request</button></span>
+
+
+  </div>
+  <div *ngIf="!Type" class="row">
+    <div class="col-lg-12">
+      <div widget class="card">
+        <div class="card-header">
+          <span >Item : {{detail_view.item_cat_name}}</span> || <span>Batch : {{detail_view.batch}}</span>
+          <button *ngIf="selected.length > 0 && user_type === 'super_admin'" type="submit" class="btn  btn-info fa fa-pencil-square-o pull-right" (click)="stockamend()" >Stock Amendment Request</button>
+        </div>
+        <div class="card-body widget-body">
+          <div class="row">
+            <table class="table col-md-4">
+              <tbody>
+                  <tr>
+                    <th>Bill Date</th>
+                    <td>{{detail_view.bill_date | date: 'dd-MM-yyyy'}}</td>
+                  </tr>
+                  <tr>
+                      <th>Inward at</th>
+                      <td>{{detail_view.inward_at | date: 'dd-MM-yyyy HH:mm:ss'}}</td>
+                  </tr>
+                  <tr>
+                      <th>Vendor Name</th>
+                      <td>{{detail_view.bill_vendor_name}}</td>
+                  </tr>
+                  <tr>
+                    <th>Item Category</th>
+                    <td>{{detail_view.item_cat_name}}</td>
+                  </tr>
+                  <tr *ngIf="user_type == 'super_admin' || user_type == 'manager'">
+                      <th >Amount</th>
+                      <td>{{detail_view.amount | indianCurrency}}</td>
+                  </tr>
+              </tbody>
+            </table>
+            <table class="table col-md-4">
+              <tbody>
+                  <tr>
+                      <th>Bill Number</th>
+                      <td>{{detail_view.bill_number}}</td>
+                  </tr>
+                  <tr>
+                      <th>Inward by</th>
+                      <td>{{detail_view.inwarder_name}}</td>
+                  </tr>
+                  <tr>
+                      <th>PO Number</th>
+                      <td>
+                        <span *ngIf="detail_view.bill_po_number != null">{{detail_view.bill_po_number}}</span>
+                        <span *ngIf="detail_view.bill_po_number == null">Non</span></td>
+                  </tr>
+                  <tr>
+                    <th>Item Type</th>
+                    <td *ngIf="detail_view.item_type == 1">Raw Material</td>
+                    <td *ngIf="detail_view.item_type == 2">Product</td>
+                    <td *ngIf="detail_view.item_type == 3">Service</td>
+                  </tr>
+                  <tr *ngIf="user_type == 'super_admin' || user_type == 'manager'">
+                      <th>Tax Percent</th>
+                      <td>{{detail_view.tax_percent}} %</td>
+                  </tr>
+              </tbody>
+            </table>
+            <table class="table col-md-4">
+              <tbody>
+                  <tr>
+                      <th>Bill Entered by</th>
+                      <td>{{detail_view.bill_creater_name}}</td>
+                  </tr>
+                  <tr>
+                      <th>Inward Quantity</th>
+                      <td>{{detail_view.inward_qty}}</td>
+                  </tr>
+                  <tr>
+                      <th>Notes</th>
+                      <td>{{detail_view.notes}}</td>
+                  </tr>
+                  <tr>
+                    <th>Item UOM</th>
+                    <td>{{detail_view.uom}}</td>
+                  </tr>
+                  <tr *ngIf="user_type == 'super_admin' || user_type == 'manager'">
+                      <th>Current Total</th>
+                      <td>{{TotalAmount | indianCurrency}}</td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="row">
+
+            <div class="col-md-12" *ngIf="detail_view.have_serial_number == 1">
+              <span><b>Serial Number : </b> </span>
+              <span *ngFor="let item of serial_number_list">{{item.serial_no}},</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  &nbsp;
+</div>
+
+<div *ngIf="!Type" class="row">
+  <div class="col">
+        <ngx-datatable
+          #table class="custom_table"
+          [headerHeight]="50"
+          [limit]="20"
+          [columnMode]="'force'"
+          [footerHeight]="50"
+          [rowHeight]="'auto'"
+          [rows]="stock_list"
+          [selected]="selected"
+          [selectionType]="'single'"
+          (activate)="onActivate($event)"> <!-- Enable Short-->
+
+        <!--  <ngx-datatable-column name="ID" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.id}}
+            </ng-template>
+          </ngx-datatable-column> -->
+
+          <ngx-datatable-column prop="batch" name="BATCH" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.batch}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="item_name" name="ITEM NAME" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              <span style="font-weight:bold;">{{row.item_name}}</span>
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="item_description" name="DESCRIPTION" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.item_description}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="hsn" name="HSN" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.hsn}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column name="LOT QUANTITY" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.inward_qty}} {{row.uom}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column name="STOCK ON HAND" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.stock}} {{row.uom}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column name="UNIT USED" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.inward_qty - row.stock}} {{row.uom}}
+            </ng-template>
+          </ngx-datatable-column>
+        </ngx-datatable>
+  </div>
+</div>
+
+<div *ngIf="Type" class="row">
+  <div class="col">
+        <ngx-datatable
+          #table class="custom_table"
+          [headerHeight]="50"
+          [limit]="20"
+          [columnMode]="'force'"
+          [footerHeight]="50"
+          [rowHeight]="'auto'"
+          [rows]="stock_list"
+          [selected]="selected"
+          [selectionType]="'single'"
+          (activate)="onActivate($event)"> <!-- Enable Short-->
+
+        <!--  <ngx-datatable-column name="ID" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.id}}
+            </ng-template>
+          </ngx-datatable-column> -->
+
+          <ngx-datatable-column prop="batch" name="BATCH"  *ngIf="!Type">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.batch}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="item_name" name="ITEM NAME" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              <span style="font-weight:bold;">{{row.item_name}}</span>
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="item_description" name="DESCRIPTION" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.item_description}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="hsn" name="HSN" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.hsn}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column name="LOT QUANTITY" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.inward_qty}} {{row.uom}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column name="STOCK ON HAND" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.stock}} {{row.uom}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column name="UNIT USED" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.inward_qty - row.stock}} {{row.uom}}
+            </ng-template>
+          </ngx-datatable-column>
+        </ngx-datatable>
+  </div>
+</div>
+
+<ng-template #AmendStock let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">STOCK AMENDMENT</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="StockAmd" (ngSubmit)="SubmitAmendment(StockAmd.value)">
+      <div class="row">
+        <div class="form-group col-4">
+          New Stock Value
+        </div>
+        <div class="form-group col-6">
+          <input formControlName="new_stock" type="number" class="form-control" id="input-11">
+          <span class="help-block text-danger" *ngIf="StockAmd.get('new_stock').touched && StockAmd.get('new_stock').hasError('required')">Enter New Stock Qty!</span>
+        </div>
+        <div class="form-group col-4">
+          Amendment Reason
+        </div>
+        <div class="form-group col-6">
+          <input formControlName="reason" type="text" class="form-control" id="input-11" placeholder="Enter Reason for changing the quantity">
+          <span class="help-block text-danger" *ngIf="StockAmd.get('reason').touched && StockAmd.get('reason').hasError('required')">Enter Reason!</span>
+          <span class="help-block text-danger" *ngIf="StockAmd.get('reason').touched && StockAmd.get('reason').hasError('minlength')">Minimum 3 Letters</span>
+        </div>
+        <div class="col-12">
+          <div class="row justify-content-center">
+            <button [disabled]="loading" type="submit" class="btn btn-success">Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #purchaseorder let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">PURCHASE ORDER</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="po" (ngSubmit)="Submit(po.value)">
+      <div class="row">
+        <div class="form-group col-4">
+          Item
+       </div>
+       <div class="form-group col-6">
+        <!-- <select formControlName="item" class="form-control">
+          <option value="0">Select Item</option>
+          <option *ngFor= "let view of item_list" value="{{view.item_id}}">{{view.name}}</option>
+        </select> -->
+
+        <ng-select formControlName="item"  class=" form-control custom-select" [clearable]="false" >
+          <ng-option *ngFor= "let view of item_list" value="{{view.item_id}}" class="form-control">
+            {{view.name}}
+          </ng-option>
+        </ng-select>
+         <span class="help-block text-danger" *ngIf="po.get('item').touched && po.get('item').hasError('required')">Select Item!</span>
+       </div>
+        <div class="form-group col-4">
+           Stock Value
+        </div>
+        <div class="form-group col-6">
+          <input formControlName="quantity" type="number" class="form-control" id="input-11">
+          <span class="help-block text-danger" *ngIf="po.get('quantity').touched && po.get('quantity').hasError('required')">Enter the Quantity!</span>
+        </div>
+        <div class="form-group col-4">
+          Description
+        </div>
+        <div class="form-group col-6">
+          <input formControlName="description" type="text" class="form-control" id="input-11" placeholder="Enter Description">
+          <span class="help-block text-danger" *ngIf="po.get('description').touched && po.get('description').hasError('required')">Enter New Stock Qty!</span>
+          <span class="help-block text-danger" *ngIf="po.get('description').touched && po.get('description').hasError('minlength')">Minimum 3 Letters</span>
+        </div>
+        <div class="col-12">
+          <div class="row justify-content-center">
+            <button [disabled]="loading" type="submit" class="btn btn-success">Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+
+

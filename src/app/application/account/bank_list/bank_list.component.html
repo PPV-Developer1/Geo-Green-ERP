@@ -1,0 +1,705 @@
+<div *ngIf="selected.length == 0 && !show  ">
+    <div class="row">
+        <div class="col-md-12">
+            <table>
+              <tr>
+                <td style="width: 10px;">
+                  <h1><small></small></h1>
+                </td>
+                <td style="width: 300px;">
+                  <h5>Account List</h5>
+                </td>
+                <td style="width: 950px;">
+                  <div class="input-group input-group-sm my-3">
+                  </div>
+                </td>
+                <td style="width: 100px;"> </td>
+                <td style="width: 100px; text-align: center; vertical-align: center;">
+                </td>
+                <td style="width: 200px; text-align: center; vertical-align: center;">
+                  <div class="btn-group" role="group" aria-label="Basic example">
+                    <button type="button" class="btn btn-success fa fa-plus" (click)="AccountAddButton()">Account</button>
+                  </div>
+                </td>
+              </tr>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <ngx-datatable
+                #table
+                class="custom_table"
+                [headerHeight]="50"
+                [limit]="10"
+                [columnMode]="'force'"
+                [footerHeight]="50"
+                [rowHeight]="'auto'"
+                [rows]="bankData"
+                [selected]="selected"
+                [selectionType]="'single'"
+                (activate)="onActivate($event)">
+
+                <ngx-datatable-column prop="account_name" name="ACCOUNT NAME"  >
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                        {{row.account_name}}
+                    </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column prop="mode" name="ACCOUNT MODE">
+                    <ng-template  ngx-datatable-cell-template let-row="row">
+                        <span *ngIf="row.mode === 1 " >
+                            Bank
+                        </span>
+                        <span *ngIf="row.mode === 2 " >
+                            Cash
+                        </span>
+                        <span *ngIf="row.mode === 3 " >
+                            Internal
+                        </span>
+
+                    </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column prop="balance" name="BALANCE">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                    <span style="font-weight:bold;"> {{row.balance | indianCurrency}} </span>
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="STATUS">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      <label *ngIf="row.status == 1" style="color:green"><strong>Active</strong></label>
+                      <label *ngIf="row.status == 0" style="color:#ec300f"><strong>Disabled</strong></label>
+                    </ng-template>
+                </ngx-datatable-column>
+            </ngx-datatable>
+        </div>
+    </div>
+</div>
+&nbsp;
+<div *ngIf="selected.length == 0 && !show">
+  <div class="row">
+      <div class="col-md-12">
+          <table>
+            <tr>
+              <td style="width: 10px;">
+                <h1><small></small></h1>
+              </td>
+              <td style="width: 300px;">
+                <h5>Expense List</h5>
+              </td>
+              <td style="width: 950px;">
+                <div class="input-group input-group-sm my-3">
+                </div>
+              </td>
+              <td style="width: 100px;"> </td>
+              <td style="width: 100px; text-align: center; vertical-align: center;">
+              </td>
+              <td style="width: 200px; text-align: center; vertical-align: center;">
+                <div class="btn-group" role="group" aria-label="Basic example">
+                  <button type="button" class="btn btn-success fa fa-plus" (click)="ExpenseAddButton()">Account</button>
+                </div>
+              </td>
+            </tr>
+          </table>
+      </div>
+  </div>
+
+  <div class="row">
+      <div class="col">
+          <ngx-datatable
+              #table
+              class="custom_table"
+              [headerHeight]="50"
+              [limit]="10"
+              [columnMode]="'force'"
+              [footerHeight]="50"
+              [rowHeight]="'auto'"
+              [rows]="expenseData"
+              [selected]="selected"
+              [selectionType]="'single'"
+              (activate)="onActivate_expense($event)">
+
+              <ngx-datatable-column prop="account_type"  name="ACCOUNT TYPE"  >
+                <ng-template ngx-datatable-cell-template let-row="row">
+
+                    <span *ngIf="row.account_type == 1">Fixed Asset</span>
+                    <span *ngIf="row.account_type == 2">Other Current Asset</span>
+                    <span *ngIf="row.account_type == 3">Other Liability</span>
+                    <span *ngIf="row.account_type == 4">Other Current Asset</span>
+                    <span *ngIf="row.account_type == 5">Expense</span>
+                    <span *ngIf="row.account_type == 6">Cost Of Goods Sold</span>
+                    <span *ngIf="row.account_type == 7">Other Expense</span>
+
+                </ng-template>
+            </ngx-datatable-column>
+              <ngx-datatable-column prop="account_name"  name="ACCOUNT NAME"  >
+                  <ng-template ngx-datatable-cell-template let-row="row">
+                      {{row.account_name}}
+                  </ng-template>
+              </ngx-datatable-column>
+
+
+              <ngx-datatable-column name="STATUS">
+                  <ng-template ngx-datatable-cell-template let-row="row">
+                    <label *ngIf="row.status == 1" style="color:green"><strong>Active</strong></label>
+                    <label *ngIf="row.status == 0" style="color:#ec300f"><strong>Disabled</strong></label>
+                  </ng-template>
+              </ngx-datatable-column>
+          </ngx-datatable>
+      </div>
+   </div>
+ </div>
+
+<ng-template #add_account let-modal>
+    <div class="row bottom-10">
+        <div class="col">
+            <div widget class="card">
+                <div class="card-header">
+                    <span>ADD NEW ACCOUNT</span>
+                    <div class="widget-controls">
+                        <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+                        <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+                        <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+                        <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+                        <a data-widgster="close" (click)="close()" href="#" class="transition"><i class="fa fa-times"></i></a>
+                    </div>
+                </div>
+                <div class="card-body widget-body" >
+
+                    <form class="row" [formGroup]="addAccount" (ngSubmit)="newAccount(addAccount.value)">
+                        <div class="form-group col-md-5">
+                            <input type="text" formControlName="account_name"  class="form-control" placeholder="Account Name">
+                            <span class="help-block text-danger" *ngIf="addAccount.get('account_name').touched && addAccount.get('account_name').hasError('required')">Name Required !</span>
+                            <span class="help-block text-danger" *ngIf="addAccount.get('account_name').touched && addAccount.get('account_name').hasError('minlength')">Minimum 3 Letters</span>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <select class="form-control" formControlName="mode">
+                                <option value="0" >Select Account Type</option>
+                                <option value="1">BANK</option>
+                                <option value="2">CASH</option>
+                                <!-- <option value="3">INTERNAL</option> -->
+                            </select>
+                            <span class="help-block text-danger" *ngIf="addAccount.get('type').touched && addAccount.get('type').hasError('required')">Must Select !</span>
+                            <span class="help-block text-danger" *ngIf="addAccount.get('type').touched && addAccount.get('type').hasError('min')">Select One Type</span>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <input type="number" formControlName="opening_balance" class="form-control" placeholder="Opening Balance">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <button [disabled]="loading" type="submit"  class="btn btn-info">Create Account<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+                        </div>
+                    </form>
+                    <p class="text-danger fa fa-star "> Account cannot be delete once it created</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #add_expense let-modal>
+  <div class="row bottom-10">
+      <div class="col">
+          <div widget class="card">
+              <div class="card-header">
+                  <span>ADD NEW ACCOUNT</span>
+                  <div class="widget-controls">
+                      <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+                      <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+                      <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+                      <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+                      <a data-widgster="close" (click)="close()" href="#" class="transition"><i class="fa fa-times"></i></a>
+                  </div>
+              </div>
+              <div class="card-body widget-body" >
+
+                  <form class="row" [formGroup]="addExpense" (ngSubmit)="newExpense(addExpense.value)">
+                      <div class="form-group col-md-5">
+                          <input type="text" formControlName="account_name"  class="form-control" placeholder="Account Name">
+                          <span class="help-block text-danger" *ngIf="addExpense.get('account_name').touched && addExpense.get('account_name').hasError('required')">Name Required !</span>
+                          <span class="help-block text-danger" *ngIf="addExpense.get('account_name').touched && addExpense.get('account_name').hasError('minlength')">Minimum 3 Letters</span>
+                      </div>
+                      <div class="form-group col-md-3">
+                          <select class="form-control" formControlName="mode">
+                            <optgroup label="Assets">
+                              <option  value="1" >Fixed Asset</option>
+                              <option  value="2" >Other Current Asset</option>
+                            </optgroup>
+                            <optgroup label="Liability">
+                              <option  value="3" >Other Liability</option>
+                              <option  value="4" >Other Current Liability</option>
+                            </optgroup>
+                            <optgroup label="Expense">
+                              <option  value="5" >Expense</option>
+                              <option  value="6" >Cost Of Goods Sold</option>
+                              <option  value="7" >Other Expense</option>
+                            </optgroup>
+                          </select>
+                          <!-- <ng-select [formControlName]="'mode'" [ngModelOptions]="{standalone: true}" appendTo ="body" >
+                            <ng-optionGroup label="Assets">
+                              <ng-option value="1">Fixed Asset</ng-option>
+                              <ng-option value="2">Other Current Asset</ng-option>
+                            </ng-optionGroup>
+                            <ng-optionGroup label="Liability">
+                              <ng-option value="3">Other Liability</ng-option>
+                              <ng-option value="4">Other Current Liability</ng-option>
+                            </ng-optionGroup>
+                            <ng-optionGroup label="Expense">
+                              <ng-option value="5">Expense</ng-option>
+                              <ng-option value="6">Cost Of Goods Sold</ng-option>
+                              <ng-option value="7">Other Expense</ng-option>
+                            </ng-optionGroup>
+                          </ng-select> -->
+
+                        </div>
+                      <div class="form-group col-md-2">
+                          <button [disabled]="loading"  type="submit"  class="btn btn-info">Create Expense <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+                      </div>
+                  </form>
+                  <p class="text-danger fa fa-star "> Expense cannot be delete once it created</p>
+              </div>
+          </div>
+      </div>
+  </div>
+</ng-template>
+<ng-template #edit_account let-modal>
+    <div class="row bottom-10">
+        <div class="col">
+            <div widget class="card">
+                <div class="card-header">
+                    <span>Edit ACCOUNT Details</span>
+                    <div class="widget-controls">
+                        <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+                        <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+                        <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+                        <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+                        <a data-widgster="close" (click)="close()" href="#" class="transition"><i class="fa fa-times"></i></a>
+                    </div>
+                </div>
+                <div class="card-body widget-body" >
+                    <form class="row" [formGroup]="addAccount" (ngSubmit)="editAccount(addAccount.value)">
+                        <div class="form-group col-md-3">
+                            <input type="text" formControlName="account_name"  class="form-control" placeholder="Account Name">
+                            <span class="help-block text-danger" *ngIf="addAccount.get('account_name').touched && addAccount.get('account_name').hasError('required')">Name Required !</span>
+                            <span class="help-block text-danger" *ngIf="addAccount.get('account_name').touched && addAccount.get('account_name').hasError('minlength')">Minimum 3 Letters</span>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <select class="form-control" formControlName="mode">
+                                <option value="0" >Select Account Type</option>
+                                <option value="1">BANK</option>
+                                <option value="2">CASH</option>
+                                <!-- <option value="3">INTERNAL</option> -->
+                            </select>
+                            <span class="help-block text-danger" *ngIf="addAccount.get('mode').touched && addAccount.get('mode').hasError('required')">Must Select !</span>
+                            <span class="help-block text-danger" *ngIf="addAccount.get('mode').touched && addAccount.get('mode').hasError('min')">Select One Type</span>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <input type="number" formControlName="opening_balance" class="form-control" placeholder="Opening Balance" readonly>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <button [disabled]="loading" type="submit"  class="btn btn-info">Update Account <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #edit_expense let-modal>
+  <div class="row bottom-10">
+      <div class="col">
+          <div widget class="card">
+              <div class="card-header">
+                  <span>Edit Expense Details</span>
+                  <div class="widget-controls">
+                      <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+                      <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+                      <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+                      <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+                      <a data-widgster="close" (click)="close()" href="#" class="transition"><i class="fa fa-times"></i></a>
+                  </div>
+              </div>
+              <div class="card-body widget-body" >
+                  <form class="row" [formGroup]="addExpense"  (ngSubmit)="submitAccount_expense(addExpense.value)">
+                      <div class="form-group col-md-3">
+                          <input type="text" formControlName="account_name"  class="form-control" placeholder="Account Name">
+                          <span class="help-block text-danger" *ngIf="addExpense.get('account_name').touched && addExpense.get('account_name').hasError('required')">Name Required !</span>
+                          <span class="help-block text-danger" *ngIf="addExpense.get('account_name').touched && addExpense.get('account_name').hasError('minlength')">Minimum 3 Letters</span>
+                      </div>
+
+                      <div class="form-group col-md-3">
+                        <select class="form-control" formControlName="mode">
+                          <optgroup label="Assets">
+                            <option  value="1" >Fixed Asset</option>
+                            <option  value="2" >Other Current Asset</option>
+                          </optgroup>
+                          <optgroup label="Liability">
+                            <option  value="3" >Other Liability</option>
+                            <option  value="4" >Other Current Liability</option>
+                          </optgroup>
+                          <optgroup label="Expense">
+                            <option  value="5" >Expense</option>
+                            <option  value="6" >Cost Of Goods Sold</option>
+                            <option  value="7" >Other Expense</option>
+                          </optgroup>
+                        </select>
+                        <span class="help-block text-danger" *ngIf="addAccount.get('mode').touched && addAccount.get('mode').hasError('required')">Must Select !</span>
+                        <span class="help-block text-danger" *ngIf="addAccount.get('mode').touched && addAccount.get('mode').hasError('min')">Select One Type</span>
+                    </div>
+
+                      <div class="form-group col-md-2">
+                          <button [disabled]="loading"  type="submit"  class="btn btn-info"> Update Expense <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+                      </div>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+</ng-template>
+<div *ngIf="selected.length > 0">
+    <div class="modal-header">
+        <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero()"> Back</button>
+        <h2 class="modal-title">ACCOUNT DETAILS</h2>
+        <button *ngIf="this.user_type == 'super_admin'" class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Action
+        </button>
+        <div class="dropdown-menu">
+            <a class="dropdown-item" href="javascript:void(0);" (click)="EditAccount()">Edit Account</a>
+            <a *ngIf="detail_view.status === 1" class="dropdown-item" href="javascript:void(0);" (click)="DisableAccount()">Disable This Account</a>
+            <a *ngIf="detail_view.status === 0" class="dropdown-item" href="javascript:void(0);" (click)="EnableAccount()">Enable This Account</a>
+        </div>
+
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col bottom-30 typography">
+                <div class="card card-outline-info">
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-4">Account Name</dt>
+                            <dd class="col-sm-8">{{detail_view.account_name}}</dd>
+
+                            <dt class="col-sm-4">Account Mode</dt>
+                            <dd class="col-sm-8">
+                                <span *ngIf="detail_view.type === 1 " >
+                                    Bank
+                                </span>
+                                <span *ngIf="detail_view.type === 2 " >
+                                    Cash
+                                </span>
+                                <span *ngIf="detail_view.type === 3 " >
+                                    Internal
+                                </span>
+                            </dd>
+
+                            <dt class="col-sm-4">Opening Balance</dt>
+                            <dd class="col-sm-8">{{detail_view.opening_balance | indianCurrency}}</dd>
+
+                            <dt class="col-sm-4">Current Balance</dt>
+                            <dd class="col-sm-8">{{detail_view.balance | indianCurrency}}</dd>
+
+                            <dt class="col-sm-4">Current Status</dt>
+                            <dd class="col-sm-8">
+                                <span *ngIf="detail_view.status === 0 " >
+                                    Disabled
+                                </span>
+                                <span *ngIf="detail_view.status === 1 " >
+                                    Active
+                                </span>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form class="row" [formGroup]="date"  (ngSubmit)="download(date.value,'bank')">
+            <div class="form-group col-md-1">
+            </div>
+            <div class="form-group row text-sm-right col-md-4">
+                <label class="col-sm-2 form-control-label m-t-5">From</label>
+                <div class="col-sm-10">
+                    <input type="date" formControlName="fromdate"  class="form-control">
+                </div>
+            </div>
+            <div class="form-group row text-sm-right col-md-4">
+                <label class="col-sm-2 form-control-label m-t-5">To</label>
+                <div class="col-sm-10">
+                    <input type="date" formControlName="todate" class="form-control">
+                </div>
+            </div>
+            <div class="form-group col-md-2">
+                <button class="btn btn-main" class="btn btn-success" type="submit" >Download Report</button>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <div class="col">
+            <div widget class="card">
+                <div class="card-header">
+                    <span class="text-uppercase">Account Statement</span>
+                    <div class="widget-controls">
+                      <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+                      <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+                      <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+                      <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+                      <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+                    </div>
+                </div>
+                <div class="card-body widget-body">
+                    <!-- For Bank Statement-->
+                    <ngx-datatable
+                        #table
+                        class="custom_table"
+                        [headerHeight]="50"
+                        [limit]="10"
+                        [columnMode]="'force'"
+                        [footerHeight]="50"
+                        [rowHeight]="50"
+                        [rows]="transeaction_det">
+
+                        <ngx-datatable-column prop="tran_date"  [width]="120"  name="DATE" >
+                            <ng-template ngx-datatable-cell-template let-row = "row">
+                                {{row.tran_date | date: 'dd-MM-yyyy'}}
+                            </ng-template>
+                        </ngx-datatable-column>
+
+                        <ngx-datatable-column [width]="100" name="MODE">
+                            <ng-template ngx-datatable-cell-template let-row="row">
+                                  <span *ngIf="row.tran_mode === 1 " >
+                                    Wire
+                                </span>
+                                <span *ngIf="row.tran_mode === 2 " >
+                                    Cash
+                                </span>
+                                <span *ngIf="row.tran_mode === 3 " >
+                                    Cheque
+                                </span>
+                            </ng-template>
+                          </ngx-datatable-column>
+
+                        <ngx-datatable-column  prop="reference" [width]="200" name="REFERENCE">
+                            <ng-template ngx-datatable-cell-template let-row="row">
+                                {{row.reference}}
+                            </ng-template>
+                        </ngx-datatable-column>
+
+                        <ngx-datatable-column  prop="credit" [width]="110" name="CREDIT">
+                            <ng-template ngx-datatable-cell-template let-row="row">
+                              <span style="font-weight:bold;"> {{row.credit | indianCurrency}} </span>
+                              </ng-template>
+                          </ngx-datatable-column>
+
+                        <ngx-datatable-column prop="debit" [width]="110" name="DEBIT">
+                          <ng-template ngx-datatable-cell-template let-row="row">
+                            <span style="font-weight:bold;"> {{row.debit | indianCurrency}} </span>
+                            </ng-template>
+                        </ngx-datatable-column>
+
+                        <ngx-datatable-column prop="balance" name="BALANCE">
+                            <ng-template ngx-datatable-cell-template let-row="row">
+                              <span style="font-weight:bold;"> {{row.balance | indianCurrency}} </span>
+                              </ng-template>
+                        </ngx-datatable-column>
+
+                        <ngx-datatable-column prop="description" name="DESCRIPTION">
+                            <ng-template ngx-datatable-cell-template let-row="row">
+                                {{row.tran_details}}
+                            </ng-template>
+                        </ngx-datatable-column>
+
+                        <ngx-datatable-column  prop="notes" [width]="250" name="COMMAND">
+                            <ng-template ngx-datatable-cell-template let-row="row">
+                                {{row.notes}}
+                              </ng-template>
+                          </ngx-datatable-column>
+
+                    </ngx-datatable>
+                    <!-- For CASH Statement-->
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="show">
+  <div class="modal-header">
+      <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero()"> Back</button>
+      <h2 class="modal-title">EXPENCE DETAILS</h2>
+      <button *ngIf="this.user_type == 'super_admin'" class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Action
+      </button>
+      <div class="dropdown-menu">
+          <a class="dropdown-item" href="javascript:void(0);" (click)="EditAccount_expense()">Edit Expence</a>
+          <a *ngIf="expense_detail_view.status === 1" class="dropdown-item" href="javascript:void(0);" (click)="DisableAccount_expense()">Disable This Account</a>
+          <a *ngIf="expense_detail_view.status === 0" class="dropdown-item" href="javascript:void(0);" (click)="EnableAccount_expense()">Enable This Account</a>
+      </div>
+
+  </div>
+  <div class="modal-body">
+      <div class="row">
+          <div class="col bottom-30 typography">
+              <div class="card card-outline-info">
+                  <div class="card-body">
+                      <dl class="row">
+                          <dt class="col-sm-4">Account Name</dt>
+                          <dd class="col-sm-8">{{expense_detail_view.account_name}}</dd>
+
+                          <dt class="col-sm-4">Account Mode</dt>
+                          <dd class="col-sm-8">
+                            <span *ngIf="expense_detail_view.account_type == null " >
+                               Not Declered
+                          </span>
+                              <span *ngIf="expense_detail_view.account_type === 1 " >
+                                  Fixed Asset
+                              </span>
+                              <span *ngIf="expense_detail_view.account_type === 2 " >
+                                  Other Current Asset
+                              </span>
+                              <span *ngIf="expense_detail_view.account_type === 3 " >
+                                  Other Current Liability
+                              </span>
+                              <span *ngIf="expense_detail_view.account_type === 4 " >
+                                Other  Liability
+                              </span>
+                              <span *ngIf="expense_detail_view.account_type === 5 " >
+                                 Expense
+                              </span>
+                              <span *ngIf="expense_detail_view.account_type === 6" >
+                               Cost Of Goods Sold
+                              </span>
+                              <span *ngIf="expense_detail_view.account_type === 7 " >
+                                Other Expense
+                               </span>
+                          </dd>
+
+                         <!--  <dt class="col-sm-4">Opening Balance</dt>
+                          <dd class="col-sm-8">{{detail_view.opening_balance | indianCurrency}}</dd>
+
+                          <dt class="col-sm-4">Current Balance</dt>
+                          <dd class="col-sm-8">{{detail_view.balance | indianCurrency}}</dd> -->
+
+                          <dt class="col-sm-4">Current Status</dt>
+                          <dd class="col-sm-8">
+                              <span *ngIf="expense_detail_view.status === 0 " >
+                                  Disabled
+                              </span>
+                              <span *ngIf="expense_detail_view.status === 1 " >
+                                  Active
+                              </span>
+                          </dd>
+                      </dl>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <form class="row" [formGroup]="date"  (ngSubmit)="download(date.value,'expense')">
+          <div class="form-group col-md-1">
+          </div>
+
+          <div class="form-group row text-sm-right col-md-4">
+              <label class="col-sm-2 form-control-label m-t-5">From</label>
+              <div class="col-sm-10">
+                  <input type="date" formControlName="fromdate" class="form-control">
+              </div>
+          </div>
+          <div class="form-group row text-sm-right col-md-4">
+              <label class="col-sm-2 form-control-label m-t-5">To</label>
+              <div class="col-sm-10">
+                  <input type="date" formControlName="todate" class="form-control">
+              </div>
+          </div>
+          <div class="form-group col-md-2">
+              <button class="btn btn-main" class="btn btn-success" type="submit">Download Report</button>
+          </div>
+        </form>
+  </div>
+  <div class="modal-footer">
+      <div class="col">
+          <div widget class="card">
+              <div class="card-header">
+                  <span class="text-uppercase">Account Statement</span>
+                  <div class="widget-controls">
+                    <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+                    <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+                    <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+                    <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+                    <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+                  </div>
+              </div>
+              <div class="card-body widget-body">
+                  <!-- For Bank Statement-->
+                  <ngx-datatable
+                      #table
+                      class="custom_table"
+                      [headerHeight]="50"
+                      [limit]="10"
+                      [columnMode]="'force'"
+                      [footerHeight]="50"
+                      [rowHeight]="50"
+                      [rows]="expense_transeaction_det">
+
+                      <ngx-datatable-column prop="exp_date" name="TRANSACTION DATE" >
+                          <ng-template ngx-datatable-cell-template let-row = "row">
+                              {{row.exp_date  | date: 'dd-MM-yyyy'}}
+                          </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column  name="MODE">
+                          <ng-template ngx-datatable-cell-template let-row="row">
+                                <span *ngIf="row.exp_mode === 1 " >
+                                  Wire
+                              </span>
+                              <span *ngIf="row.exp_mode === 2 " >
+                                  Cash
+                              </span>
+                              <span *ngIf="row.exp_mode === 3 " >
+                                  Cheque
+                              </span>
+                          </ng-template>
+                        </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="amount" name="AMOUNT">
+                          <ng-template ngx-datatable-cell-template let-row="row">
+                            <span style="font-weight:bold;"> {{row.amount | indianCurrency}} </span>
+                            </ng-template>
+                        </ngx-datatable-column>
+
+                      <ngx-datatable-column name="SERVICE">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                          <span *ngIf="row.exp_type === 1 " >
+                            Goods
+                        </span>
+                        <span *ngIf="row.exp_type === 2 " >
+                            Service
+                        </span>
+                    </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="tax_amount" name="TAX">
+                          <ng-template ngx-datatable-cell-template let-row="row">
+                            <span style="font-weight:bold;"> {{row.tax_amount | indianCurrency}} </span>
+                            </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="name_of_expense" name="EXPENSE">
+                          <ng-template ngx-datatable-cell-template let-row="row">
+                              {{row.name_of_expense}}
+                          </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="notes" name="COMMAND">
+                          <ng-template ngx-datatable-cell-template let-row="row">
+                              {{row.notes}}
+                            </ng-template>
+                        </ngx-datatable-column>
+
+                  </ngx-datatable>
+                  <!-- For CASH Statement-->
+
+              </div>
+          </div>
+      </div>
+  </div>
+</div>

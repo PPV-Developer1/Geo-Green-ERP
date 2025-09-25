@@ -1,0 +1,415 @@
+<div *ngIf="selected.length == 0">
+  <div class="col-md-12">
+    <table>
+      <tr>
+        <td style="width: 10px;">
+          <h1><small></small></h1>
+        </td>
+        <td style="width: 250px;">
+          <h5>ASSOCIATION</h5>
+        </td>
+        <td style="width: 1100px;">
+          <div class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input class="form-control" type="text" placeholder="Search Project Name  and Product Category..." (keyup)="updateFilter($event)"/>
+          </div>
+        </td>
+        <td style="width: 100px;"> </td>
+        <td style="width: 100px; text-align: center; vertical-align: center;">
+        </td>
+        <td style="width: 200px; text-align: center; vertical-align: center;">
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="col">
+    <ngx-datatable
+      #table
+      class="custom_table"
+      [headerHeight]="50"
+      [limit]="15"
+      [columnMode]="'force'"
+      [footerHeight]="50"
+      [rowHeight]="'auto'"
+      [rows]="asso_view"
+      [selected]="selected"
+      [selectionType]="'single'"
+      (activate)="onActivate($event)">
+
+      <ngx-datatable-column prop="id" name="ID" [width]="50">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.id}}
+          </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="created_by" name="CREATED BY" [width]="100">
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.created_by}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="project_id" name="PROJECT ID" [width]="70">
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.project_id}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="project_name" name="PROJECT NAME" [width]="200">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          <span style="font-weight:bold;">{{row.project_name}}</span>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="category_name" name="PRODUCT CATEGORY" [width]="125">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          <span style="font-weight:bold;"> {{row.category_name}}</span>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column prop="description" name="DESCRIPTION" [width]="180">
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.description}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column   name="STATUS" [width]="50">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          <span *ngIf="row.connection === null && row.has_sub_item == 0" style="color: blue;">Created</span>
+          <span *ngIf="row.connection != null && row.has_sub_item == 0" style="color: green;">Completed</span>
+          <span *ngIf="row.type == '1'" style="color: green;">Completed</span>
+
+          <span *ngIf=" row.has_sub_item == 1 && row.level == 0" style="color: blue;">Created</span>
+          <span *ngIf=" row.has_sub_item == 1 && row.level == 1" style="color: blue;">Processing</span>
+          <span *ngIf=" row.has_sub_item == 1 && row.level == 2" style="color: blue;">Processing</span>
+          <span *ngIf=" row.has_sub_item == 1 && row.level == 3" style="color: blue;">Processing</span>
+          <span *ngIf=" row.has_sub_item == 1 && row.level == 4" style="color: green;">Completed</span>
+        </ng-template>
+
+      </ngx-datatable-column>
+    </ngx-datatable>
+  </div>
+</div>
+<div *ngIf="selected.length > 0">
+  <div class="modal-header">
+    <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero($event)"> Back</button>
+    <span *ngIf="detail_view.has_sub_item === 0 && detail_view.connection === null"><button type="submit" class="btn btn-primary fa fa-plus pull-right" (click)="add_from_store($event)"> Add From Store</button> </span>
+    <span *ngIf="detail_view.has_sub_item === 0 && detail_view.connection === null"><button type="submit" class="btn btn-warning fa fa-plus pull-right" (click)="create_pur_request($event)"> Create Purchase Request</button></span>
+    <span *ngIf="detail_view.has_sub_item === 1"><button type="submit" class="btn btn-success fa fa-plus pull-right" (click)="call_add_level1()"> Add New Byproduct</button> </span>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div widget class="card">
+        <div class="card-header">
+          <span>Association Detailed View</span>
+          <div class="widget-controls">
+              <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+              <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+              <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+              <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+              <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+          </div>
+        </div>
+        <div class="card-body widget-body">
+          <div class="row">
+            <table class="table col-md-6">
+              <tbody>
+                  <!-- <tr>
+                    <th>Project ID</th>
+                    <td>{{detail_view.project_id}}</td>
+                  </tr> -->
+                  <tr>
+                      <th>Project Name</th>
+                      <td>{{detail_view.project_name}}</td>
+                  </tr>
+                  <tr>
+                      <th>Project Created By</th>
+                      <td>{{detail_view.created_by}}</td>
+                  </tr>
+                  <tr>
+                    <th>Level</th>
+                    <td *ngIf="detail_view.has_sub_item == 1">{{asso_percentage}} %</td>
+                    <td *ngIf="detail_view.has_sub_item == 0">{{connection_id}} %</td>
+                </tr>
+              </tbody>
+            </table>
+            <table class="table col-md-6">
+              <tbody>
+                <tr>
+                  <th>Part ID</th>
+                  <td>{{detail_view.id}}</td>
+                </tr>
+                <tr>
+                    <th>Part Category</th>
+                    <td>{{detail_view.category_name}}</td>
+                </tr>
+                <tr>
+                  <th>Part Description</th>
+                  <td>{{detail_view.description}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div widget class="card" *ngIf="detail_view.has_sub_item == 0">
+    <div class="card-header">
+      <span class="text-uppercase">Connected Item</span>
+    </div>
+    <div class="card-body">
+      <span *ngIf="detail_view.connection === null">
+        There is no Item Linked with this Association
+      </span>
+      <span *ngIf="detail_view.connection != null">
+        <div class="row">
+          <table class="table col-md-6">
+            <tbody>
+              <tr>
+                <th>Item Name</th>
+                <td>{{detail_view.con_item_name}}</td>
+              </tr>
+              <tr>
+                <th>HSN Code</th>
+                <td>{{detail_view.con_hsn}}</td>
+              </tr>
+              <tr>
+                <th>Quantity</th>
+                <td>{{detail_view.con_qty}}</td>
+              </tr>
+              <tr>
+                <th>Batch</th>
+                <td>{{detail_view.con_batch}}</td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table col-md-6">
+            <tbody>
+                <tr>
+                  <th>Item Description</th>
+                  <td>{{detail_view.con_item_description}}</td>
+                </tr>
+                <tr>
+                  <th>Tax Percent</th>
+                  <td>{{detail_view.con_tax_percent}}</td>
+                </tr>
+                <tr>
+                  <th>UOM</th>
+                  <td>{{detail_view.con_uom}}</td>
+                </tr>
+                <tr>
+                  <th>Notes</th>
+                  <td>{{detail_view.con_notes}}</td>
+                </tr>
+            </tbody>
+          </table>
+        </div>
+      </span>
+    </div>
+  </div>
+  <div widget class="card" *ngIf="detail_view.has_sub_item == 1">
+    <div class="card-header">
+      <span class="text-uppercase">List of Byproducts</span>
+    </div>
+    <div class="card-body">
+      <ngx-datatable
+        #table
+        class="custom_table"
+        [headerHeight]="50"
+        [limit]="10"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="byproduct_details"
+        [selected]="selected"
+        [selectionType]="'single'">
+
+        <!-- <ngx-datatable-column name="ID" [width]="50">
+            <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.id}}
+            </ng-template>
+        </ngx-datatable-column> -->
+
+        <ngx-datatable-column prop="date_time" name="CREATED AT" [width]="100">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.date_time  | date: 'dd-MM-yyyy'}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="creater_name" name="CREATED BY" [width]="100">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.creater_name}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="category_name" name="ITEM CATEGORY" [width]="100">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.category_name}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="description" name="DESCRIPTION" [width]="150">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.description}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="production_id" name="PRODUCTION ID" [width]="80">
+          <ng-template ngx-datatable-cell-template let-row="row">
+             <span *ngIf="row.production_id != null">{{row.production_id}}</span>
+             <span *ngIf="row.production_id === null">Not Asign</span>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="status" name="STATUS" [width]="80">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span *ngIf="row.level == 0" style="color: red;">Created</span>
+            <span *ngIf="row.level == 1" style="color: red;">Moving to Plan</span>
+            <span *ngIf="row.level == 2" style="color: blue;">Waiting for Approval</span>
+            <span *ngIf="row.level == 3" style="color: blue;">Move to Production</span>
+            <span *ngIf="row.level == 4" style="color: green;">Completed</span>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column  name="ACTION" [width]="100">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              <button class="btn btn-info btn-sm fa fa-pencil" (click) = "call_edit_level1(row)"> Edit</button>
+              &nbsp;
+              <button class="btn btn-danger btn-sm fa fa-trash" (click) ="delete_level_1(row.id)"> Delete</button>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </div>
+  </div>
+</div>
+<ng-template #level1_add let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Add New Byproduct</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="AddByProduct" (ngSubmit)="onSubmit(AddByProduct.value)" class="row">
+      <div class="form-group col-md-3">
+        <!-- <select formControlName="category_id" class="form-control">
+          <option *ngFor= "let item of add_options"  value={{item.id}}>{{item.name}}</option>
+        </select> -->
+
+        <ng-select formControlName="category_id"  class=" form-control custom-select"   [clearable]="false" >
+          <ng-option *ngFor= "let view of add_options" value="{{view.id}}" class="form-control">
+            {{view.name}}
+          </ng-option>
+        </ng-select>
+        <span class="help-block text-danger" *ngIf="AddByProduct.get('category_id').touched && AddByProduct.get('category_id').hasError('required')"> Required !</span>
+      </div>
+      <div class="form-group col-md-6">
+        <input formControlName="description" type="text" class="form-control" placeholder="Enter Description">
+        <span class="help-block text-danger" *ngIf="AddByProduct.get('description').touched && AddByProduct.get('description').hasError('required')"> Required !</span>
+        <span class="help-block text-danger" *ngIf="AddByProduct.get('description').touched && AddByProduct.get('description').hasError('minlength')">Minimum 3 Letters</span>
+      </div>
+      <div class="form-group col-md-3">
+        <button [disabled]="loading" type="submit" class="btn btn-info pull-right">Add Byproduct <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+<ng-template #level1_edit let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Update Byproduct</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="AddByProduct" (ngSubmit)="onUpdate(AddByProduct.value)" class="row">
+      <div class="form-group col-md-3">
+        <!-- <select formControlName="category_id" class="form-control">
+          <option *ngFor= "let item of add_options" value={{item.id}}>{{item.name}}</option>
+        </select> -->
+
+        <ng-select formControlName="category_id"  class=" form-control custom-select"   [clearable]="false" >
+          <ng-option *ngFor= "let item of add_options" [value]="item.id" class="form-control">
+            {{item.name}}
+          </ng-option>
+        </ng-select>
+      </div>
+      <div class="form-group col-md-6">
+        <input formControlName="description" type="account" class="form-control" placeholder="Enter Description">
+        <span class="help-block text-danger" *ngIf="AddByProduct.get('description').touched && AddByProduct.get('description').hasError('required')"> Required !</span>
+        <span class="help-block text-danger" *ngIf="AddByProduct.get('description').touched && AddByProduct.get('description').hasError('minlength')">Minimum 3 Letters</span>
+      </div>
+      <div class="form-group col-md-3">
+        <button [disabled]="loading" type="submit" class="btn btn-info pull-right">Update Byproduct <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+<ng-template #AddStore let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Update Byproduct</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="AddFromStore" (ngSubmit)="UpdateToStore(AddFromStore.value)" class="row">
+      <div class="form-group col-md-10">
+        <!-- <select formControlName="stock_id" class="form-control">
+          <option *ngFor= "let item of stock_list" value={{item.stock_id}}>{{item.item_name}} | {{item.batch}}</option>
+        </select> -->
+
+        <ng-select formControlName="stock_id"  class=" form-control custom-select"   [clearable]="false" >
+          <ng-option *ngFor= "let item of stock_list" value="{{item.stock_id}}" class="form-control">
+            {{item.item_name}} | {{item.batch}}
+          </ng-option>
+        </ng-select>
+
+      </div>
+      <div class="form-group col-md-2">
+        <button [disabled]="loading" type="submit" class="btn btn-info pull-right">Add Byproduct <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #purchaseorder let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">PURCHASE ORDER</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="po" (ngSubmit)="Submit(po.value)">
+      <div class="row">
+        <div class="form-group col-4">
+          Item
+       </div>
+       <div class="form-group col-6">
+        <select formControlName="item" class="form-control">
+          <option value="0">select Item</option>
+          <option *ngFor= "let view of item_list" value="{{view.item_id}}">{{view.name}}</option>
+        </select>
+         <span class="help-block text-danger" *ngIf="po.get('item').touched && po.get('item').hasError('required')">Select Item!</span>
+       </div>
+        <div class="form-group col-4">
+           Stock Value
+        </div>
+        <div class="form-group col-6">
+          <input formControlName="quantity" type="number" class="form-control" id="input-11">
+          <span class="help-block text-danger" *ngIf="po.get('quantity').touched && po.get('quantity').hasError('required')">Enter the Quantity!</span>
+        </div>
+        <div class="form-group col-4">
+          Description
+        </div>
+        <div class="form-group col-6">
+          <input formControlName="description" type="text" class="form-control" id="input-11" placeholder="Enter Description">
+          <span class="help-block text-danger" *ngIf="po.get('description').touched && po.get('description').hasError('required')">Enter New Stock Qty!</span>
+          <span class="help-block text-danger" *ngIf="po.get('description').touched && po.get('description').hasError('minlength')">Minimum 3 Letters</span>
+        </div>
+        <div class="col-12">
+          <div class="row justify-content-center">
+            <button [disabled]="loading" type="submit" class="btn btn-success">Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>

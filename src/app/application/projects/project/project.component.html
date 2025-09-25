@@ -1,0 +1,851 @@
+<div *ngIf="selected.length == 0 && create_page == false">
+  <div class="col-md-12">
+    <table>
+      <tr>
+        <td style="width: 10px;">
+          <h1><small></small></h1>
+        </td>
+        <td style="width: 250px;">
+          <h5>PROJECT</h5>
+        </td>
+        <td style="width: 1100px;">
+          <div class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input class="form-control" type="text" placeholder="Search Project by Project Name or Customer Name..." (keyup)="updateFilter($event)"/>
+          </div>
+        </td>
+        <td style="width: 100px;"> </td>
+        <td style="width: 100px; text-align: center; vertical-align: center;">
+        </td>
+        <td style="width: 200px; text-align: center; vertical-align: center;">
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <button type="submit" class="btn btn-success fa fa-plus pull-right" (click)="openCreateProject()"> New Project</button>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="col">
+      <ngx-datatable
+          #table
+          class="custom_table"
+          [headerHeight]="50"
+          [limit]="15"
+          [columnMode]="'force'"
+          [footerHeight]="50"
+          [rowHeight]="'auto'"
+          [rows]="rows"
+          [selected]="selected"
+          [selectionType]="'single'"
+          (activate)="onActivate($event)">
+
+          <!-- <ngx-datatable-column prop="id" [width]="90" name="ID" >
+              <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.id}}
+              </ng-template>
+          </ngx-datatable-column> -->
+
+          <ngx-datatable-column prop="type" [width]="100" name="TYPE">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                  {{row.type}}
+              </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="name" [width]="300" [sortable] = "false" name="NAME">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                  <span style="font-weight:bold;">{{row.name}}</span>
+              </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="capacity" [width]="100" alig name="CAPACITY">
+              <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.capacity}}
+              </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="customer" [width]="300" name="CUSTOMER">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.customer}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="start" [width]="100"  [sortable] = "false" name="START">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.start | date: 'dd-MM-yyyy'}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="end" [width]="100" [sortable] = "false" name="END">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.end | date: 'dd-MM-yyyy'}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column prop="level" [width]="100" name="STATUS" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              <label *ngIf="row.level == 0" style="color:red"><strong>Created</strong></label>
+              <label *ngIf="row.level == 1" style="color:blue"><strong>Processing</strong></label>
+              <label *ngIf="row.level == 2" style="color:blue"><strong>Processing</strong></label>
+              <label *ngIf="row.level == 3" style="color:blue"><strong>Processing</strong></label>
+              <label *ngIf="row.level == 4" style="color:green"><strong>Completed</strong></label>
+            </ng-template>
+          </ngx-datatable-column>
+
+      </ngx-datatable>
+  </div>
+</div>
+
+<div *ngIf="selected.length > 0 && create_page == false">
+  <div class="modal-header" style=" display: flex;flex-wrap: wrap;justify-content: space-between;">
+    <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero($event)"> Back</button>
+    <!-- <button type="submit" class="btn btn-success dropdown-toggle fa fa-plus pull-right" (click)="call_add($event)"> Add New Association</button> -->
+
+      <div class="btn-group mb-3 col-md-3" role="group" aria-label="Basic example">
+             <button type="submit" class="btn btn-outline-success fa fa-pencil-square-o btn-sm"  (click)="edit()"> Edit</button>
+               <button type="submit" class="btn btn-outline-success fa fa-clone btn-sm"  (click)="Clone(detail_view.id)"> Clone</button>
+                    <button class="btn btn-outline-success dropdown-toggle fa fa-plus btn-sm" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Add New Association</button>
+                    <div class="dropdown-menu">
+                          <a class="dropdown-item" href="javascript:void(0);" (click)="call_add($event)" >Add New Association</a>
+                          <a class="dropdown-item" href="javascript:void(0);" (click)="call_add_serial($event)" >Add item</a>
+                  </div>
+      </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div widget class="card">
+        <div class="card-header">
+          <span>PROJECT</span>
+          <div class="widget-controls">
+              <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+              <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+              <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+              <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+              <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+          </div>
+        </div>
+        <div class="card-body widget-body">
+          <div class="row">
+            <table class="table col-md-6">
+              <tbody>
+                  <tr>
+                    <th>Project ID</th>
+                    <td>{{detail_view.id}}</td>
+                  </tr>
+                  <tr>
+                      <th>Date</th>
+                      <td>{{detail_view.date_time |date:'dd-MM-yyyy HH:MM '}}</td>
+                  </tr>
+                  <tr>
+                      <th>Created By</th>
+                      <td>{{detail_view.created_by}}</td>
+                  </tr>
+                  <tr>
+                      <th>Product Type</th>
+                      <td>{{detail_view.type}}</td>
+                  </tr>
+                  <tr>
+                      <th>Referance Number</th>
+                      <td>{{detail_view.reff}}</td>
+                  </tr>
+                  <tr>
+                    <th>Start Date</th>
+                    <td>{{detail_view.start | date: 'dd-MM-yyyy'}}</td>
+                  </tr>
+                  <tr>
+                    <th>Status</th>
+                    <td *ngIf="detail_view.status == 0">Inactive</td>
+                    <td *ngIf="detail_view.status == 1">Active</td>
+                  </tr>
+              </tbody>
+            </table>
+            <table class="table col-md-6">
+              <tbody>
+                  <tr>
+                      <th>Name</th>
+                      <td>{{detail_view.name}}</td>
+                  </tr>
+                  <tr>
+                      <th>Description</th>
+                      <td>{{detail_view.description}}</td>
+                  </tr>
+                  <tr>
+                      <th>Customer</th>
+                      <td>{{detail_view.customer}}</td>
+                  </tr>
+                  <tr>
+                      <th>Capacity</th>
+                      <td>{{detail_view.capacity}}</td>
+                  </tr>
+                  <tr>
+                    <th>End Date</th>
+                    <td>{{detail_view.end | date: 'dd-MM-yyyy'}}</td>
+                  </tr>
+                  <tr>
+                    <th>Level</th>
+                    <!-- <td *ngIf="detail_view.level == 0">New</td>
+                    <td *ngIf="detail_view.level == 1">Move to Production</td>
+                    <td *ngIf="detail_view.level == 2">Completed</td> -->
+                    <td>{{project_level ? project_level + '%' : '0 %'}}</td>
+                  </tr>
+                  <tr>
+                    <th>Remark</th>
+                    <td>{{detail_view.remark}}</td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+
+  <div widget class="card">
+    <div class="card-header">
+      <span class="text-uppercase">List of Association</span>
+    </div>
+    <div class="card-body">
+      <ngx-datatable
+        #table
+        class="custom_table"
+        [headerHeight]="50"
+        [limit]="10"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="asso_view"
+        [selected]="selected"
+        [selectionType]="'single'">
+
+        <ngx-datatable-column prop="id" name="ID" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.id}}
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="date_time" name="CREATED AT">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.date_time  | date: 'dd-MM-yyyy'}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="created_by" name="CREATED BY">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.created_by}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="category_name" name="ITEM CATEGORY">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.category_name}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="description" name="DESCRIPTION" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.description}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="status" name="STATUS">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span *ngIf="row.connection === null && row.has_sub_item == 0" style="color: red;">Created</span>
+            <span *ngIf="row.connection != null && row.has_sub_item == 0" style="color: green;">Completed</span>
+            <span *ngIf="row.type == '1'" style="color: green;">Completed</span>
+
+            <span *ngIf=" row.has_sub_item == 1 && row.level == 0" style="color: red;">Created</span>
+            <span *ngIf=" row.has_sub_item == 1 && row.level == 1" style="color: blue;">Processing</span>
+            <span *ngIf=" row.has_sub_item == 1 && row.level == 2" style="color: blue;">Processing</span>
+            <span *ngIf=" row.has_sub_item == 1 && row.level == 3" style="color: blue;">Processing</span>
+            <span *ngIf=" row.has_sub_item == 1 && row.level == 4" style="color: green;">Completed</span>
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        <ngx-datatable-column name="ACTION" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+              <button class="btn btn-info fa fa-pencil" (click) = "inonActivate(row)"></button>
+              &nbsp;
+              <button class="btn btn-danger fa fa-trash" (click) ="delete_associate(row.id)"></button>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </div>
+  </div>
+
+
+  <div *ngIf="this.pro_serial_item_list != null" widget class="card">
+    <div class="card-header">
+      <span class="text-uppercase">List of Material</span><span> (with serial number)</span>
+    </div>
+    <div class="card-body">
+      <ngx-datatable
+        #table
+        class="custom_table"
+        [headerHeight]="50"
+        [limit]="10"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="pro_serial_item_list"
+        [selected]="selected"
+        [selectionType]="'single'"
+        >
+
+        <ngx-datatable-column prop="date_time" name="CREATED AT">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.date_time  | date: 'dd-MM-yyyy'}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="bill_number" name="bill_number">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.bill_number}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="bill_date" name="bill_date">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.bill_date}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="vendor" name="vendor">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.vendor}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="name" name="ITEM">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.name}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="value" name="QUANTITY">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.value}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <!-- <ngx-datatable-column prop="description" name="DESCRIPTION">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.description}}
+          </ng-template>
+        </ngx-datatable-column> -->
+
+        <ngx-datatable-column prop="notes" name="DESCRIPTION">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.notes}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="ACTION" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+              <button class="btn btn-info fa fa-pencil" (click) = "itemActivate(row)"></button>
+              &nbsp;
+              <button class="btn btn-danger fa fa-trash" (click) ="delete_item(row)"></button>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </div>
+  </div>
+
+
+
+<div *ngIf="this.project_item_List != null" widget class="card">
+    <div class="card-header">
+      <span class="text-uppercase">List of Material</span><span> (without serial number)</span>
+    </div>
+    <div class="card-body">
+      <ngx-datatable
+        #table
+        class="custom_table"
+        [headerHeight]="50"
+        [limit]="10"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="project_item_List"
+        [selected]="selected"
+        [selectionType]="'single'"
+        >
+
+        <ngx-datatable-column prop="date_time" name="CREATED AT">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.date_time  | date: 'dd-MM-yyyy'}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="name" name="ITEM">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.name}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="value" name="QUANTITY">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.value}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        <ngx-datatable-column prop="notes" name="DESCRIPTION">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.notes}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="ACTION" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+              <button class="btn btn-info fa fa-pencil" (click) = "itemActivate(row)"></button>
+              &nbsp;
+              <button class="btn btn-danger fa fa-trash" (click) ="delete_item(row)"></button>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </div>
+  </div>
+</div>
+
+<ng-template #open_associations let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Add New Association</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="AddAssociate" (ngSubmit)="onSubmit(AddAssociate.value)" class="row">
+      <div class="form-group col-md-3">
+
+        <ng-select formControlName="category_id"  class=" form-control custom-select" style="height: 37px;"  [clearable]="false" >
+          <ng-option *ngFor= "let item of add_options" [value]="item.id" class="form-control">
+            {{item.name}}
+          </ng-option>
+        </ng-select>
+
+        <span class="help-block text-danger" *ngIf="AddAssociate.get('category_id').touched && AddAssociate.get('category_id').hasError('required')">Required !</span>
+        <span class="help-block text-danger" *ngIf="AddAssociate.get('category_id').touched && AddAssociate.get('category_id').hasError('minlength')">Minimum Length 3</span>
+      </div>
+      <div class="form-group col-md-6">
+        <input formControlName ="description" type="text" class="form-control" placeholder="Enter Description">
+        <span class="help-block text-danger" *ngIf="AddAssociate.get('description').touched && AddAssociate.get('description').hasError('required')">Required !</span>
+        <span class="help-block text-danger" *ngIf="AddAssociate.get('description').touched && AddAssociate.get('description').hasError('minlength')">Minimum Length 3</span>
+      </div>
+      <div class="form-group col-md-3">
+        <button [disabled]="loading"  type="submit" class="btn btn-info pull-right">Add Association <i class="fa fa-spinner fa-spin" *ngIf="loading"></i> </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+
+
+<ng-template #open_associations_serial let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Add New Item</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="AddAssociate_item" (ngSubmit)="onSubmit_item(AddAssociate_item.value)" class="row">
+
+      <div class="form-group col-md-6">
+
+        <ng-select formControlName="item_id"  class=" form-control custom-select" style="height: 37px;" (change)="selectitem($event)"  [clearable]="false" >
+          <ng-option *ngFor="let item of serial_item_list" [value]="item.item_id"  class="form-control">
+             {{item.name}}
+          </ng-option>
+        </ng-select>
+
+        <span class="help-block text-danger" *ngIf="AddAssociate_item.get('item_id').touched && AddAssociate_item.get('item_id').hasError('required')">Required !</span>
+        <span class="help-block text-danger" *ngIf="AddAssociate_item.get('item_id').touched && AddAssociate_item.get('item_id').hasError('minlength')">Minimum Length 3</span>
+      </div>
+
+      <div class="form-group col-md-6">
+        <input formControlName ="description" type="text" class="form-control" placeholder="Enter Description" readonly>
+        <span class="help-block text-danger" *ngIf="AddAssociate_item.get('description').touched && AddAssociate_item.get('description').hasError('required')">Required !</span>
+        <span class="help-block text-danger" *ngIf="AddAssociate_item.get('description').touched && AddAssociate_item.get('description').hasError('minlength')">Minimum Length 3</span>
+      </div>
+
+      <div class="form-group col-md-6">
+        <input formControlName ="item_count" [readOnly]="Qty_disabled" type="text" class="form-control" placeholder="Enter Quantity">
+        <span class="help-block text-danger" *ngIf="AddAssociate_item.get('item_count').touched && AddAssociate_item.get('item_count').hasError('required')">Required !</span>
+        <span class="help-block text-danger" *ngIf="AddAssociate_item.get('item_count').touched && AddAssociate_item.get('item_count').hasError('minlength')">Minimum Length 3</span>
+      </div>
+
+      <div class="form-group col-md-6">
+        <input formControlName ="notes" type="text" class="form-control" placeholder="Enter Notes">
+        <span class="help-block text-danger" *ngIf="AddAssociate_item.get('notes').touched && AddAssociate_item.get('notes').hasError('required')">Required !</span>
+        <span class="help-block text-danger" *ngIf="AddAssociate_item.get('notes').touched && AddAssociate_item.get('notes').hasError('minlength')">Minimum Length 3</span>
+      </div>
+
+
+      <div class="col-md-12 text-center">
+        <button [disabled]="loading"  type="submit" class="btn btn-info justify-content-center">Add <i class="fa fa-spinner fa-spin" *ngIf="loading"></i> </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+
+<ng-template #edit_item let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Edit  Item</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="EditAssociate_item" (ngSubmit)="onSubmit_edititem(EditAssociate_item.value)" class="row">
+
+      <div class="form-group col-md-6">
+
+        <ng-select formControlName="item_id"  class=" form-control custom-select" style="height: 37px;" (change)="selectitem($event)"  [clearable]="false" >
+          <ng-option *ngFor="let item of serial_item_list" [value]="item.item_id"  class="form-control">
+             {{item.name}}
+          </ng-option>
+        </ng-select>
+
+        <span class="help-block text-danger" *ngIf="EditAssociate_item.get('item_id').touched && EditAssociate_item.get('item_id').hasError('required')">Required !</span>
+        <span class="help-block text-danger" *ngIf="EditAssociate_item.get('item_id').touched && EditAssociate_item.get('item_id').hasError('minlength')">Minimum Length 3</span>
+      </div>
+
+      <div class="form-group col-md-6">
+        <input formControlName ="description" type="text" class="form-control" placeholder="Enter Description" readonly>
+        <span class="help-block text-danger" *ngIf="EditAssociate_item.get('description').touched && EditAssociate_item.get('description').hasError('required')">Required !</span>
+        <span class="help-block text-danger" *ngIf="EditAssociate_item.get('description').touched && EditAssociate_item.get('description').hasError('minlength')">Minimum Length 3</span>
+      </div>
+
+      <div class="form-group col-md-6">
+        <input formControlName ="item_count" type="number" class="form-control" placeholder="Enter Quantity">
+        <span class="help-block text-danger" *ngIf="EditAssociate_item.get('item_count').touched && EditAssociate_item.get('item_count').hasError('required')">Required !</span>
+        <span class="help-block text-danger" *ngIf="EditAssociate_item.get('item_count').touched && EditAssociate_item.get('item_count').hasError('minlength')">Minimum Length 3</span>
+      </div>
+
+      <div class="form-group col-md-6">
+        <input formControlName ="notes" type="text" class="form-control" placeholder="Enter Notes">
+        <span class="help-block text-danger" *ngIf="EditAssociate_item.get('notes').touched && EditAssociate_item.get('notes').hasError('required')">Required !</span>
+        <span class="help-block text-danger" *ngIf="EditAssociate_item.get('notes').touched && EditAssociate_item.get('notes').hasError('minlength')">Minimum Length 3</span>
+      </div>
+
+
+      <div class="col-md-12 text-center">
+        <button [disabled]="loading"  type="submit" class="btn btn-info justify-content-center">Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i> </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #open_dialogue let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Edit Association</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="AddAssociate" (ngSubmit)="onUpdate(AddAssociate.value)" class="row">
+      <div class="form-group col-md-3">
+        <!-- <select formControlName ="category_id" class="form-control">
+          <option *ngFor= "let item of add_options" value={{item.id}}>{{item.name}}</option>
+        </select> -->
+
+        <ng-select formControlName="category_id"  class=" form-control custom-select" style="height: 37px;"  [clearable]="false" >
+          <ng-option *ngFor= "let item of add_options" [value]="item.id" class="form-control">
+            {{item.name}}
+          </ng-option>
+        </ng-select>
+
+      </div>
+      <div class="form-group col-md-6">
+        <input formControlName ="description" type="text" class="form-control" placeholder="Enter Description">
+        <span class="help-block text-danger" *ngIf="AddAssociate.get('description').touched && AddAssociate.get('description').hasError('required')">Name Required !</span>
+        <span class="help-block text-danger" *ngIf="AddAssociate.get('description').touched && AddAssociate.get('description').hasError('minlength')">Minimum Length 3</span>
+      </div>
+      <div class="form-group col-md-3">
+        <button [disabled]="loading" type="submit" class="btn btn-info pull-right">
+          <i class="fa fa-spinner fa-spin" *ngIf="loading"></i>
+          Update Association</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<div *ngIf="create_page == true">
+  <button type="submit" class="btn btn-info fa fa-arrow-left mb-3" (click)="set_zero_back()"> Back</button>
+  <div class="row">
+    <div class="col-lg-12 col-md-7  ">
+      <form [formGroup]="newProject" (ngSubmit)="SubmitProject(newProject.value)">
+        <div class="card card-outline-info box-shadow">
+          <div class="card-header">
+            <span>Add New Project</span>
+          </div>
+          <div class="card-body">
+            <div class="row">
+
+              <div class="col-md-6">
+                <div class="row">
+                  <div class="col-md-6 mt-2">
+                    <b>Project Name </b>
+                    <span class="help-block text-danger" *ngIf="newProject.get('name').touched && newProject.get('name').hasError('required')">Name Required !</span>
+                    <span class="help-block text-danger" *ngIf="newProject.get('name').touched && newProject.get('name').hasError('minlength')">Minimum Length 3</span>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="input-group">
+                      <input type="text" class="form-control" formControlName="name" placeholder="Enter Project Name">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row mt-3">
+                  <div class="col-md-6 mt-2">
+                    <b>Product Type</b>
+                  </div>
+                  <div class="col-md-6">
+                    <!-- <select formControlName="type" class="form-control custom-select">
+                      <option *ngFor= "let view of product_list" value="{{view.id}}" >{{view.name}}</option>
+                    </select> -->
+
+                    <ng-select formControlName="type"  class=" form-control custom-select"   [clearable]="false" >
+                      <ng-option *ngFor= "let view of product_list" value="{{view.id}}" class="form-control">
+                        {{view.name}}
+                      </ng-option>
+                    </ng-select>
+                  </div>
+                </div>
+
+                <div class="row mt-3">
+                  <div class="col-md-6 mt-2">
+                    <b>Reference </b>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="text" formControlName="reff_number" class="form-control" placeholder="Enter Reference Number"/>
+                  </div>
+                </div>
+
+                <div class="row mt-3">
+                  <div class="col-md-6 mt-2">
+                    <b>Description </b>
+                    <span class="help-block text-danger" *ngIf="newProject.get('description').touched && newProject.get('description').hasError('required')">Required !</span>
+                    <span class="help-block text-danger" *ngIf="newProject.get('description').touched && newProject.get('description').hasError('minlength')">Minimum Length 3</span>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="text" formControlName="description" class="form-control" placeholder="Enter Description"/>
+                  </div>
+                </div>
+
+                <div class="row mt-3">
+                  <div class="col-md-6 mt-2">
+                    <b>Customer Name</b>
+                    <span class="help-block text-danger" *ngIf="newProject.get('customer_id').touched && newProject.get('customer_id').hasError('required')">Required !</span>
+                  </div>
+                  <div class="col-md-6">
+                    <!-- <select formControlName="customer_id" class="form-control custom-select">
+                      <option *ngFor= "let view of customer_list" value="{{view.customer_id}}" >{{view.company_name}}</option>
+                    </select> -->
+
+                    <ng-select formControlName="customer_id"  class=" form-control custom-select"   [clearable]="false" >
+                      <ng-option *ngFor = "let view of customer_list" value="{{view.customer_id}}" class="form-control">
+                        {{view.company_name}}
+                      </ng-option>
+                    </ng-select>
+                  </div>
+                </div>
+
+                <div class="row mt-3">
+                  <div class="col-md-6 mt-2">
+                    <b> Project Value </b>
+                    <span class="help-block text-danger" *ngIf="newProject.get('value').touched && newProject.get('value').hasError('required')">Required !</span>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="number" formControlName="value" class="form-control" placeholder="Enter Value in Amount"/>
+                  </div>
+                </div>
+
+                <div class="row mt-3">
+                  <div class="col-md-6 mt-2">
+                    <b> Capacity </b>
+                    <span class="help-block text-danger" *ngIf="newProject.get('capacity').touched && newProject.get('capacity').hasError('required')">Required !</span>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="text" formControlName="capacity" class="form-control" placeholder="Enter Capacity"/>
+                  </div>
+                </div>
+
+                <div class="row mt-3">
+                  <div class="col-md-6 mt-2">
+                    <b>Start Date </b>
+                    <span class="help-block text-danger" *ngIf="newProject.get('startDate').touched && newProject.get('startDate').hasError('required')">Required !</span>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="date" formControlName="startDate" class="form-control"/>
+                  </div>
+                </div>
+
+                <div class="row mt-3">
+                  <div class="col-md-6 mt-2">
+                    <b>End Date </b>
+                    <span class="help-block text-danger" *ngIf="newProject.get('endDate').touched && newProject.get('endDate').hasError('required')">Required !</span>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="date" formControlName="endDate" class="form-control"/>
+                  </div>
+                </div>
+
+                <div class="row mt-3">
+                  <div class="col-md-6 mt-2">
+                    <b>Remark </b>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="text" formControlName="remark" class="form-control" placeholder="Enter Remark"/>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <div class="col-12 mb-3">
+            <div class="row justify-content-center">
+
+              <button [disabled]="loading" type="submit" class="btn btn-success">
+                <i class="fa fa-spinner fa-spin" *ngIf="loading"></i>
+                CREATE PROJECT</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #edit_project let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Edit Project</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="editProject" (ngSubmit)="ediProject(editProject.value)">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="row">
+                <div class="col-md-6 mt-2">
+                  <b>Project Name </b>
+                  <span class="help-block text-danger" *ngIf="editProject.get('name').touched && editProject.get('name').hasError('required')">Name Required !</span>
+                  <span class="help-block text-danger" *ngIf="editProject.get('name').touched && editProject.get('name').hasError('minlength')">Minimum Length 3</span>
+                </div>
+                <div class="col-md-6">
+                  <div class="input-group">
+                    <input type="text" class="form-control" formControlName="name" placeholder="Enter Project Name">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mt-3">
+                <div class="col-md-6 mt-2">
+                  <b>Product Type</b>
+                </div>
+                <div class="col-md-6">
+
+                  <ng-select formControlName="type"  class=" form-control custom-select"   [clearable]="false" >
+                    <ng-option *ngFor= "let view of product_list" [value]="view.id" class="form-control">
+                      {{view.name}}
+                    </ng-option>
+                  </ng-select>
+                </div>
+              </div>
+
+              <div class="row mt-3">
+                <div class="col-md-6 mt-2">
+                  <b>Reference </b>
+                </div>
+                <div class="col-md-6">
+                  <input type="text" formControlName="reff_number" class="form-control" placeholder="Enter Reference Number"/>
+                </div>
+              </div>
+
+              <div class="row mt-3">
+                <div class="col-md-6 mt-2">
+                  <b>Description </b>
+                  <span class="help-block text-danger" *ngIf="editProject.get('description').touched && editProject.get('description').hasError('required')">Required !</span>
+                  <span class="help-block text-danger" *ngIf="editProject.get('description').touched && editProject.get('description').hasError('minlength')">Minimum Length 3</span>
+                </div>
+                <div class="col-md-6">
+                  <input type="text" formControlName="description" class="form-control" placeholder="Enter Description"/>
+                </div>
+              </div>
+
+              <div class="row mt-3">
+                <div class="col-md-6 mt-2">
+                  <b>Customer Name</b>
+                  <span class="help-block text-danger" *ngIf="editProject.get('customer_id').touched && editProject.get('customer_id').hasError('required')">Required !</span>
+                </div>
+                <div class="col-md-6">
+
+
+                  <ng-select formControlName="customer_id"  class=" form-control custom-select"   [clearable]="false" >
+                    <ng-option *ngFor = "let view of customer_list" [value]="view.customer_id" class="form-control">
+                      {{view.company_name}}
+                    </ng-option>
+                  </ng-select>
+                </div>
+              </div>
+
+              <div class="row mt-3">
+                <div class="col-md-6 mt-2">
+                  <b> Project Value </b>
+                  <span class="help-block text-danger" *ngIf="editProject.get('value').touched && editProject.get('value').hasError('required')">Required !</span>
+                </div>
+                <div class="col-md-6">
+                  <input type="number" formControlName="value" class="form-control" placeholder="Enter Value in Amount"/>
+                </div>
+              </div>
+
+              <div class="row mt-3">
+                <div class="col-md-6 mt-2">
+                  <b> Capacity </b>
+                  <span class="help-block text-danger" *ngIf="editProject.get('capacity').touched && editProject.get('capacity').hasError('required')">Required !</span>
+                </div>
+                <div class="col-md-6">
+                  <input type="text" formControlName="capacity" class="form-control" placeholder="Enter Capacity"/>
+                </div>
+              </div>
+
+              <div class="row mt-3">
+                <div class="col-md-6 mt-2">
+                  <b>Start Date </b>
+                  <span class="help-block text-danger" *ngIf="editProject.get('startDate').touched && editProject.get('startDate').hasError('required')">Required !</span>
+                </div>
+                <div class="col-md-6">
+                  <input type="date" formControlName="startDate" class="form-control"/>
+                </div>
+              </div>
+
+              <div class="row mt-3">
+                <div class="col-md-6 mt-2">
+                  <b>End Date </b>
+                  <span class="help-block text-danger" *ngIf="editProject.get('endDate').touched && editProject.get('endDate').hasError('required')">Required !</span>
+                </div>
+                <div class="col-md-6">
+                  <input type="date" formControlName="endDate" class="form-control"/>
+                </div>
+              </div>
+
+              <div class="row mt-3">
+                <div class="col-md-6 mt-2">
+                  <b>Remark </b>
+                </div>
+                <div class="col-md-6">
+                  <input type="text" formControlName="remark" class="form-control" placeholder="Enter Remark"/>
+                </div>
+              </div>
+        </div>
+
+        &nbsp;
+        <div class="col-12 mb-3">
+          <div class="row justify-content-center">
+            <button [disabled]="loading" type="submit" class="btn btn-success"><i class="fa fa-spinner fa-spin" *ngIf="loading"></i>submit</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>

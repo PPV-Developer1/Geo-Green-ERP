@@ -1,0 +1,158 @@
+/* Invoice List */
+.customer
+{
+    overflow:hidden;
+    text-overflow: ellipsis;
+
+}
+
+/* Scroll Bar */
+::-webkit-scrollbar {
+    width: 10px;
+    overflow-y: scroll;
+    background: rgb(255, 255, 255);
+    box-shadow: inset 0 0 4px #707070;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgb(202, 202, 204);
+}
+
+
+/* only for Invoice */
+.full_border
+{
+    border: 1px solid white;
+}
+.no_border
+{
+    border: 0px solid white;
+}
+.else_top
+{
+    border: 1px solid black;
+    border-top: 0px solid rgb(255, 255, 255);
+}
+.else_bottom
+{
+    border: 1px solid black;
+    border-bottom: 0px solid rgb(255, 255, 255);
+}
+.else_right
+{
+    border: 1px solid black;
+    border-right: 0px solid rgb(255, 255, 255);
+}
+.else_left
+{
+    border: 1px solid black;
+    border-left: 0px solid rgb(255, 255, 255);
+}
+.else_bottom_top
+{
+    border: 1px solid black;
+    border-top: 0px solid rgb(255, 255, 255);
+    border-bottom: 0px solid rgb(255, 255, 255);
+}
+.else_top_left
+{
+    border: 1px solid black;
+    border-collapse: collapse;
+    text-align: left;
+    border-top: 0px solid rgb(255, 255, 255);
+    border-left: 0px solid rgb(255, 255, 255);
+}
+.right_only
+{
+    border: 1px solid black;
+    border-top: 0px solid rgb(255, 255, 255);
+    border-bottom: 0px solid rgb(255, 255, 255);
+    border-left: 0px solid rgb(255, 255, 255);
+}
+.left_only
+{
+    border: 1px solid black;
+    border-top: 0px solid rgb(255, 255, 255);
+    border-bottom: 0px solid rgb(255, 255, 255);
+    border-right: 0px solid rgb(255, 255, 255);
+}
+.bottom_only
+{
+    border: 1px solid black;
+    border-top: 0px solid rgb(255, 255, 255);
+    border-right: 0px solid rgb(255, 255, 255);
+    border-left: 0px solid rgb(255, 255, 255);
+}
+.top_only
+{
+    border: 1px solid black;
+    border-bottom: 0px solid rgb(255, 255, 255);
+    border-right: 0px solid rgb(255, 255, 255);
+    border-left: 0px solid rgb(255, 255, 255);
+}
+
+.color_cell
+{
+    text-align: center;
+    border: 1px solid black;
+    border-collapse: collapse;
+    text-align: center;
+    background-color: rgb(119, 180, 58);
+    border-top: 0px solid rgb(255, 255, 255);
+}
+/* Invoice table */
+
+
+/* styles.css (or styles.scss) */
+
+/* Default table styles */
+.my-custom-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.my-custom-table th,
+.my-custom-table td {
+  border: none; /* Hide all borders */
+  padding: 8px;
+}
+
+.my-custom-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.my-custom-table tbody tr.even-row {
+  background-color: #e6e6e6; /* Background color for even rows */
+}
+.my-custom-table td {
+  text-align: center;
+}
+
+.my-custom-table tbody tr:nth-child(even) {
+  background-color: #f1ecec;
+}
+
+.my-custom-table tbody tr:hover {
+  background-color: #e6e6e6;
+}
+
+.my-custom-table i {
+  color: red;
+}
+
+.my-custom-table tbody tr.even-row:hover {
+  background-color: #f9f9f9 !important;
+}
+
+.square-box {
+  width: 150px;
+  height: 150px;
+  display: flex;
+  background-color: #80a376f8;
+  margin-right: 50px;
+  color: #fff;
+  justify-content: center;
+  align-items: center;
+
+}

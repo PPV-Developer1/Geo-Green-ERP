@@ -1,0 +1,52 @@
+
+[
+    {
+        "id"            : 1,
+        "sender"        : "Renga Rajan",
+        "senderMail"    : "raja@gmail.com",
+        "subject"       : "Hai",
+        "date"          : "29/03/2022",
+        "body"          : "Hello",
+        "attachment"    : false,
+        "attachments"   : "dgfj",
+        "unread"        : true,
+        "sent"          : true,
+        "starred"       : true,
+        "draft"         : false,
+        "trash"         : false,
+        "selected"      : false
+    },
+    {
+        "id"            : 2,
+        "sender"        : "Renga Rajan",
+        "senderMail"    : "raja@gmail.com",
+        "subject"       : "Hai",
+        "date"          : "29/03/2022",
+        "body"          : "Hello",
+        "attachment"    : false,
+        "attachments"   : "dgfj",
+        "unread"        : true,
+        "sent"          : true,
+        "starred"       : false,
+        "draft"         : false,
+        "trash"         : false,
+        "selected"      : false
+    },
+    {
+        "id"            : 3,
+        "sender"        : "Renga Rajan",
+        "senderMail"    : "raja@gmail.com",
+        "subject"       : "Hai",
+        "date"          : "29/03/2022",
+        "body"          : "Hello",
+        "attachment"    : false,
+        "attachments"   : "dgfj",
+        "unread"        : true,
+        "sent"          : true,
+        "starred"       : false,
+        "draft"         : false,
+        "trash"         : false,
+        "selected"      : false
+    }
+
+]

@@ -1,0 +1,82 @@
+
+  <div *ngIf="!show" >
+
+    <div class="col-md-12">
+      <table>
+        <tr>
+          <!-- <td style="width: 10px">
+            <h1><small></small></h1>
+          </td> -->
+          <td style="width: 200px">
+            <h5 class="mt-2 ml-2">CREDIT NOTES</h5>
+          </td>
+          <td style="width: 1100px">
+            <div class="input-group input-group-sm my-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
+              </div>
+              <input class="form-control" type="text" placeholder="Search ...."
+                (keyup)="updateFilter($event)" />
+            </div>
+          </td>
+          <td style="width: 100px"></td>
+          <td style="width: 100px; text-align: center; vertical-align: center"></td>
+          <td style="width: 200px; text-align: center; vertical-align: center">
+            <!-- <div class="btn-group" role="group" aria-label="Basic example">
+              <button type="button" (click)="addVendor()" class="btn btn-success btn-sm fa fa-plus">
+                New Vendor
+              </button>
+            </div> -->
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <div widget class="card">
+          <div class="card-body widget-body">
+            <ngx-datatable style="cursor: pointer;" #table class="custom_table" [headerHeight]="50" [limit]="20"
+              [columnMode]="'force'" [footerHeight]="50" [rowHeight]="'auto'" [rows]="List" [selected]="selected"
+              [selectionType]="'single'" (activate)="onActivate($event)">
+
+               <ngx-datatable-column prop="generate_date" name="DATE">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  {{ row.generate_date | date:'dd-MM-yyyy'}}
+                </ng-template>
+              </ngx-datatable-column>
+                 <ngx-datatable-column prop="credit_note_no" name="CREDIT NOTE NO">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  {{ row.credit_note_no }}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="company_name" name="NAME">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  <span style="font-weight:bold;">{{ row.company_name }}</span>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="terms_condition" name="BILL">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  {{ row.bill_number }}
+                </ng-template>
+              </ngx-datatable-column>
+            </ngx-datatable>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+<div *ngIf="show">
+  <div>
+    <button type="submit" class="btn btn-info fa fa-arrow-left mb-3" (click)="back()">
+      Back
+    </button>
+  </div>
+
+  <app-credit_note_view></app-credit_note_view>
+</div>

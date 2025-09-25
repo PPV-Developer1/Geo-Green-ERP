@@ -1,0 +1,42 @@
+[
+    {
+        "name"	    : "Employee 1",
+        "period"	: "01/01/2022 - 31/01/2022",
+        "type"		: "Employee",
+        "amount"    : "100000.00",
+        "account"   :  "1022365216546",
+        "IFSC"      :   "SBIN00254",
+        "Bank"      :   "SBI",
+        "Branch"    :   "Chennai"
+    },
+    {
+        "name"	    : "User 1",
+        "period"	: "01/01/2022 - 31/01/2022",
+        "type"		: "Employee",
+        "amount"    : "100000.00"
+    },
+	{
+        "name"	    : "User 2",
+        "period"	: "01/01/2022 - 31/01/2022",
+        "type"		: "Contract",
+        "amount"    : "10000.00"
+    },
+	{
+        "name"	    : "User 3",
+        "period"	: "01/01/2022 - 31/01/2022",
+        "type"		: "Labor",
+        "amount"    : "5000.00"
+    },
+	{
+        "name"	    : "User 4",
+        "period"	: "01/01/2022 - 31/01/2022",
+        "type"		: "Employee",
+        "amount"    : "100000.00"
+    },
+	{
+        "name"	    : "User 5",
+        "period"	: "01/01/2022 - 31/01/2022",
+        "type"		: "Employee",
+        "amount"    : "100000.00"
+    }   
+]

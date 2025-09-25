@@ -1,0 +1,311 @@
+<div *ngIf="selected.length == 0">
+  <div class="col-md-12">
+    <table>
+      <tr>
+        <td style="width: 10px;">
+          <h5><small></small></h5>
+        </td>
+        <td style="width: 250px;">
+          <h5>BYPRODUCTS</h5>
+        </td>
+        <td style="width: 1100px;">
+          <div class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input class="form-control" type="text" placeholder="Search Project Name or Category Name or Description..." (keyup)="updateFilter($event)"/>
+          </div>
+        </td>
+        <td style="width: 100px;"> </td>
+        <td style="width: 100px; text-align: center; vertical-align: center;">
+        </td>
+      </tr>
+    </table>
+  </div>
+
+      <ngx-datatable
+        #table
+        class="custom_table"
+        [headerHeight]="50"
+        [limit]="15"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="byproduct_details"
+        [selected]="selected"
+        [selectionType]="'single'"
+        (activate)="onActivate($event)">
+
+        <ngx-datatable-column prop="id" name="ID" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.id}}
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="project_name" name="PROJECT NAME">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.project_name}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="asso_name" name="ASSOCIATE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span style="font-weight:bold;"> {{row.asso_name}}</span>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="category_name" name="BYPRODUCT">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span style="font-weight:bold;">{{row.category_name}}</span>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="description" name="DESCRIPTION" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.description}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="production_id" name="PRODUCTION ID" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+             <span *ngIf="row.production_id != null">{{row.production_id}}</span>
+             <span *ngIf="row.production_id === null">Not Asign</span>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="level" name="STATUS">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span *ngIf="row.level == 0" style="color: red;">Created</span>
+            <span *ngIf="row.level == 1" style="color: red;">Moving to Plan</span>
+            <span *ngIf="row.level == 2" style="color: blue;">Waiting for Approval</span>
+            <span *ngIf="row.level == 3" style="color: blue;">Move to Production</span>
+            <span *ngIf="row.level == 4" style="color: green;">Completed</span>
+          </ng-template>
+        </ngx-datatable-column>
+
+      </ngx-datatable>
+</div>
+<div *ngIf="selected.length > 0">
+  <div class="modal-header">
+    <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero($event)"> Back</button>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div widget class="card">
+        <div class="card-header">
+          <span>BYPRODUCT</span>
+          <div class="widget-controls">
+              <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+              <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+              <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+              <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+              <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+          </div>
+        </div>
+        <div class="card-body widget-body">
+          <div class="row">
+            <table class="table col-md-6">
+              <tbody>
+                  <tr>
+                    <th>Project ID</th>
+                    <td>{{detail_view.project_id}}</td>
+                  </tr>
+                  <tr>
+                    <th>Associate ID</th>
+                    <td>{{detail_view.asso_id}}</td>
+                  </tr>
+                  <tr>
+                      <th>Created By</th>
+                      <td>{{detail_view.creater_name}}</td>
+                  </tr>
+                  <tr>
+                    <th>Byproduct ID</th>
+                    <td>{{detail_view.id}}</td>
+                  </tr>
+                  <tr>
+                    <th>Level</th>
+                    <td *ngIf="level == 0">0%</td>
+                    <td *ngIf="level == 1">25%</td>
+                    <td *ngIf="level == 2">50%</td>
+                    <td *ngIf="level == 3">75%</td>
+                    <td *ngIf="level == 4">100%</td>
+                  </tr>
+
+              </tbody>
+            </table>
+            <table class="table col-md-6">
+              <tbody>
+                <tr>
+                  <th>Project Name</th>
+                  <td>{{detail_view.project_name}}</td>
+                </tr>
+                <tr>
+                  <th>Associate Name</th>
+                  <td>{{detail_view.asso_name}}</td>
+                </tr>
+                <tr>
+                  <th>Created at</th>
+                  <td>{{detail_view.date_time | date: 'dd-MM-yyyy HH:mm:ss'}}</td>
+                </tr>
+                <tr>
+                    <th>Byproduct Name</th>
+                    <td>{{detail_view.category_name}}</td>
+                </tr>
+                <tr>
+                  <th>Status</th>
+                  <td *ngIf="detail_view.status == 1"> Active </td>
+                  <td *ngIf="detail_view.status == 2"> Completed </td>
+                </tr>
+              </tbody>
+            </table>
+              <div class="col-md-6" *ngIf="detail_view.production_id === null">
+                <button [disabled]="loading" type="submit" class="btn btn-primary fa fa-plus pull-right" (click)="AddFromStore($event)"> Add From Store <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+              </div>
+              <div class="col-md-6" *ngIf="detail_view.production_id === null">
+                <button  [disabled]="loading" type="button" class="btn btn-success fa fa-bullhorn" (click)="move_to_production()"> Move to Production <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div widget class="card" *ngIf="detail_view.production_id != null">
+        <div class="card-header">
+          <span>PRODUCTION DETAILS</span>
+          <div class="widget-controls">
+              <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+              <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+              <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+              <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+              <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+          </div>
+        </div>
+        <div class="card-body widget-body">
+          <div class="row">
+            <table class="table col-md-6">
+              <tbody>
+                  <tr>
+                    <th>Product ID</th>
+                    <td>{{production_view.id}}</td>
+                  </tr>
+
+                  <tr>
+                      <th>Assign to ID</th>
+                      <td *ngIf="production_view.assign_id != null">{{production_view.assign_id}}</td>
+                      <td *ngIf="production_view.assign_id === null">Not Assign</td>
+                  </tr>
+
+                  <tr>
+                    <th>Created By</th>
+                    <td>{{production_view.creater_name}}</td>
+                  </tr>
+
+                  <tr>
+                    <th>Start Date & Time</th>
+                    <td *ngIf="production_view.start_datetime != null">{{production_view.start_datetime | date: 'dd-MM-yyyy HH:mm:ss'}}</td>
+                    <td *ngIf="production_view.start_datetime === null">Not Assign</td>
+                  </tr>
+
+                  <tr>
+                    <th>Level</th>
+                    <td *ngIf="production_view.level == 1"> Created </td>
+                    <td *ngIf="production_view.level == 2"> Approved For Production</td>
+                    <td *ngIf="production_view.level == 3"> Work Assigned</td>
+                    <td *ngIf="production_view.level == 4"> Done</td>
+                  </tr>
+
+              </tbody>
+            </table>
+            <table class="table col-md-6">
+              <tbody>
+
+                <tr>
+                  <th>Product Name</th>
+                  <td>{{production_view.product_name}}</td>
+                </tr>
+
+                <tr>
+                  <th>Assign to Name</th>
+                  <td *ngIf="production_view.assign_id != null">{{production_view.assign_name}}</td>
+                  <td *ngIf="production_view.assign_id === null">Not Assign</td>
+                </tr>
+
+                <tr>
+                  <th>Created At</th>
+                  <td>{{production_view.date_time | date: 'dd-MM-yyyy HH:mm:ss'}}</td>
+                </tr>
+
+                <tr>
+                  <th>End Date & Time</th>
+                  <td *ngIf="production_view.end_datetime != null">{{production_view.end_datetime | date: 'dd-MM-yyyy HH:mm:ss'}}</td>
+                  <td *ngIf="production_view.end_datetime === null">Not Assign</td>
+                </tr>
+
+                <tr>
+                  <th>Status</th>
+                  <td *ngIf="production_view.status == 1"> Active </td>
+                  <td *ngIf="production_view.status == 2"> Completed </td>
+                </tr>
+
+              </tbody>
+            </table>
+              <div class="col-md-6" *ngIf="detail_view.production_id === null">
+                <button type="submit" class="btn btn-primary fa fa-plus pull-right" (click)="call_add($event)"> Add From Store</button>
+              </div>
+              <div class="col-md-6" *ngIf="detail_view.production_id === null">
+                <button type="button" class="btn btn-success fa fa-bullhorn" (click)="move_to_production()"> Move to Production</button>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #move_to_pro let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Confirmation</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    Are you sure to move this part for production!
+
+     <div class="row" style="padding-top: 10px;">
+                <div class="col-md-6">
+                  By Product Number
+                </div>
+                <div class="col-md-6">
+                  <input type="text"  [(ngModel)]="Product_no" class="form-control" placeholder="By product no"/>
+                </div>
+              </div>
+  </div>
+
+  <div class="modal-footer">
+      <button [disabled]="loading" type="button" class="btn btn-success" data-dismiss="modal" (click)="confirm()">Proceed <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      <button type="button" class="btn btn-danger" data-dismiss="modal" (click)="modal.dismiss('Cross click')">Close</button>
+  </div>
+</ng-template>
+<ng-template #AddStore let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Add From Store</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="AddFromStr" (ngSubmit)="AddStoreItem(AddFromStr.value)" class="row">
+      <div class="form-group col-md-10">
+        <!-- <select formControlName ="store_id" class="form-control">
+          <option *ngFor= "let item of store_list" value={{item.id}}>{{item.product_name}} | {{item.batch}} | {{item.notes}}</option>
+        </select> -->
+
+        <ng-select formControlName="store_id"  class=" form-control custom-select"   [clearable]="false" >
+          <ng-option *ngFor= "let item of store_list" value="{{item.id}}" class="form-control">
+            {{item.product_name}} | {{item.batch}} | {{item.notes}}
+          </ng-option>
+        </ng-select>
+
+        <span class="help-block text-danger" *ngIf="AddFromStr.get('store_id').touched && AddFromStr.get('store_id').hasError('required')">Selection Required!</span>
+      </div>
+      <div class="form-group col-md-2">
+        <button [disabled]="loading" type="submit" class="btn btn-info pull-right">Add  <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      </div>
+    </form>
+  </div>
+</ng-template>

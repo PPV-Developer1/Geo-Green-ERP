@@ -1,0 +1,481 @@
+<div class="row bottom-30">
+  <div class="col-md-12">
+    <div widget class="card">
+        <div class="card-header">
+            <span>Attendance Entry</span>
+            <div class="widget-controls">
+                <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+                <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+                <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+                <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+                <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+            </div>
+        </div>
+        <div class="card-body widget-body">
+          <form [formGroup]="form_date" (ngSubmit)="onSubmit_date(form_date.value)" class="row">
+            <div class="col-md-3">
+              <input [formControl]="date_val" type="date" class="form-control" id="input-12">
+              <span class="help-block text-danger" *ngIf="form_date.get('date_val').touched && form_date.get('date_val').hasError('required')">select date Required !</span>
+            </div>
+            <div class="col-md-2">
+              <button [disabled]="loading" class="btn btn-info btn-block" type="submit">Load <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+            </div>
+          </form>
+        </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #add_att let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Add Attendance</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form_att" (ngSubmit)="onSubmit(form_att.value)" class="row">
+
+      <div class="form-group col-md-4">
+        Hours
+      </div>
+      <div class="form-group col-md-8">
+        <input [formControl]="att_val_hr" type="number" (input)="WorkingHours()" min="0" max="8" class="form-control" placeholder="Hours">
+
+        <span class="help-block text-danger" *ngIf="form_att.get('att_val_hr').touched && form_att.get('att_val_hr').hasError('required')">Entry Required !</span>
+         <!-- Min -->
+          <span class="help-block text-danger" *ngIf="form_att.get('att_val_hr')?.touched && form_att.get('att_val_hr')?.hasError('min')">
+            Minimum value is 0 !
+          </span>
+
+          <!-- Max -->
+          <span class="help-block text-danger" *ngIf="form_att.get('att_val_hr')?.touched && form_att.get('att_val_hr')?.hasError('max')">
+            Maximum 8 hours !
+          </span>
+      </div>
+
+      <div class="form-group col-md-4" *ngIf="employee_type != 'Admin'">
+        Over Time
+      </div>
+
+      <div class="form-group col-md-8" *ngIf="employee_type != 'Admin'">
+        <input [formControl]="att_val_ot" type="number" (input)="WorkingOT()" min="0" max="24" class="form-control" placeholder="Over Time">
+         <!-- Min -->
+          <span class="help-block text-danger" *ngIf="form_att.get('att_val_ot')?.touched && form_att.get('att_val_ot')?.hasError('min')">
+            Minimum value is 0 !
+          </span>
+
+          <!-- Max -->
+          <span class="help-block text-danger" *ngIf="form_att.get('att_val_ot')?.touched && form_att.get('att_val_ot')?.hasError('max')">
+            Maximum 24 hours !
+          </span>
+      </div>
+
+      <div class="form-group col-md-4" *ngIf="employee_type == 'Admin'">
+            Com Off <br>
+             <!-- <span class="help-block text-danger" >
+                      ( Availabe com-off {{employee_data.com_off}} )
+                    </span> -->
+          </div>
+          <div class="form-group col-md-8" *ngIf="employee_type == 'Admin'">
+            <input [formControl]="att_val_cl" (input)="ComoffCalculate()" type="number" min="0" max="8" class="form-control" placeholder="Com-off">
+
+             <!-- Min -->
+            <span class="help-block text-danger" *ngIf="form_att.get('att_val_cl')?.touched && form_att.get('att_val_cl')?.hasError('min')">
+              Minimum value is 0 !
+            </span>
+
+            <!-- Max -->
+            <span class="help-block text-danger" *ngIf="form_att.get('att_val_cl')?.touched && form_att.get('att_val_cl')?.hasError('max')">
+              Maximum 8 hours !
+            </span>
+          </div>
+
+        <div class="form-group col-md-4">
+          Leave
+        </div>
+        <div class="form-group col-md-8">
+          <input [formControl]="att_val_pl" type="number" min="0" max="8" (input)="LeaveCalculate()" class="form-control" placeholder="Leave">
+        <!-- Min -->
+            <span class="help-block text-danger" *ngIf="form_att.get('att_val_pl')?.touched && form_att.get('att_val_pl')?.hasError('min')">
+              Minimum value is 0 !
+            </span>
+
+            <!-- Max -->
+            <span class="help-block text-danger" *ngIf="form_att.get('att_val_pl')?.touched && form_att.get('att_val_pl')?.hasError('max')">
+              Maximum 8 hours !
+            </span>
+
+      </div>
+
+      <!-- <div class="form-group col-md-4">
+        Sick Leave
+      </div>
+      <div class="form-group col-md-8">
+        <input [formControl]="att_val_sl" type="number" class="form-control" placeholder="Sick Leave">
+      </div> -->
+
+
+
+      <div class="form-group col-md-4">
+        Notes
+      </div>
+      <div class="form-group col-md-8">
+        <textarea [formControl]="att_notes"  class="form-control" placeholder="Notes"></textarea>
+      </div>
+
+      <div class="form-group col-md-7">
+        <button [disabled]="loading" type="submit" class="btn btn-info pull-right">Add <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #edit_att let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Update Attendance</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form_att_edit" (ngSubmit)="onUpdate(form_att_edit.value)" class="row">
+
+      <div class="form-group col-md-4">
+        Hours
+      </div>
+      <div class="form-group col-md-8">
+        <input [formControl]="att_edit_val_hr" value = {{edit_att_value_hr}} type="number" (input)="WorkingHoursEdit()" min="0" max="8" class="form-control" placeholder="Hours">
+
+       <span class="help-block text-danger" *ngIf="form_att_edit.get('att_edit_val_hr').touched && form_att_edit.get('att_edit_val_hr').hasError('required')">Entry Required !</span>
+         <!-- Min -->
+          <span class="help-block text-danger" *ngIf="form_att_edit.get('att_edit_val_hr')?.touched && form_att_edit.get('att_edit_val_hr')?.hasError('min')">
+            Minimum value is 0 !
+          </span>
+
+          <!-- Max -->
+          <span class="help-block text-danger" *ngIf="form_att_edit.get('att_edit_val_hr')?.touched && form_att_edit.get('att_edit_val_hr')?.hasError('max')">
+            Maximum 8 hours !
+          </span>
+      </div>
+
+       <div class="form-group col-md-4" *ngIf="employee_type != 'Admin'">
+        Over Time
+      </div>
+
+      <div class="form-group col-md-8" *ngIf="employee_type != 'Admin'">
+        <input [formControl]="att_edit_val_ot" value={{edit_att_value_ot}} type="number" (input)="WorkingOTEdit()" min="0" max="24" class="form-control" placeholder="Over Time">
+
+         <!-- Min -->
+          <span class="help-block text-danger" *ngIf="form_att_edit.get('att_edit_val_ot')?.touched && form_att_edit.get('att_edit_val_ot')?.hasError('min')">
+            Minimum value is 0 !
+          </span>
+
+          <!-- Max -->
+          <span class="help-block text-danger" *ngIf="form_att_edit.get('att_edit_val_ot')?.touched && form_att_edit.get('att_edit_val_ot')?.hasError('max')">
+            Maximum 24 hours !
+          </span>
+      </div>
+
+        <div class="form-group col-md-4" *ngIf="employee_type == 'Admin'">
+              Com Off
+        </div>
+        <div class="form-group col-md-8" *ngIf="employee_type == 'Admin'">
+          <input [formControl]="att_edit_val_cl" value = {{edit_att_value_cl}} (input)="ComoffCalculateEdit()" type="number" min="0" max="8" class="form-control" placeholder="Com-off">
+            <!-- Min -->
+        <span class="help-block text-danger" *ngIf="form_att_edit.get('att_edit_val_cl')?.touched && form_att_edit.get('att_edit_val_cl')?.hasError('min')">
+          Minimum value is 0 !
+        </span>
+
+        <!-- Max -->
+        <span class="help-block text-danger" *ngIf="form_att_edit.get('att_edit_val_cl')?.touched && form_att_edit.get('att_edit_val_cl')?.hasError('max')">
+          Maximum 8 hours !
+        </span>
+        </div>
+
+      <div class="form-group col-md-4">
+         Leave
+      </div>
+      <div class="form-group col-md-8">
+        <input [formControl]="att_edit_val_pl" value={{edit_att_value_pl}} type="number" type="number" min="0" max="8" (input)="LeaveCalculateEdit()" class="form-control" placeholder="Leave">
+      <!-- Min -->
+            <span class="help-block text-danger" *ngIf="form_att_edit.get('att_edit_val_pl')?.touched && form_att_edit.get('att_edit_val_pl')?.hasError('min')">
+              Minimum value is 0 !
+            </span>
+
+            <!-- Max -->
+            <span class="help-block text-danger" *ngIf="form_att_edit.get('att_edit_val_pl')?.touched && form_att_edit.get('att_edit_val_pl')?.hasError('max')">
+              Maximum 8 hours !
+            </span>
+      </div>
+
+      <!-- <div class="form-group col-md-4">
+        Sick Leave
+      </div>
+      <div class="form-group col-md-8">
+        <input [formControl]="att_edit_val_sl" value={{edit_att_value_sl}} type="number" class="form-control" placeholder="Sick Leave">
+      </div> -->
+
+
+
+      <div class="form-group col-md-4">
+        Notes
+      </div>
+      <div class="form-group col-md-8">
+        <textarea [formControl]="att_edit_notes"  class="form-control" placeholder="Notes"></textarea>
+      </div>
+
+      <div class=" col-md-12" style="text-align: center;" >
+        <button [disabled]="loading" type="submit"  class="btn btn-info">Update <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+
+<div class="row" *ngIf="att_window == 1">
+
+  <!-- <div class="col-md-10" role="group" aria-label="Basic example">
+    <button type="button" value="show" class="btn btn-success fa fa-plus pull-right" (click)="add_com_off()">Add Com OFF</button>
+    <button type="button" value="show" class="btn btn-success fa fa-plus pull-right" (click)="add_com_off()">Add Com OFF</button>
+  </div> -->
+
+<div class="col-md-9"></div>
+    <div class="btn-group  col-md-2 pull-right" role="group" aria-label="Basic example">
+
+      <button type="button" *ngIf="employee_type == 'Admin'" class="btn btn-outline-info fa fa-pencil btn-sm " (click)="add_com_off()">Add Com OFF</button>
+      <!-- <button type="button" class="btn btn-outline-info fa fa-print btn-sm" (click)="add_paid_leave()"> Add Paid Leave</button> -->
+
+      &nbsp;
+      &nbsp;
+      &nbsp;
+      &nbsp;
+    </div>
+
+    <div class="col-md-12">
+    <div class="card-body widget-body">
+      <ngx-datatable #table
+      class="custom_table"
+      [headerHeight]="50"
+      [limit]="15"
+      [columnMode]="'force'"
+      [footerHeight]="50"
+      [rowHeight]="50"
+      [rows]="att_list"
+      [selected]="selected"
+      [selectionType]="'single'"
+      (activate)="onActivate($event)">
+
+        <ngx-datatable-column prop="emp_id" name="EMPLOYEE ID">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span *ngIf="row.status === 1" style="color:red">{{row.emp_id}}</span>
+            <span *ngIf="row.status === 0">{{row.emp_id}}</span>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="name" name="EMPLOYEE NAME">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span *ngIf="row.status === 1" style="color:red">{{row.name}}</span>
+            <span *ngIf="row.status === 0">{{row.name}}</span>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="att_hr" name="ATTENDANCE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span *ngIf="row.status === 1" style="color:red">{{row.att_hr}}</span>
+            <span *ngIf="row.status === 0">{{row.att_hr}}</span>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="att_ot" name="OVER TIME">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span *ngIf="row.status === 1" style="color:red">{{row.att_ot}}</span>
+            <span *ngIf="row.status === 0">{{row.att_ot}}</span>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="att_cl" name="COM_OFF LEAVE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span *ngIf="row.status === 1" style="color:red">{{row.att_cl}}</span>
+            <span *ngIf="row.status === 0">{{row.att_cl}}</span>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <!-- <ngx-datatable-column prop="att_sl" name="SICK LEAVE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span *ngIf="row.status === 1" style="color:red">{{row.att_sl}}</span>
+            <span *ngIf="row.status === 0">{{row.att_sl}}</span>
+          </ng-template>
+        </ngx-datatable-column> -->
+
+        <ngx-datatable-column prop="att_pl" name="LEAVE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span *ngIf="row.status === 1" style="color:red">{{row.att_pl}}</span>
+            <span *ngIf="row.status === 0">{{row.att_pl}}</span>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column prop="notes" name="Notes">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span *ngIf="row.status === 1" style="color:red">{{row.att_notes}}</span>
+            <span *ngIf="row.status === 0">{{row.att_notes}}</span>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #addcom_off let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Add Com Off</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+      <div class="row">
+        <div class="form-group col-md-4">
+          Number Of Hours
+        </div>
+        <div class="form-group col-md-8">
+          <input ty="number" class="form-control" placeholder="Total Hours"  [(ngModel)]="days">
+        </div>
+
+        <div class="form-group col-md-4">
+          Select Employee List
+        </div>
+
+        <!-- <div class="form-group col-md-8" >
+          <div (mouseleave)="showDropDown = false">
+              <button class="drop-toggle btn flat" (click)="showDropDown=!showDropDown">
+                  <span *ngIf="checkedList.length<=0">Select</span>
+                  <span *ngIf="checkedList.length>0">{{checkedList.join(', ')}}</span>
+                  <i class="fa fa-angle-down"></i>
+              </button>
+              <div class="drop-show" *ngIf="showDropDown">
+                  <label *ngFor="let a of employee_list trackBy: trackByFn">
+                      <input type="checkbox" [(ngModel)]="a.checked" (change)="getSelectedValue(a.checked,a.emp_id)" />
+                      <span>{{a.name}}</span>
+                  </label>
+              </div>
+          </div>
+        </div> -->
+
+
+        <div class="form-group col-md-8">
+  <div class="custom-dropdown" (mouseleave)="showDropDown = false">
+
+    <!-- Button -->
+    <button class="btn flat dropdown-toggle w-100 text-start"
+            (click)="showDropDown = !showDropDown" type="button">
+      <span *ngIf="checkedList.length <= 0">Select employees</span>
+      <span *ngIf="checkedList.length > 0">{{ checkedList.join(', ') }}</span>
+    </button>
+
+    <!-- Dropdown List -->
+    <div class="dropdown-menu w-100 p-2 shadow-sm show" *ngIf="showDropDown">
+      <div class="form-check" *ngFor="let a of employee_list; trackBy: trackByFn">
+        <input class="form-check-input"
+               type="checkbox"
+               [id]="'emp-' + a.emp_id"
+               [(ngModel)]="a.checked"
+               (change)="getSelectedValue(a.checked, a.emp_id)" />
+        <label class="form-check-label" [for]="'emp-' + a.emp_id">
+          {{ a.name }}
+        </label>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+    <div class="col-md-5"></div>
+    <div>
+      <button type="button" value="show" class="btn btn-success " (click)="update()">Add</button>
+    </div>
+   </div>
+  </div>
+</ng-template>
+
+
+
+<ng-template #addpaid_laeve let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Add Paid Leave</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+      <div class="row">
+        <div class="form-group col-md-4">
+          Number Of Hours
+        </div>
+        <div class="form-group col-md-8">
+          <input ty="number" class="form-control" placeholder="Total Hours"  [(ngModel)]="days">
+        </div>
+
+        <div class="form-group col-md-4">
+          Select Employee List
+        </div>
+
+        <!-- <div class="form-group col-md-8" >
+          <div (mouseleave)="showDropDown = false">
+              <button class="drop-toggle btn flat" (click)="showDropDown=!showDropDown">
+                  <span *ngIf="checkedList.length<=0">Select</span>
+                  <span *ngIf="checkedList.length>0">{{checkedList.join(', ')}}</span>
+                  <i class="fa fa-angle-down"></i>
+              </button>
+              <div class="drop-show" *ngIf="showDropDown">
+                  <label *ngFor="let a of employee_list trackBy: trackByFn">
+                      <input type="checkbox" [(ngModel)]="a.checked" (change)="getSelectedValue(a.checked,a.emp_id)" />
+                      <span>{{a.name}}</span>
+                  </label>
+              </div>
+          </div>
+        </div> -->
+
+        <div class="form-group col-md-8">
+  <div class="custom-dropdown" (mouseleave)="showDropDown = false">
+
+    <!-- Button -->
+    <button class="btn flat dropdown-toggle w-100 text-start"
+            (click)="showDropDown = !showDropDown"
+            type="button">
+      <span *ngIf="checkedList.length <= 0">Select employees</span>
+      <span *ngIf="checkedList.length > 0">{{ checkedList.join(', ') }}</span>
+    </button>
+
+    <!-- Dropdown List -->
+    <div class="dropdown-menu w-100 p-2 shadow-sm show" *ngIf="showDropDown">
+
+      <!-- ✅ Select All -->
+      <!-- <div class="form-check border-bottom mb-2 pb-2">
+        <input class="form-check-input"
+               type="checkbox"
+               id="selectAll"
+               [checked]="allSelected"
+               (change)="toggleSelectAll($event)" />
+        <label class="form-check-label" for="selectAll">Select All</label>
+      </div> -->
+
+      <!-- Employees -->
+      <div class="employee-list" style="max-height: 200px; overflow-y: auto;">
+        <div class="form-check" *ngFor="let a of employee_list; trackBy: trackByFn">
+          <input class="form-check-input"
+                 type="checkbox"
+                 [id]="'emp-' + a.emp_id"
+                 [(ngModel)]="a.checked"
+                 (change)="getSelectedValue(a.checked, a.emp_id)" />
+          <label class="form-check-label" [for]="'emp-' + a.emp_id">
+            {{ a.name }}
+          </label>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+    <div class="col-md-5"></div>
+    <div>
+      <button type="button" value="show" class="btn btn-success " (click)="update_pl()">Add</button>
+    </div>
+   </div>
+  </div>
+</ng-template>

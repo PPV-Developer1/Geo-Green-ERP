@@ -1,0 +1,8 @@
+.googlemap .card .card-body{
+  padding: 0;
+  height: calc(100vh - 260px);
+  .map-container {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
