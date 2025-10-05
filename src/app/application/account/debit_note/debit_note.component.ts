@@ -363,7 +363,8 @@ ReturnToList()
 
 Confirm_back()
 {
-        this.show_new_note = false
+           this.show_new_note = false
+        this.formShow = true;
         this.DebitNoteForm.reset();
         this.billFrom           = null;
         this.billAttention      = null;
@@ -373,6 +374,9 @@ Confirm_back()
         this.billState          = null;
         this.billZipcode        = null;
         this.model_ref.close();
+        this.ngOnInit()
+        this.resetTableHeight()
+        this.isDropdownAppendedToBody = true
 }
 async specItem(item,i)
   {
@@ -602,7 +606,7 @@ async specItem(item,i)
      this.tableWidth=100
     const today = new Date();
     let date = today.toISOString().split('T')[0];
-    this.DebitNoteForm.reset();
+    // this.DebitNoteForm.reset();
     this.DebitNoteForm.controls['type'].setValue(this.type);
     this.DebitNoteForm.controls['created_by'].setValue(this.uid);
     this.DebitNoteForm.controls['subTotal'].setValue(0);

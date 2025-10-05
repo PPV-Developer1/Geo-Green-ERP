@@ -6,6 +6,7 @@ import { DatatableComponent } from '@swimlane/ngx-datatable';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { loadavg } from 'os';
+import { debounceTime, of, Subject, switchMap } from 'rxjs';
 @Component({
   selector: 'app-credit_note',
   templateUrl: './credit_note.component.html',
@@ -81,7 +82,7 @@ public notes               : any;
   vendor_list              : any;
   model_ref                : any;
   loading                  : boolean = false
-
+  vendorInput$ = new Subject<string>();
     @ViewChild(DatatableComponent) table: DatatableComponent;
     @ViewChild('tableResponsive', { static: false }) tableResponsive: ElementRef;
     @ViewChild("Confirmation_return",{static:true}) Confirmation_return:ElementRef;
@@ -340,6 +341,7 @@ ReturnToList()
 Confirm_back()
 {
         this.show_new_note = false
+        this.formShow = true;
         this.DebitNoteForm.reset();
         this.billFrom           = null;
         this.billAttention      = null;
@@ -349,6 +351,9 @@ Confirm_back()
         this.billState          = null;
         this.billZipcode        = null;
         this.model_ref.close();
+        this.ngOnInit()
+        this.resetTableHeight()
+        this.isDropdownAppendedToBody = true
 }
 
 

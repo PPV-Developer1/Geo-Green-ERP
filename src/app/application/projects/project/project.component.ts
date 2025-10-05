@@ -176,6 +176,13 @@ export class ProjectComponent implements OnInit
   }
 
 
+  activePanel: string | null = "panel1";
+
+  togglePanel(panel: string): void {
+    console.log(panel)
+  this.activePanel = this.activePanel === panel ? null : panel;
+}
+
   selectitem(item_value)
   {
 

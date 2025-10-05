@@ -1,0 +1,394 @@
+
+<div >
+  <div class="col-md-12">
+    <table>
+      <tr>
+        <td style="width: 10px;">
+          <h1><small></small></h1>
+        </td>
+        <td style="width: 450px;">
+          <h5>JOB WORKS</h5>
+        </td>
+        <td style="width: 900px;">
+          <div class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input class="form-control" type="text" placeholder="Search Vendor Name or Item Name or Bill Number..." (keyup)="updateFilter($event)"/>
+          </div>
+        </td>
+        <td style="width: 100px;"> </td>
+        <td style="width: 100px; text-align: center; vertical-align: center;">
+        </td>
+        <td style="width: 200px; text-align: center; vertical-align: center;">
+           <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="submit" class="btn btn-success fa fa-plus pull-right" (click)="CreateJobsheet()"> JobSheet</button>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <ngx-datatable
+    #table
+    class="custom_table"
+    [headerHeight]="50"
+    [limit]="20"
+    [columnMode]="'force'"
+    [footerHeight]="50"
+    [rowHeight]="'auto'"
+    [rows]="List"
+    [selected]="selected"
+    [selectionType]="'single'"
+    (activate)="onActivate($event)">
+
+    <ngx-datatable-column prop="id" name="ID" >
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.id}}
+        </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="date_time" name="DATE TIME">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.date_time}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="name" name="NAME">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.name}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="description" name="DESCRIPTION">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.description}}
+      </ng-template>
+    </ngx-datatable-column>
+
+   <ngx-datatable-column prop="qty" name="QUANTITY">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.qty}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="start_date" name="START DATE">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.start_date}}
+      </ng-template>
+    </ngx-datatable-column>
+
+     <ngx-datatable-column prop="end_date" name="END DATE">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.end_date}}
+      </ng-template>
+    </ngx-datatable-column>
+
+     <ngx-datatable-column prop="status" name="STATUS">
+      <ng-template ngx-datatable-cell-template let-row="row">
+         <span *ngIf="row.status == 1">Created</span>
+           <span *ngIf="row.status == 2">Complete</span>
+      </ng-template>
+    </ngx-datatable-column>
+
+  </ngx-datatable>
+</div>
+
+
+
+<ng-template #AddNew_Job let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Add Jobsheet</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="Jobsheet" (ngSubmit)="SubmitJob(Jobsheet.value)" class="row">
+      <div class="form-group col-md-12">
+        <label for="name">Name</label>
+        <input formControlName="name" placeholder="Enter Name" type="text" class="form-control">
+        <span class="help-block text-danger" *ngIf="Jobsheet.get('name').touched && Jobsheet.get('name').hasError('required')">Required !</span>
+        <span class="help-block text-danger" *ngIf="Jobsheet.get('name').touched && Jobsheet.get('name').hasError('minlength')">Minimum 3 Letters</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Description</label>
+        <textarea formControlName="description" id="" placeholder="Enter Description"  class="form-control"></textarea>
+        <span class="help-block text-danger" *ngIf="Jobsheet.get('description').touched && Jobsheet.get('description').hasError('required')">Required !</span>
+      </div>
+
+     <div class="form-group col-md-12">
+        <label for="name">Quantity</label>
+        <input formControlName="qty" placeholder="Enter Quantity" type="number" min="1" class="form-control">
+        <span class="help-block text-danger" *ngIf="Jobsheet.get('qty').touched && Jobsheet.get('qty').hasError('required')">Required !</span>
+      </div>
+       <div class="form-group col-md-12">
+            <label for="name">Start Date</label>
+            <input type="date" formControlName="startDate" class="form-control"/>
+           <span class="help-block text-danger" *ngIf="Jobsheet.get('startDate').touched && Jobsheet.get('startDate').hasError('required')">Required !</span>
+      </div>
+
+       <div class="form-group col-md-12">
+            <label for="name">End Date</label>
+            <input type="date" formControlName="endDate" class="form-control"/>
+           <span class="help-block text-danger" *ngIf="Jobsheet.get('endDate').touched && Jobsheet.get('endDate').hasError('required')">Required !</span>
+      </div>
+
+      <div class="col-md-7">
+      <button [disabled]="loading" class="btn btn-primary pull-right" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+    </div>
+    </form>
+  </div>
+</ng-template>
+
+
+<ng-template #Edit_Job let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Edit Jobsheet</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="JobsheetEdit" (ngSubmit)="JobEditSubmit(JobsheetEdit.value)" class="row">
+      <div class="form-group col-md-12">
+        <label for="name">Name</label>
+        <input formControlName="name" placeholder="Enter Name" type="text" class="form-control">
+        <span class="help-block text-danger" *ngIf="JobsheetEdit.get('name').touched && JobsheetEdit.get('name').hasError('required')">Required !</span>
+        <span class="help-block text-danger" *ngIf="JobsheetEdit.get('name').touched && JobsheetEdit.get('name').hasError('minlength')">Minimum 3 Letters</span>
+      </div>
+
+      <div class="form-group col-md-12">
+        <label for="name">Description</label>
+        <textarea formControlName="description" id="" placeholder="Enter Description"  class="form-control"></textarea>
+        <span class="help-block text-danger" *ngIf="JobsheetEdit.get('description').touched && JobsheetEdit.get('description').hasError('required')">Required !</span>
+      </div>
+
+    <div class="form-group col-md-12">
+        <label for="name">Quantity</label>
+        <input formControlName="qty" placeholder="Enter Quantity" type="number" min="1" class="form-control">
+        <span class="help-block text-danger" *ngIf="JobsheetEdit.get('qty').touched && JobsheetEdit.get('qty').hasError('required')">Required !</span>
+
+      </div>
+
+       <div class="form-group col-md-12">
+            <label for="name">Start Date</label>
+            <input type="date" formControlName="startDate" class="form-control"/>
+           <span class="help-block text-danger" *ngIf="JobsheetEdit.get('startDate').touched && JobsheetEdit.get('startDate').hasError('required')">Required !</span>
+      </div>
+
+       <div class="form-group col-md-12">
+            <label for="name">End Date</label>
+            <input type="date" formControlName="endDate" class="form-control"/>
+           <span class="help-block text-danger" *ngIf="JobsheetEdit.get('endDate').touched && JobsheetEdit.get('endDate').hasError('required')">Required !</span>
+      </div>
+
+      <div class="col-md-7">
+      <button [disabled]="loading" class="btn btn-primary pull-right" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+    </div>
+    </form>
+  </div>
+</ng-template>
+
+
+<div *ngIf="selected.length > 0">
+  <div class="modal-header">
+    <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero($event)"> Back</button>
+    <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true"
+        aria-expanded="false">
+        Action
+      </button>
+      <div class="dropdown-menu">
+         <a class="dropdown-item" href="javascript:void(0);" (click)="Edit()">Edit Jobsheet</a>
+        <a class="dropdown-item" href="javascript:void(0);" (click)="AddItem()">Add Item</a>
+        <a class="dropdown-item" href="javascript:void(0);" (click)="OpenStatusUpdate($event)">Complete the Jobsheet</a>
+      </div>
+  </div>
+
+    <div class="row">
+    <div class="col-lg-12">
+      <div widget class="card">
+        <div class="card-header">
+          <span>Jobsheet Details</span>
+          <div class="widget-controls">
+              <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+              <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+              <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+              <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+              <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+          </div>
+        </div>
+        <div class="card-body widget-body">
+          <div class="row">
+            <table class="table col-md-6">
+              <tbody>
+                  <tr>
+                    <th>Date</th>
+                    <td>{{selected_data.date_time | date: 'dd-MM-yyyy(hh:mm:ss a)'}}</td>
+                  </tr>
+                  <tr>
+                    <th>Name</th>
+                    <td>{{selected_data.name}}</td>
+                  </tr>
+                  <tr>
+                    <th>Description</th>
+                    <td>{{selected_data.description}}</td>
+                  </tr>
+
+              </tbody>
+            </table>
+            <table class="table col-md-6">
+              <tbody>
+                <tr>
+                  <th>Start Date</th>
+                  <td>{{selected_data.start_date}}</td>
+                </tr>
+                <tr>
+                  <th>End Date</th>
+                  <td>{{selected_data.end_date}}</td>
+                </tr>
+                <tr>
+                  <th>Qunatity</th>
+                  <td>{{selected_data.qty}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  &nbsp;
+  <ngx-datatable
+    #table
+    class="custom_table"
+    [headerHeight]="50"
+    [limit]="10"
+    [columnMode]="'force'"
+    [footerHeight]="50"
+    [rowHeight]="'auto'"
+    [rows]="outwardList"
+    [selected]="selected"
+    [selectionType]="'single'"
+    (activate)="onIntActive($event)">
+
+    <!-- <ngx-datatable-column name="ID" >
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.id}}
+        </ng-template>
+    </ngx-datatable-column> -->
+
+    <ngx-datatable-column prop="date_time" name="DATE & TIME">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.date_time | date: 'dd-MM-yyyy HH:mm:ss'}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="batch" name="BATCH NUMBER">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.batch}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="item_name" name="ITEM NAME">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.item_name}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="qty" name="QUANTITY">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.qty}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column prop="notes" name="NOTES">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.notes}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column>
+      <ng-template ngx-datatable-cell-template let-row="row">
+        <button class="btn btn-danger btn-sm fa fa-trash" (click)="delete_item(row)"> Delete</button>
+             &nbsp;
+        <button  class="btn btn-info btn-sm fa fa-pencil" (click)="edit(row)" > Edit</button>
+
+    </ng-template>
+    </ngx-datatable-column>
+  </ngx-datatable>
+</div>
+
+
+<!-- Item add model -->
+
+<ng-template #AddnewItem let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label"> ADD ITEM</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="Item" (ngSubmit)="ItemSubmit(Item.value)">
+      <div class="row">
+        <div class="form-group col-4">
+          Outward Date & Time
+        </div>
+        <div class="form-group col-6">
+          <input formControlName="outward_at" type="datetime-local" class="form-control" format="MM-DD-YYYY HH:mm" id="input-11">
+          <span class="help-block text-danger" *ngIf="Item.get('outward_at').touched && Item.get('outward_at').hasError('required')">Inward Date Time Required !</span>
+        </div>
+
+        <div class="form-group col-4">
+          <label for="input-15">Select Item</label>
+        </div>
+        <div class="form-group col-6">
+
+            <ng-select formControlName="item_id"  class=" form-control custom-select" id="batch" (change)="LoadBatch($event)"  [clearable]="false" >
+              <ng-option *ngFor="let item of category_list" value ="{{item.item_id}}" class="form-control">
+                {{item.name}}
+              </ng-option>
+            </ng-select>
+
+           <span class="help-block text-danger" *ngIf="Item.get('item_id').touched && Item.get('item_id').hasError('required')">Item Required !</span>
+        </div>
+
+        <div class="form-group col-4" *ngIf="batchList != null">
+
+          <label for="input-15">Select Batch</label>
+        </div>
+        <div class="form-group col-6" *ngIf="batchList != null">
+
+          <ng-select formControlName="batch_id"  class=" form-control custom-select" id="exampleSelect3" (change)="LoadQty($event)"  [clearable]="false" >
+            <ng-option *ngFor= "let item of batchList" [value]="item.stock_id" class="form-control">
+              {{item.batch}}
+            </ng-option>
+          </ng-select>
+
+          <span class="help-block text-danger" *ngIf="Item.get('batch_id').touched && Item.get('batch_id').hasError('required')"> Required !</span>
+        </div>
+
+        <div class="form-group col-4" *ngIf="batchQty != null && batchList!= null ">
+          <label for="input-15">Enter Quantity</label>
+        </div>
+        <div class="form-group col-6" *ngIf="batchQty != null && batchList != null">
+          <input formControlName ="quantity" type="number" class="form-control" id="input-10" (click)="ClearError()">
+          <span class="help-block text-danger" *ngIf="Item.get('quantity').touched && Item.get('quantity').hasError('required')"> Required !</span>
+          <span class="help-block text-danger" *ngIf="QtyError === true">Grater than Stock</span>
+        </div>
+
+        <div class="form-group col-4" *ngIf="batchQty != null && batchList != null">
+          <label for="input-15">Notes</label>
+        </div>
+        <div class="form-group col-6" *ngIf="batchQty != null && batchList != null">
+          <input formControlName ="notes" type="text" class="form-control" id="input-10" placeholder=" Enter Outward Notes">
+        </div>
+
+        <div class="col-12" *ngIf="batchQty != null && batchList != null">
+          <div class="row justify-content-center">
+            <button [disabled]="loading" type="submit" class="btn btn-success">Enter Line Items <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>

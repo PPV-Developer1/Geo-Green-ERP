@@ -92,6 +92,7 @@
     <button class="btn btn-success dropdown-toggle fa fa-tasks" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Take Action</button>
     <div class="dropdown-menu">
       <a class="dropdown-item" href="javascript:void(0);" (click)="Edit_Button($event)" *ngIf="detail_view.status == 1">Edit Dispatch</a>
+      <a class="dropdown-item" href="javascript:void(0);" (click)="Update_tran($event)" *ngIf="detail_view.status == 1">Update Transport</a>
       <a class="dropdown-item" href="javascript:void(0);" (click)="approval_button($event)" *ngIf="user_type == 'super_admin' && detail_view.status == 1 && edit_type =='project'" >Approve</a>
       <a class="dropdown-item" href="javascript:void(0);" (click)="approval_button($event)" *ngIf="user_type == 'super_admin' && detail_view.status == 1 && edit_type =='items'" >Move to outward</a>
       <a class="dropdown-item" href="javascript:void(0);" (click)="packing_list()" *ngIf="detail_view.status == 2 ||detail_view.status == 3" >Print Packing List</a>
@@ -190,7 +191,7 @@
                   </tr>
                   <tr>
                       <th>Dispatch Incharge</th>
-                      <td>{{detail_view.dispatch_incharge}}</td>
+                      <td>{{detail_view.incharge_name}}</td>
                   </tr>
                   <tr>
                       <th>Vehicle Type</th>
@@ -468,7 +469,7 @@
 
               </div>
             </div>
-            <div class="row">
+            <!-- <div class="row">
               <div class="col bottom-30 typography">
                 <div class="card card-outline-info">
                   &nbsp;
@@ -596,10 +597,7 @@
                           <label for="input-1">Tax Rate</label>
                         </div>
                         <div class="col-8">
-                          <!-- <select formControlName="tax_percent" class="form-control custom-select">
 
-                            <option *ngFor= "let list of tax_list" value="{{list.rate}}" >{{list.name}}</option>
-                          </select> -->
 
                           <ng-select formControlName="tax_percent"  class=" form-control custom-select" [clearable]="false" appendTo="body">
                             <ng-option *ngFor= "let list of tax_list" [value]="list.rate" class="form-control">
@@ -614,7 +612,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </div> -->
             <div class="row">
               <div class="form-group col-6">
                 <div class="input-group">
@@ -948,7 +946,7 @@
 
               </div>
             </div>
-            <div class="row">
+            <!-- <div class="row">
               <div class="col bottom-30 typography">
                 <div class="card card-outline-info">
                   &nbsp;
@@ -1074,10 +1072,7 @@
                           <label for="input-1">Tax Rate</label>
                         </div>
                         <div class="col-8">
-                          <!-- <select formControlName="tax_percent" class="form-control custom-select">
 
-                            <option *ngFor= "let list of tax_list" value="{{list.rate}}" >{{list.name}}</option>
-                          </select> -->
 
                           <ng-select formControlName="tax_percent"  class=" form-control custom-select" [clearable]="false" >
                               <ng-option *ngFor= "let list of tax_list" [value]="list.rate" class="form-control">
@@ -1092,7 +1087,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </div> -->
             <div class="row">
               <div class="form-group col-6">
                 <div class="input-group">
@@ -1401,6 +1396,7 @@
     </form>
   </div>
 </ng-template>
+
 <ng-template #approval let-modal>
   <div class="modal-header state modal-info">
     <h2 class="modal-title" id="modal-primary-label">Confirmation</h2>
@@ -1593,3 +1589,157 @@
 
             </ngx-datatable>
     </div>
+
+
+ <ng-template #Transport let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Add Item</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="DriverDetails" (ngSubmit)="Tranportdata(DriverDetails.value)">
+              <div class="row">
+                <div class="col-mb-12" >
+
+                    <div class="form-group">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label>Transport Name</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" formControlName="transporter_name" class="form-control" placeholder="Enter Transporter Name">
+                          <span class="help-block text-danger" *ngIf="DriverDetails.get('transporter_name').touched && DriverDetails.get('transporter_name').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DriverDetails.get('transporter_name').touched && DriverDetails.get('transporter_name').hasError('minlength')">Minimum 5 Character Required!</span>
+                        </div>
+                         </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label>Vehicle Type</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" formControlName="vehicle_type" class="form-control" placeholder="Enter Vehicle Type">
+                          <span class="help-block text-danger" *ngIf="DriverDetails.get('vehicle_type').touched && DriverDetails.get('vehicle_type').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DriverDetails.get('vehicle_type').touched && DriverDetails.get('vehicle_type').hasError('minlength')">Minimum 3 Character Required!</span>
+                        </div>
+                      </div>
+                    </div>
+
+
+                    <div class="form-group">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Vehicle Number</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" formControlName="vehicle_number" class="form-control" placeholder="Vehical Number">
+                          <span class="help-block text-danger" *ngIf="DriverDetails.get('vehicle_number').touched && DriverDetails.get('vehicle_number').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DriverDetails.get('vehicle_number').touched && DriverDetails.get('vehicle_number').hasError('minlength')">Minimum 5 Character Required!</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group ">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Document Number</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" formControlName="document_number" class="form-control" placeholder="Transporter Document Number">
+                          <span class="help-block text-danger" *ngIf="DriverDetails.get('document_number').touched && DriverDetails.get('document_number').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DriverDetails.get('document_number').touched && DriverDetails.get('document_number').hasError('minlength')">Minimum 3 Character Required!</span>
+                        </div>
+                      </div>
+                    </div>
+
+
+                    <div class="form-group ">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Transport Incharge Name</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" formControlName="tran_in_name" class="form-control" placeholder="Incharge Name">
+                          <span class="help-block text-danger" *ngIf="DriverDetails.get('tran_in_name').touched && DriverDetails.get('tran_in_name').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DriverDetails.get('tran_in_name').touched && DriverDetails.get('tran_in_name').hasError('minlength')">Minimum 3 Character Required!</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group ">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Transport Incharge Mobile</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="number" formControlName="tran_in_mobile" onKeyPress="if(this.value.length==10) return false;" class="form-control" placeholder="Incharge Mobile Number" onKeyPress="if(this.value.length==10) return false;">
+                          <span class="help-block text-danger" *ngIf="DriverDetails.get('tran_in_mobile').touched && DriverDetails.get('tran_in_mobile').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DriverDetails.get('tran_in_mobile').touched && DriverDetails.get('tran_in_mobile').hasError('pattern')">Valid Mobile Number !</span>
+                          <span class="help-block text-danger" *ngIf="DriverDetails.get('tran_in_mobile').touched && DriverDetails.get('tran_in_mobile').hasError('minlength')">Minimum 10 Digit Required!</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="form-group ">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Driver Name</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="text" formControlName="driver_name" class="form-control" placeholder="Driver Name">
+                          <span class="help-block text-danger" *ngIf="DriverDetails.get('driver_name').touched && DriverDetails.get('driver_name').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DriverDetails.get('driver_name').touched && DriverDetails.get('driver_name').hasError('minlength')">Minimum 3 Character Required!</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group ">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Driver Mobile</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="number" formControlName="driver_mobile" onKeyPress="if(this.value.length==10) return false;" class="form-control" placeholder="Driver Mobile" onKeyPress="if(this.value.length==10) return false;">
+                          <span class="help-block text-danger" *ngIf="DriverDetails.get('driver_mobile').touched && DriverDetails.get('driver_mobile').hasError('required')">Required !</span>
+                          <span class="help-block text-danger" *ngIf="DriverDetails.get('driver_mobile').touched && DriverDetails.get('driver_mobile').hasError('pattern')">Valid Mobile Number !</span>
+                          <span class="help-block text-danger" *ngIf="DriverDetails.get('driver_mobile').touched && DriverDetails.get('driver_mobile').hasError('minlength')">Minimum 10 Digit Required!</span>
+                        </div>
+                      </div>
+                    </div>
+
+
+                    <div class="form-group ">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Transport Cost</label>
+                        </div>
+                        <div class="col-8">
+                          <input type="number" formControlName="amount" class="form-control" placeholder="Amount">
+                          <span class="help-block text-danger" *ngIf="DriverDetails.get('amount').touched && DriverDetails.get('amount').hasError('required')">Required !</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group ">
+                      <div class="input-group">
+                        <div class="col-4">
+                          <label for="input-1">Tax Rate</label>
+                        </div>
+                        <div class="col-8">
+                          <ng-select formControlName="tax_percent"  class=" form-control custom-select" [clearable]="false">
+                            <ng-option *ngFor= "let list of tax_list" [value]="list.rate" class="form-control">
+                              {{list.name}}
+                            </ng-option>
+                          </ng-select>
+
+                          <span class="help-block text-danger" *ngIf="DriverDetails.get('tax_percent').touched && DriverDetails.get('tax_percent').hasError('required')">Required !</span>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+      <div class="col-md-7">
+      <button [disabled]="loading" class="btn btn-primary pull-right" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+    </div>
+    </form>
+  </div>
+</ng-template>

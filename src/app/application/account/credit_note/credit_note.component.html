@@ -145,6 +145,7 @@
                                 {{vendor.company_name}}
                             </ng-option>
                         </ng-select>
+                         <span class="help-block text-danger" *ngIf="DebitNoteForm.get('vendor_id').touched && DebitNoteForm.get('vendor_id').hasError('required')">Select vendor !</span>
                       </div>
                    </div>
 
@@ -157,6 +158,10 @@
                                 {{customer.company_name}}
                             </ng-option>
                         </ng-select>
+
+                         <span class="help-block text-danger"
+                          *ngIf="DebitNoteForm.get('vendor_id').touched && DebitNoteForm.get('vendor_id').hasError('required')">Select customer !</span>
+
                       </div>
                    </div>
               </div>

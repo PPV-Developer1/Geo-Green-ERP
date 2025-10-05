@@ -59,7 +59,7 @@ export const routes: Routes = [
             { path: 'store', loadChildren: () => import('./store/dispatch/dispatch.module').then(m => m.DispatchModule), data: { breadcrumb: 'STORE' }  },
             { path: 'store', loadChildren: () => import('./store/outward_sales/outward_sales.module').then(m => m.Outward_salesModule), data: { breadcrumb: 'STORE' }  },
             { path: 'store', loadChildren: () => import('./store/product_stock_list/product_stock_list.module').then(m => m.Product_stock_listModule), data: { breadcrumb: 'STORE' }  },
-
+            { path: 'store', loadChildren: () => import('./store/jobwork/jobwork.module').then(m => m.JobworkModule), data: { breadcrumb: 'STORE' }  },
 
             { path: 'production', loadChildren: () => import('./production/planning/planning.module').then(m => m.PlanningModule), data: { breadcrumb: 'PRODUCTION' }  },
             { path: 'production', loadChildren: () => import('./production/approval/approval.module').then(m => m.ApprovalModule), data: { breadcrumb: 'PRODUCTION' }  },

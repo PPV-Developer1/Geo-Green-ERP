@@ -8,12 +8,14 @@ import { FormGroup,  FormBuilder, Validators, FormControl, FormArray } from '@an
 import * as XLSX from "xlsx";
 import { dispatch } from 'd3';
 import { formatDate } from 'fullcalendar';
+import { error } from 'console';
 
 @Component({
   selector: 'az-dispatch',
   templateUrl: './dispatch.component.html',
   styleUrls: ['./dispatch.component.scss']
 })
+
 export class DispatchComponent implements OnInit {
 
   @ViewChild(DatatableComponent) table: DatatableComponent;
@@ -24,6 +26,7 @@ export class DispatchComponent implements OnInit {
   @ViewChild("RemoveFromDispatch",{static:true}) RemoveFromDispatch:ElementRef;
   @ViewChild("RemoveFromDispatch_item",{static:true}) RemoveFromDispatch_item:ElementRef;
   @ViewChild("approve_item_list",{static:true}) approve_item_list:ElementRef;
+  @ViewChild("Transport",{static:true}) Transport:ElementRef;
 
   public uid       = localStorage.getItem('uid');
   public user_type = localStorage.getItem('type');
@@ -71,26 +74,29 @@ export class DispatchComponent implements OnInit {
   filter_data_project   : any;
   filter_data_2         : any;
   project_asso_list_edit: any;
-  total                 :any
-  show                  :boolean
+  total                 : any
+  show                  : boolean
   outward_quantity      : any;
   have_serial_number    : boolean = false
-  outwardList           :any
-  item_list             :any
+  outwardList           : any
+  item_list             : any
   product_details       : any
-  item_category         :any
+  item_category         : any
   batchList             : any
   item                  : any
   totalSelectedCount    : any
   show_dropdown         : boolean = false
-  today              : Date   = new Date();
-  jstoday           = '';
-  project_item_list  :any;
-  checkedList       : any
-  update_stock      : FormGroup;
-  DispatchForm      : FormGroup;
-  DispatchEditForm  : FormGroup;
-  dropdownSettings: any = {};
+  today                 : Date   = new Date();
+  jstoday               = '';
+  project_item_list     : any;
+  checkedList           : any
+  update_stock          : FormGroup;
+  DispatchForm          : FormGroup;
+  DispatchEditForm      : FormGroup;
+  DriverDetails         : FormGroup;
+  dropdownSettings      : any = {};
+  list_view             : Boolean = false
+
   Outward = new FormGroup
   ({
     'created_by'    : new FormControl(this.uid),
@@ -141,6 +147,24 @@ export class DispatchComponent implements OnInit {
         customername      : [null],
         dispatch_incharge : [null, Validators.compose([Validators.required])],
         transport_type    : ['Company', Validators.compose([Validators.required])],
+        dispatch_type     : [null],
+        notes             : [null],
+
+        'asso_list'       : this.fb.array([]),
+        'status'          : [1]
+      })
+
+    this.DispatchEditForm = fb.group(
+      {
+        datetime          : [null, Validators.compose([Validators.required])],
+        dispatch_incharge : [null, Validators.compose([Validators.required])],
+        transport_type    : ['Company', Validators.compose([Validators.required])],
+        'asso_list'       : this.fb.array([]),
+         notes             : [null],
+      })
+
+      this.DriverDetails = fb.group(
+        {
         transporter_name  : [null, Validators.compose([Validators.required, ])],
         vehicle_type      : [null, Validators.compose([Validators.required,])],
         vehicle_number    : [null, Validators.compose([Validators.required])],
@@ -149,34 +173,10 @@ export class DispatchComponent implements OnInit {
         tran_in_mobile    : [null, Validators.compose([Validators.required, Validators.minLength(10)])],
         driver_name       : [null, Validators.compose([Validators.required, ])],
         driver_mobile     : [null, Validators.compose([Validators.required, Validators.minLength(10)])],
-        notes             : [null],
-        dispatch_type     : [null],
         amount            : [null, Validators.compose([Validators.required])],
         tax_percent       : [null, Validators.compose([Validators.required])],
-        'asso_list'       : this.fb.array([]),
-        'status'          : [1]
-      }
-    )
-    this.DispatchEditForm = fb.group(
-      {
-        datetime          : [null, Validators.compose([Validators.required])],
-        dispatch_incharge : [null, Validators.compose([Validators.required])],
-        transport_type    : ['Company', Validators.compose([Validators.required])],
-        transporter_name  : [null, Validators.compose([Validators.required, ])],
-        vehicle_type      : [null, Validators.compose([Validators.required, ])],
-        vehicle_number    : [null, Validators.compose([Validators.required])],
-        document_number   : [null, Validators.compose([Validators.required, ])],
-        tran_in_name      : [null, Validators.compose([Validators.required,])],
-        tran_in_mobile    : [null, Validators.compose([Validators.required, Validators.minLength(10)])],
-        driver_name       : [null, Validators.compose([Validators.required, ])],
-        driver_mobile     : [null, Validators.compose([Validators.required, Validators.minLength(10)])],
-        notes             : [null],
-        amount            : [null, Validators.compose([Validators.required])],
-        tax_percent       : [null, Validators.compose([Validators.required])],
-        'asso_list'       : this.fb.array([]),
-      }
-    )
-
+        }
+      )
    }
 
    Edit_Button()
@@ -191,17 +191,17 @@ export class DispatchComponent implements OnInit {
     this.DispatchEditForm.controls['datetime'].setValue(this.detail_view['dispatch_datetime']);
     this.DispatchEditForm.controls['dispatch_incharge'].setValue(this.detail_view['dispatch_incharge']);
     this.DispatchEditForm.controls['transport_type'].setValue(this.detail_view['tran_scope']);
-    this.DispatchEditForm.controls['transporter_name'].setValue(this.detail_view['tran_name']);
-    this.DispatchEditForm.controls['vehicle_type'].setValue(this.detail_view['vehicle_type']);
-    this.DispatchEditForm.controls['vehicle_number'].setValue(this.detail_view['vehicle_number']);
-    this.DispatchEditForm.controls['document_number'].setValue(this.detail_view['document_number']);
-    this.DispatchEditForm.controls['tran_in_name'].setValue(this.detail_view['tran_inc_name']);
-    this.DispatchEditForm.controls['tran_in_mobile'].setValue(this.detail_view['tran_inc_mobile']);
-    this.DispatchEditForm.controls['driver_name'].setValue(this.detail_view['tran_driver_name']);
-    this.DispatchEditForm.controls['driver_mobile'].setValue(this.detail_view['tran_driver_mobile']);
+    // this.DispatchEditForm.controls['transporter_name'].setValue(this.detail_view['tran_name']);
+    // this.DispatchEditForm.controls['vehicle_type'].setValue(this.detail_view['vehicle_type']);
+    // this.DispatchEditForm.controls['vehicle_number'].setValue(this.detail_view['vehicle_number']);
+    // this.DispatchEditForm.controls['document_number'].setValue(this.detail_view['document_number']);
+    // this.DispatchEditForm.controls['tran_in_name'].setValue(this.detail_view['tran_inc_name']);
+    // this.DispatchEditForm.controls['tran_in_mobile'].setValue(this.detail_view['tran_inc_mobile']);
+    // this.DispatchEditForm.controls['driver_name'].setValue(this.detail_view['tran_driver_name']);
+    // this.DispatchEditForm.controls['driver_mobile'].setValue(this.detail_view['tran_driver_mobile']);
     this.DispatchEditForm.controls['notes'].setValue(this.detail_view['note']);
-    this.DispatchEditForm.controls['amount'].setValue(this.detail_view['amount']);
-    this.DispatchEditForm.controls['tax_percent'].setValue(this.detail_view['tax_percent']);
+    // this.DispatchEditForm.controls['amount'].setValue(this.detail_view['amount']);
+    // this.DispatchEditForm.controls['tax_percent'].setValue(this.detail_view['tax_percent']);
    }
 
   ngOnInit()
@@ -267,15 +267,20 @@ export class DispatchComponent implements OnInit {
                 this.loading = false;
                 this.toastrService.success('Dispatch Updated Succesfully');
                 this.LoadDispatch();
-                this.LoadDispatch();
-                this.editdispatch_form = false;
-                this.addnew_form = false;
-                this.selected = [];
-                this.selected_item = [];
-                this.showdetails = false;
+                // this.LoadDispatch();
+
+                // this.addnew_form = false;
+                this.showdetails = true
+                this.selected = [this.detail_view];
+                // this.selected_item = [];
+                // this.showdetails = false;
+               setTimeout(async() => {
+                   this.detail_view = await this.dispatch_list.find(i => i.id == this.detail_view.id)
+                    this.editdispatch_form = false;
+                }, 100);
             }
             else
-             { this.toastrService.error(data.status);
+             { this.toastrService.error(data);
               this.loading = false;}
                return true;
             }).catch(error => {this.toastrService.error('API Faild : OnUpdate');
@@ -288,7 +293,7 @@ export class DispatchComponent implements OnInit {
         this.loading = false;});
   }
 
-  list_view : Boolean = false
+
   approval_button()
   {
 
@@ -300,15 +305,77 @@ export class DispatchComponent implements OnInit {
                 this.list_view = true
             }
       }
-    if(this.dispatch_pro_item_list == undefined)
-    {
-      this.openSm(this.approval);
-
-    }
+      if(this.dispatch_pro_item_list == undefined)
+      {
+        this.openSm(this.approval);
+      }
 
   }
 
 
+  async Update_tran()
+  {
+     await this.Loadtax()
+    this.DriverDetails.controls['transporter_name'].setValue(this.detail_view['tran_name']);
+    this.DriverDetails.controls['vehicle_type'].setValue(this.detail_view['vehicle_type']);
+    this.DriverDetails.controls['vehicle_number'].setValue(this.detail_view['vehicle_number']);
+    this.DriverDetails.controls['document_number'].setValue(this.detail_view['document_number']);
+    this.DriverDetails.controls['tran_in_name'].setValue(this.detail_view['tran_inc_name']);
+    this.DriverDetails.controls['tran_in_mobile'].setValue(this.detail_view['tran_inc_mobile']);
+    this.DriverDetails.controls['driver_name'].setValue(this.detail_view['tran_driver_name']);
+    this.DriverDetails.controls['driver_mobile'].setValue(this.detail_view['tran_driver_mobile']);
+    this.DriverDetails.controls['amount'].setValue(this.detail_view['amount']);
+    this.DriverDetails.controls['tax_percent'].setValue(this.detail_view['tax_percent']);
+    this.openModel = this.modalService.open(this.Transport,{ size: 'md'});
+    console.log("tax list ",this.tax_list)
+
+  }
+
+  async Tranportdata(value)
+  {
+    console.log(value)
+     console.log("details : ",this.detail_view.id)
+    Object.keys(this.DriverDetails.controls).forEach(field =>
+      {
+        const control = this.DriverDetails.get(field);
+        control.markAsTouched({ onlySelf: true });
+      });
+
+    if(this.DriverDetails.valid)
+    {
+      this.loading = true
+      await  this.api.post('post_update_data.php?table=dispatch&field=id&value='+this.detail_view.id+'&authToken='+environment.authToken,this.DriverDetails.value).then(async (data: any) =>
+      {
+        console.log(data)
+        if(data.status == "success")
+        {
+           await this.LoadDispatch();
+            this.loading = false
+            this.toastrService.success('Dispatch Updated Succesfully');
+            this.openModel.close()
+
+            console.log("detail_view : ",this.detail_view)
+            setTimeout(async() => {
+                this.detail_view = await this.dispatch_list.find(i => i.id == this.detail_view.id)
+            }, 100);
+
+            // this.LoadDispatch();
+            // this.editdispatch_form = false;
+            // this.addnew_form = false;
+            // this.selected = [];
+            // this.selected_item = [];
+            // this.showdetails = false;
+        }
+      }).catch(error=> {
+            this.toastrService.error('Something went wrong');
+            this.loading = false
+      })
+
+    }
+    else{
+       this.toastrService.error('Fill the required details');
+    }
+  }
   async approval_submit()
   {
     let type =this.detail_view['delivery_against'];
@@ -670,14 +737,14 @@ async  update(Batch)
     }).catch(error => {this.toastrService.error('Something went wrong');});
   }
 
-  Loadtax()
+ async Loadtax()
   {
-    this.api.get('get_data.php?table=tax&authToken='+environment.authToken).then((data: any) =>
+   await this.api.get('get_data.php?table=tax&authToken='+environment.authToken).then((data: any) =>
     {
       this.tax_list  = data;
     }).catch(error => {this.toastrService.error('Something went wrong');});
 
-    this.api.get('get_data.php?table=employee&authToken='+environment.authToken).then((data: any) =>
+   await this.api.get('get_data.php?table=employee&authToken='+environment.authToken).then((data: any) =>
     {
       this.employee_list = data;
     }).catch(error => {this.toastrService.error('Something went wrong');});

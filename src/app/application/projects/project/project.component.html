@@ -204,10 +204,14 @@
   <br>
 
   <div widget class="card">
-    <div class="card-header">
-      <span class="text-uppercase">List of Association</span>
+    <div class="card-header d-flex justify-content-between align-items-center" >
+
+          <span class="text-uppercase">List of Association</span>
+             <span  style="color: white;" (click)="togglePanel('panel1')">
+                          <i class="fa" [ngClass]="{'fa-chevron-up': activePanel === 'panel1', 'fa-chevron-down': activePanel !== 'panel1'}"></i>
+              </span>
     </div>
-    <div class="card-body">
+    <div class="card-body widget-body"  *ngIf="activePanel === 'panel1'">
       <ngx-datatable
         #table
         class="custom_table"
@@ -278,10 +282,16 @@
 
 
   <div *ngIf="this.pro_serial_item_list != null" widget class="card">
-    <div class="card-header">
-      <span class="text-uppercase">List of Material</span><span> (with serial number)</span>
+    <div class="card-header d-flex justify-content-between align-items-center ">
+      <div>
+            <span class="text-uppercase">List of Material </span> <span>(with serial number)</span>
+      </div>
+
+       <span  style="color: white;" (click)="togglePanel('panel2')">
+                          <i class="fa" [ngClass]="{'fa-chevron-up': activePanel === 'panel2', 'fa-chevron-down': activePanel !== 'panel2'}"></i>
+        </span>
     </div>
-    <div class="card-body">
+    <div class="card-body widget-body"  *ngIf="activePanel === 'panel2'">
       <ngx-datatable
         #table
         class="custom_table"
@@ -357,10 +367,17 @@
 
 
 <div *ngIf="this.project_item_List != null" widget class="card">
-    <div class="card-header">
-      <span class="text-uppercase">List of Material</span><span> (without serial number)</span>
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <div>
+            <span class="text-uppercase">List of Material</span><span> (without serial number)</span>
+      </div>
+
+       <span  style="color: white;" (click)="togglePanel('panel3')">
+                          <i class="fa" [ngClass]="{'fa-chevron-up': activePanel === 'panel3', 'fa-chevron-down': activePanel !== 'panel3'}"></i>
+        </span>
     </div>
-    <div class="card-body">
+
+    <div class="card-body widget-body"  *ngIf="activePanel === 'panel3'">
       <ngx-datatable
         #table
         class="custom_table"
