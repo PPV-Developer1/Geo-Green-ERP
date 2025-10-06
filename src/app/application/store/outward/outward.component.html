@@ -72,7 +72,7 @@
           {{row.by_product_no}}
       </ng-template>
     </ngx-datatable-column>
-    
+
     <ngx-datatable-column prop="product_name" name="PRODUCT NAME">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.product_name}}
@@ -195,7 +195,8 @@
 
           <ng-select formControlName="item_id"  class=" form-control custom-select" id="batch" (change)="LoadBatch($event)"  [clearable]="false" >
             <ng-option *ngFor="let item of category_list" value ="{{item.item_id}}" class="form-control">
-              {{item.name}}
+              <span *ngIf="item.stock_status == 0" style="color: red;"> {{ item.name }}</span>
+               <span *ngIf="item.stock_status >0" > {{ item.name }}</span>
             </ng-option>
           </ng-select>
 

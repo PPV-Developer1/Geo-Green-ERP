@@ -82,7 +82,7 @@ export class OutwardComponent implements OnInit
   }
   openSm(content)
   {
-    this.openModel = this.modalService.open(content, { size: 'xl'});
+    this.openModel = this.modalService.open(content, { size: 'md'});
   }
 
 
@@ -332,6 +332,7 @@ export class OutwardComponent implements OnInit
     this.edit_Outward.controls['quantity'].setValue(row.qty)
     this.edit_Outward.controls['notes'].setValue(row.notes)
   }
+
   update(value)
   {
           let id = this.InOnActive.id

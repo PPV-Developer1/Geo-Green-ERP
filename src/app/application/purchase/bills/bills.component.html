@@ -491,6 +491,7 @@
         <select formControlName="invoicetype" class="form-control" (change)="bill_type($event.target.value)">
           <option value = "project">Project</option>
           <option value = "company">Company</option>
+           <option value ="service">Service</option>
         </select>
         <span class="help-block text-danger" *ngIf="SelectCategory.get('invoicetype').touched && SelectCategory.get('invoicetype').hasError('required')">Selection Required !</span>
       </div>

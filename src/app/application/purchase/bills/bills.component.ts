@@ -181,19 +181,20 @@ export class BillsComponent implements OnInit {
         dueDate : [(new Date()).toISOString().substring(0, 10)],
         subTotal: [0,Validators.compose([Validators.required])],
         shippingCharge: [0],
-        TCS     : [0],
-        TDS     : [0],
-        roundOff: [0],
-        notes: [null, Validators.compose([Validators.required])],
+        TCS       : [0],
+        TDS       : [0],
+        roundOff  : [0],
+        notes     : [null, Validators.compose([Validators.required])],
         terms_condition: [null, Validators.compose([Validators.required])],
-        status  : [1],
-        total   : [0],
+        status    : [1],
+        total     : [0],
         tds_percentage:[0],
         tcs_percentage:[0],
-        tax_type: [null],
+        tax_type  : [null],
         project_id : [null],
-        size : [null],
-        product: this.fb.array([])
+        size    : [null],
+        product: this.fb.array([]),
+        type   : [null]
       })
 
 
@@ -503,7 +504,8 @@ export class BillsComponent implements OnInit {
   }
   async onSubmit(bill_data)
   {
-
+    bill_data.type = this.type
+    console.log(this.bill.value)
     Object.keys(this.bill.controls).forEach(field => {
       const control = this.bill.get(field);
       control.markAsTouched({ onlySelf: true });
@@ -867,7 +869,7 @@ export class BillsComponent implements OnInit {
 
   AddSubmit(value)
   {
-
+      this.bill.controls["type"].setValue(this.type)
     if(this.type =="project")
       {
         if(this.SelectCategory.value.project_id != null)
@@ -881,7 +883,7 @@ export class BillsComponent implements OnInit {
             this.toastrService.error('Select all data');
           }
       }
-     else if(this.type =="company"){
+     else if(this.type =="company" || this.type =="service" ){
         this.type = value.invoicetype
             this.show_new_bill = true;
             this.formShow      = true

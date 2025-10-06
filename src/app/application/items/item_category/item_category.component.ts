@@ -37,6 +37,7 @@ export class Item_categoryComponent implements OnInit {
     name              : new FormControl('', [Validators.required, Validators.minLength(3)]),
     type              : new FormControl('', [Validators.required]),
     HaveSerialNumber  : new FormControl(null),
+    JobworkMaterial   : new FormControl(null),
     status            : new FormControl(null)
   });
 
@@ -46,6 +47,7 @@ export class Item_categoryComponent implements OnInit {
     name              : new FormControl('', [Validators.required, Validators.minLength(3)]),
     type              : new FormControl('', [Validators.required]),
     HaveSerialNumber  : new FormControl(0),
+    JobworkMaterial   : new FormControl(null),
     status            : new FormControl(1)
   });
 
@@ -93,6 +95,7 @@ export class Item_categoryComponent implements OnInit {
       this.EditCategory.controls['name'].setValue(this.detail_view['title']);
       this.EditCategory.controls['type'].setValue(this.detail_view['type']);
       this.EditCategory.controls['HaveSerialNumber'].setValue(this.detail_view['have_seriel_number']);
+      this.EditCategory.controls['JobworkMaterial'].setValue(this.detail_view['jobworkmaterial']);
       this.EditCategory.controls['status'].setValue(this.detail_view['status']);
       this.OpenCatEdit();
     }
@@ -121,6 +124,7 @@ export class Item_categoryComponent implements OnInit {
           this.loading = false;
       });
   }
+
   async AddSubmit(data)
   {
     Object.keys(this.AddCategory.controls).forEach(field =>
