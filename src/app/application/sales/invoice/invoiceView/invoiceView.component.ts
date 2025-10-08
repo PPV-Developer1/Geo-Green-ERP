@@ -55,6 +55,7 @@ export class InvoiceViewComponent implements OnInit {
   clone_invoice_show        : boolean = false;
   payment_view              : boolean = true;
 
+  dc_numbers                : any;
   advance_list              : any;
   subtotal                  : any;
   openMd                    : any;
@@ -174,12 +175,12 @@ export class InvoiceViewComponent implements OnInit {
   today                     = new Date();
   todaysDate                = '';
   item_index                : any;
-  private startX: number = 0;
-  private startWidth: number = 0;
-  private columnIndex: number | null = null;
-  private resizing = false;
-  tableWidth :any= 100 ;
-  originalTableHeight      : any
+  private startX      : number = 0;
+  private startWidth  : number = 0;
+  private columnIndex : number | null = null;
+  private resizing    = false;
+  tableWidth          : any= 100 ;
+  originalTableHeight : any
   private dropdownOpen = false;
   imgUrl: string = '../../../../assets/img/logo/geogreen.png';
  // imgUrl: string =  'https://chart.googleapis.com/chart?chs=100x100&cht=qr&chl=http://ppvgroups.org/test.php?id=100001';
@@ -443,13 +444,21 @@ fontload()
       this.stateCode     = data[0].state_code;
       this.load_paymentTransactiond(this.invoicePdf[0].invoice_id);
       this.customer_address(data[0].customer_id);
-
+      this.Load_dispath_data()
     }).catch(error => {
        this.toastrService.error('Something went wrong');
       });
 
   }
 
+ async Load_dispath_data()
+  {
+      await this.api.get('mp_invoice_dc_item_dispatch_data.php?id=' + this.view_invoice + '&type=Invoice&authToken=' + environment.authToken).then((data: any) => {
+          console.log("dispatch data ",data)
+         }).catch(error => {
+       this.toastrService.error('Something went wrong');
+      });
+  }
   async LoadCustomerBills()
   {
     await this.api.get('mp_customer_invoice.php?&authToken=' + environment.authToken).then((data: any) =>
@@ -480,7 +489,8 @@ fontload()
 
     if (event.type === "click")
     {
-
+      console.log(event.row.serial_number)
+      this.view_invoice = event.row.serial_number;
       this.invoice_id   = event.row.invoice_id;
       this.invoice_list = event.row;
       this.name = event.row.customer_name;
@@ -493,11 +503,12 @@ fontload()
       this.e_way_bill.controls['vehicle_no'].setValue(this.invoice_list.vehicle_number);
       this.e_way_bill.controls['shipment_mode'].setValue(this.invoice_list.transport_mode);
       this.customer_address(event.row.customer_id);
+      this.Load_dispath_data()
     }
 
   }
 
-  dc_numbers :any
+
  async  selectEdit_data()
     {
         var serial_no =  this.invoice_list['serial_no'];
@@ -781,6 +792,7 @@ async FetchAddress(data)
      let qty   = item.qty;
      let price = item.amount;
      this.edit_priceChange(qty, price, j);
+
    });
 
   for(let m = 0; m < this.invoiceitem_list.length; m++)

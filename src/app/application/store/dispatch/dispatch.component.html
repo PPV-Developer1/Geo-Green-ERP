@@ -373,6 +373,14 @@
             {{row.item_description}}
         </ng-template>
       </ngx-datatable-column>
+
+
+      <ngx-datatable-column prop="qty" name="QUANTITY" >
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.qty}} {{row.uom}}
+        </ng-template>
+      </ngx-datatable-column>
+
       </ngx-datatable>
     </div>
   </div>
@@ -709,6 +717,13 @@
                       </ng-template>
                     </ngx-datatable-column>
 
+                    <ngx-datatable-column prop="qty" name="QUANTITY" >
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.qty}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+
                     <ngx-datatable-column prop="status" name="STATUS">
                       <ng-template ngx-datatable-cell-template let-row="row">
                         <label *ngIf="row.status == 1" style="color:blue"><strong>Created</strong></label>
@@ -834,6 +849,12 @@
                     <ngx-datatable-column prop="item_description" name="DESCRIPTION" >
                       <ng-template ngx-datatable-cell-template let-row="row">
                           {{row.item_description}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                     <ngx-datatable-column prop="qty" name="QUANTITY" >
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.qty}} {{row.uom}}
                       </ng-template>
                     </ngx-datatable-column>
 
@@ -1183,6 +1204,12 @@
                       </ng-template>
                     </ngx-datatable-column>
 
+                     <ngx-datatable-column prop="qty" name="QUANTITY" >
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.qty}} {{row.uom}}
+                      </ng-template>
+                    </ngx-datatable-column>
+
                     <ngx-datatable-column prop="status" name="STATUS">
                       <ng-template ngx-datatable-cell-template let-row="row">
                         <label *ngIf="row.status == 1" style="color:blue"><strong>Created</strong></label>
@@ -1304,6 +1331,12 @@
                         {{row.item_description}}
                     </ng-template>
                   </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="qty" name="QUANTITY" >
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                          {{row.qty}} {{row.uom}}
+                      </ng-template>
+                    </ngx-datatable-column>
 
                   <ngx-datatable-column prop="status" name="STATUS">
                     <ng-template ngx-datatable-cell-template let-row="row">

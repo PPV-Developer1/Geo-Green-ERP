@@ -1251,7 +1251,7 @@ updateFilter_item (event)
         if(event.type =="click")
         {
           this.approved_item = event.row
-
+          console.log("event : ",event.row)
           this.outward_quantity = event.row.value
           this.LoadBatch(event.row.item_id)
         }
@@ -1311,14 +1311,24 @@ updateFilter_item (event)
       product.clear();
       if(this.batchList != null)
       {
+        console.log("batch : ",this.batchList)
+         console.log("detail_view : ",this.detail_view)
         this.batchList.forEach((item,j) => {
           product.push(this.fb.group({
+          type        : this.detail_view['delivery_against'],
+          item_type   : this.detail_view['type'],
+          item_id     : [item.item_list_id],
           items       : [item.item_name],
           descriptions: [item.item_description],
           batch       : [item.batch],
           quantity    : [0],
           stock       : [item.stock],
-          select      : [item.serial_itemList]
+          select      : [item.serial_itemList],
+          price       : [item.amount],
+          stock_id    : [item.stock_id],
+          dc_id       : this.detail_view["dc_id"],
+          invoice_id  : this.detail_view["invoice_id"],
+          project_item_id  : this.approved_item.id
           }));
         });
       }

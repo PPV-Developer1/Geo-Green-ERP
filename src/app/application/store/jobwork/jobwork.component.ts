@@ -1,13 +1,12 @@
-import { Item } from './../../purchase/class/dcItems';
+
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DatatableComponent, id } from '@swimlane/ngx-datatable';
-import { Model } from 'fullcalendar';
 import { ToastrService } from 'ngx-toastr';
 import { ApiService } from 'src/app/service/api.service';
 import { environment } from 'src/environments/environment';
-import { Item_listModule } from '../../items/item_list/item_list.module';
+import {formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-jobwork',
@@ -19,6 +18,7 @@ export class JobsheetComponent implements OnInit {
   Jobsheet      : FormGroup
   JobsheetEdit  : FormGroup
   Item          : FormGroup
+  InwardEntry   : FormGroup
   filter_data   : any;
   List          : any;
   selected      = []
@@ -31,6 +31,15 @@ export class JobsheetComponent implements OnInit {
   batchQty      : any;
   Jobsheet_items: any;
   Jobwork_list  : any
+  job_bills     : any
+  select_item   : any
+  bill_list     : any
+  Bill_id       : any
+  activePanel   : string | null = "panel1";
+  bill_row_id   : any
+  batchCode     : any
+  todays_Date   = '';
+  today      = new Date();
 
    edit_Outward = new FormGroup
     ({
@@ -38,6 +47,7 @@ export class JobsheetComponent implements OnInit {
       quantity      : new FormControl(null, [Validators.required]),
       notes         : new FormControl(null),
     })
+
   UpdateStatus = new FormGroup
     ({
       date_time       : new FormControl(null, [Validators.required]),
@@ -49,8 +59,9 @@ export class JobsheetComponent implements OnInit {
   @ViewChild("AddnewItem", { static: true }) AddnewItem   : ElementRef;
   @ViewChild("edititem",{static:true}) edititem:ElementRef;
   @ViewChild("delete",{static:true}) delete:ElementRef;
-  @ViewChild("UpdateOutward",{static:true}) UpdateOutward:ElementRef;
-   @ViewChild("bill",{static:true}) bill:ElementRef;
+  @ViewChild("delete_bill",{static:true}) delete_bill:ElementRef;
+  @ViewChild("CompleteJob",{static:true}) CompleteJob:ElementRef;
+  @ViewChild("bill",{static:true}) bill:ElementRef;
 
   constructor(
       public fb           : FormBuilder,
@@ -95,6 +106,15 @@ export class JobsheetComponent implements OnInit {
       'status'      : new FormControl('1')
     })
 
+  this.InwardEntry  = new FormGroup
+  ({
+      'inward_by'     : new FormControl(this.Uid),
+      batch           : new FormControl(null, [Validators.required]),
+      inward_at       : new FormControl(null, [Validators.required]),
+      notes           : new FormControl(null),
+    })
+    
+  this.todays_Date = formatDate(this.today, 'yyyy-MM-dd HH:mm:ss', 'en-US', '+0530');
   }
 
  async ngOnInit() {
@@ -131,11 +151,22 @@ export class JobsheetComponent implements OnInit {
       if(event.type == "click")
       {
         this.selected_data = event.row
-        // this.Edit()
         await  this.LoadItems()
         await  this.LoadJobsheet_item()
-        await this.BillList()
+        await  this.BillList()
+        await this.jobsheet_bills()
+
       }
+  }
+
+
+async jobsheet_bills()
+  {
+     await this.api.get('mp_jobwork_bill_list.php?id='+this.selected_data.id+'&authToken='+environment.authToken).then((data: any) =>
+        {
+          this.job_bills  = data
+
+        }).catch(error => {this.toastrService.error('Something went wrong');});
   }
 
   Edit()
@@ -358,7 +389,7 @@ async  update(value)
        const stock = this.batchList.find(i => i.batch == this.Item.value.batch_id)
        console.log(stock)
        this.Item.controls["stock_id"].setValue(stock.stock_id)
-     Object.keys(this.Item.controls).forEach(field =>
+      Object.keys(this.Item.controls).forEach(field =>
           {
             const control = this.Item.get(field);
             control.markAsTouched({ onlySelf: true });
@@ -423,7 +454,7 @@ async  update(value)
 
   }
 
-  select_item : any
+
   delete_item(row)
   {
     this.select_item = row
@@ -447,43 +478,29 @@ async  update(value)
   }
 
 
-   OpenStatusUpdate()
-  {
-    const now = new Date();
-    const offset = 5.5 * 60 * 60 * 1000; // 5.5 hours in milliseconds
-    const istTime = new Date(now.getTime() + offset);
-    const formattedDate = istTime.toISOString().slice(0, 16).replace("T", "T");
-     this.UpdateStatus.controls['date_time'].setValue(formattedDate)
-
-    if(this.Jobsheet_items != null)
-    {
-      this.OpenModel = this.modalService.open(this.UpdateOutward,{size:"md"})
-    }
-    else{
-      this.toastrService.error('Not added the Outward Item');
-    }
-  }
 
   async Complete(value)
     {
-      Object.keys(this.UpdateStatus.controls).forEach(field =>
+      console.log(this.InwardEntry.value)
+      Object.keys(this.InwardEntry.controls).forEach(field =>
         {
-          const control = this.UpdateStatus.get(field);
+          const control = this.InwardEntry.get(field);
           control.markAsTouched({ onlySelf: true });
         });
-      if(this.UpdateStatus.valid)
+      if(this.InwardEntry.valid)
       {
 
           this.loading=true;
-          await this.api.post('post_update_data.php?table=jobsheet_items_update&field=id&value='+this.selected_data.id+'&authToken='+environment.authToken,value).then((data: any) =>
+          await this.api.post('mp_complete_jobwork.php?id='+this.selected_data.id+'&authToken='+environment.authToken,this.InwardEntry.value).then((data: any) =>
           {
             console.log(data)
             if(data.status == "success")
             {
               this.loading=false;
-              this.toastrService.success('Product Completed Succesfully');
+              this.toastrService.success('Jobwork Completed');
               this.OpenModel.dismiss();
               this.selected = [];
+              this.InwardEntry.reset()
               this.LoadData();
             }
             else { this.toastrService.error('Something went wrong : onUpdate');
@@ -506,25 +523,18 @@ async  update(value)
       this.OpenModel = this.modalService.open(this.bill,{size:"md"})
     }
 
-    bill_list : any
-    Bill_id   : any
 
      async BillList()
     {
 
-        await this.api.get('mp_vendor_bill.php?&authToken=' + environment.authToken).then((data: any) =>
+        await this.api.get('mp_service_bill_list.php?&authToken=' + environment.authToken).then((data: any) =>
           {
-            function levelFilter(value) {
-                    if (!value) { return false; }
-                    return value.type === "service";
-                    }
-                      let get_data = data.filter(levelFilter);
-                      this.bill_list = get_data
+                      this.bill_list = data
                       console.log(this.bill_list)
           }).catch(error => { this.toastrService.error('Something went wrong in LoadVendorBills'); });
     }
 
-  async  bill_submot()
+  async  bill_submit()
     {
       console.log(this.Bill_id)
       const value ={
@@ -533,9 +543,7 @@ async  update(value)
         jobsheet_id : this.selected_data.id
       }
       console.log(value)
-
       this.loading=true;
-
           await this.api.post('post_insert_data.php?table=jobwork_bills&authToken='+environment.authToken,value).then(async(data: any) =>
           {
             console.log(data)
@@ -544,6 +552,9 @@ async  update(value)
                this.loading=false;
                this.toastrService.success('Bill added succesfully');
                this.OpenModel.close()
+               this.Bill_id = null
+               this.jobsheet_bills()
+               this.BillList()
             }
             else { this.toastrService.error('Something went wrong');
             this.loading = false;}
@@ -555,4 +566,74 @@ async  update(value)
           });
     }
 
+
+  togglePanel(panel: string): void {
+    console.log(panel)
+  this.activePanel = this.activePanel === panel ? null : panel;
+}
+
+
+  ReqDelete_bill(row)
+  {
+    console.log(row)
+    this.bill_row_id = row.id
+    this.OpenModel = this.modalService.open(this.delete_bill,{size:"md"})
+  }
+
+  async Delete()
+  {
+    this.loading = true
+    await this.api.get('delete_data.php?table=jobwork_bills&field=id&id='+this.bill_row_id+'&authToken=' + environment.authToken).then(async (data: any) =>
+            {
+              this.loading = false
+               this.toastrService.success("Bill Removed")
+               await this.jobsheet_bills()
+               this.OpenModel.close()
+              this.BillList()
+
+            }).catch(error => { this.toastrService.error('Something went wrong'); });
+  }
+
+
+
+ async OpenStatusUpdate()
+  {
+        const today = new Date();
+
+        // Get the parts of the date
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+        const year = String(today.getFullYear()).slice(-2); // Last two digits of year
+
+        // Format: DDMMYY
+        const formattedDate = day + month + year;
+
+        this.batchCode = formattedDate + '/' + this.selected_data.item_id;
+        console.log("batchCode : ",this.batchCode)
+        console.log("batchCode : ",this.todays_Date)
+
+        await this.api.get('get_data.php?table=stock_list&find=batch&value='+this.batchCode+'&authToken='+environment.authToken).then((data: any) =>
+          {
+            if(data != null)
+            {
+              const count = data.length +1
+              this.batchCode   = formattedDate+'/'+this.selected_data.item_id+'-'+count;
+            }
+          }).catch(error => {this.toastrService.error('Something went wrong');});
+
+          setTimeout(() => {
+                    this.InwardEntry.controls['inward_by'].setValue(this.Uid);
+                    this.InwardEntry.controls['batch'].setValue(this.batchCode);
+                    this.InwardEntry.controls['inward_at'].setValue(this.todays_Date);
+                    if(this.Jobsheet_items != null)
+                    {
+                      this.OpenModel = this.modalService.open(this.CompleteJob,{size:"md"})
+                    }
+                    else{
+                      this.toastrService.error('Not added the Outward Item');
+                    }
+        }, 500);
+
+
+  }
 }

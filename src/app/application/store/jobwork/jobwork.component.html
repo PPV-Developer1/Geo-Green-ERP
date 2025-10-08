@@ -14,7 +14,7 @@
             <div class="input-group-prepend">
                 <span class="input-group-text"><i class="fa fa-search"></i></span>
             </div>
-            <input class="form-control" type="text" placeholder="Search Vendor Name or Item Name or Bill Number..." (keyup)="updateFilter($event)"/>
+            <input class="form-control" type="text" placeholder="Search Name or  Description ..." (keyup)="updateFilter($event)"/>
           </div>
         </td>
         <td style="width: 100px;"> </td>
@@ -85,8 +85,8 @@
 
      <ngx-datatable-column prop="status" name="STATUS">
       <ng-template ngx-datatable-cell-template let-row="row">
-         <span *ngIf="row.status == 1">Created</span>
-           <span *ngIf="row.status == 2">Complete</span>
+         <span *ngIf="row.status == 1" style="color: crimson;">Created</span>
+           <span *ngIf="row.status == 2" style="color: green;" >Complete</span>
       </ng-template>
     </ngx-datatable-column>
 
@@ -265,11 +265,23 @@
     </div>
 
        &nbsp;
+   <div widget class="card">
+        <div class="card-header">
+          <span>Jobsheet Materials</span>
+          <div class="widget-controls">
+              <span  style="color: white;" (click)="togglePanel('panel1')">
+                          <i class="fa" [ngClass]="{'fa-chevron-up': activePanel === 'panel1', 'fa-chevron-down': activePanel !== 'panel1'}"></i>
+                </span>
+          </div>
+        </div>
+        <div class="card-body widget-body" *ngIf="activePanel === 'panel1'">
+
+
             <ngx-datatable
               #table
               class="custom_table"
               [headerHeight]="50"
-              [limit]="10"
+              [limit]="5"
               [columnMode]="'force'"
               [footerHeight]="50"
               [rowHeight]="'auto'"
@@ -314,7 +326,7 @@
                 </ng-template>
               </ngx-datatable-column>
 
-              <ngx-datatable-column>
+              <ngx-datatable-column *ngIf="selected_data.status == 1">
                 <ng-template ngx-datatable-cell-template let-row="row">
                   <button *ngIf="selected_data.status == 1" class="btn btn-danger btn-sm fa fa-trash" (click)="delete_item(row)"> Delete</button>
                       &nbsp;
@@ -325,7 +337,81 @@
             </ngx-datatable>
           </div>
 
+    </div>
 
+
+      &nbsp;
+   <div widget class="card">
+        <div class="card-header">
+          <span>Bills</span>
+          <div class="widget-controls">
+               <span  style="color: white;" (click)="togglePanel('panel2')">
+                          <i class="fa" [ngClass]="{'fa-chevron-up': activePanel === 'panel2', 'fa-chevron-down': activePanel !== 'panel2'}"></i>
+                </span>
+          </div>
+        </div>
+        <div class="card-body widget-body" *ngIf="activePanel === 'panel2'" >
+
+
+            <ngx-datatable
+              #table
+              class="custom_table"
+              [headerHeight]="50"
+              [limit]="5"
+              [columnMode]="'force'"
+              [footerHeight]="50"
+              [rowHeight]="'auto'"
+              [rows]="job_bills"
+
+
+             >
+
+              <!-- <ngx-datatable-column name="ID" >
+                  <ng-template ngx-datatable-cell-template let-row="row">
+                      {{row.id}}
+                  </ng-template>
+              </ngx-datatable-column> -->
+
+              <ngx-datatable-column prop="bill_date" name="DATE">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.bill_date | date: 'dd-MM-yyyy'}}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="batch" name="BILL NUMBER">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.bill_number}}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="item_name" name="VENDOR NAME">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.vendor_name}}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="total" name="AMOUNT">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.total | indianCurrency}}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column prop="note" name="NOTES">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.note}}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column  *ngIf="selected_data.status == 1">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                  <button  class="btn btn-danger btn-sm fa fa-trash" (click)="ReqDelete_bill(row)"> Delete</button>
+              </ng-template>
+              </ngx-datatable-column>
+            </ngx-datatable>
+          </div>
+
+    </div>
+</div>
 <!-- Item add model -->
 
 <ng-template #AddnewItem let-modal>
@@ -454,6 +540,21 @@
   </div>
 </ng-template>
 
+
+<ng-template #delete_bill let-modal>
+  <div class="modal-header state modal-danger">
+    <h2 class="modal-title" id="modal-primary-label">Delete Confirmation</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    Are you sure to delete this Outward Item!
+  </div>
+  <div class="modal-footer">
+      <button [disabled]="loading" type="button" class="btn btn-danger" data-dismiss="modal" (click)="Delete()">Delete<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      <button type="button" class="btn btn-success" data-dismiss="modal" (click)="modal.dismiss('Cross click')">Close</button>
+  </div>
+</ng-template>
+
 <ng-template #UpdateOutward let-modal>
   <div class="modal-header state modal-info">
     <h3 class="modal-title" id="modal-primary-label">JOBSHEET COMPLETED ENTRY</h3>
@@ -483,7 +584,7 @@
 
 <ng-template #bill let-modal>
   <div class="modal-header state modal-info">
-    <h3 class="modal-title" id="modal-primary-label">Bill ENTRY</h3>
+    <h3 class="modal-title" id="modal-primary-label">BLL ENTRY</h3>
     <button type="button" class="close" data-dismiss="modal" aria-label="Close"
       (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
   </div>
@@ -503,10 +604,51 @@
         </div>
         <div class="col-12">
           <div class="row justify-content-center">
-            <button [disabled]="loading" type="submit" class="btn btn-success" (click)="bill_submot()"> Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+            <button [disabled]="loading" type="submit" class="btn btn-success" (click)="bill_submit()"> Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
           </div>
         </div>
       </div>
+  </div>
+</ng-template>
 
+
+<ng-template #CompleteJob let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label"> ADD INWARD DETAILS</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="InwardEntry" (ngSubmit)=" Complete(InwardEntry.value)">
+      <div class="row">
+        <div class="form-group col-4">
+          Outward Date & Time
+        </div>
+        <div class="form-group col-6">
+          <input formControlName="inward_at" type="datetime-local" class="form-control" format="MM-DD-YYYY HH:mm" id="input-11">
+          <span class="help-block text-danger" *ngIf="InwardEntry.get('inward_at').touched && InwardEntry.get('inward_at').hasError('required')">Inward Date Time Required !</span>
+        </div>
+
+        <div class="form-group col-4" >
+          <label for="input-15">Batch</label>
+        </div>
+        <div class="form-group col-6">
+          <input formControlName ="batch" type="text" class="form-control" id="input-10" placeholder=" Enter batch ">
+           <span class="help-block text-danger" *ngIf="InwardEntry.get('batch').touched && InwardEntry.get('batch').hasError('required')"> Required !</span>
+        </div>
+
+        <div class="form-group col-4" >
+          <label for="input-15">Notes</label>
+        </div>
+        <div class="form-group col-6">
+          <input formControlName ="notes" type="text" class="form-control" id="input-10" placeholder=" Enter Outward Notes">
+        </div>
+         <div class="col-12">
+          <div class="row justify-content-center">
+            <button [disabled]="loading" type="submit" class="btn btn-success" > Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+          </div>
+        </div>
+      </div>
+    </form>
   </div>
 </ng-template>

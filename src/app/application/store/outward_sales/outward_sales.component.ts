@@ -5,6 +5,7 @@ import { ApiService } from 'src/app/service/api.service';   // For API
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment.prod';
 import { FormGroup, FormArray, FormBuilder, Validators, FormControl} from '@angular/forms';
+import { privateDecrypt } from 'crypto';
 
 @Component({
   selector: 'app-outward_sales',
@@ -23,8 +24,8 @@ export class Outward_salesComponent implements OnInit {
   ItemList           = [];
   stock_list         = [];
   item               = [];
-  checkedList : any[];
-  currentSelected : {};
+  checkedList        : any[];
+  currentSelected    : {};
   category_list      : any;
   batchList          : any;
   batchQty           : any;
@@ -38,7 +39,7 @@ export class Outward_salesComponent implements OnInit {
   item_category      : any;
   show_list          : any;
   totalSelectedCount = 0;
-  dropdownSettings: any = {};
+  dropdownSettings   : any = {};
   productsSelectedItems: any[];
   showDropDown       : boolean = false
   show_dropdown      : boolean = false
@@ -49,9 +50,10 @@ export class Outward_salesComponent implements OnInit {
   show               : boolean = false;
   loading            : boolean = false;
 
-  public uid       = localStorage.getItem('uid');
-  public user_type = localStorage.getItem('type');
-  update_stock    : FormGroup ;
+  public uid        = localStorage.getItem('uid');
+  public user_type  = localStorage.getItem('type');
+  update_stock      : FormGroup ;
+
   Outward = new FormGroup
     ({
       'created_by'    : new FormControl(this.uid),
@@ -70,10 +72,10 @@ export class Outward_salesComponent implements OnInit {
       date_time       : new FormControl(null, [Validators.required]),
       'level'         : new FormControl('4')
     })
-    @Input() list:any[];
 
-    @Output() shareCheckedList = new EventEmitter();
-    @Output() shareIndividualCheckedList = new EventEmitter();
+  @Input() list:any[];
+  @Output() shareCheckedList = new EventEmitter();
+  @Output() shareIndividualCheckedList = new EventEmitter();
 
   @ViewChild("AddOutward",{static:true}) AddOutward:ElementRef;
   @ViewChild("UpdateOutward",{static:true}) UpdateOutward:ElementRef;
@@ -146,74 +148,75 @@ export class Outward_salesComponent implements OnInit {
     }).catch(error => {this.toastrService.error('Something went wrong');});
   }
 
-async onActivate1 (event)
-{
-  if(event.type === "click")
+  async onActivate1 (event)
   {
-    this.detail_view = event.row;
-    this.loadOutward_list();
-  }
-}
-
-loadOutward_list()
-{
-  var type = this.detail_view['delivery_against'];
-  var id   = this.detail_view['id'];
-  if( type == "Invoice")
-  {
-    this.api.get('get_data.php?table=invoice_item&find=dispatch_id&value='+id+'&find1=status&value1=2&authToken=' + environment.authToken).then((data: any) =>
-      {
-        if(data != null)
-        {
-          this.outwardList = data;
-          let data_length  = data.length;
-          for(let i=0;i<data_length;i++)
-          {
-            var list_id = this.outwardList[i].item_list_id;
-            var data    = this.item_list.find(t=>t.item_id == list_id);
-            this.outwardList[i]['itemname'] =data.name;
-          }
-        }
-      else
-        {
-          this.outwardList = null;
-          this.selected=[];
-        }
-    }).catch(error => { this.toastrService.error('Something went wrong'); });
+    if(event.type === "click")
+    {
+      this.detail_view = event.row;
+      this.loadOutward_list();
+    }
   }
 
-  if( type == "DC")
+  loadOutward_list()
   {
-    this.api.get('get_data.php?table=dc_item&find=dispatch_id&value='+id+'&find1=status&value1=2&authToken=' + environment.authToken).then((data: any) =>
-      {
-        if(data != null)
+    var type = this.detail_view['delivery_against'];
+    var id   = this.detail_view['id'];
+    if( type == "Invoice")
+    {
+      this.api.get('get_data.php?table=invoice_item&find=dispatch_id&value='+id+'&find1=status&value1=2&authToken=' + environment.authToken).then((data: any) =>
         {
-          this.outwardList = data;
-          let data_length  = data.length;
-          for(let i=0;i<data_length;i++)
+          if(data != null)
           {
-            var list_id = this.outwardList[i].item_list_id;
-            var data    = this.item_list.find(t=>t.item_id == list_id);
-            this.outwardList[i]['itemname'] =data.name;
+            this.outwardList = data;
+            let data_length  = data.length;
+            for(let i=0;i<data_length;i++)
+            {
+              var list_id = this.outwardList[i].item_list_id;
+              var data    = this.item_list.find(t=>t.item_id == list_id);
+              this.outwardList[i]['itemname'] =data.name;
+            }
           }
-        }
         else
-        {
-          this.outwardList = null;
-          this.selected=[];
-        }
+          {
+            this.outwardList = null;
+            this.selected=[];
+          }
       }).catch(error => { this.toastrService.error('Something went wrong'); });
+    }
+
+    if( type == "DC")
+    {
+      this.api.get('get_data.php?table=dc_item&find=dispatch_id&value='+id+'&find1=status&value1=2&authToken=' + environment.authToken).then((data: any) =>
+        {
+          if(data != null)
+          {
+            this.outwardList = data;
+            let data_length  = data.length;
+            for(let i=0;i<data_length;i++)
+            {
+              var list_id = this.outwardList[i].item_list_id;
+              var data    = this.item_list.find(t=>t.item_id == list_id);
+              this.outwardList[i]['itemname'] =data.name;
+            }
+          }
+          else
+          {
+            this.outwardList = null;
+            this.selected=[];
+          }
+        }).catch(error => { this.toastrService.error('Something went wrong'); });
+    }
   }
-}
 
 
-async onActivate(event)
+  async onActivate(event)
   {
     if(event.type === "click")
     {
       this.detail_view_item = event.row;
       var item_id           = event.row.item_list_id;
       this.outward_quantity = event.row.qty;
+      console.log(this.detail_view_item)
       this.LoadBatch(item_id);
     }
   }
@@ -268,16 +271,26 @@ async onActivate(event)
     this.item = [];
     const product = this.update_stock.get('product') as FormArray;
     product.clear();
+     console.log("detail_view",this.detail_view)
+    console.log("batchList",this.batchList)
     if(this.batchList != null)
     {
       this.batchList.forEach((item,j) => {
         product.push(this.fb.group({
+        type        : this.detail_view['delivery_against'],
+        item_type   : this.detail_view['type'],
+        item_id     : [item.item_list_id],
         items       : [item.item_name],
         descriptions: [item.item_description],
         batch       : [item.batch],
         quantity    : [0],
         stock       : [item.stock],
-        select      : [item.serial_itemList]
+        select      : [item.serial_itemList],
+        price       : [item.amount],
+        stock_id    : [item.stock_id],
+        dc_id       : this.detail_view["dc_id"],
+        invoice_id  : this.detail_view["invoice_id"],
+        project_item_id : null
         }));
       });
     }
@@ -327,11 +340,11 @@ async onActivate(event)
     {
      var item_id = this.detail_view_item['dc_item_id'];
     }
-
+    console.log("value :",this.update_stock.value)
     this.loading = true;
      this.api.post('mp_outward_stocklist_update.php?value='+id+'&type='+type+'&item_id='+item_id+'&authToken=' + environment.authToken, this.update_stock.value).then((data: any) =>
     {
-
+      console.log(data)
       if (data.status == "success")
       {
         this.toastrService.success(' Updated Succesfully');
@@ -386,12 +399,14 @@ async onActivate(event)
 
     if(this.total == this.outward_quantity)
       {
+        console.log("update_stock : ",this.update_stock.value)
         this.loading = true;
          this.api.post('mp_outward_stocklist_update.php?value='+id+'&type='+type+'&item_id='+item_id+'&authToken=' + environment.authToken, this.update_stock.value).then((data: any) =>
         {
-
+        console.log(data)
           if (data.status == "success")
           {
+
             this.toastrService.success(' Updated Succesfully');
             this.close();
             this.getProductList();
