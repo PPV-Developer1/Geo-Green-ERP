@@ -254,7 +254,7 @@
       class="custom_table"
       [headerHeight]="50"
       [limit]="15"
-      [columnMode]="'force'"
+      [columnMode]="'flex'"
       [footerHeight]="50"
       [rowHeight]="50"
       [rows]="att_list"
@@ -262,35 +262,35 @@
       [selectionType]="'single'"
       (activate)="onActivate($event)">
 
-        <ngx-datatable-column prop="emp_id" name="EMPLOYEE ID">
+        <ngx-datatable-column prop="emp_id" name="EMPLOYEE ID" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.status === 1" style="color:red">{{row.emp_id}}</span>
             <span *ngIf="row.status === 0">{{row.emp_id}}</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="name" name="EMPLOYEE NAME">
+        <ngx-datatable-column prop="name" name="EMPLOYEE NAME" [flexGrow]="2">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.status === 1" style="color:red">{{row.name}}</span>
             <span *ngIf="row.status === 0">{{row.name}}</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="att_hr" name="ATTENDANCE">
+        <ngx-datatable-column prop="att_hr" name="ATTENDANCE" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.status === 1" style="color:red">{{row.att_hr}}</span>
             <span *ngIf="row.status === 0">{{row.att_hr}}</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="att_ot" name="OVER TIME">
+        <ngx-datatable-column prop="att_ot" name="OVER TIME" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.status === 1" style="color:red">{{row.att_ot}}</span>
             <span *ngIf="row.status === 0">{{row.att_ot}}</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="att_cl" name="COM_OFF LEAVE">
+        <ngx-datatable-column prop="att_cl" name="COM_OFF LEAVE" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.status === 1" style="color:red">{{row.att_cl}}</span>
             <span *ngIf="row.status === 0">{{row.att_cl}}</span>
@@ -304,14 +304,14 @@
           </ng-template>
         </ngx-datatable-column> -->
 
-        <ngx-datatable-column prop="att_pl" name="LEAVE">
+        <ngx-datatable-column prop="att_pl" name="LEAVE" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.status === 1" style="color:red">{{row.att_pl}}</span>
             <span *ngIf="row.status === 0">{{row.att_pl}}</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="notes" name="Notes">
+        <ngx-datatable-column prop="notes" name="Notes" [flexGrow]="2">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.status === 1" style="color:red">{{row.att_notes}}</span>
             <span *ngIf="row.status === 0">{{row.att_notes}}</span>
@@ -370,15 +370,14 @@
 
     <!-- Dropdown List -->
     <div class="dropdown-menu w-100 p-2 shadow-sm show" *ngIf="showDropDown">
-      <div class="form-check" *ngFor="let a of employee_list; trackBy: trackByFn">
-        <input class="form-check-input"
-               type="checkbox"
+      <div class="form-check" *ngFor="let a of Admin_employee_list; trackBy: trackByFn">
+        <input class="form-check-input" type="checkbox"
                [id]="'emp-' + a.emp_id"
                [(ngModel)]="a.checked"
                (change)="getSelectedValue(a.checked, a.emp_id)" />
-        <label class="form-check-label" [for]="'emp-' + a.emp_id">
-          {{ a.name }}
-        </label>
+              <label class="form-check-label" [for]="'emp-' + a.emp_id">
+                {{ a.name }}
+              </label>
       </div>
     </div>
 

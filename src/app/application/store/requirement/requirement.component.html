@@ -36,16 +36,16 @@
   [selected]="selected"
   [selectionType]="'single'"
   (activate)="onActivate($event)">
-  
+
   <ngx-datatable-column name="ID" >
       <ng-template ngx-datatable-cell-template let-row="row">
-          {{row.id}}  
+          {{row.id}}
       </ng-template>
   </ngx-datatable-column>
 
   <ngx-datatable-column name="CREATED BY">
     <ng-template ngx-datatable-cell-template let-row="row">
-        {{row.creater_name}}  
+        {{row.creater_name}}
     </ng-template>
   </ngx-datatable-column>
 
@@ -54,13 +54,13 @@
         {{row.item_name}}
     </ng-template>
   </ngx-datatable-column>
-  
+
   <ngx-datatable-column name="DESCRIPTION">
     <ng-template ngx-datatable-cell-template let-row="row">
         {{row.item_description}}
     </ng-template>
   </ngx-datatable-column>
-  
+
   <ngx-datatable-column name="QUANTITY">
     <ng-template ngx-datatable-cell-template let-row="row">
         {{row.qty}}
@@ -69,7 +69,7 @@
 
   <ngx-datatable-column name="NOTES">
     <ng-template ngx-datatable-cell-template let-row="row">
-        {{row.notes}}  
+        {{row.notes}}
     </ng-template>
   </ngx-datatable-column>
 
@@ -80,7 +80,9 @@
     </ng-template>
   </ngx-datatable-column>
 
-</ngx-datatable>  
+</ngx-datatable>
+
+
 <ng-template #AddReq let-modal>
   <div class="modal-header state modal-info">
     <h3 class="modal-title" id="modal-primary-label">ADD REQUIREMENT</h3>
@@ -89,7 +91,7 @@
   </div>
   <div class="modal-body">
     <form [formGroup]="AddReqForm" (ngSubmit)="OnSubmit(AddReqForm.value)">
-      <div class="row"> 
+      <div class="row">
 
         <div class="form-group col-4">
           <label for="input-15">Select Item</label>
@@ -135,6 +137,7 @@
     </form>
   </div>
 </ng-template>
+
 <ng-template #delete let-modal>
   <div class="modal-header state modal-danger">
     <h2 class="modal-title" id="modal-primary-label">Delete Confirmation</h2>
@@ -146,5 +149,5 @@
   <div class="modal-footer">
       <button type="button" class="btn btn-danger" data-dismiss="modal" (click)="ReqDelete()">Delete</button>
       <button type="button" class="btn btn-success" data-dismiss="modal" (click)="modal.dismiss('Cross click')">Close</button>
-  </div> 
+  </div>
 </ng-template>

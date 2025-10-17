@@ -211,8 +211,8 @@ export class EmployeeComponent implements OnInit
       emergency_Con_PersonRelationship: new FormControl('', [Validators.required]),
       hra             : new FormControl('', [Validators.required]),
       allowance       : new FormControl('', [Validators.required]),
-      epf_amount      : new FormControl('', [Validators.required]),
-      professional_tax: new FormControl('', [Validators.required]),
+      epf_amount      : new FormControl(0, [Validators.required]),
+      professional_tax: new FormControl(0 , [Validators.required]),
     })
   constructor(private modalService: NgbModal, public api: ApiService, public toastrService: ToastrService, fb: FormBuilder,private http: HttpClient)
   {
@@ -318,8 +318,8 @@ export class EmployeeComponent implements OnInit
         emp_uan                 : [null],
         emp_hra                 : new FormControl('', [Validators.required]),
         emp_allowance           : new FormControl('', [Validators.required]),
-        emp_epf_amount          : new FormControl('', [Validators.required]),
-        emp_professional_tax    : new FormControl('', [Validators.required]),
+        emp_epf_amount          : new FormControl(0, [Validators.required]),
+        emp_professional_tax    : new FormControl(0, [Validators.required]),
       })
 
       this.createBank_FG = fb.group
@@ -547,6 +547,13 @@ export class EmployeeComponent implements OnInit
 
   async updateEmp(updateEmp)
   {
+    const confirmed = confirm("Are you sure you want to update this employee details?");
+       console.log(confirmed)
+      if (!confirmed) {
+        this.employeeLoad(this.emp_id);
+        this.status   = true;
+        return;
+      }
       this.SalEditConv    = this.sal_edit.controls['SalEditConv'];
       this.SalEditSA      = this.sal_edit.controls['SalEditSA'];
       this.SalEditTA      = this.sal_edit.controls['SalEditTA'];
@@ -673,10 +680,11 @@ export class EmployeeComponent implements OnInit
           {
             this.toastrService.success('Employee Added Succesfully');
             this.addEmployee.reset();
+            this.addEmployee.controls["created_by"].setValue(this.uid)
             this.loading=false;
             this.loadData();
           }
-          else { this.toastrService.error(data.status);
+          else { this.toastrService.error("Something went wrong");
             this.loading=false;}
           return true;
         }).catch(error => {
@@ -908,9 +916,15 @@ export class EmployeeComponent implements OnInit
 
   cancel()
   {
+    const confirmed = confirm("Are you sure you want to cancel the changes?");
+       console.log(confirmed)
+      if (!confirmed) {
+        return;
+      }
     this.show    = true;
     this.status  = true;
     this.dropdown= true;
+    this.employeeLoad(this.emp_id);
   }
 
   set_zero_1()
@@ -921,6 +935,12 @@ export class EmployeeComponent implements OnInit
 
  async professional_tax_change()
   {
+     const confirmed = confirm("Are you sure you want to update professional tax?");
+       console.log(confirmed)
+      if (!confirmed) {
+         this.Perssional_tax_edit = false;
+        return;
+      }
       await  this.api.get('single_field_update.php?table=employee&field=emp_id&value='+this.employee_details.emp_id+'&up_field=professional_tax&update='+this.emp_professional_tax+'&authToken='+environment.authToken).then((data: any) =>
               {
                 console.log(data);
@@ -942,6 +962,12 @@ export class EmployeeComponent implements OnInit
 
   async epf_change()
   {
+     const confirmed = confirm("Are you sure you want to update epf amount?");
+       console.log(confirmed)
+      if (!confirmed) {
+         this.EPF_edit = false;
+        return;
+      }
       await  this.api.get('single_field_update.php?table=employee&field=emp_id&value='+this.employee_details.emp_id+'&up_field=epf_amount&update='+this.emp_epf_amount+'&authToken='+environment.authToken).then((data: any) =>
               {
                 console.log(data);

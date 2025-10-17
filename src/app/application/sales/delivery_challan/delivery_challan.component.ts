@@ -6,6 +6,7 @@ import { ApiService } from "../../../service/api.service";
 import { environment } from "../../../../environments/environment";
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppState } from 'src/app/app.state';
 
 @Component({
   selector   : 'az-delivery_challan',
@@ -150,7 +151,8 @@ export class Delivery_challanComponent implements OnInit {
     public  fb           : FormBuilder,
     public  toastrService: ToastrService,
     private api          : ApiService,
-    private renderer: Renderer2
+    private renderer     : Renderer2,
+    private _state       : AppState
   )
   {
     this.dc = fb.group(
@@ -178,7 +180,9 @@ export class Delivery_challanComponent implements OnInit {
         tax_type  :[null],
         tds_percentage:[0],
         tcs_percentage:[0],
-        size:[null]
+        size  :[null],
+        prefix:[null],
+
       })
 
 
@@ -323,6 +327,8 @@ export class Delivery_challanComponent implements OnInit {
       formArray.removeAt(i);
     }
   }
+
+  prefix_data : any
   async VendorSelection(id)
   {
     this.isDropdownAppendedToBody = false;
@@ -372,9 +378,9 @@ export class Delivery_challanComponent implements OnInit {
       this.payment_terms   = data[0].payment_terms;
       let MyPaymentTerm    = data[0].my_payment_terms;
       this.taxempty        = data[0].tax_mode;
-      let dc_id   = data[0].serial_no + 1;
-      var dcprifix= data[0].prefix ;
-      this.inv_no = dcprifix  + dc_id;
+      let dc_id            = data[0].serial_no + 1;
+      this.prefix_data     = data[0].prefix ;
+      this.inv_no          = dc_id;
       this.dc.controls['paymentTerms'].setValue(MyPaymentTerm)
       const today = new Date();
       let date = today.toISOString().split('T')[0];
@@ -508,7 +514,7 @@ export class Delivery_challanComponent implements OnInit {
       const billNoValue = this.inv_no;
       if (this.dc.valid)
         {
-          const billNoValue = this.inv_no;
+          const billNoValue = this.prefix_data+this.inv_no;
           function normalizeString(str : any) {
             return str.replace(/\s+/g, '').toLowerCase();
           }
@@ -888,6 +894,7 @@ export class Delivery_challanComponent implements OnInit {
   }
   setzero()
   {
+    this._state.notifyDataChanged('menu.isCollapsed', false);
     this.show_new_bill = false;
     this.selected = [];
     this.LoadCustomerBills();

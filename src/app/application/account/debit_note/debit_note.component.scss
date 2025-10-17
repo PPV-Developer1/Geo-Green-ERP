@@ -11,6 +11,10 @@
   border: 1px solid #969696;
   white-space: normal;
   height: fit-content;
+  padding: 0 !important;              /* Remove padding from the option */
+  margin: 0 !important;               /* Remove margin from the option */
+  // width: 100% !important;             /* Force full width */
+  // box-sizing: border-box;            /* Ensure padding/border doesn't exceed width */
 }
 
 /* Styling the options */
@@ -22,11 +26,14 @@
 ::ng-deep .ng-dropdown-panel .ng-option.ng-option-selected {
   background-color: rgb(30, 89, 201) !important;
   color: #f7f5f5 !important;
+  //  width: 100%;
 }
 
 /* Styling the option labels */
 ::ng-deep .ng-dropdown-panel .ng-option .ng-option-label {
-  padding: 10px;
+  padding: 10px ;
+  // display: block;
+  //  box-sizing: border-box;
 }
 
 ::ng-deep .ng-value-container .ng-value {

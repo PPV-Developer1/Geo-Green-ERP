@@ -43,46 +43,46 @@
         <div widget class="card">
           <div class="card-body widget-body">
             <ngx-datatable style="cursor: pointer;" #table class="custom_table" [headerHeight]="50" [limit]="20"
-              [columnMode]="'force'" [footerHeight]="50" [rowHeight]="'auto'" [rows]="List" [selected]="selected"
+              [columnMode]="'flex'" [footerHeight]="50" [rowHeight]="'auto'" [rows]="List" [selected]="selected"
               [selectionType]="'single'" (activate)="onActivate($event)">
 
-               <ngx-datatable-column prop="generate_date" name="DATE">
+               <ngx-datatable-column prop="generate_date" name="DATE" [flexGrow]="1">
                 <ng-template ngx-datatable-cell-template let-row="row">
                   {{ row.generate_date | date:'dd-MM-yyyy'}}
                 </ng-template>
               </ngx-datatable-column>
 
-               <ngx-datatable-column prop="note_type" name="TYPE">
+               <ngx-datatable-column prop="note_type" name="TYPE" [flexGrow]="1">
                 <ng-template ngx-datatable-cell-template let-row="row">
                   {{ row.note_type }}
                 </ng-template>
               </ngx-datatable-column>
 
-                 <ngx-datatable-column prop="credit_note_no" name="DEBIT NOTE NO">
+                 <ngx-datatable-column prop="debit_note_no" name="DEBIT NOTE NO" [flexGrow]="1">
                 <ng-template ngx-datatable-cell-template let-row="row">
-                  {{ row.credit_note_no }}
+                  {{ row.debit_note_no }}
                 </ng-template>
               </ngx-datatable-column>
 
-              <ngx-datatable-column prop="company_name" name="NAME">
+              <ngx-datatable-column prop="company_name" [flexGrow]="2" name="NAME">
                 <ng-template ngx-datatable-cell-template let-row="row">
                   <span style="font-weight:bold;">{{ row.company_name }}</span>
                 </ng-template>
               </ngx-datatable-column>
 
-              <ngx-datatable-column prop="terms_condition" name="BILL">
+              <ngx-datatable-column prop="bill_number" [flexGrow]="1" name="BILL">
                 <ng-template ngx-datatable-cell-template let-row="row">
                   {{ row.bill_number }}
                 </ng-template>
               </ngx-datatable-column>
 
-              <ngx-datatable-column prop="terms_condition" name="INVOICE">
+              <ngx-datatable-column prop="invoice_no" [flexGrow]="1" name="INVOICE">
                 <ng-template ngx-datatable-cell-template let-row="row">
                   {{ row.invoice_no }}
                 </ng-template>
               </ngx-datatable-column>
 
-              <ngx-datatable-column prop="terms_condition" name="AMOUNT">
+              <ngx-datatable-column prop="total_amount" [flexGrow]="1" name="AMOUNT">
                 <ng-template ngx-datatable-cell-template let-row="row">
                  <b>{{ row.total_amount| indianCurrency }}</b>
                 </ng-template>
@@ -124,9 +124,8 @@
                   <div class="row mb-1"  *ngIf="type =='vendor'">
                      <label style="color: red" class="col-sm-2 mt-2 col-form-label col-form-label-sm">Vendor *</label>
                       <div class="col-sm-7 mb-5">
-                        <ng-select formControlName="vendor_id"  class=" form-control " (change)="Selection($event)"
-                              [clearable]="false" [appendTo]="isDropdownAppendedToBody ? 'body' : null">
-                            <ng-option *ngFor="let vendor of vendor_list" value="{{vendor.vendor_id}}" class="form-control">
+                        <ng-select formControlName="vendor_id"  class=" form-control " (change)="Selection($event)"  [appendTo]="isDropdownAppendedToBody ? 'body' : null">
+                            <ng-option *ngFor="let vendor of vendor_list" [value]="vendor.vendor_id" class="form-control">
                                 {{vendor.company_name}}
                             </ng-option>
                         </ng-select>
@@ -139,9 +138,8 @@
                   <div class="row mb-1"  *ngIf="type =='customer'">
                      <label style="color: red" class="col-sm-2 mt-2 col-form-label col-form-label-sm">Customer *</label>
                       <div class="col-sm-7 mb-5">
-                        <ng-select formControlName="vendor_id"  class=" form-control " (change)="Selection($event)"
-                              [clearable]="false" [appendTo]="isDropdownAppendedToBody ? 'body' : null">
-                            <ng-option *ngFor="let customer of Customer_list" value="{{customer.customer_id}}" class="form-control">
+                        <ng-select formControlName="vendor_id"  class=" form-control " (change)="Selection($event)" [appendTo]="isDropdownAppendedToBody ? 'body' : null">
+                            <ng-option *ngFor="let customer of Customer_list" [value]="customer.customer_id" class="form-control">
                                 {{customer.company_name}}
                             </ng-option>
                         </ng-select>
@@ -158,8 +156,8 @@
                   <div class="col-sm-7 mb-5">
 
                     <ng-select formControlName="bill_number"  class=" form-control " (change)="VendorSelection($event)"
-                    [clearable]="false" [appendTo]="isDropdownAppendedToBody ? 'body' : null">
-                        <ng-option *ngFor="let bill of Bill_list" value="{{bill.bill_id}}" class="form-control">
+                       [appendTo]="isDropdownAppendedToBody ? 'body' : null">
+                        <ng-option *ngFor="let bill of Bill_list" [value]="bill.bill_id" class="form-control">
                             {{bill.bill_number}}
                         </ng-option>
                    </ng-select>
@@ -174,8 +172,8 @@
                   <div class="col-sm-7 mb-5">
 
                     <ng-select formControlName="bill_number"  class=" form-control " (change)="VendorSelection($event)"
-                    [clearable]="false" [appendTo]="isDropdownAppendedToBody ? 'body' : null">
-                        <ng-option *ngFor="let bill of Bill_list" value="{{bill.invoice_id}}" class="form-control">
+                      [appendTo]="isDropdownAppendedToBody ? 'body' : null">
+                        <ng-option *ngFor="let bill of Bill_list" [value]="bill.invoice_id" class="form-control">
                             {{bill.invoice_number}}
                         </ng-option>
                    </ng-select>
@@ -243,8 +241,12 @@
 
                   <div class="row mb-3">
                     <label style="color: #e54643"  class="col-sm-2 col-form-label col-form-label-sm">Debit Note Number *</label>
-                    <div class="col-sm-4">
-                      <input type="text" formControlName="note_no"  [(ngModel)]="note_no" placeholder="Enter Credit Note Number" class="form-control form-control-sm"/>
+                    <div class="col-sm-2">
+                          <input type="text" readonly formControlName="prefix" [(ngModel)]="Prefix" class="form-control form-control-sm" />
+                      </div>
+
+                      <div class="col-sm-1">
+                          <input type="number" formControlName="note_no" [(ngModel)]="note_no" class="form-control form-control-sm" />
                       <span class="help-block text-danger" *ngIf="DebitNoteForm.get('note_no').touched && DebitNoteForm.get('note_no').hasError('required')">Enter Credit Note Number !</span>
                     </div>
                   </div>

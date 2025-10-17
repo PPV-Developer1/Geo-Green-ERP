@@ -6,6 +6,7 @@ import { ApiService } from "../../../service/api.service";
 import { environment } from "../../../../environments/environment";
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppState } from 'src/app/app.state';
 
 @Component({
   selector: 'az-invoice',
@@ -159,13 +160,15 @@ export class InvoiceComponent implements OnInit {
     public  fb           : FormBuilder,
     public  toastrService: ToastrService,
     private api          : ApiService,
-    private renderer: Renderer2
+    private renderer     : Renderer2,
+    private _state       : AppState
   )
+
   {
     this.invoice = fb.group(
       {
         created_by: [this.uid],
-        customerId: ['', Validators.compose([Validators.required])],
+        customerId: [null, Validators.compose([Validators.required])],
         billFrom: [null],
         shipFrom: [null],
         invoiceNo: [null, Validators.compose([Validators.required])],
@@ -188,7 +191,9 @@ export class InvoiceComponent implements OnInit {
         tax_type :[null],
         size : [null],
         product: this.fb.array([]),
-        dc_data : [null]
+        dc_data : [null],
+        prefix : [null],
+        project_list : [null]
       })
 
      this.SelectCategory = fb.group({
@@ -302,6 +307,7 @@ dropdownSettings = {
     await this.api.get('mp_customer_invoice.php?&authToken=' + environment.authToken).then((data: any) =>
     {
       this.CustomerBillList = data;
+      if(data != null)
       this.temp   =[...data]
     }).catch(error => { this.toastrService.error('Something went wrong in LoadCustomerInvoice'); });
   }
@@ -349,29 +355,32 @@ dropdownSettings = {
     }
   }
 
-
+  prefix_data : any
+  selected_project : any
   async VendorSelection(id)
   {
-    this.isDropdownAppendedToBody = false;
-    this.formShow = false;
-    this.customer_id = id;
-     this.tableWidth=100
-    const today = new Date();
-    let date = today.toISOString().split('T')[0];
-    this.invoice.reset();
-    this.invoice.controls['inv_type'].setValue(this.type);
-    this.invoice.controls['customerId'].setValue(id);
-    this.invoice.controls['created_by'].setValue(this.uid);
-    this.invoice.controls['billDate'].setValue(date);
-    this.invoice.controls['subTotal'].setValue(0);
-    this.invoice.controls['shippingCharge'].setValue(0);
-    this.invoice.controls['TCS'].setValue(0);
-    this.invoice.controls['TDS'].setValue(0);
-    this.invoice.controls['roundOff'].setValue(0);
-    this.invoice.controls['tax_type'].setValue(null);
-    this.invoice.controls['status'].setValue(1);
-    this.invoice.controls['tds_percentage'].setValue(0);
-    this.invoice.controls['tcs_percentage'].setValue(0);
+
+      this.isDropdownAppendedToBody = false;
+      this.formShow = false;
+      this.customer_id = id;
+      this.tableWidth=100
+      const today = new Date();
+      let date = today.toISOString().split('T')[0];
+      this.invoice.reset();
+      this.invoice.controls['inv_type'].setValue(this.type);
+      this.invoice.controls['customerId'].setValue(id);
+      this.invoice.controls['created_by'].setValue(this.uid);
+      this.invoice.controls['billDate'].setValue(date);
+      this.invoice.controls['subTotal'].setValue(0);
+      this.invoice.controls['shippingCharge'].setValue(0);
+      this.invoice.controls['TCS'].setValue(0);
+      this.invoice.controls['TDS'].setValue(0);
+      this.invoice.controls['roundOff'].setValue(0);
+      this.invoice.controls['tax_type'].setValue(null);
+      this.invoice.controls['status'].setValue(1);
+      this.invoice.controls['tds_percentage'].setValue(0);
+      this.invoice.controls['tcs_percentage'].setValue(0);
+      this.invoice.controls['project_list'].setValue(null);
     const formArray         = this.invoice.get('product') as FormArray;
     const formArrayLength   = formArray.length;
     const formArrayControls = formArray.controls;
@@ -380,62 +389,90 @@ dropdownSettings = {
       const control = formArrayControls[i];
       formArray.removeAt(i);
     }
+        this.dc_list            = null;
+        this.ItemList           = null;
+        this.bill_addr          = null;
+        this.billFrom           = null;
+        this.billAttention      = null;
+        this.billAddress_line_1 = null;
+        this.billAddress_line_2 = null;
+        this.billCity           = null;
+        this.billState          = null;
+        this.billZipcode        = null;
+        this.invoice.controls['billFrom'].setValue(null);
 
-    await this.api.get('mp_invoice.php?&value=' + this.customer_id + '&authToken=' + environment.authToken).then((data: any) =>
-    {
-      this.FetchAddress(data[0]);
-      this.company_name    = data[0].company_name;
-      this.notes           = data[0].notes;
-      this.terms_condition = data[0].terms_condition;
-      this.stateCode       = data[0].place_from_supply_code;
-      this.payment_terms   = data[0].payment_terms;
-      let MyPaymentTerm    = data[0].my_payment_terms;
-      this.taxmode         = data[0].tax_mode;
-      let invoice_id       = data[0].serial_no + 1;
-      var invoiceprifix    = data[0].prefix ;
-      this.inv_no          = invoiceprifix + invoice_id;
+        this.shipp_addr         = null;
+        this.shipFrom           = null;
+        this.shipAttention      = null;
+        this.shipAddress_line_1 = null;
+        this.shipAddress_line_2 = null;
+        this.shipCity           = null;
+        this.shipState          = null;
+        this.shipZipcode        = null;
+        this.invoice.controls['shipFrom'].setValue(null);
+        this.company_name       = null;
+        this.selected_project   = null;
+  if(id)
+  {
+              await this.api.get('mp_invoice.php?&value=' + this.customer_id + '&authToken=' + environment.authToken).then((data: any) =>
+              {
+                this.FetchAddress(data[0]);
+                this.company_name    = data[0].company_name;
+                this.notes           = data[0].notes;
+                this.terms_condition = data[0].terms_condition;
+                this.stateCode       = data[0].place_from_supply_code;
+                this.payment_terms   = data[0].payment_terms;
+                let MyPaymentTerm    = data[0].my_payment_terms;
+                this.taxmode         = data[0].tax_mode;
+                this.prefix_data     = data[0].prefix ;
+                this.inv_no          = data[0].serial_no + 1;;
 
-      const today = new Date();
-      let date = today.toISOString().split('T')[0];
-      if(MyPaymentTerm != null)
-        {
-          this.invoice.controls['paymentTerms'].setValue(MyPaymentTerm)
-          this.dueDates(MyPaymentTerm, date);
-        }
-        if(this.stateCode == 33)
-        {
-          this.LoadGST('GST');
-          this.invoice.controls['tax_type'].setValue("GST");
-        }
-        else
-        {
-          this.LoadGST('IGST');
-          this.invoice.controls['tax_type'].setValue("IGST");
-        }
+                const today = new Date();
+                let date = today.toISOString().split('T')[0];
+                if(MyPaymentTerm != null)
+                  {
+                    this.invoice.controls['paymentTerms'].setValue(MyPaymentTerm)
+                    this.dueDates(MyPaymentTerm, date);
+                  }
+                  if(this.stateCode == 33)
+                  {
+                    this.LoadGST('GST');
+                    this.invoice.controls['tax_type'].setValue("GST");
+                  }
+                  else
+                  {
+                    this.LoadGST('IGST');
+                    this.invoice.controls['tax_type'].setValue("IGST");
+                  }
 
-    }).catch(error => { this.toastrService.error('Something went wrong'); });
+              }).catch(error => { this.toastrService.error('Something went wrong'); });
 
-    if(this.type == "project")
-    {
-     this.api.get('mp_projectList_load.php?value=' + this.customer_id + '&authToken=' + environment.authToken).then((data: any) =>
-       {
-        this.ItemList = null;
-       if(data.status != "no_data")
-       {
-         this.ItemList = data;
-       }
-       else
-       {
-        this.toastrService.warning('No data ');
-       }
-       }).catch(error => { this.toastrService.error('Something went wrong in Project Load'); });
+              if(this.type == "project")
+              {
+              this.api.get('mp_projectList_load.php?value=' + this.customer_id + '&authToken=' + environment.authToken).then((data: any) =>
+                {
+                  this.ItemList = null;
+                if(data.status != "no_data")
+                {
+                  this.ItemList = data;
+                }
+                else
+                {
+                  this.toastrService.warning('No data ');
+                }
+                }).catch(error => { this.toastrService.error('Something went wrong in Project Load'); });
+              }
+
+              this.selectedDCs=[]
+              if(this.type == "items")
+              {
+                this.Items_DctoInvoice(this.customer_id)
+              }
     }
-
-     this.selectedDCs=[]
-     if(this.type == "items")
-     {
-      this.Items_DctoInvoice(this.customer_id)
-     }
+    else{console.log("clear")
+       this.selected_project   = null;
+       this.GSTCalculation();
+    }
   }
 
 
@@ -716,7 +753,7 @@ async  UnSlecetAllDcitems(event) {
        console.log("Invoice data : ",bill_data)
     if(this.invoice.valid)
     {
-        const billNoValue = this.inv_no;
+        const billNoValue = this.prefix_data+this.inv_no;
             function normalizeString(str : any) {
               return str.replace(/\s+/g, '').toLowerCase();
             }
@@ -801,7 +838,7 @@ async  UnSlecetAllDcitems(event) {
 
        if(this.taxmode == 1)
        {
-        this.taxes        = data[0].tax_percent;
+        this.taxes     = data[0].tax_percent;
        }
        if(this.taxmode == 0)
        {
@@ -998,6 +1035,7 @@ async  UnSlecetAllDcitems(event) {
 
   set_zero()
   {
+     this._state.notifyDataChanged('menu.isCollapsed', false);
     this.selected = [];
   }
 
@@ -1089,8 +1127,10 @@ async  UnSlecetAllDcitems(event) {
     this.show_new_bill = true;
     this.formShow      = true;
   }
+  
   setzero()
   {
+     this._state.notifyDataChanged('menu.isCollapsed', false);
     this.show_new_bill = false;
     this.selected      = [];
     this.LoadCustomerBills();
@@ -1118,6 +1158,7 @@ async  AddSubmit(data)
         {
 
           this.ItemList = data;
+          console.log("item",data)
         }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
      }
 

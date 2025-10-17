@@ -442,6 +442,11 @@ export class CustomerComponent implements OnInit {
 
       if(this.gst_submit === true &&  this.name_submit === true && this.pan_submit === true)
       {
+        const confirmed = confirm(" Are you sure you want to update these changes?");
+          console.log(confirmed)
+          if (!confirmed) {
+            return;
+          }
         this.loading   = true;
         this.change    = true
         this.stateShow = true;
@@ -667,7 +672,11 @@ export class CustomerComponent implements OnInit {
 
   async submit(updateAddress)
   {
-
+      const confirmed = confirm(" Are you sure you want to update these changes?");
+          console.log(confirmed)
+          if (!confirmed) {
+            return;
+          }
       let id = this.editAddressId;
       this.loading = true;
       this.api.post('post_update_data.php?table=customer_address&field=cust_addr_id&value=' + id + '&authToken=' + environment.authToken, updateAddress).then((data_rt: any) => {
@@ -855,6 +864,12 @@ cancel()
 
 contact_submit(data)
 {
+
+  const confirmed = confirm(" Are you sure you want to update these changes?");
+          console.log(confirmed)
+          if (!confirmed) {
+            return;
+          }
     let id = this.editContactId;
     this.loading=true;
     this.api.post('post_update_data.php?table=customer_contact&field=cust_cont_id&value=' + id + '&authToken=' + environment.authToken, data).then((data: any) => {

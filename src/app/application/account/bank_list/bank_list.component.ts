@@ -189,6 +189,11 @@ export class Bank_listComponent implements OnInit
   {
     if (this.addAccount.valid)
     {
+       const confirmed = confirm("Are you sure you want to update this account details?");
+        if (!confirmed) {
+          this.modalRef.dismiss();
+          return;
+        }
       this.loading=true;
       await this.api.post('post_update_data.php?table=bank&field=bank_id&value='+this.detail_view['bank_id']+'&authToken=' + environment.authToken, editAccount).then((data: any) =>
       {
@@ -221,6 +226,11 @@ export class Bank_listComponent implements OnInit
   {
     if (this.addExpense.valid)
     {
+      const confirmed = confirm("Are you sure you want to update this account details?");
+        if (!confirmed) {
+          this.modalRef.dismiss();
+          return;
+        }
       await this.api.post('post_update_data.php?table=expense_account&field=id&value='+this.expense_detail_view['id']+'&authToken=' + environment.authToken, editExpense).then((data: any) =>
       {
         if(data.status == "success")
@@ -271,6 +281,11 @@ export class Bank_listComponent implements OnInit
   }
   async DisableAccount()
   {
+    const confirmed = confirm("Confirm in this account as inactive?");
+        if (!confirmed) {
+
+          return;
+        }
     await this.api.get('single_field_update.php?table=bank&field=bank_id&value='+this.detail_view['bank_id']+'&update=0&up_field=status&authToken=' + environment.authToken).then((data: any) =>
       {
         if(data.status == "success")
@@ -294,6 +309,11 @@ export class Bank_listComponent implements OnInit
 
   async EnableAccount()
   {
+     const confirmed = confirm("Confirm in this account as active?");
+        if (!confirmed) {
+
+          return;
+        }
     await this.api.get('single_field_update.php?table=bank&field=bank_id&value='+this.detail_view['bank_id']+'&update=1&up_field=status&authToken=' + environment.authToken).then((data: any) =>
       {
         if(data.status == "success")
@@ -317,6 +337,11 @@ export class Bank_listComponent implements OnInit
 
   async DisableAccount_expense()
   {
+     const confirmed = confirm("Confirm in this account as inactive?");
+        if (!confirmed) {
+
+          return;
+        }
     await this.api.get('single_field_update.php?table=expense_account&field=id&value='+this.expense_detail_view['id']+'&update=0&up_field=status&authToken=' + environment.authToken).then((data: any) =>
       {
         if(data.status == "success")
@@ -343,6 +368,10 @@ export class Bank_listComponent implements OnInit
 
   async EnableAccount_expense()
   {
+     const confirmed = confirm("Confirm in this account as active?");
+        if (!confirmed) {
+          return;
+        }
     await this.api.get('single_field_update.php?table=expense_account&field=id&value='+this.expense_detail_view['id']+'&update=1&up_field=status&authToken=' + environment.authToken).then((data: any) =>
       {
         if(data.status == "success")

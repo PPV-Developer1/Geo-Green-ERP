@@ -216,7 +216,8 @@
               [rowHeight]="'auto'"
               [rows]="itemWithoutAsso"
               [selected]="selected"
-              [selectionType]="'single'" >
+              [selectionType]="'single'"
+               (activate)="item_data($event)">
 
         <ngx-datatable-column prop="name"  name="ITEM NAME">
             <ng-template ngx-datatable-cell-template let-row="row">
@@ -237,14 +238,15 @@
             </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column  prop="price" alig name="PRICE">
+        <ngx-datatable-column  prop="amount" alig name="AMOUNT">
           <ng-template ngx-datatable-cell-template let-row="row">
-          {{row.price| indianCurrency}}
+          {{row.dispatch_amount != null? (row.dispatch_amount| indianCurrency:'1.2-2') : 0 }}
           </ng-template>
       </ngx-datatable-column>
+
         <ngx-datatable-column   name="TOTAL AMOUNT">
           <ng-template ngx-datatable-cell-template let-row="row">
-          {{row.value*row.price | indianCurrency}}
+          {{row.value*row.dispatch_amount | indianCurrency:'1.2-2'}}
           </ng-template>
       </ngx-datatable-column>
 
@@ -481,7 +483,7 @@
 
       <ngx-datatable-column  prop="total"  name="AMOUNT">
         <ng-template ngx-datatable-cell-template let-row="row">
-        {{row.total| indianCurrency}}
+        {{row.store_amount * row.qty | indianCurrency}}
         </ng-template>
     </ngx-datatable-column>
     </ngx-datatable>
@@ -515,12 +517,12 @@
 
                   <tr>
                     <th>Batch</th>
-                    <td>{{product_details.batch}}</td>
+                    <td>{{product_details.batch?product_details.batch:"Not Found"}}</td>
                   </tr>
 
                   <tr>
                     <th>Bill Number</th>
-                    <td>{{product_details.bill_number}}</td>
+                    <td>{{product_details.bill_number?product_details.bill_number:"Not Found"}}</td>
                   </tr>
 
                   <tr>
@@ -534,7 +536,7 @@
               <tbody>
                     <tr>
                       <th>Item Rate</th>
-                      <td>{{product_details.price| indianCurrency}}</td>
+                      <td>{{product_details.store_amount| indianCurrency}}</td>
                   </tr>
 
                   <tr>
@@ -543,15 +545,15 @@
                   </tr>
                   <tr>
                     <th>Total </th>
-                    <td>{{product_details.total| indianCurrency}}</td>
+                    <td>{{product_details.store_amount*product_details.qty | indianCurrency}}</td>
                   </tr>
                   <tr>
                     <th>Vendor </th>
-                    <td>{{product_details.vendor}}</td>
+                    <td>{{product_details.vendor?product_details.vendor:"Not Found"}}</td>
                   </tr>
                   <tr>
                     <th>Bill Date </th>
-                    <td>{{product_details.bill_date | date:'dd-MM-YYYY'}}</td>
+                    <td>{{product_details.bill_date? (product_details.bill_date | date:'dd-MM-YYYY'): "Not Found"}}</td>
                   </tr>
               </tbody>
             </table>
@@ -610,4 +612,43 @@
 
 
 
+<ng-template #details let-modal>
+  <div class="modal-header state modal-info">
+      <h3 class="modal-title" id="modal-primary-label">Dispatch Details</h3>
+       <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
 
+  <div class="modal-body">
+       <ngx-datatable
+        #table
+        class="custom_table"
+        [headerHeight]="50"
+        [limit]="5"
+        [columnMode]="'force'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="project_item_list_dispatch"
+        [selected]="selected"
+        [selectionType]="'single'">
+
+            <ngx-datatable-column prop="name"  name="BATCH">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.batch}}
+                </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column  prop="value"  name="QUANTITY">
+                <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.value}} {{row.uom}}
+                </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column  prop="total"  name="AMOUNT">
+              <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.amount * row.value | indianCurrency}}
+              </ng-template>
+          </ngx-datatable-column>
+    </ngx-datatable>
+
+  </div>
+</ng-template>

@@ -179,7 +179,8 @@ export class Purchase_orderComponent implements OnInit {
         size        :[null],
         deliverytype:[null, Validators.compose([Validators.required])],
         freight     :[null, Validators.compose([Validators.required])],
-        delivery_schedule :[null, Validators.compose([Validators.required])]
+        delivery_schedule :[null, Validators.compose([Validators.required])],
+        prefix      : [null]
       })
   }
 
@@ -286,6 +287,7 @@ export class Purchase_orderComponent implements OnInit {
     await this.api.get('mp_po_bill.php?&authToken=' + environment.authToken).then((data: any) =>
     {
       this.VendorPOList = data;
+      if(data != null)
       this.temp   =[...data]
     }).catch(error => { this.toastrService.error('Something went wrong in LoadVendorBills'); });
   }
@@ -331,7 +333,7 @@ export class Purchase_orderComponent implements OnInit {
     }
   }
 
-
+po_prifix : any
   async VendorSelection(id)
   {
     this.formShow  = false;
@@ -376,8 +378,8 @@ export class Purchase_orderComponent implements OnInit {
 
       let MyPaymentTerm    = data[0].my_payment_terms;
       let po_id            = data[0].serial_no + 1;
-      var po_prifix        = data[0].prefix ;
-      this.po_no           = po_prifix + po_id;
+      this.po_prifix        = data[0].prefix ;
+      this.po_no           = po_id;
       this.taxempty        = data[0].tax_mode;
 
       this.po.controls['paymentTerms'].setValue(MyPaymentTerm)
@@ -481,7 +483,7 @@ export class Purchase_orderComponent implements OnInit {
     });
     if (this.po.valid)
     {
-      const billNoValue = this.po_no;
+      const billNoValue = this.po_prifix+this.po_no;
       function normalizeString(str : any) {
         return str.replace(/\s+/g, '').toLowerCase();
       }

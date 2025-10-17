@@ -34,20 +34,20 @@
       class="custom_table"
       [headerHeight]="50"
       [limit]="18"
-      [columnMode]="'force'"
+      [columnMode]="'flex'"
       [footerHeight]="50"
       [rowHeight]="'auto'"
       [rows]="category_list"
       [selected]="selected"
       (activate)="onActivate($event)">
 
-        <ngx-datatable-column prop="title" name="NAME">
+        <ngx-datatable-column prop="title" name="NAME" [flexGrow]="2">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.title}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="type" name="TYPE">
+        <ngx-datatable-column prop="type" name="TYPE" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <label *ngIf="row.type == 1">Raw Material</label>
             <label *ngIf="row.type == 2">Product</label>
@@ -55,21 +55,21 @@
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="have_seriel_number" name="HAVE SERIAL NUMBER">
+        <ngx-datatable-column prop="have_seriel_number" name="HAVE SERIAL NUMBER" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <label *ngIf="row.have_seriel_number == 0"><strong>No</strong></label>
             <label *ngIf="row.have_seriel_number == 1"><strong>Yes</strong></label>
           </ng-template>
         </ngx-datatable-column>
 
-      <ngx-datatable-column prop="have_seriel_number" name="JOB MATERIAL">
+      <ngx-datatable-column prop="have_seriel_number" name="JOB MATERIAL" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <label *ngIf="row.jobworkmaterial == 0"><strong>No</strong></label>
             <label *ngIf="row.jobworkmaterial == 1"><strong>Yes</strong></label>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="status" name="STATUS">
+        <ngx-datatable-column prop="status" [flexGrow]="1" name="STATUS">
           <ng-template ngx-datatable-cell-template let-row="row">
             <label *ngIf="row.status == 0" style="color:red"><strong>Inactive</strong></label>
             <label *ngIf="row.status == 1" style="color:green"><strong>Active</strong></label>

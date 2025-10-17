@@ -24,7 +24,7 @@
           <td style="width: 200px; text-align: center; vertical-align: center;">
             <div class="btn-group  col-md-5" role="group" aria-label="Basic example">
               <button type="button" value="show" class="btn btn-outline-success fa fa-plus" (click)="PageAction('show')"> Generate Salary</button>
-              <button type="button" value="show" class="btn btn-outline-success fa fa-money" (click)="open_pop()"> Salary advance</button>
+              <!-- <button type="button" value="show" class="btn btn-outline-success fa fa-money" (click)="open_pop()"> Salary advance</button> -->
             </div>
           </td>
           <td style="width: 100px;"> </td>
@@ -38,7 +38,7 @@
             class="custom_table"
             [headerHeight]="50"
             [limit]="20"
-            [columnMode]="'force'"
+            [columnMode]="'flex'"
             [footerHeight]="50"
             [rowHeight]="'auto'"
             [rows]="SalaryList"
@@ -52,19 +52,19 @@
               </ng-template>
             </ngx-datatable-column> -->
 
-            <ngx-datatable-column prop="name" name="EMPLOYEE NAME" >
+            <ngx-datatable-column prop="name" name="EMPLOYEE NAME" [flexGrow]="2">
                 <ng-template ngx-datatable-cell-template let-row="row">
                     {{row.employee_name}}
                 </ng-template>
             </ngx-datatable-column>
 
-            <ngx-datatable-column prop="from_date" name="FROM">
+            <ngx-datatable-column prop="from_date" name="FROM" [flexGrow]="1">
                 <ng-template ngx-datatable-cell-template let-row="row">
                     {{row.from_date  | date: 'dd-MM-yyyy'}}
                 </ng-template>
             </ngx-datatable-column>
 
-            <ngx-datatable-column prop="to_date" name="TO">
+            <ngx-datatable-column prop="to_date" name="TO"  [flexGrow]="1">
               <ng-template ngx-datatable-cell-template let-row="row">
                   {{row.to_date  | date: 'dd-MM-yyyy'}}
               </ng-template>
@@ -75,7 +75,7 @@
                 <span style="font-weight:bold;"> {{row.salary | indianCurrency}} </span>
                 </ng-template>
             </ngx-datatable-column> -->
-            <ngx-datatable-column prop="status" name="STATUS">
+            <ngx-datatable-column prop="status" name="STATUS" [flexGrow]="1">
               <ng-template ngx-datatable-cell-template let-row="row">
                   <span *ngIf="row.status == 1">Generated</span>
                   <span *ngIf="row.status == 2">Done</span>
@@ -103,15 +103,15 @@
                               <td>{{detail_view.name}}</td>
                           </tr>
                           <tr>
-                              <th>Total Worked Days</th>
+                              <th>Total Worked Hours</th>
                               <td>{{detail_view.total_hours}}</td>
                           </tr>
                           <tr>
-                              <th>Number of Worked Days</th>
+                              <th>Number of Worked Hours</th>
                               <td>{{detail_view.working_hours}}</td>
                           </tr>
                           <tr>
-                            <th>Number of Salary Paid Days For</th>
+                            <th>Number of Salary Paid Hours For</th>
                             <td>{{final_data.salary_paid_days}}</td>
                         </tr>
                           <tr>
@@ -142,7 +142,7 @@
                           <tr>
                             <th>Salary Paid</th>
                             <td>
-                              {{salary_dtails.salary_paid}}
+                              {{salary_dtails.salary_paid | indianCurrency}}
                               </td>
                         </tr>
                       </tbody>
@@ -172,7 +172,7 @@
                                 <option *ngFor= "let view of BankList" value="{{view.bank_id}}" >{{view.account_name}}</option>
                               </select> -->
 
-                              <ng-select   formControlName="ip_bank_id" style="text-align: left;"  class="custom-select" [clearable]="false">
+                              <ng-select   formControlName="ip_bank_id" style="text-align: left;"  class="custom-select" [clearable]="true">
                                 <ng-option *ngFor="let item of BankList" [value]="item.bank_id"  style="align-content:center;">
                                   {{ item.account_name}}
                                 </ng-option>
@@ -185,7 +185,7 @@
                         <label for="email-h-f" class="col-sm-3 form-control-label m-t-5">Payment Mode</label>
                         <div class="col-sm-8">
                           <div class="input-group">
-                            <select [formControl]="ip_tran_mode" class="form-control custom-select">
+                            <select [formControl]="ip_tran_mode" class="form-control custom-select" >
                               <option value = "0" selected>Select Mode</option>
                               <option value = "1">Wire</option>
                               <option value = "2">Cash</option>
@@ -304,7 +304,7 @@
           class="custom_table2"
           [headerHeight]="50"
           [limit]="10"
-          [columnMode]="'force'"
+          [columnMode]="'flex'"
           [footerHeight]="50"
           [rowHeight]="50"
           [rows]="salary_detail"
@@ -312,26 +312,26 @@
           [selectionType]="'single'"
           (activate)="onAction1($event)">
 
-            <ngx-datatable-column prop="tran_date" name="TRANSACTION DATE">
+            <ngx-datatable-column prop="tran_date" name="TRANSACTION DATE" [flexGrow]="1">
               <ng-template ngx-datatable-cell-template let-row="row">
                 <span>{{row.tran_date  | date: 'dd-MM-yyyy'}}</span>
               </ng-template>
             </ngx-datatable-column>
 
-            <ngx-datatable-column prop="utr" name="UTR">
-              <ng-template ngx-datatable-cell-template let-row="row">
+            <ngx-datatable-column prop="utr" name="UTR" [flexGrow]="1">
+              <ng-template ngx-datatable-cell-template let-row="row" >
                 <span>{{row.utr}}</span>
               </ng-template>
             </ngx-datatable-column>
 
 
-            <ngx-datatable-column prop="amount" name="AMOUNT">
+            <ngx-datatable-column prop="amount" name="AMOUNT" [flexGrow]="1">
               <ng-template ngx-datatable-cell-template let-row="row">
                 <span style="font-weight:bold;">{{row.amount | indianCurrency}}</span>
               </ng-template>
             </ngx-datatable-column>
 
-            <ngx-datatable-column prop="reference" name="REFERENCE">
+            <ngx-datatable-column prop="reference" name="REFERENCE" [flexGrow]="1">
               <ng-template ngx-datatable-cell-template let-row="row">
                 <span>{{row.reference}}</span>
               </ng-template>
@@ -422,7 +422,7 @@
                 class="custom_table2"
                 [headerHeight]="50"
                 [limit]="10"
-                [columnMode]="'force'"
+                [columnMode]="'flex'"
                 [footerHeight]="50"
                 [rowHeight]="50"
                 [rows]="LoadSalaryData"
@@ -430,31 +430,31 @@
                 [selectionType]="'single'"
                 (activate)="onAction($event)">
 
-                  <ngx-datatable-column  prop="emp_id" name="EMPLOYEE ID">
+                  <ngx-datatable-column  prop="emp_id" name="EMPLOYEE ID" [flexGrow]="1">
                     <ng-template ngx-datatable-cell-template let-row="row">
                       {{row.emp_id}}
                     </ng-template>
                   </ngx-datatable-column>
 
-                  <ngx-datatable-column prop="name" name="EMPLOYEE NAME">
+                  <ngx-datatable-column prop="name" name="EMPLOYEE NAME" [flexGrow]="2">
                     <ng-template ngx-datatable-cell-template let-row="row">
                       <span>{{row.name}}</span>
                     </ng-template>
                   </ngx-datatable-column>
 
-                  <ngx-datatable-column prop="hr" name="ATTENDANCE">
+                  <ngx-datatable-column prop="hr" name="ATTENDANCE" [flexGrow]="1">
                     <ng-template ngx-datatable-cell-template let-row="row">
                       <span>{{row.hr}} Hrs</span>
                     </ng-template>
                   </ngx-datatable-column>
 
-                  <ngx-datatable-column prop="ot" name="OVER TIME">
+                  <ngx-datatable-column prop="ot" name="OVER TIME" [flexGrow]="1">
                     <ng-template ngx-datatable-cell-template let-row="row">
                       <span>{{row.ot}}  Hrs</span>
                     </ng-template>
                   </ngx-datatable-column>
 
-                  <ngx-datatable-column prop="cl" name="COM-OFF LEAVE">
+                  <ngx-datatable-column prop="cl" name="COM-OFF LEAVE" [flexGrow]="1">
                     <ng-template ngx-datatable-cell-template let-row="row">
                       <span>{{row.cl}}  Hrs</span>
                     </ng-template>
@@ -466,7 +466,7 @@
                     </ng-template>
                   </ngx-datatable-column> -->
 
-                  <ngx-datatable-column prop="pl" name="PERSONAL LEAVE">
+                  <ngx-datatable-column prop="pl" name="PERSONAL LEAVE" [flexGrow]="1">
                     <ng-template ngx-datatable-cell-template let-row="row">
                       <span>{{row.pl}}  Hrs</span>
                     </ng-template>
@@ -594,7 +594,7 @@
       </div>
         <div class="form-group col-xl-3" style="text-align: center;padding: center;">
 
-            <small *ngIf="total_days*8 - total_workeddays <= 32 && pl_status == null" style="color: #e0a225;" > * Not eligible for PL leave — you have missed more than 4 working days.</small>
+            <small *ngIf="total_days*8 - total_workeddays <= 32 && pl_status == null" style="color: #e0a225;" > * Not eligible for PL leave,if more than 4 working days absent.</small>
               <small *ngIf="total_days*8 - total_workeddays > 32 && pl_status == null" style="color:red;">* Not eligible for PL leave due to insufficient worked days!</small>
               <small *ngIf="pl_status != null" style="color: #e0a225;" > * Already applied for PL leave</small>
         </div>
@@ -661,7 +661,7 @@
         <label for="name">PL Balance (hrs)</label>
         </div>
         <div class="form-group col-xl-2">
-        <input formControlName="pl_balance" id="pl_balance" placeholder="Enter PL Balance" min="0" type="number" readonly class="form-control" >
+        <input formControlName="pl_balance" id="pl_balance" [(ngModel)]="pl_balance" placeholder="Enter PL Balance" min="0" type="number" readonly class="form-control" >
         <span class="help-block text-danger"
           *ngIf="payroll_days.get('pl_balance').touched && payroll_days.get('pl_balance').hasError('required')">Enter PL Balance !</span>
       </div>
@@ -689,7 +689,7 @@
         <label for="name">Comp off Balance (hrs)</label>
         </div>
         <div class="form-group col-xl-2">
-        <input formControlName="c_off_balance" id="c_off_balance" placeholder="Enter Comp off Balance" min="0" type="number" readonly class="form-control" >
+        <input formControlName="c_off_balance" id="c_off_balance" [(ngModel)]="cl_balance" placeholder="Enter Comp off Balance" min="0" type="number" readonly class="form-control" >
         <span class="help-block text-danger"
           *ngIf="payroll_days.get('c_off_balance').touched && payroll_days.get('c_off_balance').hasError('required')">Enter Comp off Balance !</span>
       </div>
@@ -698,7 +698,7 @@
         <label for="name">LOP (hrs)</label>
         </div>
         <div class="form-group col-xl-9">
-        <input formControlName="lop" id="lop" placeholder="Enter LOP" type="number" class="form-control input-size" >
+        <input formControlName="lop" id="lop" readonly placeholder="Enter LOP" type="number" class="form-control input-size" >
         <span class="help-block text-danger"
           *ngIf="payroll_days.get('lop').touched && payroll_days.get('lop').hasError('required')">Enter LOP !</span>
       </div>
@@ -707,7 +707,7 @@
         <label for="name">Salary Paid Hours</label>
         </div>
         <div class="form-group col-xl-9">
-        <input formControlName="salary_paid_day" id="salary_paid_day" placeholder="Enter Salary Paid Day" type="number" class="form-control input-size" >
+        <input formControlName="salary_paid_day" readonly id="salary_paid_day" placeholder="Enter Salary Paid Day" type="number" class="form-control input-size" >
         <span class="help-block text-danger"
           *ngIf="payroll_days.get('salary_paid_day').touched && payroll_days.get('salary_paid_day').hasError('required')">Enter Salary Paid Day !</span>
       </div>
@@ -741,22 +741,22 @@
         <table class="table col-md-6">
           <thead>
               <tr>
-                  <th>Total Days</th>
+                  <th>Total Hours</th>
                   <td>{{final_data.no_of_days}}</td>
               </tr>
           </thead>
           <tbody>
               <tr>
-                  <th>Total Worked Days</th>
+                  <th>Total Worked Hours</th>
                   <td>{{final_data.no_of_workeddays}}</td>
               </tr>
               <tr>
-                <th>Personal Leave</th>
+                <th>Personal Leave Hours</th>
                 <td>{{final_data.personal_leave}}</td>
             </tr>
 
               <tr>
-                  <th>Casual Leave</th>
+                  <th>Casual Leave Hours</th>
                   <td>{{final_data.com_off_leave}}</td>
               </tr>
           </tbody>
@@ -765,21 +765,21 @@
           <thead>
 
               <tr>
-                  <th>Sick Leave</th>
+                  <th>Sick Leave Hours</th>
                   <td>{{final_data.sick_leave}}</td>
               </tr>
           </thead>
           <tbody>
               <tr>
-                <th>Com Off Use</th>
+                <th>Com Off Use Hours</th>
                 <td>{{final_data.com_off}}</td>
             </tr>
               <tr>
-                  <th>LOP</th>
+                  <th>LOP Hours</th>
                   <td>{{final_data.lop}}</td>
               </tr>
               <tr>
-                  <th>Salary Paid Days</th>
+                  <th>Salary Paid Hours</th>
                   <td>{{final_data.salary_paid_days}}</td>
               </tr>
           </tbody>
@@ -825,7 +825,7 @@
                   </div>
                   <div class="col-md-6">
                     <div class="input-group">
-                      <input type="number" class="form-control" [(ngModel)]="salary_advance"   (input)="salary_amount_calculation()" formControlName="salary_advance" placeholder=" Enter Salary Advance">
+                      <input type="number" class="form-control" [(ngModel)]="salary_advance" [readonly]="account_balance <= 0"  (input)="salary_amount_calculation()" formControlName="salary_advance" placeholder=" Enter Salary Advance">
                     </div>
                   </div>
                </div>

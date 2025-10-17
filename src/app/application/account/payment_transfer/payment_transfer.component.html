@@ -27,8 +27,8 @@
             <div class="form-group">
                 <label for="exampleSelect3">Transfer From</label>
                 <span *ngIf="this.user_type == 'super_admin'">
-                 
-                  <ng-select formControlName="from_bank" (change)="selecct($event)" [items]="bankData" bindLabel="account_name" bindValue="bank_id"  groupBy="mode" class=" form-control custom-select" [clearable]="false">
+
+                  <ng-select formControlName="from_bank" (change)="selecct($event)" [items]="bankData" bindLabel="account_name" bindValue="bank_id"  groupBy="mode" class=" form-control">
                       <ng-template ng-optgroup-tmp let-item="item" class="form-control">
                           <span *ngIf="item.mode == 1" style="padding: 20px;"><b>Bank</b></span>
                           <span *ngIf="item.mode == 2" style="padding: 20px;"><b>Cash</b></span>
@@ -50,6 +50,7 @@
                     </ng-option>
                   </ng-select>
                 </span>
+                 <span class="help-block text-danger" *ngIf="addTrans.get('from_bank').touched && addTrans.get('from_bank').hasError('required')"> Required !</span>
             </div>
 
             <div class="form-group">
@@ -71,7 +72,8 @@
                   </optgroup>
                </select> -->
 
-               <ng-select formControlName="to_bank" (change)="selecct($event)" [items]="bankData" bindLabel="account_name" bindValue="bank_id"  groupBy="mode" class=" form-control custom-select" [clearable]="false">
+               <ng-select formControlName="to_bank" (change)="selecct($event)" [items]="bankData" bindLabel="account_name" bindValue="bank_id"
+               groupBy="mode" class=" form-control custom-select" [clearable]="true">
                       <ng-template ng-optgroup-tmp let-item="item" class="form-control">
                           <span *ngIf="item.mode == 1" style="padding: 20px;"><b>Bank</b></span>
                           <span *ngIf="item.mode == 2" style="padding: 20px;"><b>Cash</b></span>
@@ -94,6 +96,7 @@
                   </ng-option>
                 </ng-select>
               </span>
+               <span class="help-block text-danger" *ngIf="addTrans.get('to_bank').touched && addTrans.get('to_bank').hasError('required')"> Required !</span>
             </div>
             <div class="form-group">
               <div>

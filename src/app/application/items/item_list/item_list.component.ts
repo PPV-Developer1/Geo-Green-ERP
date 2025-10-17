@@ -47,11 +47,11 @@ export class Item_listComponent implements OnInit
 
   EditItem = new FormGroup
   ({
-    name           : new FormControl('', [Validators.required, Validators.minLength(3)]),
-    hsnsac         : new FormControl('', [Validators.required, Validators.minLength(3)]),
-    item_cat       : new FormControl('', [Validators.required]),
-    uom            : new FormControl('', [Validators.required]),
-    tax            : new FormControl('', [Validators.required]),
+    name           : new FormControl(null, [Validators.required, Validators.minLength(3)]),
+    hsnsac         : new FormControl(null, [Validators.required, Validators.minLength(3)]),
+    item_cat       : new FormControl(null, [Validators.required]),
+    uom            : new FormControl(null, [Validators.required]),
+    tax            : new FormControl(null, [Validators.required]),
     purchase       : new FormControl(null),
     sale           : new FormControl(null),
     price          : new FormControl('', [Validators.required]),
@@ -62,14 +62,14 @@ export class Item_listComponent implements OnInit
   NewItem = new FormGroup
   ({
     created_by      : new FormControl(this.uid),
-    name            : new FormControl('', [Validators.required, Validators.minLength(3)]),
-    item_cat        : new FormControl('', [Validators.required]),
-    hsnsac          : new FormControl('', [Validators.required, Validators.minLength(4)]),
+    name            : new FormControl(null, [Validators.required, Validators.minLength(3)]),
+    item_cat        : new FormControl(null, [Validators.required]),
+    hsnsac          : new FormControl(null, [Validators.required, Validators.minLength(4)]),
     uom             : new FormControl('Nos', [Validators.required]),
     purchase        : new FormControl(0),
     sale            : new FormControl(0),
     price           : new FormControl('', [Validators.required]),
-    tax_percent     : new FormControl('18'),
+    tax_percent     : new FormControl('18', [Validators.required]),
     description     : new FormControl(null),
     status          : new FormControl(1)
   });
@@ -128,6 +128,11 @@ export class Item_listComponent implements OnInit
 
   async EditSubmit(data)
   {
+    const confirmed = confirm(" Are you sure you want to update these changes?");
+          console.log(confirmed)
+          if (!confirmed) {
+            return;
+          }
     this.loading=true;
     await this.api.post('post_update_data.php?table=item&field=item_id&value=' + this.detail_view['item_id'] + '&authToken=' + environment.authToken, data).then((data_rt: any) =>
     {

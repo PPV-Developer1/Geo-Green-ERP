@@ -12,7 +12,7 @@
       <button type="button" class="btn btn-outline-info fa fa-pencil-square-o btn-sm" (click)="e_bill()"> Transport Vehicle Details</button>
       <button type="button" class="btn btn-outline-info fa fa-copy btn-sm"  (click)="clone()"> Clone</button>
       <button type="button" class="btn btn-outline-info fa fa-copy btn-sm" [disabled]="status === 2" (click)="addbill()"> Convert To Bill</button>
-      <button type="button" class="btn btn-outline-danger fa fa-trash-o btn-sm" [disabled]="status === 2" (click)="remove()"> Delete</button>
+      <button type="button" class="btn btn-outline-danger fa fa-trash-o btn-sm" [disabled]="status === 2 ||edit_status > 0" (click)="remove()"> Delete</button>
       &nbsp;
       &nbsp;
       &nbsp;
@@ -23,7 +23,7 @@
   <div class="card-group col-md-12">
     <div class="col-md-4">
       <ngx-datatable #table class="custom_table vh-100" [headerHeight]="0" [limit]="5" [columnMode]="'force'"
-        [footerHeight]="50" [rowHeight]="70" [rows]="VendorBillList" [selected]="selected"
+        [footerHeight]="50" [rowHeight]="100" [rows]="VendorBillList" [selected]="selected"
         [selectionType]="SelectionType.single" [scrollbarV]="true" (activate)="onActivate($event)"
         (select)="onSelect($event)">
 
@@ -37,14 +37,14 @@
               <div class="col-md-9"> <b> {{row.vendor_name | uppercase }} </b> </div>
               <div class="col-md-3">{{row.total | indianCurrency }} </div>
             </div>
-            <div class="row">
-              <div class="col-md-5 ml-2">{{row.po_number}} | {{row.reference_number}}</div>
 
+            <div class="row">
+              <div class="col-md-9 "><b>{{ row.creater_name}}</b> </div>
+              <div class="col-md-3 " style="text-align: right;">{{ row.po_date | date: 'dd-MM-yyyy'}} </div>
             </div>
 
             <div class="row">
-              <div class="col-md-5 ml-2"><b>{{ row.creater_name}}</b> </div>
-              <div class="col-md-5 ml-2" style="text-align: right;">{{ row.po_date | date: 'dd-MM-yyyy'}} </div>
+              <div class="col-md-9 ">{{row.po_number}}</div>
             </div>
             </div>
           </ng-template>
@@ -136,7 +136,7 @@
                       <b>Contact :</b>{{invoice.ship_phone}}
                     </td>
                     <td style="text-align: left; vertical-align: top;">
-                      
+
                      <b> Mode Of Transport  : </b> {{invoice.shipment_mode}}<br>
                      <b>Delivery Type : </b>{{invoice.delivery_type}}<br>
                      <b>Ref : </b>{{invoice.reference_number}}
@@ -848,13 +848,15 @@
 
                 <div class="row mb-3">
                   <label style="color: #e54643" class="col-sm-2 col-form-label col-form-label-sm">PO Number*</label>
-                  <div class="col-sm-4">
-                    <input type="text" formControlName="poNo"
-                      class="form-control form-control-sm" [(ngModel)]="inv_no" (ngModelChange)="onInputChange()" />
-                    <span class="help-block text-danger"
-                      *ngIf="Edit_po.get('poNo').touched && Edit_po.get('poNo').hasError('required')">Enter
-                      PO Number !</span>
-                  </div>
+                  <div class="col-sm-2">
+                          <input type="text" readonly formControlName="prefix" [(ngModel)]="po_prefix" class="form-control form-control-sm" />
+                      </div>
+
+                      <div class="col-sm-1">
+                          <input type="text" formControlName="poNo" [(ngModel)]="inv_no"
+                            class="form-control form-control-sm" />
+                          <span class="help-block text-danger" *ngIf="Edit_po.get('poNo').touched && Edit_po.get('poNo').hasError('required')">Enter PO Number !</span>
+                      </div>
                 </div>
 
                 <div class="row mb-3">
@@ -1614,7 +1616,14 @@ aria-labelledby="modal-large-label" style="display: none;">
 
       <div class="form-group">
         <label for="input-12">Payment Receipt No</label>
-        <input type="text" formControlName="receipt_no" class="form-control" id="input-12">
+        <div class="d-flex">
+            <div class="col-sm-4">
+              <input type="text" readonly formControlName="prefix" [(ngModel)]="prefix" class="form-control text-uppercase" />
+          </div>
+              <div class="col-sm-4">
+                <input type="number" formControlName="receipt_no" [(ngModel)]="receipt_serial_no" class="form-control" />
+              </div>
+         </div>
       </div>
       <div class="form-group">
         <label for="exampleSelect3">Mode of Transfer</label>

@@ -67,15 +67,20 @@
     </ngx-datatable-column>
 
 
-       <ngx-datatable-column prop="by_product_no" name="PRODUCT NO">
+    <ngx-datatable-column prop="by_product_no" name="PRODUCT NO">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.by_product_no}}
       </ng-template>
     </ngx-datatable-column>
 
+  <ngx-datatable-column prop="by_product_description" name="DESCRIPTION">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.by_product_description}}
+      </ng-template>
+    </ngx-datatable-column>
     <ngx-datatable-column prop="product_name" name="PRODUCT NAME">
       <ng-template ngx-datatable-cell-template let-row="row">
-          {{row.product_name}}
+          {{row.product_name}}by_product_description
       </ng-template>
     </ngx-datatable-column>
 

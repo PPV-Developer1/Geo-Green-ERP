@@ -1,3 +1,4 @@
+import { routes } from './../../pages/ui/ui.module';
 import { Component, ViewChild, OnInit, ElementRef, } from '@angular/core';
 import { DatatableComponent } from '@swimlane/ngx-datatable';
 import { ApiService } from 'src/app/service/api.service';
@@ -40,8 +41,11 @@ export class TrackingComponent implements OnInit {
   modalRef         :any
   customer_list    :any
   vendor_list      :any
+  Model             : any
 
   @ViewChild(DatatableComponent) table: DatatableComponent;
+  @ViewChild("details",{static:true}) details:ElementRef;
+
   gfg: { status: string; }[];
 
 
@@ -127,7 +131,29 @@ export class TrackingComponent implements OnInit {
     }
   }
 
+  project_item_list_dispatch : any
+ async item_data(event)
+  {
+    if(event.type =="click")
+    {
+      console.log(event.row)
+      await this.api.get('get_data.php?table=project_item_list_dispatch&find=project_item_id&value='+event.row.id+'&authToken='+environment.authToken).then((data: any) =>
+      {
+        console.log("data :",data)
+      this.project_item_list_dispatch = data;this.itemWithoutAsso
+      if(data != null)
+      {
+          for(let i =0;i<data.length;i++)
+          {
+            this.project_item_list_dispatch[i]['uom'] = event.row.uom
+          }
+       }
 
+      }).catch(error => {this.toastrService.error('Something went wrong');});
+
+      this.Model = this.modalService.open(this.details,{size:"md"})
+    }
+  }
 
   set_zero()
   {

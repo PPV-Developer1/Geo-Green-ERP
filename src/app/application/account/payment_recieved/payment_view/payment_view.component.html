@@ -1,6 +1,6 @@
-<div  class="col-md-12">
+<div  class="row">
 
-  <div class="row">
+  <!-- <div class="row">
     <div class="col-md-2">
       <h4 class="ml-5"><span>TRANSACTIONS</span></h4>
     </div>
@@ -16,9 +16,41 @@
       </div>
 
     </div>
-   </div>
+   </div> -->
+
+   <div class="col-md-12" style="padding-left:1.7%;">
+        <table>
+          <tr>
+
+             <td style="width: 42%;">
+                      <div class="input-group input-group-sm my-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-search"></i></span>
+                        </div>
+                        <input class="form-control" type="text" placeholder="Search ..." (keyup)="updateFilter($event)"/>
+                      </div>
+              </td>
+
+            <td style="width: 38%; text-align: center;">
+              <h4><B>TRANSACTIONS</B></h4>
+            </td>
+            <td style="width: 16%; text-align: center; vertical-align: center;">
+            </td>
+            <td>
+              <div *ngIf="invoice_no != null" class="col-12" >
+            <button type="submit"  class="btn btn-success fa fa-print pull-right" (click)="download()"> Print</button>
+          </div>
+
+          <div *ngIf="invoice_no == null" class="col-12" >
+            <button type="submit"  class="btn btn-success fa fa-print pull-right" (click)="advance_download()"> Print</button>
+          </div>
+            </td>
+          </tr>
+        </table>
+  </div>
+
   <div class="card-group col-md-12">
-    <div class="col-md-4">
+    <div class="col-md-5">
       <ngx-datatable #table class="custom_table vh-100" [headerHeight]="0" [limit]="5" [columnMode]="'force'"
         [footerHeight]="50" [rowHeight]="70" [rows]="paymentlist" [selected]="selected"
         [selectionType]="SelectionType.single" [scrollbarV]="true" (activate)="onActivate($event)"
@@ -26,7 +58,7 @@
 
         <ngx-datatable-column [sortable]="false">
           <ng-template ngx-datatable-cell-template let-row="row">
-            <div  [attr.id]="'invoice-row-' + row.tran_id">
+            <div  [attr.id]="'invoice-row-' + row.tran_id" style="overflow: hidden;">
               <div class="row">
 
               <input type="hidden" [value]="row.invoice_id">
@@ -36,19 +68,19 @@
               <div class="col-md-3">{{row.debit | indianCurrency }} </div>
             </div>
             <div class="row">
-              <div class="col-md-8 ml-2"> {{ row.tran_date  | date: 'dd-MM-yyyy'}}  </div>
-              <div class="col-md-3 ml-3"> {{ row.tran_type}}  </div>
+              <div class="col-md-9"> {{ row.tran_date  | date: 'dd-MM-yyyy'}}  </div>
+              <div class="col-md-3"> {{ row.tran_type}}  </div>
             </div>
             <div class="row">
-              <div class="col-md-6 ml-2">{{row.invoice_number}} </div>
-              <div class="col-md-3 ml-2">{{ "Invoice payment"}} </div>
+              <div class="col-md-9">{{row.invoice_number}} </div>
+              <div class="col-md-3">{{ "Invoice"}} </div>
             </div>
             </div>
           </ng-template>
         </ngx-datatable-column>
       </ngx-datatable>
     </div>
-     <div class="card col-md-8 vh-100" style="overflow-y: scroll;">
+     <div class="card col-md-7 vh-100" style="overflow-y: scroll;">
       <div class="page-content container">
         <div class="container px-0">
           <div id="table1" class="row mt-4">

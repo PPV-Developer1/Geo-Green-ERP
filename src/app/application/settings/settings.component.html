@@ -1,5 +1,5 @@
 <div *ngIf="show" class="row mbm-20">
-  <div class="col">
+  <div class="col-12">
       <div widget class="card">
           <div class="card-body widget-body">
               <div id="accordion" role="tablist" aria-multiselectable="true">
@@ -59,6 +59,8 @@
           </div>
       </div>
   </div>
+
+
 </div>
 
 
@@ -78,9 +80,7 @@
         </div>
         <div class="form-group col-xl-9">
         <input formControlName="name" id="name" placeholder="Enter Name" type="text" class="form-control" >
-        <span class="help-block text-danger"
-          *ngIf="profile_update.get('name').touched && profile_update.get('name').hasError('required')">Enter
-          Name !</span>
+        <span class="help-block text-danger" *ngIf="profile_update.get('name').touched && profile_update.get('name').hasError('required')">Enter Name !</span>
       </div>
 
       <div class="form-group col-xl-3">
@@ -364,7 +364,6 @@
                     <td>{{detail_view?.address_2}}</td>
                   </tr>
 
-
                   <tr>
                     <th>Bank</th>
                       <td>{{detail_view?.bank_name}}</td>
@@ -496,6 +495,10 @@
                       <th>Credit Note</th>
                       <td>{{detail_view?.credit_notes}}</td>
                   </tr>
+                    <tr>
+                      <th>Production Prefix</th>
+                      <td>{{detail_view?.production_prefix}}</td>
+                  </tr>
               </tbody>
             </table>
             <table class="table col-md-6">
@@ -517,6 +520,10 @@
                       <th>Debit Note</th>
                       <td>{{detail_view?.debit_note}}</td>
                   </tr>
+                  <tr>
+                    <th>&nbsp;</th>
+                    <td>&nbsp;</td>
+                  </tr>
               </tbody>
             </table>
           </div>
@@ -524,7 +531,146 @@
       </div>
     </div>
   </div>
+
+&nbsp;
+<div class="col-6">
+ <div widget class="card " >
+            <div class="card-header d-flex justify-content-between align-items-center" >
+
+                  <span class="text-uppercase">Production Prefix List</span>
+                     <!-- <div class="widget-controls">
+                        <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+                        <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+                        <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+                        <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+                        <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+                      </div> -->
+              </div>
+
+                 <div class="card-body widget-body row"  >
+                      <div class=" col-12" style="text-align: right;bottom: 10px;">
+                         <button type="submit" class="btn btn-success fa fa-plus" (click)="add_Production_prefix()"> Add</button>
+                      </div>
+
+                    <div class=" col-12">
+                    <ngx-datatable
+                    #table
+                    class="custom_table"
+                    [headerHeight]="50"
+                    [limit]="10"
+                    [columnMode]="'force'"
+                    [footerHeight]="50"
+                    [rowHeight]="50"
+                    [rows]="production_prefix_list"
+                      (activate)="onActivate_product_prefix($event)">
+
+                    <ngx-datatable-column prop="date_time"    name="DATE" >
+                        <ng-template ngx-datatable-cell-template let-row = "row">
+                            {{row.date_time | date: 'dd-MM-yyyy'}}
+                        </ng-template>
+                    </ngx-datatable-column>
+
+                     <ngx-datatable-column prop="prefix"  name="PREFIX" >
+                        <ng-template ngx-datatable-cell-template let-row = "row">
+                            {{row.prefix}}
+                        </ng-template>
+                    </ngx-datatable-column>
+
+
+                      <ngx-datatable-column    name="STATUS" >
+                        <ng-template ngx-datatable-cell-template let-row = "row">
+                           <span *ngIf="row.status == 1"  style="color: green;font-weight: bold;">Active</span>
+                            <span *ngIf="row.status == 0" style="color:red;font-weight: bold;" >InActive</span>
+                        </ng-template>
+                    </ngx-datatable-column>
+                  </ngx-datatable>
+                </div>
+              </div>
+          </div>
 </div>
+
+</div>
+
+
+<ng-template #Product_prefix_add let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Add Product Prefix</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="product_prefix" (ngSubmit)="submit_Product_prefix(product_prefix.value)">
+
+      <div class="row">
+       <div class="form-group col-xl-6">
+        <label for="name">Prefix</label>
+        </div>
+        <div class="form-group col-xl-6 ">
+        <input formControlName="name" id="name" placeholder="Enter Prefix" type="text" maxlength="3"  (input)="onInput($event)" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="product_prefix.get('name').touched && product_prefix.get('name').hasError('required')">Enter Prefix !</span>
+      </div>
+
+     <div class="form-group col-md-6">
+        <label>Status</label>
+      </div>
+      <div class="form-group col-md-6">
+        <div class="custom-control custom-switch">
+          <input type="checkbox" formControlName="status" class="custom-control-input" id="customSwitch2" />
+          <label class="custom-control-label" for="customSwitch2"></label>
+        </div>
+      </div>
+
+       <div class="col-xl-6"></div>
+        <div>
+          <button [disabled]="loading" class="btn btn-primary" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+         </div>
+      </div>
+
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #Product_prefix_edit let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Edit Product Prefix</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="edit_product_prefix" (ngSubmit)="update_Product_prefix(edit_product_prefix.value)">
+
+      <div class="row">
+       <div class="form-group col-xl-6">
+        <label for="name">Prefix</label>
+        </div>
+        <div class="form-group col-xl-6 ">
+        <input formControlName="name" id="name" placeholder="Enter Prefix" type="text" maxlength="3"  (input)="onInput($event)" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="edit_product_prefix.get('name').touched && edit_product_prefix.get('name').hasError('required')">Enter Prefix !</span>
+      </div>
+
+     <div class="form-group col-md-6">
+        <label>Status</label>
+      </div>
+      <div class="form-group col-md-6">
+        <div class="custom-control custom-switch">
+          <input type="checkbox" formControlName="status" class="custom-control-input" id="customSwitch2" />
+          <label class="custom-control-label" for="customSwitch2"></label>
+        </div>
+      </div>
+
+       <div class="col-xl-6"></div>
+        <div>
+          <button [disabled]="loading" class="btn btn-primary" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+         </div>
+      </div>
+
+    </form>
+  </div>
+</ng-template>
 
 
 <ng-template #edit_prefix let-modal>
@@ -624,6 +770,14 @@
         <span class="help-block text-danger"
           *ngIf="prefix_update.get('debit').touched && prefix_update.get('debit').hasError('required')">Enter
           Debit  Prefix!</span>
+      </div>
+    <div class="form-group  col-xl-3">
+        <label for="name">Product Prefix</label>
+      </div>
+      <div class="form-group col-xl-9">
+        <input formControlName="product_prefix" id="product_prefix" placeholder="Enter Product Prefix" type="text" class="form-control">
+
+        <span class="help-block text-danger" *ngIf="prefix_update.get('product_prefix').touched && prefix_update.get('product_prefix').hasError('required')">Enter Product  Prefix!</span>
       </div>
 
        <div class="col-xl-6"></div>

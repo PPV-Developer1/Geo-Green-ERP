@@ -38,33 +38,34 @@
         <div widget class="card">
           <div class="card-body widget-body">
             <ngx-datatable style="cursor: pointer;" #table class="custom_table" [headerHeight]="50" [limit]="15"
-              [columnMode]="'force'" [footerHeight]="50" [rowHeight]="'auto'" [rows]="customers" [selected]="selected"
+              [columnMode]="'flex'" [footerHeight]="50" [rowHeight]="'auto'" [rows]="customers" [selected]="selected"
               [selectionType]="'single'" (activate)="onActivate($event)">
-              <ngx-datatable-column prop="company_name" name="NAME">
+              
+              <ngx-datatable-column prop="company_name" name="NAME" [flexGrow]="2" >
                 <ng-template ngx-datatable-cell-template let-row="row">
                   <span style="font-weight:bold;"> {{ row.company_name }}</span>
                 </ng-template>
               </ngx-datatable-column>
 
-              <ngx-datatable-column prop="customer_type" name="TYPE">
+              <ngx-datatable-column prop="customer_type" name="TYPE" [flexGrow]="1">
                 <ng-template ngx-datatable-cell-template let-row="row">
                   {{ row.customer_type }}
                 </ng-template>
               </ngx-datatable-column>
 
-              <ngx-datatable-column prop="pan_number" name="PAN">
+              <ngx-datatable-column prop="pan_number" name="PAN" [flexGrow]="1">
                 <ng-template ngx-datatable-cell-template let-row="row">
                   {{ row.pan_number }}
                 </ng-template>
               </ngx-datatable-column>
 
-              <ngx-datatable-column prop="terms_condition" name="TERMS & CONDITIONS">
+              <ngx-datatable-column prop="terms_condition" name="TERMS & CONDITIONS" [flexGrow]="1">
                 <ng-template ngx-datatable-cell-template let-row="row">
                   {{ row.terms_condition }}
                 </ng-template>
               </ngx-datatable-column>
 
-              <ngx-datatable-column prop="opening_balance" name="OPENING BALANCE">
+              <ngx-datatable-column prop="opening_balance" name="OPENING BALANCE" [flexGrow]="1">
                 <ng-template ngx-datatable-cell-template let-row="row">
                   {{ row.opening_balance | indianCurrency }}
                 </ng-template>
@@ -441,65 +442,65 @@
                     </div>
                     &nbsp;
                     <ngx-datatable style="cursor: pointer;" #table class="custom_table" [headerHeight]="50"
-                      [limit]="10" [columnMode]="'force'" [footerHeight]="50" [rowHeight]="'auto'"
+                      [limit]="10" [columnMode]="'flex'" [footerHeight]="50" [rowHeight]="'auto'"
                       [rows]="customer_address" [selected]="selected" [selectionType]="'single'">
-                      <ngx-datatable-column prop="attention" name="NAME">
+                      <ngx-datatable-column prop="attention" name="NAME" [flexGrow]="2">
                         <ng-template ngx-datatable-cell-template let-row="row">
                           {{ row.attention }}
                         </ng-template>
                       </ngx-datatable-column>
 
-                      <ngx-datatable-column prop="address_line_1" name="ADDRESS 1">
+                      <ngx-datatable-column prop="address_line_1" name="ADDRESS 1" [flexGrow]="2">
                         <ng-template ngx-datatable-cell-template let-row="row">
                           {{ row.address_line_1 }}
                         </ng-template>
                       </ngx-datatable-column>
 
-                      <ngx-datatable-column prop="address_line_2" name="ADDRESS 2">
+                      <ngx-datatable-column prop="address_line_2" name="ADDRESS 2" [flexGrow]="2">
                         <ng-template ngx-datatable-cell-template let-row="row">
                           {{ row.address_line_2 }}
                         </ng-template>
                       </ngx-datatable-column>
 
-                      <ngx-datatable-column prop="city" name="CITY">
+                      <ngx-datatable-column prop="city" name="CITY" [flexGrow]="1">
                         <ng-template ngx-datatable-cell-template let-row="row">
                           {{ row.city }}
                         </ng-template>
                       </ngx-datatable-column>
 
-                      <ngx-datatable-column prop="state" name="STATE">
+                      <ngx-datatable-column prop="state" name="STATE" [flexGrow]="1">
                         <ng-template ngx-datatable-cell-template let-row="row">
                           {{ row.state }}
                         </ng-template>
                       </ngx-datatable-column>
 
-                      <ngx-datatable-column prop="zip_code" name="PIN CODE">
+                      <ngx-datatable-column prop="zip_code" name="PIN CODE" [flexGrow]="1">
                         <ng-template ngx-datatable-cell-template let-row="row">
                           {{ row.zip_code }}
                         </ng-template>
                       </ngx-datatable-column>
 
-                      <ngx-datatable-column prop="phone" name="MOBILE">
+                      <ngx-datatable-column prop="phone" name="MOBILE" [flexGrow]="1">
                         <ng-template ngx-datatable-cell-template let-row="row">
                           {{ row.phone }}
                         </ng-template>
                       </ngx-datatable-column>
 
-                      <ngx-datatable-column prop="type" name="TYPE">
+                      <ngx-datatable-column prop="type" name="TYPE" [flexGrow]="1">
                           <ng-template ngx-datatable-cell-template let-row="row">
                             <span *ngIf="row.type == 1"> Bill Address</span>
                             <span *ngIf="row.type == 2"> Ship Address </span>
                           </ng-template>
                       </ngx-datatable-column>
 
-                      <ngx-datatable-column prop="status" name="STATUS">
+                      <ngx-datatable-column prop="status" name="STATUS" [flexGrow]="1">
                         <ng-template ngx-datatable-cell-template let-row="row">
                           <span *ngIf="row.status == 0"> Inactive</span>
                           <span *ngIf="row.status == 1"> Active </span>
                         </ng-template>
                       </ngx-datatable-column>
 
-                      <ngx-datatable-column  name="ACTION">
+                      <ngx-datatable-column  name="ACTION" [flexGrow]="1">
                         <ng-template ngx-datatable-cell-template let-row="row">
                           <button type="button" class="btn btn-danger btn-sm ml-2"
                             (click)="editCustomerAddress(row.cust_addr_id)">
@@ -525,52 +526,52 @@
                     </div>
                     &nbsp;
                     <ngx-datatable style="cursor: pointer;" #table class="custom_table" [headerHeight]="50"
-                      [limit]="10" [columnMode]="'force'" [footerHeight]="50" [rowHeight]="'auto'"
+                      [limit]="10" [columnMode]="'flex'" [footerHeight]="50" [rowHeight]="'auto'"
                       [rows]="customer_contact" [selected]="selected" [selectionType]="'single'">
-                      <ngx-datatable-column prop="prifix" name="PREFIX">
+                      <ngx-datatable-column prop="prifix" name="PREFIX" [flexGrow]="1">
                         <ng-template ngx-datatable-cell-template let-row="row">
                           {{ row.prefix }}
                         </ng-template>
                       </ngx-datatable-column>
 
-                      <ngx-datatable-column prop="first_name" name="FIRST NAME">
+                      <ngx-datatable-column prop="first_name" name="FIRST NAME" [flexGrow]="2">
                         <ng-template ngx-datatable-cell-template let-row="row">
                           {{ row.first_name }}
                         </ng-template>
                       </ngx-datatable-column>
 
-                      <ngx-datatable-column prop="last_name" name="LAST NAME">
+                      <ngx-datatable-column prop="last_name" name="LAST NAME" [flexGrow]="2">
                         <ng-template ngx-datatable-cell-template let-row="row">
                           {{ row.last_name }}
                         </ng-template>
                       </ngx-datatable-column>
 
-                      <ngx-datatable-column prop="email" name="EMAIL">
+                      <ngx-datatable-column prop="email" name="EMAIL" [flexGrow]="1">
                         <ng-template ngx-datatable-cell-template let-row="row">
                           {{ row.email }}
                         </ng-template>
                       </ngx-datatable-column>
 
-                      <ngx-datatable-column prop="phone" name="WORK PHONE">
+                      <ngx-datatable-column prop="phone" name="WORK PHONE" [flexGrow]="1">
                         <ng-template ngx-datatable-cell-template let-row="row">
                           {{ row.phone }}
                         </ng-template>
                       </ngx-datatable-column>
 
-                      <ngx-datatable-column prop="mobile" name="MOBILE">
+                      <ngx-datatable-column prop="mobile" name="MOBILE" [flexGrow]="1">
                         <ng-template ngx-datatable-cell-template let-row="row">
                           {{ row.mobile }}
                         </ng-template>
                       </ngx-datatable-column>
 
-                      <ngx-datatable-column prop="status" name="STATUS">
+                      <ngx-datatable-column prop="status" name="STATUS" [flexGrow]="1">
                         <ng-template ngx-datatable-cell-template let-row="row">
                           <span *ngIf="row.status == 0"> Inactive</span>
                           <span *ngIf="row.status == 1"> Active </span>
                         </ng-template>
                       </ngx-datatable-column>
 
-                      <ngx-datatable-column name="ACTION">
+                      <ngx-datatable-column name="ACTION" [flexGrow]="1">
                         <ng-template ngx-datatable-cell-template let-row="row">
                           <button type="button" class="btn btn-danger btn-sm ml-2"
                             (click)="editCustomerContact(row.cust_cont_id)">

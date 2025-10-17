@@ -110,19 +110,19 @@ export class ByproductComponent implements OnInit
   }
 
 
-  move_to_production()
-  {
-    const today = new Date();
-    const day = String(today.getDate()).padStart(2, '0');       // "14"
-    const month = String(today.getMonth() + 1).padStart(2, '0'); // "09" (months are 0-based)
-    const year = String(today.getFullYear()).slice(-2);         // "25"
+  // move_to_production()
+  // {
+  //   const today = new Date();
+  //   const day = String(today.getDate()).padStart(2, '0');       // "14"
+  //   const month = String(today.getMonth() + 1).padStart(2, '0'); // "09" (months are 0-based)
+  //   const year = String(today.getFullYear()).slice(-2);         // "25"
 
-    const formattedDate = day + month + year+'/'+ this.detail_view['id'];
+  //   const formattedDate = day + month + year+'/'+ this.detail_view['id'];
 
-    console.log(formattedDate); // e.g., "140925"
-    this.Product_no = formattedDate
-    this.openSm(this.move_to_pro);
-  }
+  //   console.log(formattedDate); // e.g., "140925"
+  //   this.Product_no = formattedDate
+  //   this.openSm(this.move_to_pro);
+  // }
 
 
   async confirm()
@@ -135,6 +135,9 @@ export class ByproductComponent implements OnInit
           {
             this.loading = false;
             this.toastrService.success('Succesfully Moved to Production');
+              this.api.get('single_field_update.php?table=production_prefix&field=id&value='+this.Product_id+'&up_field=last_serial_no&update='+this.Serial_no+'&authToken='+environment.authToken)
+                        .then((data:any) =>
+                        { console.log(data) });
             this.getAsso();
             this.selected = [];
           }
@@ -190,4 +193,24 @@ export class ByproductComponent implements OnInit
       }
     }
   }
+
+  Prefix      : any
+  Serial_no   : any
+  Product_id  : any
+
+  async move_to_production()
+  {
+    console.log(this.detail_view)
+      await this.api.get('production_batch_number.php?Product_id='+this.detail_view['category_id']+'&authToken='+environment.authToken).then((data: any) =>
+      {
+        console.log(data)
+        this.Prefix     = data[0]['prefix'];
+        this.Serial_no  = data[0]['serial_no'];
+        this.Product_no = this.Prefix  + this.Serial_no ;
+        this.Product_id = data[0]['product_prefix_id'];
+        this.openSm(this.move_to_pro);
+      }).catch(error => {this.toastrService.error('Something went wrong');});
+    // this.Product_no = formattedDate
+  }
+
 }

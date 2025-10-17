@@ -198,12 +198,15 @@
 
                       <div class="row mb-3">
                         <label style="color: #e54643"  class="col-sm-2 col-form-label col-form-label-sm">PO Number *</label>
-                        <div class="col-sm-4">
-                          <input type="text" formControlName="poNo"  [(ngModel)]="po_no"  (ngModelChange)="onInputChange()" placeholder="Enter PO Number" class="form-control form-control-sm" />
-                          <span class="help-block text-danger"
-                            *ngIf="po.get('poNo').touched && po.get('poNo').hasError('required')">Enter
-                            PO Number !</span>
-                        </div>
+                         <div class="col-sm-2">
+                          <input type="text" readonly formControlName="prefix" [(ngModel)]="po_prefix" class="form-control form-control-sm" />
+                      </div>
+
+                      <div class="col-sm-1">
+                          <input type="text" formControlName="poNo" [(ngModel)]="po_no"
+                            class="form-control form-control-sm" />
+                          <span class="help-block text-danger" *ngIf="po.get('poNo').touched && po.get('poNo').hasError('required')">Enter PO Number !</span>
+                      </div>
                       </div>
 
                       <div class="row mb-3">
@@ -218,6 +221,35 @@
                         </div>
                       </div>
 
+
+                       <div class="row mb-3">
+                    <label style="color: #e54643" class="col-sm-2 col-form-label col-form-label-sm">Delivery Type *</label>
+                    <div class="col-sm-4">
+                     <select formControlName="deliverytype"  class=" form-control custom-select">
+                          <option value="Godown / Door Delivery">Godown / Door Delivery</option>
+                     </select>
+                    </div>
+                  </div>
+
+                    <div class="row mb-3">
+                    <label style="color: #e54643" class="col-sm-2 col-form-label col-form-label-sm">Delivery Schedule *</label>
+                    <div class="col-sm-4">
+                     <select formControlName="delivery_schedule"  class=" form-control custom-select">
+                          <option value="Immediate">Immediate</option>
+                     </select>
+                    </div>
+                  </div>
+
+                    <div class="row mb-3">
+                    <label style="color: #e54643" class="col-sm-2 col-form-label col-form-label-sm">Freight *</label>
+                    <div class="col-sm-4">
+                     <select formControlName="freight"  class=" form-control custom-select">
+                          <option value="Supplier Scope">Supplier Scope</option>
+                     </select>
+                    </div>
+                  </div>
+
+                  
                       <div class="row mb-3">
                         <label style="color:#d64830" class="col-sm-2 col-form-label col-form-label-sm">Bill Date*</label>
                         <div class="col-sm-4">
@@ -285,7 +317,7 @@
                               <tbody formArrayName="product">
                                 <tr *ngFor="let product of po.get('product')['controls']; let i = index;" [formGroupName]="i">
                                   <td style="width: 350px;" class="dropdown-wrapper">
-                                    <ng-select formControlName="items" class="form-control custom-select " (click)="adjustTableHeight()" 
+                                    <ng-select formControlName="items" class="form-control custom-select " (click)="adjustTableHeight()"
                                      style=" text-align: left;" (change)="specItem($event, i)" [clearable]="false">
                                       <ng-option *ngFor="let item of ItemList" [value]="item.item_id" class="form-control">
                                         {{item.name}}

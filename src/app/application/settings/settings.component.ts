@@ -66,7 +66,8 @@ export class SettingsComponent implements OnInit
   user_edit         :FormGroup;
   pay_roll_update   :FormGroup;
   editUnit          :FormGroup;
-
+  product_prefix    :FormGroup;
+  edit_product_prefix: FormGroup;
   public uid         = localStorage.getItem('uid');
 
   constructor(private modalService: NgbModal, public router: Router, public api: ApiService, public toastrService: ToastrService, private fb: FormBuilder)
@@ -107,6 +108,7 @@ export class SettingsComponent implements OnInit
       debit          :[null],
       payment_receipt:[null],
       payment_made   :[null],
+      product_prefix :[null]
     });
 
     this.product = fb.group({
@@ -177,6 +179,18 @@ export class SettingsComponent implements OnInit
        epf_percentage    :[null],
        company_paid_esi  :[null],
     })
+
+    this.product_prefix = fb.group({
+       ['created_by']:[this.uid],
+       name         :[null,Validators.compose([Validators.required])],
+       status       :[1]
+    })
+      this.edit_product_prefix = fb.group({
+            ['created_by']:[this.uid],
+            name         :[null,Validators.compose([Validators.required])],
+            status       :[1]
+          })
+
   }
 
   @ViewChild("edit_address", { static: true }) edit_address: ElementRef
@@ -192,6 +206,8 @@ export class SettingsComponent implements OnInit
   @ViewChild("add_user", { static: true }) add_user: ElementRef
   @ViewChild("edit_user_type", { static: true }) edit_user_type: ElementRef
   @ViewChild("pay_roll", { static: true }) pay_roll: ElementRef
+  @ViewChild("Product_prefix_add", { static: true }) Product_prefix_add: ElementRef
+   @ViewChild("Product_prefix_edit", { static: true }) Product_prefix_edit: ElementRef
 
   ngOnInit()
   {
@@ -278,18 +294,38 @@ export class SettingsComponent implements OnInit
       this.report_view  = false;
     }
 
- prefix()
+    production_prefix_list : any
+ async prefix()
     {
       this.prefix_view=true;
       this.show=false;
-      this.api.get('get_data.php?table=prefix&authToken='+environment.authToken).then((data: any) =>
-      {
+      await this.api.get('get_data.php?table=prefix&authToken='+environment.authToken).then((data: any) =>
+        {
 
-        this.prefix_list = data[0];
-        this.detail_view = data[0];
-        this.id =data[0].prefix_id;
-        this.prefix_dataload()
-      }).catch(error => {this.toastrService.error('Something went wrong ');});
+          this.prefix_list = data[0];
+          this.detail_view = data[0];
+          this.id =data[0].prefix_id;
+          this.prefix_dataload()
+        }).catch(error => {this.toastrService.error('Something went wrong ');});
+
+        await this.api.get('get_data.php?table=production_prefix&asign_field=id&asign_value=DESC&authToken='+environment.authToken).then((data: any) =>
+        {
+
+          this.production_prefix_list = data
+        }).catch(error => {this.toastrService.error('Something went wrong ');});
+    }
+
+    product_prefix_data :any
+    onActivate_product_prefix(event)
+    {
+      if(event.type == "click")
+      {
+        console.log(event.row)
+        this.product_prefix_data = event.row
+        this.edit_product_prefix.controls['status'].setValue(event.row.status)
+        this.edit_product_prefix.controls['name'].setValue(event.row.prefix)
+        this.editAddress  = this.modalService.open(this.Product_prefix_edit,{size:"sm"})
+      }
     }
 
  prefix_dataload()
@@ -302,12 +338,90 @@ export class SettingsComponent implements OnInit
       this.prefix_update.controls['payment_receipt'].setValue(this.prefix_list.payment_receipt);
       this.prefix_update.controls['credit'].setValue(this.prefix_list.credit_notes);
       this.prefix_update.controls['debit'].setValue(this.prefix_list.debit_note);
+      this.prefix_update.controls['product_prefix'].setValue(this.prefix_list.product_prefix);
+    }
+
+  async  update_Product_prefix()
+    {
+        Object.keys(this.edit_product_prefix.controls).forEach(field =>
+        {
+          const control = this.edit_product_prefix.get(field);
+          control.markAsTouched({ onlySelf: true });
+        });
+      if (this.edit_product_prefix.valid)
+      {
+        console.log(this.edit_product_prefix.value)
+
+          this.loading=true;
+        await this.api.post('post_update_data.php?table=production_prefix&field=id&value='+this.product_prefix_data.id+'&authToken=' + environment.authToken, this.edit_product_prefix.value).then((data: any) => {
+            console.log(data)
+            if (data.status == "success")
+            {
+              this.loading=false;
+              this.toastrService.success(' Updated Succesfully');
+              this.editAddress.close();
+              this.prefix();
+              this.edit_product_prefix.reset();
+
+            }
+            else { this.toastrService.error(data.status);
+                  this.loading=false; }
+
+          }).catch(error => { this.toastrService.error(' Somthing went wrong ');
+                            this.loading=false;});
+      }
     }
 
   edit_prefix_data()
     {
       this.editAddress = this.modalService.open(this.edit_prefix, { size: 'md' });
     }
+
+    add_Production_prefix()
+    {
+        this.product_prefix.controls['created_by'].setValue(this.uid)
+        this.product_prefix.controls['status'].setValue(1)
+        this.editAddress = this.modalService.open(this.Product_prefix_add,{size:"sm"})
+    }
+
+    onInput(event: any): void {
+  const input = event.target;
+  input.value = input.value.toUpperCase();
+  this.product_prefix.get('name')?.setValue(input.value, { emitEvent: false });
+   this.edit_product_prefix.get('name')?.setValue(input.value, { emitEvent: false });
+}
+
+
+async  submit_Product_prefix()
+  {
+    Object.keys(this.product_prefix.controls).forEach(field =>
+        {
+          const control = this.product_prefix.get(field);
+          control.markAsTouched({ onlySelf: true });
+        });
+      if (this.product_prefix.valid)
+      {
+        console.log(this.product_prefix.value)
+
+          this.loading=true;
+        await this.api.post('post_insert_data.php?table=production_prefix&authToken=' + environment.authToken, this.product_prefix.value).then((data: any) => {
+            console.log(data)
+            if (data.status == "success")
+            {
+              this.loading=false;
+              this.toastrService.success(' Added Succesfully');
+              this.editAddress.close();
+              this.prefix();
+              this.product_prefix.reset();
+
+            }
+            else { this.toastrService.error(data.status);
+                  this.loading=false; }
+
+          }).catch(error => { this.toastrService.error(' Somthing went wrong ');
+                            this.loading=false;});
+      }
+  }
 
   submit_prefix(value)
     {

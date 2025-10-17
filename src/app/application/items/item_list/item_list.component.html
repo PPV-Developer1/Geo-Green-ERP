@@ -34,26 +34,26 @@
       class="custom_table"
       [headerHeight]="50"
       [limit]="15"
-      [columnMode]="'force'"
+      [columnMode]="'flex'"
       [footerHeight]="50"
       [rowHeight]="'auto'"
       [rows]="item_list"
       [selected]="selected"
       (activate)="onActivate($event)">
 
-        <ngx-datatable-column prop="item_name" name="NAME" >
+        <ngx-datatable-column prop="item_name" [flexGrow]="2" name="NAME" >
           <ng-template ngx-datatable-cell-template let-row="row" >
             {{row.item_name}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column  prop="item_cat" name="CATEGORY">
+        <ngx-datatable-column  prop="item_cat" [flexGrow]="2" name="CATEGORY">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.item_cat}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="item_type" name="TYPE" >
+        <ngx-datatable-column prop="item_type" [flexGrow]="1" name="TYPE" >
           <ng-template ngx-datatable-cell-template let-row="row">
             <label *ngIf="row.item_type == 1">Raw Material</label>
             <label *ngIf="row.item_type == 2">Product</label>
@@ -61,53 +61,50 @@
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="hsnsac" name="HSN/SAC" >
+        <ngx-datatable-column prop="hsnsac" name="HSN/SAC" [flexGrow]="1" >
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.hsnsac}}
           </ng-template>
         </ngx-datatable-column>
 
-
-
-        <ngx-datatable-column prop="price" name="RATE" >
+        <ngx-datatable-column prop="price" name="RATE" [flexGrow]="1" >
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.price|indianCurrency}}
           </ng-template>
         </ngx-datatable-column>
-        <ngx-datatable-column prop="uom"  name="UOM" >
+        <ngx-datatable-column prop="uom"  name="UOM" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.uom}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="tax_percent" name="TAX %" >
+        <ngx-datatable-column prop="tax_percent" name="TAX %"  [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.tax_percent}} %
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="description" name="DESCRIPTION" >
+        <ngx-datatable-column prop="description" name="DESCRIPTION"  [flexGrow]="2">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.description}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="purchase" name="PURCHASE " >
+        <ngx-datatable-column prop="purchase" name="PURCHASE " [flexGrow]="1" >
           <ng-template ngx-datatable-cell-template let-row="row">
             <label *ngIf="row.purchase == 0" style="color:red"><strong>False</strong></label>
             <label *ngIf="row.purchase == 1" style="color:green"><strong>True</strong></label>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="sales" name="SALE" >
+        <ngx-datatable-column prop="sales" name="SALE" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <label *ngIf="row.sales == 0" style="color:red"><strong>False</strong></label>
             <label *ngIf="row.sales == 1" style="color:green"><strong>True</strong></label>
           </ng-template>
         </ngx-datatable-column>
 
-
-        <ngx-datatable-column prop="status" name="STATUS" >
+        <ngx-datatable-column prop="status" name="STATUS" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <label *ngIf="row.status == 0" style="color:red"><strong>Inactive</strong></label>
             <label *ngIf="row.status == 1" style="color:green"><strong>Active</strong></label>
@@ -138,8 +135,8 @@
 
       <div class="form-group col-md-12">
         <label for="name">Item Category</label>
-        
-        <ng-select formControlName="item_cat" class=" form-control custom-select" [clearable]="false">
+
+        <ng-select formControlName="item_cat" class=" form-control custom-select" [clearable]="true">
           <ng-option *ngFor="let item of category" value="{{item.cat_id}}" class="form-control">
             {{ item.title}}
           </ng-option>
@@ -162,7 +159,7 @@
           <option *ngFor= "let view of uom_list" value="{{view.name}}" >{{view.name}}</option>
         </select> -->
 
-        <ng-select formControlName="uom" class=" form-control custom-select" [clearable]="false">
+        <ng-select formControlName="uom" class=" form-control custom-select" [clearable]="true">
           <ng-option *ngFor="let item of uom_list" value="{{item.name}}" class="form-control">
             {{ item.name}}
           </ng-option>
@@ -184,7 +181,7 @@
           <option *ngFor= "let view of tax_list" value="{{view.rate}}" >{{view.name}}</option>
         </select> -->
 
-        <ng-select formControlName="tax_percent" class=" form-control custom-select" [clearable]="false">
+        <ng-select formControlName="tax_percent" class=" form-control custom-select" [clearable]="true">
           <ng-option *ngFor="let item of tax_list" value="{{item.rate}}" class="form-control">
             {{ item.name}}
           </ng-option>
@@ -240,7 +237,7 @@
 
       <div class="form-group col-md-12">
         <label for="name">Item Category</label>
-        <ng-select formControlName="item_cat" class=" form-control custom-select" [clearable]="false">
+        <ng-select formControlName="item_cat" class=" form-control custom-select" [clearable]="true">
           <ng-option *ngFor="let item of category" [value]="item.cat_id" class="form-control">
             {{ item.title}}
           </ng-option>
@@ -259,7 +256,7 @@
           <option *ngFor= "let view of uom_list" value="{{view.name}}" >{{view.name}}</option>
         </select> -->
 
-        <ng-select formControlName="uom" class=" form-control custom-select" [clearable]="false">
+        <ng-select formControlName="uom" class=" form-control custom-select" [clearable]="true">
           <ng-option *ngFor="let item of uom_list" value="{{item.name}}" class="form-control">
             {{ item.name}}
           </ng-option>
@@ -281,7 +278,7 @@
           <option *ngFor= "let view of tax_list" value="{{view.rate}}" >{{view.name}}</option>
         </select> -->
 
-        <ng-select formControlName="tax" class=" form-control custom-select" [clearable]="false">
+        <ng-select formControlName="tax" class=" form-control custom-select" [clearable]="true">
           <ng-option *ngFor="let item of tax_list" [value]="item.rate" class="form-control">
             {{ item.name}}
           </ng-option>

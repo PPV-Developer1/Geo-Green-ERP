@@ -7,6 +7,7 @@ import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@ang
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { loadavg } from 'os';
 import { debounceTime, of, Subject, switchMap } from 'rxjs';
+import { AppState } from 'src/app/app.state';
 @Component({
   selector: 'app-credit_note',
   templateUrl: './credit_note.component.html',
@@ -86,7 +87,8 @@ public notes               : any;
     @ViewChild(DatatableComponent) table: DatatableComponent;
     @ViewChild('tableResponsive', { static: false }) tableResponsive: ElementRef;
     @ViewChild("Confirmation_return",{static:true}) Confirmation_return:ElementRef;
-  constructor(public toastrService: ToastrService, private api: ApiService,private fb: FormBuilder,   private renderer: Renderer2,private modalService  : NgbModal,) {
+  constructor(public toastrService: ToastrService, private api: ApiService,private fb: FormBuilder,
+    private renderer: Renderer2,private modalService  : NgbModal,private _state : AppState) {
 
     this.DebitNoteForm = new FormGroup
   ({
@@ -104,6 +106,7 @@ public notes               : any;
       product         : this.fb.array([]),
       message         : new FormControl(null),
       reference       : new FormControl(null),
+      prefix          : new FormControl(null)
 
     })
 
@@ -249,8 +252,14 @@ public notes               : any;
 
   back()
   {
+    // const confirmed = confirm("  Are you sure you want to go back to this form ?");
+    //    console.log(confirmed)
+    //   if (!confirmed) {
+    //     return;
+    //   }
     this.show=false
     this.ngOnInit()
+    this._state.notifyDataChanged('menu.isCollapsed', false);
 
   }
 
@@ -335,7 +344,13 @@ public notes               : any;
 ReturnToList()
 {
 
-  this.model_ref = this.modalService.open(this.Confirmation_return, { size: 'sm' });
+  // this.model_ref = this.modalService.open(this.Confirmation_return, { size: 'sm' });
+   const confirmed = confirm("  Are you sure you want to go back to this form ?");
+       console.log(confirmed)
+      if (!confirmed) {
+        return;
+      }
+      this.Confirm_back()
 }
 
 Confirm_back()
@@ -354,6 +369,7 @@ Confirm_back()
         this.ngOnInit()
         this.resetTableHeight()
         this.isDropdownAppendedToBody = true
+        this.ItemList = null
 }
 
 
@@ -600,159 +616,183 @@ async specItem(item,i)
         this.billCity           = null;
         this.billState          = null;
         this.billZipcode        = null;
+        this.ItemList           = null;
     this.DebitNoteForm.controls['type'].setValue(this.type);
     this.DebitNoteForm.controls['created_by'].setValue(this.uid);
     this.DebitNoteForm.controls['subTotal'].setValue(0);
      this.DebitNoteForm.controls['vendor_id'].setValue(this.customer_id);
+     this.GSTCalculation();
   }
 
+  prefix: any
   async VendorSelection(id)
   {
-    this.isDropdownAppendedToBody = false;
+    // this.isDropdownAppendedToBody = false;
     this.formShow = false;
 
      this.tableWidth=100
     const today = new Date();
     let date = today.toISOString().split('T')[0];
-
-
-    if(this.type == "vendor")
+    console.log(id)
+    if(id != undefined)
     {
-       const customer = this.Bill_list.find(i => i.bill_id == id)
-       this.customer_id = customer.vendor_id
-       console.log("customer : ",customer)
-
-       this.Bill_vendor_name = customer
-      //  this.DebitNoteForm.controls['vendor_id'].setValue(this.customer_id);
-       this.DebitNoteForm.controls['terms_condition'].setValue(customer.terms_condition)
-       this.DebitNoteForm.controls['payment_term'].setValue(customer.payment_term)
-       this.DebitNoteForm.controls['bill_number'].setValue(customer.bill_number);
-
-          await this.api.get('get_data.php?table=vendor&find=vendor_id&value='+this.customer_id+'&authToken=' + environment.authToken).then((data: any) => {
-            this.Bill_vendor_name = data[0].company_name;
-            console.log("bill ",data)
-          }).catch(error => { this.toastrService.error('Something went wrong'); });
-
-        await  this.api.get('get_data.php?table=bill_item&find=bill_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) =>
+        if(this.type == "vendor")
         {
+          const customer = this.Bill_list.find(i => i.bill_id == id)
+          this.customer_id = customer.vendor_id
+          console.log("customer : ",customer)
 
-          for (let j=0;j<data.length;j++)
+          this.Bill_vendor_name = customer
+          //  this.DebitNoteForm.controls['vendor_id'].setValue(this.customer_id);
+          this.DebitNoteForm.controls['terms_condition'].setValue(customer.terms_condition)
+          this.DebitNoteForm.controls['payment_term'].setValue(customer.payment_term)
+          this.DebitNoteForm.controls['bill_number'].setValue(customer.bill_number);
+
+              await this.api.get('get_data.php?table=vendor&find=vendor_id&value='+this.customer_id+'&authToken=' + environment.authToken).then((data: any) => {
+                this.Bill_vendor_name = data[0].company_name;
+                console.log("bill ",data)
+              }).catch(error => { this.toastrService.error('Something went wrong'); });
+
+            await  this.api.get('get_data.php?table=bill_item&find=bill_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) =>
             {
-               console.log("All_ItemList : ",this.All_ItemList)
-                console.log("item_list_id : ",data[j].item_list_id)
-                  const item = this.All_ItemList.find(i => i.item_id == data[j].item_list_id)
-                  console.log("item : ",item)
-                  data[j]['name'] = item.name
-            }
 
-            console.log("data ", data)
-          this.ItemList = data;
-        }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
+              for (let j=0;j<data.length;j++)
+                {
+                  console.log("All_ItemList : ",this.All_ItemList)
+                    console.log("item_list_id : ",data[j].item_list_id)
+                      const item = this.All_ItemList.find(i => i.item_id == data[j].item_list_id)
+                      console.log("item : ",item)
+                      data[j]['name'] = item.name
+                }
+
+                console.log("data ", data)
+              this.ItemList = data;
+            }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
 
 
-                await this.api.get('mp_bill.php?&value=' + this.customer_id + '&authToken=' + environment.authToken).then((data: any) =>
-                  {
-                    console.log("bill  :",data)
-                    this.FetchAddress(data[0]);
+                    await this.api.get('mp_bill.php?&value=' + this.customer_id + '&authToken=' + environment.authToken).then((data: any) =>
+                      {
+                        console.log("bill  :",data)
+                        this.FetchAddress(data[0]);
 
-                    this.company_name    = data[0].company_name;
-                    this.notes           = data[0].notes;
-                    this.terms_condition = data[0].terms_condition;
-                    this.stateCode       = data[0].place_from_supply_code;
-                    this.payment_terms   = data[0].payment_terms;
-                    let creditNoteNumber = parseInt(data[0].credit_note);
-                    this.taxmode         = data[0].tax_mode;
-                      if (isNaN(creditNoteNumber)) {
+                        this.company_name    = data[0].company_name;
+                        this.notes           = data[0].notes;
+                        this.terms_condition = data[0].terms_condition;
+                        this.stateCode       = data[0].place_from_supply_code;
+                        this.payment_terms   = data[0].payment_terms;
+                        let creditNoteNumber = Number(data[0].credit_note);
+                        this.taxmode         = data[0].tax_mode;
+                        this.prefix          = data[0].credit_prefix
 
-                        // Handle the error if it's not a valid number
-                        console.error("Invalid credit_note value");
-                      } else {
-                        this.note_no = data[0].credit_prefix + (creditNoteNumber + 1);
-                      }
+                          if (isNaN(creditNoteNumber)) {
 
-                    const today = new Date();
-                    let date = today.toISOString().split('T')[0];
+                            // Handle the error if it's not a valid number
+                            console.error("Invalid credit_note value");
+                          } else {
+                            this.note_no = (creditNoteNumber + 1);
+                          }
+
+                        const today = new Date();
+                        let date = today.toISOString().split('T')[0];
+
+                        if(this.stateCode == 33)
+                        {
+                          this.LoadGST('GST');
+                        }
+                        else
+                        {
+                          this.LoadGST('IGST');
+                        }
+                      }).catch(error => { this.toastrService.error('Something went wrong'); });
+
+        }
+        if(this.type == "customer")
+        {
+          const customer = this.Bill_list.find(i => i.invoice_id == id)
+          //  this.customer_id = customer.customer_id
+
+          //  this.DebitNoteForm.controls['vendor_id'].setValue(this.customer_id);
+          this.DebitNoteForm.controls['terms_condition'].setValue(customer.terms_condition)
+          this.DebitNoteForm.controls['payment_term'].setValue(customer.payment_term)
+          this.DebitNoteForm.controls['bill_number'].setValue(customer.invoice_number);
+          console.log("customer : ",customer)
+
+
+            await this.api.get('get_data.php?table=vendor&find=vendor_id&value='+this.customer_id+'&authToken=' + environment.authToken).then((data: any) => {
+                this.Bill_vendor_name = data[0].company_name;
+                console.log("bill ",data)
+              }).catch(error => { this.toastrService.error('Something went wrong'); });
+
+            await  this.api.get('get_data.php?table=invoice_item&find=invoice_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) =>
+            {
+
+
+              for (let j=0;j<data.length;j++)
+                {
+                      const item = this.All_ItemList.find(i => i.item_id == data[j].item_list_id)
+                      console.log("item : ",item)
+                      data[j]['name'] = item.name
+                }
+
+                console.log("data ", data)
+              this.ItemList = data;
+            }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
+
+            await this.api.get('mp_invoice.php?&value=' + this.customer_id + '&authToken=' + environment.authToken).then((data: any) =>
+                {
+                  this.FetchAddress(data[0]);
+                  this.company_name    = data[0].company_name;
+                  this.notes           = data[0].notes;
+                  this.terms_condition = data[0].terms_condition;
+                  this.stateCode       = data[0].place_from_supply_code;
+                  this.payment_terms   = data[0].payment_terms;
+                  let MyPaymentTerm    = data[0].my_payment_terms;
+                  this.taxmode         = data[0].tax_mode;
+                  this.prefix          = data[0].credit_prefix
+
+                  let creditNoteNumber = parseInt(data[0].credit_note);
+
+                    if (isNaN(creditNoteNumber)) {
+
+                      // Handle the error if it's not a valid number
+                      console.error("Invalid credit_note value");
+                    } else {
+                      this.note_no = creditNoteNumber + 1;
+                    }
+                  const today = new Date();
+                  let date = today.toISOString().split('T')[0];
 
                     if(this.stateCode == 33)
                     {
                       this.LoadGST('GST');
+                      // this.invoice.controls['tax_type'].setValue("GST");
                     }
                     else
                     {
                       this.LoadGST('IGST');
+                      // this.invoice.controls['tax_type'].setValue("IGST");
                     }
-                  }).catch(error => { this.toastrService.error('Something went wrong'); });
 
+                }).catch(error => { this.toastrService.error('Something went wrong'); });
+        }
     }
-     if(this.type == "customer")
+    if(id== undefined)
     {
-       const customer = this.Bill_list.find(i => i.invoice_id == id)
-      //  this.customer_id = customer.customer_id
-
-      //  this.DebitNoteForm.controls['vendor_id'].setValue(this.customer_id);
-       this.DebitNoteForm.controls['terms_condition'].setValue(customer.terms_condition)
-       this.DebitNoteForm.controls['payment_term'].setValue(customer.payment_term)
-       this.DebitNoteForm.controls['bill_number'].setValue(customer.invoice_number);
-       console.log("customer : ",customer)
-
-
-         await this.api.get('get_data.php?table=vendor&find=vendor_id&value='+this.customer_id+'&authToken=' + environment.authToken).then((data: any) => {
-            this.Bill_vendor_name = data[0].company_name;
-            console.log("bill ",data)
-          }).catch(error => { this.toastrService.error('Something went wrong'); });
-
-        await  this.api.get('get_data.php?table=invoice_item&find=invoice_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) =>
-        {
-
-
-          for (let j=0;j<data.length;j++)
-            {
-                  const item = this.All_ItemList.find(i => i.item_id == data[j].item_list_id)
-                  console.log("item : ",item)
-                  data[j]['name'] = item.name
-            }
-
-            console.log("data ", data)
-          this.ItemList = data;
-        }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
-
-        await this.api.get('mp_invoice.php?&value=' + this.customer_id + '&authToken=' + environment.authToken).then((data: any) =>
-            {
-              this.FetchAddress(data[0]);
-              this.company_name    = data[0].company_name;
-              this.notes           = data[0].notes;
-              this.terms_condition = data[0].terms_condition;
-              this.stateCode       = data[0].place_from_supply_code;
-              this.payment_terms   = data[0].payment_terms;
-              let MyPaymentTerm    = data[0].my_payment_terms;
-              this.taxmode         = data[0].tax_mode;
-
-              let creditNoteNumber = parseInt(data[0].credit_note);
-
-                if (isNaN(creditNoteNumber)) {
-
-                  // Handle the error if it's not a valid number
-                  console.error("Invalid credit_note value");
-                } else {
-                  this.note_no = data[0].credit_prefix + (creditNoteNumber + 1);
-                }
-              const today = new Date();
-              let date = today.toISOString().split('T')[0];
-
-                if(this.stateCode == 33)
-                {
-                  this.LoadGST('GST');
-                  // this.invoice.controls['tax_type'].setValue("GST");
-                }
-                else
-                {
-                  this.LoadGST('IGST');
-                  // this.invoice.controls['tax_type'].setValue("IGST");
-                }
-
-            }).catch(error => { this.toastrService.error('Something went wrong'); });
+       this.DebitNoteForm.reset();
+        this.billFrom           = null;
+        this.billAttention      = null;
+        this.billAddress_line_1 = null;
+        this.billAddress_line_2 = null;
+        this.billCity           = null;
+        this.billState          = null;
+        this.billZipcode        = null;
+        this.ItemList           = null;
+      this.DebitNoteForm.controls['type'].setValue(this.type);
+      this.DebitNoteForm.controls['created_by'].setValue(this.uid);
+      this.DebitNoteForm.controls['subTotal'].setValue(0);
+      this.DebitNoteForm.controls['vendor_id'].setValue(this.customer_id);
+      this.GSTCalculation()
     }
-
     const formArray         = this.DebitNoteForm.get('product') as FormArray;
     const formArrayControls = formArray.controls;
     for (let i = formArrayControls.length-1; i >= 1; i--)
@@ -792,6 +832,28 @@ async specItem(item,i)
       const total = parseFloat(this.DebitNoteForm.value.total)
     if(this.DebitNoteForm.valid && total > 0)
       {
+          const billNoValue = this.prefix+this.note_no;
+            function normalizeString(str : any) {
+              return str.replace(/\s+/g, '').toLowerCase();
+            }
+            let checking :any
+            await this.api.get('get_data.php?table=credit_note&authToken=' + environment.authToken).then((data: any) =>
+
+              {
+                if(data != null)
+                  {
+                     checking = data.some((item: {credit_note_no: any; }) =>  normalizeString(item.credit_note_no) ===  normalizeString(billNoValue) );
+                  }
+              }).catch(error =>
+                {
+                    this.toastrService.error('API Faild : Invoice number checking failed');
+                    this.loading = false;
+                });
+              if(checking)
+               {
+                 this.toastrService.error('DebitNote Number already exist');
+                  return
+               }
         this.loading = true
         console.log("valid")
          await this.api.post('credit_note_create_accounts.php?&authToken=' + environment.authToken,this.DebitNoteForm.value).then(async(data: any) =>
@@ -810,7 +872,7 @@ async specItem(item,i)
                 this.billCity           = null;
                 this.billState          = null;
                 this.billZipcode        = null;
-
+                this.formShow           = true;
                  const formArray         = this.DebitNoteForm.get('product') as FormArray;
                     const formArrayLength   = formArray.length;
                     const formArrayControls = formArray.controls;

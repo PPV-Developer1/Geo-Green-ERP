@@ -1,6 +1,6 @@
 <div *ngIf="show" class="col-md-12">
 
-  <div class="row">
+  <!-- <div class="row">
     <div class="col-md-5">
       <h4 class="ml-4"><b>Delivery Challen</b></h4>
     </div>
@@ -8,11 +8,11 @@
 
     <div class="btn-group mb-3 col-md-7" role="group" aria-label="Basic example">
 
-      <button type="button" class="btn btn-outline-info fa fa-pencil btn-sm" (click)="editbill()"> Edit</button>
+      <button type="button" class="btn btn-outline-info fa fa-pencil btn-sm" [disabled]="status == 2" (click)="editbill()"> Edit</button>
       <button type="button" class="btn btn-outline-info fa fa-print btn-sm" (click)="download()"> Print</button>
       <button type="button" class="btn btn-outline-info fa fa-pencil-square-o btn-sm" (click)="e_bill()"> Transport Vehicle Details</button>
       <button type="button" class="btn btn-outline-info fa fa-copy btn-sm" (click)="clone()"> Clone</button>
-      <button type="button" class="btn btn-outline-danger fa fa-trash-o btn-sm" (click)="remove()"> Delete</button>
+      <button type="button" class="btn btn-outline-danger fa fa-trash-o btn-sm"  [disabled]="status == 2" (click)="remove()"> Delete</button>
       &nbsp;
       &nbsp;
       &nbsp;
@@ -20,6 +20,36 @@
     </div>
 
 
+  </div> -->
+
+   <div class="col-md-12" style="padding-left:1.7%;">
+        <table style="border: none;">
+          <tr style="border: none;">
+
+             <td style="width: 34%;border: none">
+                      <div class="input-group input-group-sm my-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-search"></i></span>
+                        </div>
+                        <input class="form-control" type="text" placeholder="Search ..." (keyup)="updateFilter($event)"/>
+                      </div>
+                </td>
+            <td style="width: 38%; text-align: center;border: none">
+              <h4><B>DELIVERY CHALLAN LIST</B></h4>
+            </td>
+            <!-- <td style="width: 10%;border: none">
+            </td> -->
+            <td style="border: none;">
+               <div class="btn-group mb-3 col-md-7" role="group" aria-label="Basic example">
+                  <button type="button" class="btn btn-outline-info fa fa-pencil btn-sm" [disabled]="status == 2" (click)="editbill()"> Edit</button>
+                    <button type="button" class="btn btn-outline-info fa fa-print btn-sm" (click)="download()"> Print</button>
+                    <button type="button" class="btn btn-outline-info fa fa-pencil-square-o btn-sm" (click)="e_bill()"> Transport Vehicle Details</button>
+                    <button type="button" class="btn btn-outline-info fa fa-copy btn-sm" (click)="clone()"> Clone</button>
+                    <button type="button" class="btn btn-outline-danger fa fa-trash-o btn-sm"  [disabled]="status == 2" (click)="remove()"> Delete</button>
+                </div>
+            </td>
+          </tr>
+        </table>
   </div>
 
 
@@ -32,17 +62,20 @@
 
         <ngx-datatable-column [sortable]="false">
           <ng-template ngx-datatable-cell-template let-row="row">
-            <div  [attr.id]="'dc-row-' + row.serial_no">
+            <div  [attr.id]="'dc-row-' + row.serial_no" style="overflow: hidden;">
             <div class="row">
               <input type="hidden" [value]="row.dc_id">
               <input type="hidden" [value]="row.customer_id">
-
               <div class="col-md-9"> <b> {{row.customer_name | uppercase }} </b> </div>
               <div class="col-md-3">{{row.total | indianCurrency }} </div>
             </div>
             <div class="row">
-              <div class="col-md-5 ml-2">{{row.dc_number}} | {{row.reference_number}}</div>
-              <div class="col-md-5 ml-2">{{ row.dc_date | date: 'dd-MM-yyyy'}} </div>
+              <div class="col-md-9 ">{{row.dc_number}} </div>
+              <div class="col-md-3 ">{{ row.dc_date | date: 'dd-MM-yyyy'}} </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12 "> {{row.reference_number}}</div>
+
             </div>
             </div>
           </ng-template>
@@ -276,6 +309,86 @@
       </div>
     </div>
   </div>
+  &nbsp;
+    <div widget  class="card" *ngIf="Dispatch_total > 0">
+            <div class="card-header d-flex justify-content-between align-items-center" >
+
+                  <span class="text-uppercase">Dispatch Details</span>
+                    <!-- <span  style="color: white;" (click)="togglePanel('panel1')">
+                                  <i class="fa" [ngClass]="{'fa-chevron-up': activePanel === 'panel1', 'fa-chevron-down': activePanel !== 'panel1'}"></i>
+                      </span> -->
+            </div>
+
+             <!-- <div class="card-body widget-body"  *ngIf="activePanel === 'panel1'"> -->
+                 <div class="card-body widget-body"  >
+
+                    <div class="d-flex " style="gap: 10px; color:midnightblue">
+                          <span> Purchased at {{Dispatch_total | indianCurrency}} and sold at {{this.invoicePdf[0]?.without_tax | indianCurrency}}. The
+                        difference is {{Difference_amount | indianCurrency}} ({{Dispatch_percentage}}%) </span>
+                    </div>
+                    &nbsp;
+                    <ngx-datatable
+                    #table
+                    class="custom_table"
+                    [headerHeight]="50"
+                    [limit]="5"
+                    [columnMode]="'force'"
+                    [footerHeight]="50"
+                    [rowHeight]="50"
+                    [rows]="Dispatch_items">
+
+                    <ngx-datatable-column prop="date_time" [width]="100"   name="DATE" >
+                        <ng-template ngx-datatable-cell-template let-row = "row">
+                            {{row.date_time | date: 'dd-MM-yyyy'}}
+                        </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="batch" [width]="100"  name="BATCH" >
+                        <ng-template ngx-datatable-cell-template let-row = "row">
+                            {{row.batch }}
+                        </ng-template>
+                    </ngx-datatable-column>
+
+                     <ngx-datatable-column prop="name" [width]="300"  name="ITEM" >
+                        <ng-template ngx-datatable-cell-template let-row = "row">
+                            {{row.name}}
+                        </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="bill_number" [width]="100"   name="BILL" >
+                        <ng-template ngx-datatable-cell-template let-row = "row">
+                            {{row.bill_number}}
+                        </ng-template>
+                    </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="value" [width]="100"   name="QUANTITY" >
+                        <ng-template ngx-datatable-cell-template let-row = "row">
+                            {{row.value}} {{row.uom}}
+                        </ng-template>
+                    </ngx-datatable-column>
+
+                     <!-- <ngx-datatable-column  prop="" [width]="100"   name="AMOUNT" >
+                        <ng-template ngx-datatable-cell-template let-row = "row">
+                            {{row.amount | indianCurrency}}
+                        </ng-template>
+                    </ngx-datatable-column> -->
+
+
+                     <!-- <ngx-datatable-column  [width]="100"   name="TAX" >
+                        <ng-template ngx-datatable-cell-template let-row = "row">
+                            {{row.tax_amount | indianCurrency}}
+                        </ng-template>
+                    </ngx-datatable-column> -->
+
+                      <ngx-datatable-column  [width]="100"   name="TOTAL" >
+                        <ng-template ngx-datatable-cell-template let-row = "row">
+                            {{row.total | indianCurrency}}
+                        </ng-template>
+                    </ngx-datatable-column>
+
+                  </ngx-datatable>
+              </div>
+          </div>
 </div>
 
 <div  *ngIf=" show_dc_edit" >
@@ -746,14 +859,14 @@
 
                 <div class="row mb-3">
                   <label style="color: #e54643" class="col-sm-2 col-form-label col-form-label-sm">DC Number*</label>
-                  <div class="col-sm-4">
-                    <input type="text" formControlName="dcNo"
-                      class="form-control form-control-sm" [(ngModel)]="inv_no"  (ngModelChange)="onInputChange()"/>
+                  <div class="col-sm-2">
+                          <input type="text" readonly formControlName="prefix" [(ngModel)]="prefix_data" class="form-control form-control-sm" />
+                      </div>
 
-                    <span class="help-block text-danger"
-                      *ngIf="Edit_dc.get('dcNo').touched && Edit_dc.get('dcNo').hasError('required')">Enter
-                      DC Number !</span>
-                  </div>
+                      <div class="col-sm-1">
+                          <input type="text" formControlName="dcNo" [(ngModel)]="inv_no"
+                            class="form-control form-control-sm" />
+                        </div>
                 </div>
 
                 <div class="row mb-3">
@@ -1596,14 +1709,15 @@ aria-labelledby="modal-large-label" style="display: none;">
 
               <div class="row mb-3">
                 <label style="color: #e54643" class="col-sm-2 col-form-label col-form-label-sm">DC No*</label>
-                <div class="col-sm-4">
-                  <input type="text" formControlName="dcNo" [(ngModel)]="inv_no"
-                    class="form-control form-control-sm"  />
+                 <div class="col-sm-2">
+                          <input type="text" readonly formControlName="prefix" [(ngModel)]="prefix_data" class="form-control form-control-sm" />
+                      </div>
 
-                  <span class="help-block text-danger"
-                    *ngIf="Edit_dc.get('dcNo').touched && Edit_dc.get('dcNo').hasError('required')">Enter
-                    DC Number !</span>
-                </div>
+                      <div class="col-sm-1">
+                          <input type="text" formControlName="dcNo" [(ngModel)]="inv_no"
+                            class="form-control form-control-sm" />
+                        </div>
+                         <span class="help-block text-danger" *ngIf="Edit_dc.get('dcNo').touched && Edit_dc.get('dcNo').hasError('required')"> Required !</span>
               </div>
 
               <div class="row mb-3">
@@ -1664,6 +1778,7 @@ aria-labelledby="modal-large-label" style="display: none;">
                           <th>ITEM NAME <div class="resizer"></div></th>
                           <th>DESCRIPTION  <div class="resizer"></div></th>
                           <th>QUANTITY <div class="resizer"></div></th>
+                           <th>HSN <div class="resizer"></div></th>
                           <th>UOM <div class="resizer"></div></th>
                           <th>RATE <div class="resizer"></div></th>
                           <th>TAX <div class="resizer"></div></th>

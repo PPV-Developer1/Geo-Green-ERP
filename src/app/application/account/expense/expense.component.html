@@ -13,20 +13,20 @@
       class="custom_table"
       [headerHeight]="50"
       [limit]="10"
-      [columnMode]="'force'"
+      [columnMode]="'flex'"
       [footerHeight]="50"
       [rowHeight]="50"
       [rows]="expense_list"
       (activate)="Onclick($event)"
       >
 
-      <ngx-datatable-column prop="transaction_date"  [width]="130" name="TRANSACTION DATE" >
+      <ngx-datatable-column prop="transaction_date"   [flexGrow]="1" name="TRANSACTION DATE" >
           <ng-template ngx-datatable-cell-template let-row = "row">
               {{row.transaction_date  | date: 'dd-MM-yyyy'}}
           </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column   [width]="150" name="TRANSACTION AGAINST" >
+      <ngx-datatable-column    [flexGrow]="1" name="TRANSACTION TYPE" >
         <ng-template ngx-datatable-cell-template let-row = "row">
 
             <span *ngIf="row.bill != null"> Bill : {{row.bill}}</span>
@@ -36,19 +36,19 @@
         </ng-template>
     </ngx-datatable-column>
 
-      <ngx-datatable-column  [width]="100" prop="transaction_mode"  name="MODE">
+      <ngx-datatable-column   [flexGrow]="1" prop="transaction_mode"  name="MODE">
           <ng-template ngx-datatable-cell-template let-row="row">
               {{row.transaction_mode}}
           </ng-template>
         </ngx-datatable-column>
 
-      <ngx-datatable-column prop="amount"  [width]="80" name="AMOUNT">
+      <ngx-datatable-column prop="amount"   [flexGrow]="1" name="AMOUNT">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span style="font-weight:bold;"> {{row.amount | indianCurrency}} </span>
             </ng-template>
         </ngx-datatable-column>
 
-      <ngx-datatable-column prop="exp_type" name="SERVICE"  [width]="90">
+      <ngx-datatable-column prop="exp_type" name="SERVICE"   [flexGrow]="1">
         <ng-template ngx-datatable-cell-template let-row="row">
           <span *ngIf="row.exp_type === 1 " >
             Goods
@@ -59,31 +59,31 @@
     </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="tax_amount" name="TAX" [width]="80">
+      <ngx-datatable-column prop="tax_amount" name="TAX"  [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span style="font-weight:bold;"> {{row.tax_amount | indianCurrency}} </span>
             </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="expence_account" name="EXPENSE TYPE" [width]="140">
+      <ngx-datatable-column prop="expence_account" name="EXPENSE TYPE"  [flexGrow]="1">
         <ng-template ngx-datatable-cell-template let-row="row">
           <span style="font-weight:bold;"> {{row.expence_account}} </span>
           </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="paid_account" name="PAID ACCOUNT" [width]="130">
+    <ngx-datatable-column prop="paid_account" name="PAID ACCOUNT"  [flexGrow]="1">
       <ng-template ngx-datatable-cell-template let-row="row">
         <span style="font-weight:bold;"> {{row.paid_account}} </span>
         </ng-template>
   </ngx-datatable-column>
 
-      <ngx-datatable-column prop="name_of_expense" name="EXPENSE">
+      <ngx-datatable-column prop="name_of_expense" name="EXPENSE"  [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
               {{row.name_of_expense}}
           </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="notes" name="COMMAND">
+      <ngx-datatable-column prop="notes" name="COMMAND"  [flexGrow]="2">
           <ng-template ngx-datatable-cell-template let-row="row">
               {{row.notes}}
             </ng-template>
@@ -157,7 +157,7 @@
                   </div>
                   <div class="col-8">
                     <ng-select formControlName="exp_account" [items]="Expense_Data" bindLabel="account_name" bindValue="id"   groupBy="account_type"
-                        class=" form-control custom-select" [clearable]="false" >
+                        class=" form-control custom-select" [clearable]="true" >
                        <ng-template ng-optgroup-tmp let-item="item" class="form-control">
                            <span *ngIf="item.account_type == 1" style="padding: 20px;"><b>Fixed Asset</b></span>
                            <span *ngIf="item.account_type == 2" style="padding: 20px;"><b>Other Current Asset</b></span>
@@ -193,7 +193,7 @@
                   <div *ngIf="this.balance_disp == 0" class="col-8">
                     <span *ngIf="this.user_type == 'super_admin'">
                       <ng-select formControlName="paid_through" [items]="bankData" bindLabel="account_name" bindValue="bank_id"   groupBy="mode"
-                       class=" form-control custom-select" [clearable]="false" (ngModelChange)="balanceLoad()">
+                       class=" form-control custom-select" [clearable]="true" (ngModelChange)="balanceLoad()">
                           <ng-template ng-optgroup-tmp let-item="item" class="form-control">
                               <span *ngIf="item.mode == 1" style="padding: 20px;"><b>Bank</b></span>
                               <span *ngIf="item.mode == 2" style="padding: 20px;"><b>Cash</b></span>
@@ -207,7 +207,7 @@
                     <span *ngIf="this.user_type != 'super_admin'">
 
 
-                      <ng-select formControlName="paid_through"  class=" form-control custom-select" [clearable]="false" >
+                      <ng-select formControlName="paid_through"  class=" form-control custom-select" [clearable]="true" >
                         <ng-option  *ngFor= "let view of employee_account " [value]="view.bank_id" class="form-control">
                           {{view.account_name}}
                         </ng-option>
@@ -221,7 +221,7 @@
 
 
                       <ng-select formControlName="paid_through" [items]="bankData" bindLabel="account_name" bindValue="bank_id"   groupBy="mode"
-                        class=" form-control custom-select" [clearable]="false" (ngModelChange)="balanceLoad()">
+                        class=" form-control custom-select" [clearable]="true" (ngModelChange)="balanceLoad()">
                          <ng-template ng-optgroup-tmp let-item="item" class="form-control">
                              <span *ngIf="item.mode == 1" style="padding: 20px;"><b>Bank</b></span>
                              <span *ngIf="item.mode == 2" style="padding: 20px;"><b>Cash</b></span>
@@ -237,7 +237,7 @@
                           <option *ngFor= "let view of employee_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
                       </select> -->
 
-                      <ng-select formControlName="paid_through"  class=" form-control custom-select" [clearable]="false" >
+                      <ng-select formControlName="paid_through"  class=" form-control custom-select" [clearable]="true" >
                         <ng-option  *ngFor= "let view of employee_account " [value]="view.bank_id" class="form-control">
                           {{view.account_name}}
                         </ng-option>
@@ -281,7 +281,7 @@
                         <option *ngFor= "let view of project_list" value="{{view.project_id}}" >{{view.name}}</option>
                     </select> -->
 
-                    <ng-select formControlName="project"  class=" form-control custom-select" [clearable]="false" (change)="onSelect_pro($event)">
+                    <ng-select formControlName="project"  class=" form-control custom-select" [clearable]="true" (change)="onSelect_pro($event)">
                       <ng-option  *ngFor= "let view of project_list" value="{{view.project_id}}" class="form-control">
                         {{view.name}}
                       </ng-option>
@@ -324,7 +324,7 @@
                     <label for="exampleSelect3">Invoice</label>
                   </div>
                   <div class="col-8">
-                    <ng-select formControlName="vendor"  class=" form-control custom-select" [clearable]="false" (change)="onSelect_inv($event)">
+                    <ng-select formControlName="vendor"  class=" form-control custom-select" [clearable]="true" (change)="onSelect_inv($event)">
                       <ng-option  *ngFor= "let view of invoice_list" value="{{view.invoice_id}}" class="form-control">
                         {{view.invoice_number}}
                       </ng-option>
@@ -354,7 +354,7 @@
                     <label for="exampleSelect3">Bill</label>
                   </div>
                   <div class="col-8">
-                    <ng-select formControlName="customer"  class=" form-control custom-select" [clearable]="false" (change)="onSelect_bill($event)">
+                    <ng-select formControlName="customer"  class=" form-control custom-select" [clearable]="true" (change)="onSelect_bill($event)">
                       <ng-option  *ngFor= "let view of bill_list" value="{{view.bill_id}}" class="form-control">
                         {{view.bill_number}}
                       </ng-option>

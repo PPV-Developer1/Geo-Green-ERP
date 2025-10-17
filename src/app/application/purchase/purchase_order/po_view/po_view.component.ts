@@ -178,6 +178,7 @@ export class Po_viewComponent implements OnInit {
   receipt_serial_no   : any;
   bankData            : any;
   bankData_length     : any;
+  edit_status         : any
   private startX      : number = 0;
   private startWidth: number = 0;
   private columnIndex: number | null = null;
@@ -219,7 +220,8 @@ export class Po_viewComponent implements OnInit {
       size      : [null],
       deliverytype:[null, Validators.compose([Validators.required])],
       freight     :[null, Validators.compose([Validators.required])],
-      delivery_schedule :[null, Validators.compose([Validators.required])]
+      delivery_schedule :[null, Validators.compose([Validators.required])],
+      prefix      :[null]
     })
 
     this.bill = fb.group(
@@ -264,7 +266,8 @@ export class Po_viewComponent implements OnInit {
             amount      : [0],
             tran_date   : [this.todaysDate],
             reference   : [null, Validators.compose([Validators.required, Validators.minLength(3)])],
-            description : [null, Validators.compose([Validators.required, Validators.minLength(3)])]
+            description : [null, Validators.compose([Validators.required, Validators.minLength(3)])],
+            prefix      : [null]
           } )
         }
 
@@ -394,7 +397,7 @@ export class Po_viewComponent implements OnInit {
   {
 
     this.api.get('mp_ven_po_pdf.php?value=' + this.view_bill + '&authToken=' + environment.authToken).then((data: any) => {
-
+      console.log(data)
       this.poPdf   = data;
       this.po_id   = data[0].po_id;
       this.poItems = this.poPdf[0].poItems;
@@ -403,6 +406,7 @@ export class Po_viewComponent implements OnInit {
       this.po_number = data[0].po_number;
       this.company_pdf_logo = this.poPdf[0].company_details[0].logo;
       this.stateCode = data[0].place_from_supply_code;
+      this.edit_status  = data[0].edit_status
       this.load_paymentTransactiond(data[0].po_id);
       this.company_pdf_logo = environment.baseURL + "download_file.php?path=upload/company/" +  this.company_pdf_logo + "&authToken=" + environment.authToken;
 
@@ -436,17 +440,18 @@ export class Po_viewComponent implements OnInit {
     }
   }
 
+
   onActivate(event)
   {
     if (event.type === "click")
-    {
+    {console.log(event.row)
 
       this.po_id   = event.row.po_id
       this.po_list = event.row
       this.name    = event.row.vendor_name;
       this.selectEdit_data();
       this.view_bill = event.row.serial_no;
-      this.status = event.row.status;
+      this.status   = event.row.status;
       this.e_way_bill.controls['vehicle_no'].setValue(this.po_list.vehicle_number);
       this.e_way_bill.controls['shipment_mode'].setValue(this.po_list.transport_mode);
       this.load_paymentTransactiond(event.row.po_id);
@@ -464,7 +469,7 @@ export class Po_viewComponent implements OnInit {
         this.taxempty=data[0].tax_mode;
         this.stateCode = data[0].place_from_supply_code;
         this.company_pdf_logo = this.poPdf[0].company_details[0].logo;
-
+        this.edit_status  = data[0].edit_status
       this.company_pdf_logo = environment.baseURL + "download_file.php?path=upload/company/" +  this.company_pdf_logo + "&authToken=" + environment.authToken
       }).catch(error => {
         this.toastrService.error('Something went wrong 8');
@@ -965,13 +970,14 @@ async edit_onSubmit(value)
        const control = this.Edit_po.get(field);
        control.markAsTouched({ onlySelf: true });
        });
+       console.log("enter")
        if (this.Edit_po.valid)
          {
           this.loading = true;
 
           await this.api.post('mp_po_edit_data_submit.php?value='+po_id+'&authToken=' + environment.authToken, value).then((data: any) =>
           {
-
+ console.log("data",data)
             if (data.status == "success")
             {
               this.loading=false;
@@ -1870,6 +1876,7 @@ var value =files[0]
 
  }
 
+ po_prefix:any
  async load_invoicenumber(id)
 {
    this.details =id
@@ -1877,8 +1884,8 @@ var value =files[0]
  {
     this.serial_no         = data;
     let po_id              = data[0].serial_no + 1;
-     var invoiceprifix     = data[0].prefix ;
-     this.inv_no           = invoiceprifix + po_id;
+    this.po_prefix         = data[0].prefix ;
+     this.inv_no           =  po_id;
      this.view_bill        = po_id;
 
      this.todaysDate = formatDate(this.today, 'yyyy-MM-dd', 'en-US', '+0530'); // hh:mm:ss a
@@ -1898,7 +1905,7 @@ async onSubmit(bill_data)
    });
    if (this.Edit_po.valid)
    {
-    const billNoValue = this.inv_no;
+    const billNoValue = this.po_prefix+this.inv_no;
     function normalizeString(str : any) {
       return str.replace(/\s+/g, '').toLowerCase();
     }
@@ -2055,6 +2062,7 @@ async onSubmit(bill_data)
     }).catch(error => { this.toastrService.error('Something went wrong'); });
 
       let bill_no              = this.bill_list+ 1;
+      console.log("bill_list",this.bill_list)
       var invoiceprifix        = this.prefix.bill_year ;
 
        this.new_bill            =  bill_no;
@@ -2306,6 +2314,32 @@ feedData(data)
       });
     if (this.po_payment.valid)
     {
+        const billNoValue = this.prefix+this.receipt_serial_no;
+        console.log(billNoValue)
+            function normalizeString(str : any) {
+              return str.replace(/\s+/g, '').toLowerCase();
+            }
+            let checking :any
+            await this.api.get('get_data.php?table=payment_made&authToken=' + environment.authToken).then((data: any) =>
+
+              {
+                console.log(data)
+                if(data != null)
+                  {
+                     checking = data.some((item: { receipt_no: any; }) =>  normalizeString(item.receipt_no) ===  normalizeString(billNoValue) );
+                  }
+              }).catch(error =>
+              {
+                  this.toastrService.error('API Faild : Invoice number checking failed');
+                  this.loading = false;
+              });
+
+              if(checking)
+               {
+                  this.toastrService.error('receipt Number already exist');
+                  return
+               }
+
        if(last_total >= data.amount)
        {
           this.loading=true;

@@ -34,7 +34,7 @@
     class="custom_table"
     [headerHeight]="50"
     [limit]="10"
-    [columnMode]="'force'"
+    [columnMode]="'flex'"
     [footerHeight]="50"
     [rowHeight]="50"
     [selected]="selected"
@@ -42,37 +42,37 @@
     [rows]="payment_transaction"
     (activate)="Onclick($event)">
 
-    <ngx-datatable-column prop="tran_date" [width]="100"   name="DATE" >
+    <ngx-datatable-column prop="tran_date"  [flexGrow]="1"   name="DATE" >
         <ng-template ngx-datatable-cell-template let-row = "row">
             {{row.tran_date  | date: 'dd-MM-yyyy'}}
         </ng-template>
     </ngx-datatable-column>
 
-        <ngx-datatable-column prop="customer_name" [width]="150"   name="VENDOR" >
+        <ngx-datatable-column prop="customer_name"  [flexGrow]="1"   name="VENDOR" >
           <ng-template ngx-datatable-cell-template let-row = "row">
               {{row.vendor_name}}
           </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="reference" [width]="150"   name="REFERENCE" >
+      <ngx-datatable-column prop="reference"  [flexGrow]="1"  name="REFERENCE" >
         <ng-template ngx-datatable-cell-template let-row = "row">
             {{row.reference}}
         </ng-template>
     </ngx-datatable-column>
 
-      <ngx-datatable-column prop="bill_number"  [width]="100"   name="BILL" >
+      <ngx-datatable-column prop="bill_number"   [flexGrow]="1"   name="BILL" >
         <ng-template ngx-datatable-cell-template let-row = "row">
             {{row.bill_number}}
         </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="po_number"  [width]="100"   name="PO" >
+      <ngx-datatable-column prop="po_number"   [flexGrow]="1"   name="PO" >
         <ng-template ngx-datatable-cell-template let-row = "row">
             {{row.po_number}}
         </ng-template>
       </ngx-datatable-column>
 
-    <ngx-datatable-column [width]="50" name="MODE">
+    <ngx-datatable-column  [flexGrow]="1" name="MODE">
         <ng-template ngx-datatable-cell-template let-row="row">
               <span *ngIf="row.tran_mode === 1 " >
                 Wire
@@ -86,26 +86,26 @@
         </ng-template>
       </ngx-datatable-column>
 
-    <ngx-datatable-column prop="credit" [width]="110" name="PAYMENT MADE">
+    <ngx-datatable-column prop="credit"  [flexGrow]="1" name="PAYMENT MADE">
         <ng-template ngx-datatable-cell-template let-row="row">
           <span style="font-weight:bold;"> {{row.credit | indianCurrency}} </span>
           </ng-template>
       </ngx-datatable-column>
 
-    <ngx-datatable-column prop="balance" [width]="60" name="BALANCE">
+    <ngx-datatable-column prop="balance"  [flexGrow]="1" name="BALANCE">
         <ng-template ngx-datatable-cell-template let-row="row">
           <span *ngIf="row.balance != null" style="font-weight:bold;"> {{row.balance | indianCurrency}} </span>
           <span *ngIf="row.balance == null" style="font-weight:bold;"> {{row.balance}} </span>
           </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="tran_details" [width]="150" name="DESCRIPTION">
+    <ngx-datatable-column prop="tran_details"  [flexGrow]="1" name="DESCRIPTION">
         <ng-template ngx-datatable-cell-template let-row="row">
             {{row.tran_details}}
         </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="notes" [width]="160"  name="COMMAND">
+    <ngx-datatable-column prop="notes"  [flexGrow]="2"  name="COMMAND">
         <ng-template ngx-datatable-cell-template let-row="row">
             {{row.notes}}
           </ng-template>
@@ -137,7 +137,14 @@
       <form [formGroup]="vendor_advance" (ngSubmit)="advance_submit(vendor_advance.value)" class="row">
         <div class="form-group col-12">
           <label for="input-12">Receipt No</label>
-          <input type="text" formControlName="receipt_no" class="form-control">
+           <div class="d-flex">
+            <div class="col-sm-4">
+                  <input type="text" readonly formControlName="prefix" [(ngModel)]="prefix" class="form-control text-uppercase" />
+              </div>
+                <div class="col-sm-4">
+                  <input type="number" formControlName="receipt_no" [(ngModel)]="receipt_serial_no" class="form-control" />
+              </div>
+          </div>
         </div>
         <div class="form-group col-12">
           <label for="exampleSelect3">Mode of Transfer</label>

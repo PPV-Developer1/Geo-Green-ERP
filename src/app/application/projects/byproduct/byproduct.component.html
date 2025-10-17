@@ -269,11 +269,18 @@
     Are you sure to move this part for production!
 
      <div class="row" style="padding-top: 10px;">
-                <div class="col-md-6">
+                <div class="col-md-4">
                   By Product Number
                 </div>
-                <div class="col-md-6">
-                  <input type="text"  [(ngModel)]="Product_no" class="form-control" placeholder="By product no"/>
+                <div class="col-md-8">
+                    <div class="d-flex">
+            <div class="col-sm-7">
+                  <input type="text" readonly  [(ngModel)]="Prefix" class="form-control text-uppercase" />
+              </div>
+                <div class="col-sm-5">
+                  <input type="number" [(ngModel)]="Serial_no" class="form-control" />
+              </div>
+          </div>
                 </div>
               </div>
   </div>

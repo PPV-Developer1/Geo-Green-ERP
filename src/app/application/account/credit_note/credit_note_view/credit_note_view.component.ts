@@ -8,6 +8,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { ImgToBase64Service } from 'src/app/service/img-to-base64.service';
+import { AppState } from 'src/app/app.state';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 pdfMake.fonts = {
@@ -65,14 +66,15 @@ export class Credit_note_viewComponent implements OnInit {
   notes       : any;
   item_DeleteId : any;
   item_index  : any;
-  loading : boolean = false;
+  loading     : boolean = false;
+  temp        : any;
 
   @ViewChild("add",{static:true}) add:ElementRef;
   @ViewChild('tableResponsive', { static: false }) tableResponsive: ElementRef;
   @ViewChild("delete_item",{static:true}) delete_item:ElementRef;
   @ViewChild("delete_note",{static:true}) delete_note:ElementRef;
 
-  constructor(public toastrService: ToastrService, private api: ApiService,public fb:FormBuilder,private modalService  : NgbModal,
+  constructor(public toastrService: ToastrService, private api: ApiService,public fb:FormBuilder,private modalService  : NgbModal,private _state : AppState,
                private imgToBase64: ImgToBase64Service,private renderer: Renderer2)
   {
     this.form=fb.group(
@@ -95,6 +97,7 @@ export class Credit_note_viewComponent implements OnInit {
   }
 
  async ngOnInit() {
+  this._state.notifyDataChanged('menu.isCollapsed', true);
    await this.TableData()
    await this.getImageFromService()
    await this.LoadItemDetails()
@@ -208,7 +211,8 @@ export class Credit_note_viewComponent implements OnInit {
        await this.api.get('credit_note_debit_note_list.php?type=credit&authToken='+environment.authToken).then((data: any) =>
           {
              console.log(data)
-             this.List=data
+             this.List  = data
+             this.temp  = [...data]
             var selectedId  = this.Selected_ID;
             console.log("Selected_ID : ",this.Selected_ID)
             let selectedRow = this.List.find(item => item.id == selectedId || item.serial_no == this.Selected_ID);
@@ -223,6 +227,18 @@ export class Credit_note_viewComponent implements OnInit {
 
     }
 
+    updateFilter(event) {
+
+    const val = event.target.value.toLowerCase();
+
+    const temp = this.temp.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.List = temp;
+    // this.table.offset = 0;
+  }
      scrollToSelectedRow(selectedId) {
     const uniqueId = `invoice-row-${selectedId}`;
     const selectedRow = document.getElementById(uniqueId);
@@ -1117,8 +1133,15 @@ getTermsObject() {
 async  onSubmit(value)
   {
     console.log(value)
+
+
     if(this.form.value.total>0)
     {
+       const confirmed = confirm("Are you sure you want to update this credit note?");
+       console.log(confirmed)
+      if (!confirmed) {
+        return;
+      }
       this.loading = true
       await this.api.post('credit_note_update.php?create_note_id='+this.Details.id+'&authToken=' + environment.authToken,this.form.value).then(async(data: any) =>
               {

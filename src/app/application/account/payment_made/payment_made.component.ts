@@ -6,6 +6,7 @@ import { ApiService } from 'src/app/service/api.service';
 import { environment } from "../../../../environments/environment";
 import { DatatableComponent, SelectionType } from '@swimlane/ngx-datatable';
 import { formatDate } from '@angular/common';
+import { AppState } from 'src/app/app.state';
 
 @Component({
   selector: 'app-payment_made',
@@ -46,7 +47,8 @@ export class Payment_madeComponent implements OnInit {
   constructor(    private modalService : NgbModal,
     public  fb           : FormBuilder,
     public  toastrService: ToastrService,
-    private api          : ApiService) {
+    private api          : ApiService,
+    private _state       : AppState) {
 
       {
         this.todaysDate = formatDate(this.today, 'yyyy-MM-dd', 'en-US', '+0530'); // hh:mm:ss a
@@ -60,7 +62,8 @@ export class Payment_madeComponent implements OnInit {
             amount      : [null,Validators.compose([Validators.required])],
             tran_date   : [this.todaysDate],
             reference   : ["Advance amount", Validators.compose([Validators.required, Validators.minLength(3)])],
-            description : [null, Validators.compose([Validators.required, Validators.minLength(3)])]
+            description : [null, Validators.compose([Validators.required, Validators.minLength(3)])],
+            prefix      : [null]
           })
         }
     }
@@ -99,6 +102,7 @@ export class Payment_madeComponent implements OnInit {
   setzero()
   {
     this.selected=[];
+     this._state.notifyDataChanged('menu.isCollapsed', false);
   }
 
   updateFilter(event) {
@@ -186,7 +190,7 @@ export class Payment_madeComponent implements OnInit {
   }
 
 
-  advance_submit(data)
+ async advance_submit(data)
   {
        Object.keys(this.vendor_advance.controls).forEach(field =>
         {
@@ -196,6 +200,31 @@ export class Payment_madeComponent implements OnInit {
 
       if (this.vendor_advance.valid)
       {
+        const billNoValue = this.prefix+this.receipt_serial_no;
+           console.log(billNoValue)
+            function normalizeString(str : any) {
+              return str.replace(/\s+/g, '').toLowerCase();
+            }
+            let checking :any
+            await this.api.get('get_data.php?table=payment_made&authToken=' + environment.authToken).then((data: any) =>
+
+              {
+                console.log(data)
+                if(data != null)
+                  {
+                     checking = data.some((item: { receipt_no: any; }) =>  normalizeString(item.receipt_no) ===  normalizeString(billNoValue) );
+                  }
+              }).catch(error =>
+              {
+                  this.toastrService.error('API Faild : Invoice number checking failed');
+                  this.loading = false;
+              });
+
+              if(checking)
+               {
+                  this.toastrService.error('receipt Number already exist');
+                  return
+               }
         this.loading = true;
          this.api.post('mp_vendor_advance.php?authToken=' + environment.authToken, this.vendor_advance.value).then((data: any) =>
         {
@@ -208,7 +237,7 @@ export class Payment_madeComponent implements OnInit {
               this.vendor_advance.controls['tran_mode'].reset(0);
               this.vendor_advance.controls['from_bank'].reset();
               this.vendor_advance.controls['to_bank'].setValue(1);
-              this.vendor_advance.controls['reference'].reset();
+
               this.vendor_advance.controls['description'].reset();
               this.vendor_advance.controls['amount'].setValue(0);
               this.model_open.close();

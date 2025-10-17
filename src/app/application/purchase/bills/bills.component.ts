@@ -306,6 +306,7 @@ export class BillsComponent implements OnInit {
     await this.api.get('mp_vendor_bill.php?&authToken=' + environment.authToken).then((data: any) =>
     {
       this.VendorBillList = data;
+      if(data != null)
       this.temp   =[...data]
     }).catch(error => { this.toastrService.error('Something went wrong in LoadVendorBills'); });
 

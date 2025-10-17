@@ -103,6 +103,11 @@ export class Item_categoryComponent implements OnInit {
 
   async EditSubmit(data)
   {
+    const confirmed = confirm(" Are you sure you want to update these changes?");
+          console.log(confirmed)
+          if (!confirmed) {
+            return;
+          }
     this.loading = true;
     await this.api.post('post_update_data.php?table=item_category&field=cat_id&value='+this.detail_view['cat_id']+'&authToken=' + environment.authToken, this.EditCategory.value).then((data: any) =>
       {

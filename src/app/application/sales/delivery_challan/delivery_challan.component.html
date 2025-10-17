@@ -37,7 +37,7 @@
       <ngx-datatable style="cursor: pointer;" #table class="custom_table"
         [headerHeight]="50"
         [limit]="16"
-        [columnMode]="'force'"
+        [columnMode]="'flex'"
         [columns]="columns"
         [footerHeight]="50"
         [rowHeight]="'auto'"
@@ -47,37 +47,37 @@
         (activate)="onActivate($event)"
         (select)='onSelect($event)'>
 
-        <ngx-datatable-column prop="dc_date" name="DATE">
+        <ngx-datatable-column prop="dc_date" [flexGrow]="1" name="DATE">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.dc_date  | date: 'dd-MM-yyyy'}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="dc_number" name="DC NO">
+        <ngx-datatable-column prop="dc_number" [flexGrow]="1" name="DC NO">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span style="font-weight:bold;">{{row.dc_number}}</span>
           </ng-template>
         </ngx-datatable-column>
-        <ngx-datatable-column prop="reference_number" name="REFF NUMBER">
+        <ngx-datatable-column prop="reference_number" [flexGrow]="1" name="REFF NUMBER">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.reference_number != ''"> {{row.reference_number}}</span>
             <span *ngIf="row.reference_number == ''"> Nill</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="customer_name" name="VENDOR NAME">
+        <ngx-datatable-column prop="customer_name" [flexGrow]="2" name="VENDOR NAME">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span style="font-weight:bold;">{{row.customer_name}}</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="dc_due_date" name="DUE DATE">
+        <ngx-datatable-column prop="dc_due_date" [flexGrow]="1" name="DUE DATE">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.dc_due_date | date: 'dd-MM-yyyy'}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="total" name="BILL AMOUNT">
+        <ngx-datatable-column prop="total" [flexGrow]="1" name="BILL AMOUNT">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.total | indianCurrency}}
           </ng-template>
@@ -220,14 +220,21 @@
 
                   <div class="row mb-3">
                     <label style="color: #e54643" class="col-sm-2 col-form-label col-form-label-sm">DC No*</label>
-                    <div class="col-sm-4">
-                      <input type="text" formControlName="dcNo" [(ngModel)]="inv_no"
-                        class="form-control form-control-sm" />
+
+
+                       <div class="col-sm-2">
+                          <input type="text" readonly formControlName="prefix" [(ngModel)]="prefix_data" class="form-control form-control-sm" />
+                      </div>
+
+                      <div class="col-sm-1">
+                          <input type="text" formControlName="dcNo" [(ngModel)]="inv_no"
+                            class="form-control form-control-sm" />
+                        </div>
+
 
                       <span class="help-block text-danger"
-                        *ngIf="dc.get('dcNo').touched && dc.get('dcNo').hasError('required')">Enter
-                        DC Number !</span>
-                    </div>
+                        *ngIf="dc.get('dcNo').touched && dc.get('dcNo').hasError('required')">Enter DC Number !</span>
+
                   </div>
 
                   <div class="row mb-3">
@@ -634,14 +641,18 @@
 
                   <div class="row mb-3">
                     <label style="color: #e54643" class="col-sm-2 col-form-label col-form-label-sm">DC No*</label>
-                    <div class="col-sm-4">
-                      <input type="text" formControlName="dcNo" [(ngModel)]="inv_no"
-                        class="form-control form-control-sm"  />
+                   <div class="col-sm-2">
+                          <input type="text" readonly formControlName="prefix" [(ngModel)]="prefix_data" class="form-control form-control-sm" />
+                      </div>
 
+                      <div class="col-sm-1">
+                          <input type="text" formControlName="dcNo" [(ngModel)]="inv_no"
+                            class="form-control form-control-sm" />
+                        </div>
                       <span class="help-block text-danger"
                         *ngIf="dc.get('dcNo').touched && dc.get('dcNo').hasError('required')">Enter
                         DC Number !</span>
-                    </div>
+
                   </div>
 
                   <div class="row mb-3">
@@ -703,6 +714,7 @@
                               <th>ITEM NAME <div class="resizer"></div></th>
                               <th>DESCRIPTION  <div class="resizer"></div></th>
                               <th>QUANTITY <div class="resizer"></div></th>
+                              <th>HSN <div class="resizer"></div></th>
                               <th>UOM <div class="resizer"></div></th>
                               <th>RATE <div class="resizer"></div></th>
                               <th>TAX <div class="resizer"></div></th>

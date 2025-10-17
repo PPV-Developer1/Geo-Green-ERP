@@ -14,6 +14,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { formatDate } from '@angular/common';
 import { stringify } from 'querystring';
 import { json } from 'd3';
+import { AppState } from 'src/app/app.state';
 declare let $: any;
 
 
@@ -94,7 +95,7 @@ export class InvoiceViewComponent implements OnInit {
   year                      : any;
   fullDate                  : any;
   dueValues                 : any = 0;
-
+  prefix_data               : any
   billToPdf                 : any;
   customerPdf               : any;
   branchPdf                 : any;
@@ -165,6 +166,10 @@ export class InvoiceViewComponent implements OnInit {
   taxempty                  : any;
   uom                       : any;
   total_tax                 : any;
+  Dispatch_items            : any;
+  Dispatch_total            : any;
+  Dispatch_percentage       : any;
+  Difference_amount         : any;
 
   clone_invoice             : FormGroup;
   Edit_invoice              : FormGroup;
@@ -175,6 +180,7 @@ export class InvoiceViewComponent implements OnInit {
   today                     = new Date();
   todaysDate                = '';
   item_index                : any;
+  status                    : any;
   private startX      : number = 0;
   private startWidth  : number = 0;
   private columnIndex : number | null = null;
@@ -191,7 +197,7 @@ export class InvoiceViewComponent implements OnInit {
   public user          = localStorage.getItem('type');
   public user_bank_id  = localStorage.getItem('bank_id');
  selectedDCs: any[] = [];  // instead of null
-
+  temp: any[] = [];
 
   dropdownSettings = {
     singleSelection: false,
@@ -209,7 +215,7 @@ export class InvoiceViewComponent implements OnInit {
   @ViewChild("delete_item",{static:true}) delete_item:ElementRef;
   @ViewChild("delete_item_dc",{static:true}) delete_item_dc:ElementRef;
   constructor(private api: ApiService, private modalService: NgbModal, private imgToBase64: ImgToBase64Service, public toastrService: ToastrService,
-    router:Router, public fb: FormBuilder,private scriptService: ScriptService,    private renderer: Renderer2)
+    router:Router, public fb: FormBuilder,private scriptService: ScriptService, private renderer: Renderer2,private _state : AppState)
     {
 
   this.Edit_invoice = fb.group(
@@ -239,7 +245,9 @@ export class InvoiceViewComponent implements OnInit {
       invoice_id: [null],
       inv_type  : [null],
       size      : [null],
-      dc_data   : [null]
+      dc_data   : [null],
+      prefix    : [null],
+
     })
 
     this.clone_invoice = fb.group(
@@ -282,7 +290,8 @@ export class InvoiceViewComponent implements OnInit {
           amount      : [0],
           tran_date   : [this.todaysDate],
           reference   : [null, Validators.compose([Validators.required])],
-          description : [null, Validators.compose([Validators.required, Validators.minLength(3)])]
+          description : [null, Validators.compose([Validators.required, Validators.minLength(3)])],
+          prefix      : [null]
         } )
       }
 
@@ -308,6 +317,7 @@ export class InvoiceViewComponent implements OnInit {
 
   async ngOnInit()
   {
+    this._state.notifyDataChanged('menu.isCollapsed', true);
     this.loadonce();
     this.LoadCustomerBills();
     this.getImageFromService();
@@ -422,12 +432,25 @@ fontload()
     }
   }
 
+   updateFilter(event) {
+    const val = event.target.value.toLowerCase();
+    const temp = this.temp.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.CustomerBillList = temp;
+    this.table.offset = 0;
+  }
+
+
   async loadonce()
   {
     await this.api.get('mp_customer_invoice_pdf.php?value=' + this.view_invoice + '&authToken=' + environment.authToken).then((data: any) => {
 
       this.invoice_id = data[0].invoice_id;
       this.invoicePdf   = data;
+      this.status   = data[0].status
         console.log("invoicePdf ",this.invoicePdf)
       if(this.invoicePdf[0].dc_data != null)
       this.invoicePdf[0]['dc_no'] =this.invoicePdf[0].dc_data.map(item => item.dc_number).join(", ");
@@ -446,17 +469,34 @@ fontload()
       this.customer_address(data[0].customer_id);
       this.Load_dispath_data()
     }).catch(error => {
-       this.toastrService.error('Something went wrong');
+       this.toastrService.error('Something went wrong 1');
       });
 
   }
 
+
+
  async Load_dispath_data()
   {
-      await this.api.get('mp_invoice_dc_item_dispatch_data.php?id=' + this.view_invoice + '&type=Invoice&authToken=' + environment.authToken).then((data: any) => {
+      await this.api.get('mp_invoice_dc_item_dispatch_data.php?id=' + this.invoice_id + '&type=Invoice&authToken=' + environment.authToken).then((data: any) => {
           console.log("dispatch data ",data)
+          this.Dispatch_items = data.item
+          this.Dispatch_total = data?.item_total
+          if(data.item.length > 0)
+          {
+              const invoiceTotal = parseFloat(this.invoicePdf[0]?.without_tax || 0);
+              const itemTotal = parseFloat(data?.item_total || 1); // use 1 to avoid division by 0
+              const difference = invoiceTotal - itemTotal;
+              this.Difference_amount = difference.toFixed(2)
+              const percentageDifference = ((difference / invoiceTotal) * 100).toFixed(2); // 2 decimal places
+              this.Dispatch_percentage = percentageDifference
+              console.log("Invoice Total:", invoiceTotal);
+              console.log("Item Total:", itemTotal);
+              console.log("Difference:", difference);
+              console.log("Difference (%):", percentageDifference + "%");
+          }
          }).catch(error => {
-       this.toastrService.error('Something went wrong');
+       this.toastrService.error('Something went wrong 2');
       });
   }
   async LoadCustomerBills()
@@ -464,7 +504,7 @@ fontload()
     await this.api.get('mp_customer_invoice.php?&authToken=' + environment.authToken).then((data: any) =>
     {
       this.CustomerBillList = data;
-
+      this.temp   = data;
       var selectedId  = this.view_invoice;
       let selectedRow = this.CustomerBillList.find(item => item.serial_no == selectedId);
       if (selectedRow)
@@ -473,7 +513,7 @@ fontload()
         this.invoice_list=this.selected[0];
        // setTimeout(() => this.scrollToSelectedRow(selectedId), 500);
       }
-    }).catch(error => { this.toastrService.error('Something went wrong in LoadCustomerInvoice'); });
+    }).catch(error => { this.toastrService.error('Something went wrong in LoadCustomerInvoice 3'); });
   }
 
   scrollToSelectedRow(selectedId) {
@@ -517,7 +557,7 @@ fontload()
 
         this.invoicePdf = data;
         console.log("invoicePdf ",this.invoicePdf)
-
+        this.status   = data[0].status
         if(this.invoicePdf[0].dc_data != null)
         this.invoicePdf[0]['dc_no'] =this.invoicePdf[0].dc_data.map(item => item.dc_number).join(", ");
         console.log(this.invoicePdf[0]);
@@ -1331,6 +1371,12 @@ async edit_specItem(item,j)
        });
        if (this.Edit_invoice.valid)
          {
+          const confirmed = confirm("Are you sure you want to update this invoice?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
+
           this.loading=true;
           await this.api.post('mp_invoice_edit_submit.php?value='+invoice_id+'&authToken=' + environment.authToken, value).then((data: any) =>
           {
@@ -1924,7 +1970,7 @@ async payment()
     this.openpop()
   }).catch(error => { });
 
-  let serial_no = this.prefix+this.receipt_serial_no;
+  let serial_no = this.receipt_serial_no;
   this.invoice_payment.controls['receipt_no'].setValue(serial_no);
 }
 
@@ -2035,8 +2081,41 @@ feedData(data)
         });
     if (this.invoice_payment.valid)
     {
+      console.log("prefix_data",this.prefix)
+      console.log("receipt_serial_no",this.receipt_serial_no)
+        const billNoValue = this.prefix+this.receipt_serial_no;
+        console.log(billNoValue)
+            function normalizeString(str : any) {
+              return str.replace(/\s+/g, '').toLowerCase();
+            }
+            let checking :any
+            await this.api.get('get_data.php?table=payment_transactions&authToken=' + environment.authToken).then((data: any) =>
+
+              {
+                console.log(data)
+                if(data != null)
+                  {
+                     checking = data.some((item: { receipt_no: any; }) =>  normalizeString(item.receipt_no) ===  normalizeString(billNoValue) );
+                  }
+              }).catch(error =>
+              {
+                  this.toastrService.error('API Faild : Invoice number checking failed');
+                  this.loading = false;
+              });
+
+              if(checking)
+               {
+                  this.toastrService.error('receipt Number already exist');
+                  return
+               }
+               console.log("data")
        if(last_total >= data.amount)
        {
+          const confirmed = confirm("Are you sure you want to confirm this payment?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
           this.loading=true;
               await this.api.post('mp_add_invoice_payment.php?value='+invoice_id+'&amount='+amount+'&authToken=' + environment.authToken, data).then((data: any) =>
               {
@@ -2086,8 +2165,9 @@ feedData(data)
    {
 
       let invoice_id        = data[0].serial_no + 1;
-      var invoiceprifix     = data[0].prefix ;
-      this.inv_no           = invoiceprifix + invoice_id;
+      this.prefix_data      = data[0].prefix
+      console.log("prefix_data",this.prefix_data)
+      this.inv_no           = invoice_id;
       this.view_invoice     = invoice_id;
       this.invoice_type     = this.details.inv_type
 
@@ -2109,7 +2189,8 @@ async onSubmit(bill_data)
     });
     if (this.Edit_invoice.valid)
     {
-      const billNoValue = this.inv_no;
+      this.view_invoice = this.inv_no
+      const billNoValue =this.prefix_data+ this.inv_no;
       function normalizeString(str : any) {
         return str.replace(/\s+/g, '').toLowerCase();
       }
@@ -2128,6 +2209,12 @@ async onSubmit(bill_data)
           });
         if(!checking)
          {
+          const confirmed = confirm("Are you sure you want to confirm creating this clone?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
+
               this.loading = true;
               await this.api.post('mp_invoice_create.php?type=new_invoice&authToken=' + environment.authToken, bill_data).then((data: any) =>
               {
@@ -2181,6 +2268,14 @@ async onSubmit(bill_data)
     //   const control = this.e_way_bill.get(field);
     //   control.markAsTouched({ onlySelf: true });
     // });
+
+     const confirmed = confirm("Are you sure you want to update this e-way bill?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
+
+
     let invoice_id =this.invoicePdf[0].invoice_id;
     this.view_invoice =this.invoice_list.serial_no;
 
@@ -2356,7 +2451,11 @@ async onSubmit(bill_data)
     {
       if(select.debit <= this.advance.value.invoice_amount)
         {
-
+           const confirmed = confirm("Are you sure you want to confirm this payment?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
           this.api.post('mp_advance_amount_to_invoice.php?tran_id='+select.tran_id+'&authToken=' + environment.authToken, this.advance.value).then((data: any) =>
           {
 

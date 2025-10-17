@@ -7,7 +7,7 @@
 
     <div class="btn-group mb-3 col-md-7" role="group" aria-label="Basic example">
 
-      <button *ngIf="user == 'super_admin'" type="button" [disabled]="payment_view" class="btn btn-outline-info fa fa-pencil btn-sm" (click)="editbill()"> Edit</button>
+      <button *ngIf="user == 'super_admin'" type="button" [disabled]="payment_view || Edit_status >0" class="btn btn-outline-info fa fa-pencil btn-sm" (click)="editbill()"> Edit</button>
       <button type="button" class="btn btn-outline-info fa fa-print btn-sm" (click)="download()"> Print</button>
       <button  class="btn btn-outline-info dropdown-toggle fa fa-money btn-sm" [disabled]="payment_view" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         Payment
@@ -18,7 +18,7 @@
       </div>
       <button type="button" class="btn btn-outline-info fa fa-pencil-square-o btn-sm" (click)="e_bill()"> Transport Vehicle Details</button>
       <button type="button" class="btn btn-outline-info fa fa-copy btn-sm" (click)="clone()"> Clone</button>
-      <button type="button" class="btn btn-outline-danger fa fa-trash-o btn-sm" (click)="remove()"> Delete</button>
+      <button type="button" class="btn btn-outline-danger fa fa-trash-o btn-sm" (click)="remove()" [disabled]="payment_view || Edit_status >0"> Delete</button>
 
       &nbsp;
       &nbsp;
@@ -45,11 +45,8 @@
               <div class="col-md-3" style="text-align: right;">{{row.total | indianCurrency }} </div>
             </div>
             <div class="row">
-              <div class="col-md-12 ">
-                <span *ngIf="row.reference_number != null ">{{row.bill_number}} | {{row.reference_number}}</span>
-                <span *ngIf="row.reference_number == null ">{{row.bill_number}} </span>
-               </div>
-
+              <div class="col-md-9 "> {{row.bill_number}} </div>
+              <div class="col-md-3 "> {{row.bill_date}} </div>
             </div>
 
             <div class="row">
@@ -691,7 +688,14 @@
 
       <div class="form-group">
         <label for="input-12">Payment Receipt No</label>
-        <input type="text" formControlName="receipt_no" class="form-control" id="input-12">
+        <div class="d-flex">
+            <div class="col-sm-4">
+              <input type="text" readonly formControlName="prefix" [(ngModel)]="prefix" class="form-control text-uppercase" />
+          </div>
+              <div class="col-sm-4">
+                <input type="number" formControlName="receipt_no" [(ngModel)]="receipt_serial_no" class="form-control" />
+              </div>
+         </div>
       </div>
       <div class="form-group">
         <label for="exampleSelect3">Mode of Transfer</label>

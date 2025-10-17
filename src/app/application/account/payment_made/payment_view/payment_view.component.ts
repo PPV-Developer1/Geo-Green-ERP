@@ -7,6 +7,7 @@ import { environment } from "../../../../../environments/environment";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { ImgToBase64Service } from "src/app/service/img-to-base64.service";
+import { AppState } from 'src/app/app.state';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 pdfMake.fonts = {
@@ -56,20 +57,30 @@ export class Payment_viewComponent implements OnInit {
   fontFace        :any;
   receipt_no      :any;
   imageToShow     : string | ArrayBuffer;
+  temp : any
   select_id = localStorage.getItem('select_id');
-  constructor(private api: ApiService, public toastrService: ToastrService,private imgToBase64: ImgToBase64Service)
+   public isMenuCollapsed:boolean = false;
+  constructor(private api: ApiService, public toastrService: ToastrService,private imgToBase64: ImgToBase64Service, private _state:AppState)
   {
-
+      this._state.subscribe('menu.isCollapsed', (isCollapsed) =>
+        {
+            this.isMenuCollapsed = isCollapsed;
+        });
   }
 
   async ngOnInit()
   {
+    this.hideMenu();
     this.Loadpaymentlist();
     this. Loadselectdata();
     this.getImageFromService();
     await this.fontload();
     await this.fontload();
   }
+
+   public hideMenu():void{
+        this._state.notifyDataChanged('menu.isCollapsed', true);
+    }
 
   fontload()
   {
@@ -87,6 +98,7 @@ export class Payment_viewComponent implements OnInit {
     await this.api.get('mp_payment_made.php?&authToken=' + environment.authToken).then((data: any) =>
     {
       this.paymentlist = data;
+      this.temp=[...data]
       var selectedId  = this.select_id;
       let selectedRow = this.paymentlist.find(item => item.tran_id == selectedId);
       if (selectedRow)
@@ -115,6 +127,18 @@ export class Payment_viewComponent implements OnInit {
     }).catch(error => { this.toastrService.error('Something went wrong in LoadVendorBills'); });
   }
 
+    updateFilter(event) {
+
+    const val = event.target.value.toLowerCase();
+
+    const temp = this.temp.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.paymentlist = temp;
+    // this.table.offset = 0;
+  }
   scrollToSelectedRow(selectedId) {
     const uniqueId = `bill-row-${selectedId}`;
     const selectedRow = document.getElementById(uniqueId);

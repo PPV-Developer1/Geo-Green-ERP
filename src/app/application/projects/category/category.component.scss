@@ -4,11 +4,53 @@
     width: 100%;
     border: 1px solid black;
   }
-  
+
   .example-full-width {
     width: 100%;
   }
-  
+
   .example-form-field {
     width: 200px;
   }
+
+  /* Adjusting the dropdown panel */
+::ng-deep .ng-dropdown-panel {
+  background-color: #fffdfd;
+  position: absolute;
+  top: calc(100% + 5px); /* Ensure proper positioning relative to the input field */
+  left: 0;
+  right: 0;
+  font-size: 15px;
+  text-align: left;
+  border: 1px solid #969696;
+}
+
+/* Styling the options */
+::ng-deep .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
+  background-color: rgb(30, 89, 201) !important;
+  color: #f7f5f5 !important;
+}
+
+::ng-deep .ng-dropdown-panel .ng-option.ng-option-selected {
+  background-color: rgb(30, 89, 201) !important;
+  color: #f7f5f5 !important;
+}
+
+/* Styling the option labels */
+::ng-deep .ng-dropdown-panel .ng-option .ng-option-label {
+  padding: 10px;
+  width: 100%;
+}
+
+::ng-deep .ng-value-container .ng-value {
+  font-size: 15px; /* Adjust the font size as needed */
+}
+
+::ng-deep .ng-select {
+  height: 38px; /* Adjust the height as needed */
+  display: flex;
+  align-items: center;
+}
+::ng-deep .ng-select-container {
+  text-align: left;
+}

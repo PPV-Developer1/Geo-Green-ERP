@@ -5,8 +5,14 @@ export class IndianCurrency implements PipeTransform {
   transform(value: number, args: string[]): any {
 
         if (! isNaN(value)) {
-            var currencySymbol = '₹';          
-            var result = value.toString().split('.');
+            var currencySymbol = '₹';
+
+             if(value == 0)
+               {
+                return 0
+               }
+               const roundedValue = parseFloat(value.toString()).toFixed(2);
+               const result = roundedValue.split(".");
 
             var lastThree = result[0].substring(result[0].length - 3);
             var otherNumbers = result[0].substring(0, result[0].length - 3);
@@ -16,7 +22,7 @@ export class IndianCurrency implements PipeTransform {
 
             if (result.length > 1) {
                 output += "." + result[1];
-            }            
+            }
 
             return currencySymbol + output;
         }

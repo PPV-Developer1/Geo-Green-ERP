@@ -147,9 +147,10 @@ export class ProjectComponent implements OnInit
   {
     this.api.get('mp_project_list.php?authToken='+environment.authToken).then((data: any) =>
     {
-      this.filter = [...data];
-      this.rows = data;
 
+      this.rows = data;
+      if(data != null)
+        this.filter = [...data];
     }).catch(error => {this.toastrService.error('Something went wrong');});
 
     this.api.get('get_data.php?table=item&authToken='+environment.authToken).then((data: any) =>

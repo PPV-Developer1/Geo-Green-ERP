@@ -11,6 +11,8 @@ import { ScriptService } from 'src/app/service/script.service';
 import { ImgToBase64Service } from "src/app/service/img-to-base64.service";
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { formatDate } from '@angular/common';
+import { AnyARecord } from 'dns';
+import { AppState } from 'src/app/app.state';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 pdfMake.fonts = {
   'Roboto': {
@@ -142,8 +144,12 @@ export class Delivery_challen_viewComponent implements OnInit {
   tcs_percent              : any = 0;
   subtotal                 : any;
   taxempty                 : any;
-
-  imageToShow               : string | ArrayBuffer;
+  status                   : any
+  Dispatch_items           : any
+  Dispatch_total           : any
+  Dispatch_percentage      : any
+  Difference_amount        : any
+  imageToShow              : string | ArrayBuffer;
   today                     = new Date();
   todaysDate                = '';
   private startX: number = 0;
@@ -162,8 +168,9 @@ export class Delivery_challen_viewComponent implements OnInit {
 
   @ViewChild("delete",{static:true}) delete:ElementRef;
   @ViewChild('tableResponsive', { static: false }) tableResponsive: ElementRef;
+  temp: any;
 
-  constructor(private api: ApiService,private modalService: NgbModal, public toastrService: ToastrService,private imgToBase64: ImgToBase64Service,
+  constructor(private api: ApiService,private modalService: NgbModal, public toastrService: ToastrService,private imgToBase64: ImgToBase64Service,private _state : AppState,
      router:Router, public fb: FormBuilder, private renderer: Renderer2) { this.router = router;
 
   this.Edit_dc = fb.group(
@@ -191,7 +198,8 @@ export class Delivery_challen_viewComponent implements OnInit {
       product    : this.fb.array([]),
       dc_id      : [null],
       inv_type   : [null],
-      size       : [null]
+      size       : [null],
+      prefix     : [null]
     })
 
     this.e_way_bill = fb.group({
@@ -206,6 +214,7 @@ export class Delivery_challen_viewComponent implements OnInit {
 
   async ngOnInit()
   {
+    this._state.notifyDataChanged('menu.isCollapsed', true);
     this.loadonce();
     this.LoadCustomerBills();
     this.getImageFromService();
@@ -318,10 +327,11 @@ export class Delivery_challen_viewComponent implements OnInit {
 
   async loadonce()
   {
-    await this.api.get('mp_customer_dc_pdf.php?value=' + this.view_dc + '&authToken=' + environment.authToken).then((data: any) => {
+    await this.api.get('mp_customer_dc_pdf.php?value=' + this.view_dc + '&authToken=' + environment.authToken).then(async (data: any) => {
 
 
       this.invoicePdf = data;
+      this.status = data[0].status;
       this.dc_id = data[0].dc_id;
       this.company_pdf_logo = this.invoicePdf[0].company_details[0].logo;
       this.company_pdf_logo = environment.baseURL + "download_file.php?path=upload/company/" +  this.company_pdf_logo + "&authToken=" + environment.authToken
@@ -334,16 +344,56 @@ export class Delivery_challen_viewComponent implements OnInit {
       this.stateCode      = data[0].place_from_supply_code;
       this.name = data[0].customer_name;
       this.customer_address(data[0].customer_id);
+       await  this.Load_dispath_data()
+
     }).catch(error => {
        this.toastrService.error('Something went wrong');
       });
   }
 
+
+   updateFilter(event) {
+    const val = event.target.value.toLowerCase();
+    const temp = this.temp.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.CustomerBillList = temp;
+    this.table.offset = 0;
+  }
+
+ async Load_dispath_data()
+  {
+      await this.api.get('mp_invoice_dc_item_dispatch_data.php?id=' + this.dc_id + '&type=DC&authToken=' + environment.authToken).then((data: any) => {
+          console.log("dispatch data ",data)
+          this.Dispatch_items = data.item
+          this.Dispatch_total = data.item_total
+
+        const invoiceTotal = parseFloat(this.invoicePdf[0]?.without_tax || 0);
+        const itemTotal = parseFloat(data?.item_total || 1); // use 1 to avoid division by 0
+
+        const difference = invoiceTotal - itemTotal;
+        this.Difference_amount = difference.toFixed(2)
+        const percentageDifference = ((difference / invoiceTotal) * 100).toFixed(2); // 2 decimal places
+        this.Dispatch_percentage = percentageDifference
+        console.log("Invoice Total:", invoiceTotal);
+        console.log("Item Total:", itemTotal);
+        console.log("Difference:", difference);
+        console.log("Difference (%):", percentageDifference + "%");
+
+
+         }).catch(error => {
+       this.toastrService.error('Something went wrong');
+      });
+  }
   async LoadCustomerBills()
   {
     await this.api.get('mp_customer_dc.php?&authToken=' + environment.authToken).then((data: any) =>
     {
       this.CustomerBillList = data;
+      if(data.length > 0)
+        this.temp=[...data]
       var selectedId  = this.view_dc;
       let selectedRow = this.CustomerBillList.find(item => item.serial_no == selectedId);
       if (selectedRow)
@@ -364,10 +414,11 @@ export class Delivery_challen_viewComponent implements OnInit {
       }
   }
 
-  onActivate(event)
+ async onActivate(event)
   {
     if (event.type === "click")
     {
+      console.log(event.row)
       this.dc_id   = event.row.dc_id;
       this.dc_list = event.row;
       this.name = event.row.customer_name;
@@ -378,7 +429,9 @@ export class Delivery_challen_viewComponent implements OnInit {
       this.e_way_bill.controls['shipment_mode'].setValue(this.dc_list.transport_mode);
 
       this.returnable_dc_show = false
-      this.customer_address(event.row.customer_id);
+    await  this.customer_address(event.row.customer_id);
+    await  this.Load_dispath_data()
+
     }
   }
 
@@ -391,7 +444,7 @@ export class Delivery_challen_viewComponent implements OnInit {
           this.invoiceItems = this.invoicePdf[0].invoiceItems;
           this.taxempty     = data[0].tax_mode;
           this.stateCode    = data[0].place_from_supply_code;
-
+          this.status       = data[0].status;
           this.company_pdf_logo = this.invoicePdf[0].company_details[0].logo;
 
           this.company_pdf_logo = environment.baseURL + "download_file.php?path=upload/company/" +  this.company_pdf_logo + "&authToken=" + environment.authToken
@@ -945,6 +998,12 @@ async edit_specItem(item,j)
        });
        if (this.Edit_dc.valid)
         {
+          const confirmed = confirm("Are you sure you want to update this dc?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
+
           this.loading = true;
           await this.api.post('mp_dc_edit_submit.php?value='+dc_id+'&authToken=' + environment.authToken, value).then((data: any) =>
           {
@@ -1533,7 +1592,7 @@ getTermsObject(files) {
     this.selectEdit_data()
 
   }
-
+prefix_data:any
   async load_invoicenumber(id)
  {
 
@@ -1543,8 +1602,8 @@ getTermsObject(files) {
       {
 
           let dc_id             = data[0].serial_no + 1;
-          var invoiceprifix     = data[0].prefix ;
-          this.inv_no           = invoiceprifix + dc_id;
+          this.prefix_data      = data[0].prefix ;
+          this.inv_no           = dc_id;
           this.view_dc          = dc_id;
           this.invoice_type     = this.details.dc_type
           if(this.clone_dc_show == true)
@@ -1563,7 +1622,7 @@ async onSubmit(bill_data)
     });
       if (this.Edit_dc.valid)
       {
-            const billNoValue = this.inv_no;
+            const billNoValue = this.prefix_data+this.inv_no;
             function normalizeString(str : any) {
               return str.replace(/\s+/g, '').toLowerCase();
             }
@@ -1582,6 +1641,11 @@ async onSubmit(bill_data)
                 });
               if(!checking)
                {
+                const confirmed = confirm("Are you sure you want to confirm creating this clone?");
+                      console.log(confirmed)
+                      if (!confirmed) {
+                        return;
+                      }
                   this.loading = true;
                   await this.api.post('mp_dc_create.php?type=new_dc&authToken=' + environment.authToken, bill_data).then((data: any) =>
                   {
@@ -1630,7 +1694,11 @@ async onSubmit(bill_data)
 
   async billSubmit(value)
   {
-
+      const confirmed = confirm("Are you sure you want to update this dc?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
   let dc_id =this.invoicePdf[0].dc_id;
   this.view_dc =this.dc_list.serial_no;
       await this.api.post('mp_dc_create.php?dc_id='+dc_id+'&type=e_way&authToken=' + environment.authToken, value).then((data: any) =>
@@ -1702,6 +1770,11 @@ async onSubmit(bill_data)
 
   ReloadBillAddr(id)
   {
+    const confirmed = confirm("Are you sure you want to update this address?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
     this.api.get('get_data.php?table=customer_address&find=cust_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
       this.bill_addr = data[0];
 
@@ -1717,6 +1790,11 @@ async onSubmit(bill_data)
   }
 
   ReloadShippAddr(id) {
+     const confirmed = confirm("Are you sure you want to update this address?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
     this.api.get('get_data.php?table=customer_address&find=cust_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
       this.shipp_addr = data[0];
 

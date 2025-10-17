@@ -21,7 +21,7 @@
         <td style="width: 100px; text-align: center; vertical-align: center;">
         </td>
         <td>
-          <button type="submit"  class="btn btn-success fa fa-pluspull-right" (click)="advance()"> Customer Advance </button>
+          <button type="submit"  class="btn btn-success fa fa-plus pull-right" (click)="advance()"> Customer Advance </button>
         </td>
       </tr>
     </table>
@@ -33,7 +33,7 @@
   class="custom_table"
   [headerHeight]="50"
   [limit]="10"
-  [columnMode]="'force'"
+  [columnMode]="'flex'"
   [footerHeight]="50"
   [rowHeight]="50"
   [selected]="selected"
@@ -41,31 +41,31 @@
   [rows]="payment_transaction"
   (activate)="Onclick($event)">
 
-  <ngx-datatable-column prop="tran_date" [width]="80"  name=" DATE" >
+  <ngx-datatable-column prop="tran_date" [flexGrow]="1"  name=" DATE" >
       <ng-template ngx-datatable-cell-template let-row = "row">
           {{row.tran_date  | date: 'dd-MM-yyyy'}}
       </ng-template>
   </ngx-datatable-column>
 
-      <ngx-datatable-column  prop="customer_name" name="CUSTOMER" >
+      <ngx-datatable-column [flexGrow]="2" prop="customer_name" name="CUSTOMER" >
         <ng-template ngx-datatable-cell-template let-row = "row">
             {{row.customer_name}}
         </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column  prop="reference" name="REFERENCE" >
+    <ngx-datatable-column [flexGrow]="2" prop="reference" name="REFERENCE" >
       <ng-template ngx-datatable-cell-template let-row = "row">
           {{row.reference}}
       </ng-template>
   </ngx-datatable-column>
 
-    <ngx-datatable-column  prop="invoice_number"   name="INVOICE" >
+    <ngx-datatable-column [flexGrow]="1" prop="invoice_number"   name="INVOICE" >
       <ng-template ngx-datatable-cell-template let-row = "row">
           {{row.invoice_number}}
       </ng-template>
     </ngx-datatable-column>
 
-  <ngx-datatable-column [width]="80" name="MODE">
+  <ngx-datatable-column  name="MODE" [flexGrow]="1">
       <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.tran_mode === 1 " >
               Wire
@@ -85,26 +85,26 @@
       </ng-template>
   </ngx-datatable-column> -->
 
- <ngx-datatable-column prop="debit" [width]="80" name="RECIEVED">
+ <ngx-datatable-column prop="debit"  name="RECIEVED" [flexGrow]="1">
     <ng-template ngx-datatable-cell-template let-row="row">
       <span style="font-weight:bold;"> {{row.debit | indianCurrency}} </span>
       </ng-template>
   </ngx-datatable-column>
 
 
-  <ngx-datatable-column prop="balance" [width]="80" name="BALANCE">
+  <ngx-datatable-column prop="balance" name="BALANCE" [flexGrow]="1">
       <ng-template ngx-datatable-cell-template let-row="row">
         <span style="font-weight:bold;"> {{row.balance | indianCurrency}} </span>
         </ng-template>
   </ngx-datatable-column>
 
-  <ngx-datatable-column prop="tran_details" name="DESCRIPTION">
+  <ngx-datatable-column prop="tran_details" name="DESCRIPTION" [flexGrow]="2">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.tran_details}}
       </ng-template>
   </ngx-datatable-column>
 
-  <ngx-datatable-column prop="notes"  name="COMMAND">
+  <ngx-datatable-column prop="notes"  name="COMMAND" [flexGrow]="2">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.notes}}
         </ng-template>
@@ -134,7 +134,14 @@
     <form [formGroup]="customer_advance" (ngSubmit)="advance_submit(customer_advance.value)" class="row">
       <div class="form-group col-12">
         <label for="input-12">Receipt No</label>
-        <input type="text" formControlName="receipt_no" class="form-control">
+         <div class="d-flex">
+            <div class="col-sm-4">
+                  <input type="text" readonly formControlName="prefix" [(ngModel)]="prefix" class="form-control text-uppercase" />
+              </div>
+                <div class="col-sm-4">
+                  <input type="number" formControlName="receipt_no" [(ngModel)]="receipt_serial_no" class="form-control" />
+              </div>
+          </div>
       </div>
       <div class="form-group col-12">
         <label for="exampleSelect3">Mode of Transfer</label>
@@ -156,7 +163,7 @@
             </select> -->
 
 
-        <ng-select formControlName="from_bank" class=" form-control custom-select" [clearable]="false">
+        <ng-select formControlName="from_bank" class=" form-control custom-select" [clearable]="true">
           <ng-option *ngFor="let item of customer_list" [value]="item.customer_id" class="form-control">
             {{ item.company_name}}
           </ng-option>
@@ -185,7 +192,7 @@
           </select> -->
 
           <ng-select formControlName="to_bank" [items]="bankData" bindLabel="account_name" bindValue="bank_id"   groupBy="mode"
-             class=" form-control custom-select" [clearable]="false">
+             class=" form-control custom-select" [clearable]="true">
            <ng-template ng-optgroup-tmp let-item="item" class="form-control">
                <span *ngIf="item.mode == 1" style="padding: 20px;"><b>Bank</b></span>
                <span *ngIf="item.mode == 2" style="padding: 20px;"><b>Cash</b></span>

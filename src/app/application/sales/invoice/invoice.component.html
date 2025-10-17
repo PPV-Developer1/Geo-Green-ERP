@@ -37,7 +37,7 @@
       <ngx-datatable style="cursor: pointer;" #table class="custom_table"
         [headerHeight]="50"
         [limit]="16"
-        [columnMode]="'force'"
+        [columnMode]="'flex'"
         [columns]="columns"
         [footerHeight]="50"
         [rowHeight]="'auto'"
@@ -47,57 +47,57 @@
         (activate)="onActivate($event)"
         (select)='onSelect($event)'>
 
-        <ngx-datatable-column prop="invoice_date" name="DATE">
+        <ngx-datatable-column prop="invoice_date" name="DATE" [flexGrow]="1" >
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.invoice_date  | date: 'dd-MM-yyyy'}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="invoice_number" name="INVOICE NO">
+        <ngx-datatable-column prop="invoice_number" name="INVOICE NO" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span style="font-weight:bold;">{{row.invoice_number}}</span>
           </ng-template>
         </ngx-datatable-column>
-        <ngx-datatable-column prop="reference_number" name="REFF NUMBER">
+        <ngx-datatable-column prop="reference_number" name="REFF NUMBER" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.reference_number != ''"> {{row.reference_number}}</span>
             <span *ngIf="row.reference_number == ''"> Nill</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="customer_name" name="CUSTOMER NAME">
+        <ngx-datatable-column prop="customer_name" name="CUSTOMER NAME" [flexGrow]="2">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span style="font-weight:bold;">{{row.customer_name}}</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="description" name="DESCRIPTION">
+        <ngx-datatable-column prop="description" name="DESCRIPTION" [flexGrow]="2">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.description}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="invoice_due_date" name="DUE DATE">
+        <ngx-datatable-column prop="invoice_due_date" name="DUE DATE" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.invoice_due_date  | date: 'dd-MM-yyyy'}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="total"  name="BILL AMOUNT">
+        <ngx-datatable-column prop="total"  name="BILL AMOUNT" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.total | indianCurrency}}
           </ng-template>
         </ngx-datatable-column>
 
 
-        <ngx-datatable-column prop=""  name="BALANCE AMOUNT">
+        <ngx-datatable-column prop=""  name="BALANCE" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.balance | indianCurrency}}
           </ng-template>
         </ngx-datatable-column>
 
 
-        <ngx-datatable-column prop=""  name="PAID AMOUNT">
+        <ngx-datatable-column prop=""  name="PAID AMOUNT" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.paid_amount | indianCurrency}}
           </ng-template>
@@ -177,8 +177,8 @@
 
 
                     <ng-select formControlName="customerId"  class=" form-control" (change)="VendorSelection($event)"
-                       [clearable]="false" [appendTo]="isDropdownAppendedToBody ? 'body' : null">
-                      <ng-option *ngFor="let Customer of vendorDetails" value="{{Customer.customer_id}}" class="form-control">
+                       [clearable]="true" [appendTo]="isDropdownAppendedToBody ? 'body' : null">
+                      <ng-option *ngFor="let Customer of vendorDetails" [value]="Customer.customer_id" class="form-control">
                         {{Customer.company_name}}
                       </ng-option>
                     </ng-select>
@@ -238,14 +238,20 @@
 
                   <div class="row mb-3">
                     <label style="color: #e54643" class="col-sm-2 col-form-label col-form-label-sm">Invoice No*</label>
-                    <div class="col-sm-4">
-                      <input type="text" formControlName="invoiceNo" [(ngModel)]="inv_no"
-                        class="form-control form-control-sm" />
 
-                      <span class="help-block text-danger"
-                        *ngIf="invoice.get('invoiceNo').touched && invoice.get('invoiceNo').hasError('required')">Enter
+
+                      <div class="col-sm-2">
+                          <input type="text" readonly formControlName="prefix" [(ngModel)]="prefix_data" class="form-control form-control-sm" />
+                      </div>
+
+                      <div class="col-sm-1">
+                          <input type="text" formControlName="invoiceNo" [(ngModel)]="inv_no"
+                            class="form-control form-control-sm" />
+                        </div>
+
+                      <span class="help-block text-danger" *ngIf="invoice.get('invoiceNo').touched && invoice.get('invoiceNo').hasError('required')">Enter
                         Bill Number !</span>
-                    </div>
+
                   </div>
 
                   <div class="row mb-3">
@@ -300,12 +306,13 @@
                     <label *ngIf="type == 'project'" class="col-sm-2 col-form-label col-form-label-sm">Project <span style="font-size: smaller;color: rgb(39, 39, 143);"> ( for dc list ) </span></label>
                           <div class="col-sm-4" *ngIf="type == 'project'">
 
-                                          <ng-select   class=" form-control custom-select"
-                                                    (change)="Project_DctoInvoice($event)" [clearable]="false">
-                                                 <ng-option *ngFor="let item of ItemList"  [value]="item.project_id" class="form-control">
-                                                    {{item.name}}
-                                                  </ng-option>
+                                          <ng-select   class=" form-control custom-select"  formControlName="project_list"
+                                             (change)="Project_DctoInvoice($event)" [clearable]="true">
+                                                    <ng-option *ngFor="let item of ItemList"  [value]="item.project_id" class="form-control">
+                                                        {{item.name}}
+                                                      </ng-option>
                                               </ng-select>
+
 
                           </div>
 

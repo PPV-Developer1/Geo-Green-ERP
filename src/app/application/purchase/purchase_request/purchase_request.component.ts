@@ -162,9 +162,13 @@ export class Purchase_requestComponent implements OnInit {
         total      : [0],
         product    : this.fb.array([]),
         tax_type   :[null],
-        tds_percentage :[0],
-        tcs_percentage :[0],
-        size : [null],
+        tds_percentage    :[0],
+        tcs_percentage    :[0],
+        size              :[null],
+        prefix            :[null],
+        deliverytype      :[null, Validators.compose([Validators.required])],
+        freight           :[null, Validators.compose([Validators.required])],
+        delivery_schedule :[null, Validators.compose([Validators.required])],
       })
   }
 
@@ -363,7 +367,7 @@ resetTableHeight() {
       formArray.removeAt(i);
     }
   }
-
+po_prefix : any
   async VendorSelection(id)
   {
     this.isDropdownAppendedToBody = false;
@@ -382,8 +386,8 @@ resetTableHeight() {
 
       let MyPaymentTerm    = data[0].my_payment_terms;
       let po_id            = data[0].serial_no + 1;
-      var po_prifix        = data[0].prefix ;
-      this.po_no           = po_prifix + po_id;
+      this.po_prefix        = data[0].prefix ;
+      this.po_no           =  po_id;
       this.taxempty        = data[0].tax_mode;
 
 
@@ -746,7 +750,7 @@ resetTableHeight() {
     });
     if (this.po.valid)
     {
-      const billNoValue = this.po_no;
+      const billNoValue = this.po_prefix + this.po_no;
       function normalizeString(str : any) {
         return str.replace(/\s+/g, '').toLowerCase();
       }
@@ -765,6 +769,7 @@ resetTableHeight() {
             this.loading = true;
             await this.api.post('mp_po_create.php?type=pr&authToken=' + environment.authToken, bill_data).then((data: any) =>
             {
+              console.log(data)
               if (data.status == "success")
               {
                 this.toastrService.success('PO Added Succesfully');

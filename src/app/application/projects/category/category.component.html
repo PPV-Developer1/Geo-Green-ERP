@@ -63,6 +63,12 @@
       </ng-template>
     </ngx-datatable-column>
 
+    <ngx-datatable-column prop="prefix" [width]="50" alig name="PREFIX">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.prifix_name}}
+        </ng-template>
+    </ngx-datatable-column>
+
     <ngx-datatable-column prop="status" [width]="50" alig name="STATUS">
         <ng-template ngx-datatable-cell-template let-row="row">
           <span *ngIf="row.status == 1" style="color: green;"><strong>Active</strong></span>
@@ -97,6 +103,20 @@
           <option value = 1>Association</option>
           <option value = 2>Byproduct</option>
         </select>
+      </div>
+
+      <div class="form-group col-md-4">
+        Prefix
+      </div>
+      <div class="form-group col-md-8">
+          <ng-select formControlName="prefix"  class=" form-control custom-select"   [clearable]="false" >
+          <ng-option *ngFor="let item of prefix_list" [value]="item.id" class="form-control">
+            {{item.prefix}}
+          </ng-option>
+        </ng-select>
+
+         <span class="help-block text-danger" *ngIf="CategoryForm.get('prefix').touched && CategoryForm.get('prefix').hasError('required')"> Required !</span>
+
       </div>
 
       <div class="form-group col-md-4">
@@ -154,6 +174,20 @@
           <option value = 1>Association</option>
           <option value = 2>Byproduct</option>
         </select>
+      </div>
+
+     <div class="form-group col-md-4">
+        Prefix
+      </div>
+      <div class="form-group col-md-8">
+          <ng-select formControlName="prefix"  class=" form-control custom-select"   [clearable]="false" >
+          <ng-option *ngFor="let item of prefix_list" [value]="item.id" class="form-control">
+            {{item.prefix}}
+          </ng-option>
+        </ng-select>
+
+         <span class="help-block text-danger" *ngIf="CategoryForm.get('prefix').touched && CategoryForm.get('prefix').hasError('required')"> Required !</span>
+
       </div>
 
       <div class="form-group col-md-4">

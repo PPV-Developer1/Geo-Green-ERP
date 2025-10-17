@@ -263,7 +263,8 @@ export class BillviewComponent implements OnInit {
           amount      : [0],
           tran_date   : [this.todaysDate],
           reference   : [null, Validators.compose([Validators.required])],
-          description : [null, Validators.compose([Validators.required])]
+          description : [null, Validators.compose([Validators.required])],
+          prefix      : [null]
         } )
       }
 
@@ -410,9 +411,11 @@ serial_no_list:any
   loadonce()
   {
     this.api.get('mp_vendor_bill_pdf.php?value=' + this.view_bill + '&authToken=' + environment.authToken).then((data: any) => {
-
+       console.log(data)
       this.bill_id = data[0].bill_id
       this.billPdf = data;
+      this.Edit_status  = data[0].edit_status
+        console.log("Edit_status ", this.Edit_status)
       this.serial_no_list = data[0].serial_no_list
       console.log("serial ", this.serial_no_list)
       this.billItems = this.billPdf[0].billItems;
@@ -498,6 +501,7 @@ serial_no_list:any
 
   // }
 
+  Edit_status : any
   selectEdit_data()
   {
       var serial_no =  this.bill_list['serial_no'];
@@ -506,6 +510,8 @@ serial_no_list:any
 
       this.billPdf     = data;
       this.billItems   = this.billPdf[0].billItems;
+      this.Edit_status  = this.billPdf[0].edit_status
+      console.log(this.Edit_status)
       this.serial_no_list = data[0].serial_no_list
       this.taxempty    = data[0].tax_mode;
       this.company_pdf_logo = this.billPdf[0].company_details[0].logo;
@@ -1749,6 +1755,32 @@ feedData(data)
       });
     if (this.bill_payment.valid)
     {
+         const billNoValue = this.prefix+this.receipt_serial_no;
+        console.log(billNoValue)
+          function normalizeString(str : any) {
+              return str.replace(/\s+/g, '').toLowerCase();
+            }
+            let checking :any
+            await this.api.get('get_data.php?table=payment_made&authToken=' + environment.authToken).then((data: any) =>
+
+              {
+                console.log(data)
+                if(data != null)
+                  {
+                     checking = data.some((item: { receipt_no: any; }) =>  normalizeString(item.receipt_no) ===  normalizeString(billNoValue) );
+                  }
+              }).catch(error =>
+              {
+                  this.toastrService.error('API Faild : Invoice number checking failed');
+                  this.loading = false;
+              });
+
+              if(checking)
+               {
+                  this.toastrService.error('receipt Number already exist');
+                  return
+               }
+               console.log("data")
        if(last_total >= data.amount && last_total >0)
        {
           this.loading=true;
@@ -1903,6 +1935,12 @@ async onSubmit(bill_data)
 
  async remove()
   {
+
+    if(this.Edit_status >0)
+    {
+       this.toastrService.error('Bill was not able to Delete');
+       return
+    }
   await  this.api.get('get_data.php?table=payment_made&find=bill_id&value='+this.bill_id+'&authToken=' + environment.authToken).then((data: any) => {
 
    this.if_delete = false;

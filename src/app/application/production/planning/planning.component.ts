@@ -22,6 +22,7 @@ export class PlanningComponent implements OnInit {
   @ViewChild(DatatableComponent) table: DatatableComponent;
   @ViewChild("add_product",{static:true}) add_product:ElementRef;
   @ViewChild("move_to_production",{static:true}) move_to_production:ElementRef;
+  @ViewChild("delete",{static:true}) delete:ElementRef;
 
   selected        = [];
   product_details = [];
@@ -30,6 +31,7 @@ export class PlanningComponent implements OnInit {
   employee_list   = [];
   detail_view     : any;
   openModel       : any;
+  Product_no      : any;
   loading:boolean = false;
 
   CategoryForm = new FormGroup
@@ -39,7 +41,9 @@ export class PlanningComponent implements OnInit {
     category_id     : new FormControl(null, [Validators.required]),
     notes           : new FormControl(null, [Validators.required, Validators.minLength(3)]),
     'level'         : new FormControl(1),
-    'status'        : new FormControl(1)
+    'status'        : new FormControl(1),
+    product_no      : new FormControl(null, [Validators.required]),
+
   })
   AssignTo = new FormGroup
   ({
@@ -48,7 +52,7 @@ export class PlanningComponent implements OnInit {
     end_date_time   : new FormControl(null,[Validators.required]),
     notes           : new FormControl(null, [Validators.required, Validators.minLength(3)]),
     batch           : new FormControl(null),
-    'level'         : new FormControl(2)
+    'level'         : new FormControl(2),
   })
 
   constructor(private modalService: NgbModal,public api: ApiService, public toastrService: ToastrService)
@@ -60,9 +64,30 @@ export class PlanningComponent implements OnInit {
   {
     this.getProductList();
   }
-  openSm(content)
+
+ async openSm(content)
   {
+
     this.openModel = this.modalService.open(content, { size: 'md'});
+  }
+
+  Prefix      : any
+  Serial_no   : any
+  Product_id  : any
+
+ async Batch(event)
+  {
+    console.log(event)
+      await this.api.get('production_batch_number.php?Product_id='+event+'&authToken='+environment.authToken).then((data: any) =>
+      {
+        console.log(data)
+        this.Prefix     = data[0]['prefix'];
+        this.Serial_no  = data[0]['serial_no'];
+        this.Product_no = this.Prefix  + this.Serial_no ;
+        this.Product_id = data[0]['product_prefix_id'];
+
+      }).catch(error => {this.toastrService.error('Something went wrong');});
+    // this.Product_no = formattedDate
   }
   async MoveToSubmit(FormData)
   {
@@ -103,14 +128,16 @@ export class PlanningComponent implements OnInit {
   }
   async getProductList()
   {
-    await this.api.get('mp_production_view.php?authToken='+environment.authToken).then((data: any) =>
+    await this.api.get('mp_production_view.php?mode=planning&authToken='+environment.authToken).then((data: any) =>
     {
-      function levelFilter(value) { return (value.level === 1); }
-      let get_data          = data.filter(levelFilter)
-      this.product_details  = get_data;
-      this.filter_data      = [...get_data];
+      this.product_details  = data;
+      console.log(data)
+      if(data != null)
+      this.filter_data      = [...data];
+
     }).catch(error => {this.toastrService.error('Something went wrong');});
   }
+
   async onActivate(event)
   {
     if(event.type === "click")
@@ -126,35 +153,67 @@ export class PlanningComponent implements OnInit {
         const control = this.CategoryForm.get(field);
         control.markAsTouched({ onlySelf: true });
       });
-    if(this.CategoryForm.valid)
-    {
-      this.loading=true;
-      this.api.post('post_insert_data.php?table=production_material&authToken='+environment.authToken,FormData).then((data: any) =>
-      {
-        if(data.status == "success")
-        {
-          this.loading=false;
-          this.toastrService.success('Byproduct Added Succesfully');
-          this.CategoryForm.controls['notes'].reset();
-          this.getProductList();
-          this.getProductList();
-          this.openModel.dismiss();
-          this.selected = [];
-        }
-        else { this.toastrService.error('Something went wrong');
-        this.loading = false; }
-        return true;
-      }).catch(error =>
-      {
-          this.toastrService.error('Something went wrong');
-          this.loading = false;
-      });
-      }
+
+       let checking :any
+         function normalizeString(str : any) {
+              return str.replace(/\s+/g, '').toLowerCase();
+            }
+              console.log(normalizeString(this.Product_no))
+                  await this.api.get('get_data.php?table=production_material&find=by_product_no&value='+normalizeString(this.Product_no)+'&authToken=' + environment.authToken).then((data: any) =>
+
+                    {
+                      // if(data != null)
+                      //   {
+                      //      checking = data.some((item: { invoice_number: any; }) =>  normalizeString(item.invoice_number) ===  normalizeString(this.Product_no) );
+                      //   }
+                    }).catch(error =>
+                      {
+                          this.toastrService.error('API Faild : Product number checking failed');
+                          this.loading = false;
+                      });
+               if(checking)
+               {
+                  this.toastrService.error('Product Number already exist');
+                  return
+               }
+
+              if(this.CategoryForm.valid)
+              {
+                this.loading=true;
+
+                this.api.post('post_insert_data.php?table=production_material&authToken='+environment.authToken,FormData).then((data: any) =>
+                {
+                  if(data.status == "success")
+                  {
+                    this.loading=false;
+                    this.toastrService.success('Byproduct Added Succesfully');
+                    this.CategoryForm.controls['product_no'].reset();
+                    this.CategoryForm.controls['category_id'].reset();
+                    this.CategoryForm.controls['notes'].reset();
+                      this.api.get('single_field_update.php?table=production_prefix&field=id&value='+this.Product_id+'&up_field=last_serial_no&update='+this.Serial_no+'&authToken='+environment.authToken)
+                        .then((data:any) =>
+                        { console.log(data) });
+                    this.getProductList();
+                    this.getProductList();
+                    this.openModel.dismiss();
+                    this.selected = [];
+                  }
+                  else { this.toastrService.error('Something went wrong');
+                  this.loading = false; }
+                  return true;
+                }).catch(error =>
+                {
+                    this.toastrService.error('Something went wrong');
+                    this.loading = false;
+                });
+              }
   }
+
   set_zero(content)
   {
     this.selected = [];
   }
+
   addNew()
   {
     this.api.get('get_data.php?table=project_level_category&authToken='+environment.authToken).then((data: any) =>
@@ -175,7 +234,7 @@ export class PlanningComponent implements OnInit {
     this.product_details = temp;
     this.table.offset = 0;
   }
-  
+
   move_to_process(value)
   {
     this.api.get('mp_get_employee_type.php?table=employee&find=status&value=1&authToken='+environment.authToken).then((data: any) =>
@@ -200,14 +259,20 @@ export class PlanningComponent implements OnInit {
     this.openSm(this.move_to_production);
   }
 
-  delete_production(id)
+  delete_production()
   {
-    this.api.get('delete_data.php?authToken='+environment.authToken+'&table=production_material&field=id&id='+id).then((data: any) =>
+    this.openModel = this.modalService.open(this.delete,{size:"sm"})
+  }
+
+  ReqDelete()
+  {
+    this.api.get('delete_data.php?authToken='+environment.authToken+'&table=production_material&field=id&id='+this.detail_view.id).then((data: any) =>
         {
           this.getProductList();
           this.getProductList();
           this.selected = [];
           this.toastrService.success('Production Deleted Successfull');
+          this.openModel.close()
           return true;
         }).catch(error =>
         {

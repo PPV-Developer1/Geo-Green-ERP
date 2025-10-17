@@ -30,6 +30,7 @@ export class AttendanceComponent implements OnInit
   edit_att_value         : any;
   edit_att_value_id      : any;
   employee_list          : any;
+  Admin_employee_list    : any;
   days                   : any;
   com_off_data           : any;
   length                 : any;
@@ -147,6 +148,8 @@ export class AttendanceComponent implements OnInit
     this.api.get('get_data.php?table=employee&authToken='+environment.authToken).then((data: any) =>
     {
       this.employee_list = data;
+      this.Admin_employee_list = this.employee_list.filter(d => d.emp_type == 2)
+      console.log(this.Admin_employee_list)
     }).catch(error => {this.toastrService.error('Something went wrong');
     this.loading=false;});
     this.emp_type();
@@ -347,6 +350,13 @@ export class AttendanceComponent implements OnInit
             }
           }
             console.log(valid)
+
+        const confirmed = confirm("Do you want to proceed with the update?");
+       console.log(confirmed)
+      if (!confirmed) {
+          //  this.modaleditatt.close();
+        return;
+      }
       this.loading    =true;
       await this.api.post('post_update_data.php?table=attendance&field=id&value='+this.edit_att_value_id+'&authToken='+environment.authToken,data).then((data_rt: any) =>
       {
@@ -940,7 +950,11 @@ export class AttendanceComponent implements OnInit
   if(this.days != ''  && this.checkedList.length != 0)
   {
   this.length = 0;
-
+    const confirmed = confirm("Are you sure you want to add a compensatory off to this employee?");
+       console.log(confirmed)
+      if (!confirmed) {
+        return;
+      }
   // Use Promise.all to handle multiple asynchronous calls
   const promises = this.checkedList.map(async empId =>
   await  this.api.post(`mp_employee_com_off_update.php?table=employee&field=emp_id&value=${empId}&up_field=com_off&update=${this.days}&authToken=${environment.authToken}`, null));

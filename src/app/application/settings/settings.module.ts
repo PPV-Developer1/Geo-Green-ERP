@@ -6,6 +6,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { INRModule } from 'src/app/pipe/INR/INR.module';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { DirectivesModule } from 'src/app/theme/directives/directives.module';
 
 type PathMatch = "full" | "prefix" | undefined;
 export const routes = [
@@ -20,7 +21,8 @@ export const routes = [
     ReactiveFormsModule,
     NgxDatatableModule,
     INRModule,
-    NgSelectModule
+    NgSelectModule,
+    DirectivesModule
   ],
   declarations: [SettingsComponent]
 })

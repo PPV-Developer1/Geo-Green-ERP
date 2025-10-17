@@ -8,6 +8,7 @@ import { DirectivesModule } from '../../../theme/directives/directives.module';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { INRModule } from 'src/app/pipe/INR/INR.module';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 type PathMatch = "full" | "prefix" | undefined;
 
@@ -26,7 +27,8 @@ export const routes = [
     NgbModule,
     INRModule,
     NgMultiSelectDropDownModule,
-    RouterModule.forChild(routes)
+    RouterModule.forChild(routes),
+    NgSelectModule
   ],
   declarations: [CategoryComponent]
 })
