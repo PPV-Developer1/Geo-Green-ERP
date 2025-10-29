@@ -31,7 +31,7 @@
       class="custom_table"
       [headerHeight]="50"
       [limit]="15"
-      [columnMode]="'force'"
+      [columnMode]="'flex'"
       [footerHeight]="50"
       [rowHeight]="'auto'"
       [rows]="asso_view"
@@ -39,43 +39,43 @@
       [selectionType]="'single'"
       (activate)="onActivate($event)">
 
-      <ngx-datatable-column prop="id" name="ID" [width]="50">
+      <ngx-datatable-column     [resizeable]="false" prop="id" name="ID" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
               {{row.id}}
           </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="created_by" name="CREATED BY" [width]="100">
+      <ngx-datatable-column     [resizeable]="false" prop="created_by" name="CREATED BY" [flexGrow]="1">
         <ng-template ngx-datatable-cell-template let-row="row">
             {{row.created_by}}
         </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="project_id" name="PROJECT ID" [width]="70">
+      <ngx-datatable-column     [resizeable]="false" prop="project_id" name="PROJECT ID" [flexGrow]="1">
         <ng-template ngx-datatable-cell-template let-row="row">
             {{row.project_id}}
         </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="project_name" name="PROJECT NAME" [width]="200">
+      <ngx-datatable-column     [resizeable]="false" prop="project_name" name="PROJECT NAME" [flexGrow]="2">
         <ng-template ngx-datatable-cell-template let-row="row">
           <span style="font-weight:bold;">{{row.project_name}}</span>
         </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="category_name" name="PRODUCT CATEGORY" [width]="125">
+      <ngx-datatable-column     [resizeable]="false" prop="category_name" name="PRODUCT CATEGORY" [flexGrow]="2">
         <ng-template ngx-datatable-cell-template let-row="row">
           <span style="font-weight:bold;"> {{row.category_name}}</span>
         </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="description" name="DESCRIPTION" [width]="180">
+      <ngx-datatable-column     [resizeable]="false" prop="description" name="DESCRIPTION" [flexGrow]="2">
         <ng-template ngx-datatable-cell-template let-row="row">
             {{row.description}}
         </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column   name="STATUS" [width]="50">
+      <ngx-datatable-column     [resizeable]="false"   name="STATUS" [flexGrow]="1">
         <ng-template ngx-datatable-cell-template let-row="row">
           <span *ngIf="row.connection === null && row.has_sub_item == 0" style="color: blue;">Created</span>
           <span *ngIf="row.connection != null && row.has_sub_item == 0" style="color: green;">Completed</span>
@@ -220,51 +220,51 @@
         class="custom_table"
         [headerHeight]="50"
         [limit]="10"
-        [columnMode]="'force'"
+        [columnMode]="'flex'"
         [footerHeight]="50"
         [rowHeight]="'auto'"
         [rows]="byproduct_details"
         [selected]="selected"
         [selectionType]="'single'">
 
-        <!-- <ngx-datatable-column name="ID" [width]="50">
+        <!-- <ngx-datatable-column     [resizeable]="false" name="ID" [width]="50">
             <ng-template ngx-datatable-cell-template let-row="row">
                 {{row.id}}
             </ng-template>
         </ngx-datatable-column> -->
 
-        <ngx-datatable-column prop="date_time" name="CREATED AT" [width]="100">
+        <ngx-datatable-column     [resizeable]="false" prop="date_time" name="CREATED AT" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
               {{row.date_time  | date: 'dd-MM-yyyy'}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="creater_name" name="CREATED BY" [width]="100">
+        <ngx-datatable-column     [resizeable]="false" prop="creater_name" name="CREATED BY" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
               {{row.creater_name}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="category_name" name="ITEM CATEGORY" [width]="100">
+        <ngx-datatable-column     [resizeable]="false" prop="category_name" name="ITEM CATEGORY" [flexGrow]="2">
           <ng-template ngx-datatable-cell-template let-row="row">
               {{row.category_name}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="description" name="DESCRIPTION" [width]="150">
+        <ngx-datatable-column     [resizeable]="false" prop="description" name="DESCRIPTION" [flexGrow]="2">
           <ng-template ngx-datatable-cell-template let-row="row">
               {{row.description}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="production_id" name="PRODUCTION ID" [width]="80">
+        <ngx-datatable-column     [resizeable]="false" prop="production_id" name="PRODUCTION ID" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
              <span *ngIf="row.production_id != null">{{row.production_id}}</span>
              <span *ngIf="row.production_id === null">Not Asign</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="status" name="STATUS" [width]="80">
+        <ngx-datatable-column     [resizeable]="false" prop="status" name="STATUS" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.level == 0" style="color: red;">Created</span>
             <span *ngIf="row.level == 1" style="color: red;">Moving to Plan</span>
@@ -274,7 +274,7 @@
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column  name="ACTION" [width]="100">
+        <ngx-datatable-column     [resizeable]="false"  name="ACTION" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
               <button class="btn btn-info btn-sm fa fa-pencil" (click) = "call_edit_level1(row)"> Edit</button>
               &nbsp;

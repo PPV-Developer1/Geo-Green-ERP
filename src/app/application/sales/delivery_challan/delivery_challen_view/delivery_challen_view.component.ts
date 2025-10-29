@@ -149,6 +149,8 @@ export class Delivery_challen_viewComponent implements OnInit {
   Dispatch_total           : any
   Dispatch_percentage      : any
   Difference_amount        : any
+  dc_type                  : any
+  return_status            : any
   imageToShow              : string | ArrayBuffer;
   today                     = new Date();
   todaysDate                = '';
@@ -203,9 +205,10 @@ export class Delivery_challen_viewComponent implements OnInit {
     })
 
     this.e_way_bill = fb.group({
-      bill_no :[null,Validators.compose([Validators.required])],
-      vehicle_no:[null,Validators.compose([Validators.required])],
-      shipment_mode:[null,Validators.compose([Validators.required])],
+      bill_no       :[null,Validators.compose([Validators.required])],
+      vehicle_no    :[null,Validators.compose([Validators.required])],
+      shipment_mode :[null,Validators.compose([Validators.required])],
+      amount        :[null,Validators.compose([Validators.required])],
     })
   }
   @ViewChild(DatatableComponent) table: DatatableComponent;
@@ -329,8 +332,10 @@ export class Delivery_challen_viewComponent implements OnInit {
   {
     await this.api.get('mp_customer_dc_pdf.php?value=' + this.view_dc + '&authToken=' + environment.authToken).then(async (data: any) => {
 
-
+      console.log("dc view data ",data)
       this.invoicePdf = data;
+      this.dc_type = data[0].dc_type;
+      this.return_status = data[0].return_dc_status;
       this.status = data[0].status;
       this.dc_id = data[0].dc_id;
       this.company_pdf_logo = this.invoicePdf[0].company_details[0].logo;
@@ -441,10 +446,13 @@ export class Delivery_challen_viewComponent implements OnInit {
 
          this.api.get('mp_customer_dc_pdf.php?value=' + serial_no + '&authToken=' + environment.authToken).then((data: any) => {
           this.invoicePdf   = data;
-          this.invoiceItems = this.invoicePdf[0].invoiceItems;
-          this.taxempty     = data[0].tax_mode;
-          this.stateCode    = data[0].place_from_supply_code;
-          this.status       = data[0].status;
+          console.log("dc view data ",data)
+          this.dc_type        = data[0].dc_type;
+          this.return_status  = data[0].return_dc_status;
+          this.invoiceItems   = this.invoicePdf[0].invoiceItems;
+          this.taxempty       = data[0].tax_mode;
+          this.stateCode      = data[0].place_from_supply_code;
+          this.status         = data[0].status;
           this.company_pdf_logo = this.invoicePdf[0].company_details[0].logo;
 
           this.company_pdf_logo = environment.baseURL + "download_file.php?path=upload/company/" +  this.company_pdf_logo + "&authToken=" + environment.authToken
@@ -470,6 +478,38 @@ editbill()
   this.LoadItemDetails();
 }
 
+  return()
+  {
+    const confirmed = confirm("Are you sure you want to updaten the return status?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
+
+          this.api.get('single_field_update.php?table=dc&field=dc_id&value='+this.dc_id+'&up_field=return_dc_status&update=2&authToken='+environment.authToken).then((data: any) =>
+                    {
+                      if(data.status == "success")
+                      {
+                        this.loading = false;
+
+                        this.toastrService.success('DC Return Approved Succesfully');
+                        // this.view_dc = data.id;
+                        this.loading = false;
+                        this.Return();
+                        this.show_dc_edit = false;
+                        this.show = true;
+                        this.loadonce()
+                        this.clone_dc_show = false;
+
+                      }
+                      else { this.toastrService.error('Something went wrong : confirm');
+                      this.loading = false; }
+                    }).catch(error =>
+                    {
+                    this.toastrService.error('API Faild : confirm');
+                    this.loading = false;
+                    });
+  }
 async LoadItemDetails()
 {
   await this.api.get('get_data.php?table=item&authToken=' + environment.authToken).then((data: any) =>
@@ -1689,6 +1729,7 @@ async onSubmit(bill_data)
       this.e_way_bill.controls['bill_no'].setValue(data[0].e_way_bill);
       this.e_way_bill.controls['vehicle_no'].setValue(data[0].vehicle_number);
       this.e_way_bill.controls['shipment_mode'].setValue(data[0].transport_mode);
+      this.e_way_bill.controls['amount'].setValue(data[0].transport_charge);
    }).catch(error => { this.toastrService.error('Something went wrong 1'); });
   }
 

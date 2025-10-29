@@ -6,6 +6,7 @@ import { ApiService } from "../../../service/api.service";
 import { environment } from "../../../../environments/environment";
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppState } from 'src/app/app.state';
 
 
 
@@ -159,7 +160,8 @@ export class BillsComponent implements OnInit {
     public  toastrService : ToastrService,
     private api           : ApiService,
     private modalService  : NgbModal,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private _state       : AppState
   )
   {
     this.SelectCategory = fb.group({
@@ -171,7 +173,7 @@ export class BillsComponent implements OnInit {
     this.bill = fb.group(
       {
         created_by: [this.uid],
-        vendorId: ['', Validators.compose([Validators.required])],
+        vendorId: [null, Validators.compose([Validators.required])],
         billFrom: [null],
         shipFrom: [null],
         billNo  : [null, Validators.compose([Validators.required])],
@@ -200,12 +202,12 @@ export class BillsComponent implements OnInit {
 
   }
 
-  ngOnInit()
+ async ngOnInit()
   {
-    this.LoadVendorDetails();
-    this.LoadVendorBills();
-    this.initProduct();
-    this.LoadItemDetails();
+   await this.LoadVendorDetails();
+   await this.LoadVendorBills();
+   await this.initProduct();
+   await this.LoadItemDetails();
 
   }
 
@@ -329,6 +331,7 @@ export class BillsComponent implements OnInit {
   {
     await this.api.get('get_data.php?table=item&find=purchase&value=1&authToken=' + environment.authToken).then((data: any) =>
     {
+      console.log(data)
       this.ItemList = data;
     }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
   }
@@ -401,6 +404,31 @@ export class BillsComponent implements OnInit {
     formArray.removeAt(i);
     }
 
+        this.bill_list            = null;
+        // this.ItemList           = null;
+        this.bill_addr          = null;
+        this.billFrom           = null;
+        this.billAttention      = null;
+        this.billAddress_line_1 = null;
+        this.billAddress_line_2 = null;
+        this.billCity           = null;
+        this.billState          = null;
+        this.billZipcode        = null;
+        this.bill.controls['billFrom'].setValue(null);
+
+        this.shipp_addr         = null;
+        this.shipFrom           = null;
+        this.shipAttention      = null;
+        this.shipAddress_line_1 = null;
+        this.shipAddress_line_2 = null;
+        this.shipCity           = null;
+        this.shipState          = null;
+        this.shipZipcode        = null;
+        this.bill.controls['shipFrom'].setValue(null);
+        this.company_name       = null;
+
+if(id)
+{
     await this.api.get('mp_bill.php?&value=' + this.vendor_id + '&authToken=' + environment.authToken).then((data: any) =>
     {
       this.FetchAddress(data[0]);
@@ -424,17 +452,21 @@ export class BillsComponent implements OnInit {
           this.bill.controls['paymentTerms'].setValue(MyPaymentTerm)
           this.dueDates(MyPaymentTerm, date);
         }
-      if(this.stateCode == 33)
-      {
-        this.LoadGST('GST');
-        this.bill.controls['tax_type'].setValue('GST');
-      }
-      else
-      {
-        this.LoadGST('IGST');
-        this.bill.controls['tax_type'].setValue('IGST');
-      }
-    }).catch(error => { this.toastrService.error('Something went wrong'); });
+        if(this.stateCode == 33)
+        {
+          this.LoadGST('GST');
+          this.bill.controls['tax_type'].setValue('GST');
+        }
+        else
+        {
+          this.LoadGST('IGST');
+          this.bill.controls['tax_type'].setValue('IGST');
+        }
+      }).catch(error => { this.toastrService.error('Something went wrong'); });
+    }
+    else{
+      this.GSTCalculation()
+    }
   }
   async LoadGST(mode)
   {
@@ -805,6 +837,7 @@ export class BillsComponent implements OnInit {
     this.VendorBillList = temp;
     this.table.offset = 0;
   }
+
   onFocus($event: Event) {
     this.events.push({ name: '(focus)', value: $event });
   }
@@ -843,6 +876,7 @@ export class BillsComponent implements OnInit {
     this.show_new_bill = false;
     this.selected      = [];
     this.LoadVendorBills();
+    this._state.notifyDataChanged('menu.isCollapsed', false);
   }
 
   onInputChange()

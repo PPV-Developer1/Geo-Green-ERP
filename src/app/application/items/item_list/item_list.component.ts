@@ -5,7 +5,7 @@ import { environment } from 'src/environments/environment.prod';
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
-
+import * as XLSX from "xlsx";
 
 @Component({
   selector   : 'az-item_list',
@@ -253,5 +253,56 @@ export class Item_listComponent implements OnInit
 
   }
 
+  download()
+  {
+      const confirmed = confirm("Are you sure you want to download?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
 
+    let today = new Date();
+    let year  = today.getFullYear();
+    let month = String(today.getMonth() + 1).padStart(2, '0');
+    let day   = String(today.getDate()).padStart(2, '0');
+
+    let formattedDate = `${year}-${month}-${day}`;
+
+  const exportData = this.item_list.map(item => ({
+    Item_id     : item.item_id,
+    Item_name   : item.item_name,
+    Category    : item.item_cat,
+    Description : item.description,
+    Hsnsac      : item.hsnsac,
+    Uom         : item.uom,
+    Purchase    : item.purchase==1?"Active":"InActive",
+    Sales       : item.sales==1?"Active":"InActive",
+    Price       : item.price,
+    Tax_percent : item.tax_percent,
+    Have_serial : item.have_seriel_number==1?"Yes":"No",
+    Job_material: item.jobworkmaterial==1?"Yes":"No",
+    Status      : item.status==1?"Active":"InActive"
+  }));
+    console.log(exportData);
+       this.exportToExcel(exportData, 'Item List_'+formattedDate+'.xlsx');
+  }
+
+  exportToExcel(data: any[], filename: string)
+    {
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb: XLSX.WorkBook = XLSX.utils.book_new();
+
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+      const excelBlob = new Blob([XLSX.write(wb, { bookType: 'xlsx', type: 'array' })],
+                        {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+      const url = URL.createObjectURL(excelBlob);
+
+      const downloadLink    = document.createElement('a');
+      downloadLink.href     = url;
+      downloadLink.download = filename;
+      downloadLink.click();
+
+      URL.revokeObjectURL(url);
+    }
 }

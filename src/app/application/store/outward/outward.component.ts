@@ -335,6 +335,11 @@ export class OutwardComponent implements OnInit
 
   update(value)
   {
+         const confirmed = confirm("Are you sure you want to delete this item?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
           let id = this.InOnActive.id
           this.loading=true;
           this.api.post('mp_outward_item.php?id='+id+'&authToken='+environment.authToken,value).then((data: any) =>

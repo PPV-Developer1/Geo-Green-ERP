@@ -32,7 +32,7 @@
           class="custom_table"
           [headerHeight]="50"
           [limit]="10"
-          [columnMode]="'force'"
+          [columnMode]="'flex'"
           [footerHeight]="50"
           [rowHeight]="'auto'"
           [rows]="projects"
@@ -40,43 +40,43 @@
           [selectionType]="'single'"
           (activate)="onActivate($event)">
 
-          <ngx-datatable-column prop="type"  name="TYPE">
+          <ngx-datatable-column     [resizeable]="false" prop="type" [flexGrow]="2" name="TYPE">
               <ng-template ngx-datatable-cell-template let-row="row">
                   {{row.type}}
               </ng-template>
           </ngx-datatable-column>
 
-          <ngx-datatable-column prop="name"  name="NAME">
+          <ngx-datatable-column     [resizeable]="false" prop="name" [flexGrow]="2"  name="NAME">
               <ng-template ngx-datatable-cell-template let-row="row">
                   <span style="font-weight:bold;">{{row.name}}</span>
               </ng-template>
           </ngx-datatable-column>
 
-          <ngx-datatable-column  prop="capacity" alig name="CAPACITY">
+          <ngx-datatable-column     [resizeable]="false"  prop="capacity" [flexGrow]="1" alig name="CAPACITY">
               <ng-template ngx-datatable-cell-template let-row="row">
               {{row.capacity}}
               </ng-template>
           </ngx-datatable-column>
 
-          <ngx-datatable-column prop="customer" name="CUSTOMER">
+          <ngx-datatable-column     [resizeable]="false" prop="customer" [flexGrow]="2" name="CUSTOMER">
             <ng-template ngx-datatable-cell-template let-row="row">
               {{row.customer}}
             </ng-template>
           </ngx-datatable-column>
 
-          <ngx-datatable-column prop="start"  [sortable] = "false" name="START">
+          <ngx-datatable-column     [resizeable]="false" prop="start" [flexGrow]="1" [sortable] = "false" name="START">
             <ng-template ngx-datatable-cell-template let-row="row">
               {{row.start |date:'dd-MM-YYYY'}}
             </ng-template>
           </ngx-datatable-column>
 
-          <ngx-datatable-column prop="end" [sortable] = "false" name="END">
+          <ngx-datatable-column     [resizeable]="false" prop="end" [flexGrow]="1" [sortable] = "false" name="END">
             <ng-template ngx-datatable-cell-template let-row="row">
               {{row.end|date:'dd-MM-YYYY'}}
             </ng-template>
           </ngx-datatable-column>
 
-          <ngx-datatable-column prop="level"  name="STATUS" >
+          <ngx-datatable-column     [resizeable]="false" prop="level" [flexGrow]="1"  name="STATUS" >
             <ng-template ngx-datatable-cell-template let-row="row">
               <label *ngIf="row.level == 0" style="color:red"><strong>New</strong></label>
               <label *ngIf="row.level == 1" style="color:blue"><strong>Production</strong></label>
@@ -170,7 +170,7 @@
           class="custom_table"
           [headerHeight]="50"
           [limit]="8"
-          [columnMode]="'force'"
+          [columnMode]="'flex'"
           [footerHeight]="50"
           [rowHeight]="'auto'"
           [rows]="association_list"
@@ -178,26 +178,26 @@
           [selectionType]="'single'"
           (activate)="asso_select($event)">
 
-        <ngx-datatable-column prop="association_category"  name="TYPE">
+        <ngx-datatable-column     [resizeable]="false" prop="association_category" [flexGrow]="1" name="TYPE">
             <ng-template ngx-datatable-cell-template let-row="row">
                 {{row.association_category}}
             </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="association_date_time"  name="CREATED DATE">
+        <ngx-datatable-column     [resizeable]="false" prop="association_date_time" [flexGrow]="1" name="CREATED DATE">
             <ng-template ngx-datatable-cell-template let-row="row">
                 <span style="font-weight:bold;">{{ row.association_date_time | date:'dd-MM-YYYY' }}
                 </span>
             </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column  prop="association_description" alig name="DESCRIPTION">
+        <ngx-datatable-column     [resizeable]="false"  prop="association_description" [flexGrow]="1" alig name="DESCRIPTION">
             <ng-template ngx-datatable-cell-template let-row="row">
             {{row.association_description}}
             </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column  prop="total_byproduct_cost" alig name="ASSOCIATION COST">
+        <ngx-datatable-column     [resizeable]="false"  prop="total_byproduct_cost" [flexGrow]="1" alig name="ASSOCIATION COST">
           <ng-template ngx-datatable-cell-template let-row="row">
           {{row.total_byproduct_cost| indianCurrency}}
           </ng-template>
@@ -211,7 +211,7 @@
               class="custom_table"
               [headerHeight]="50"
               [limit]="8"
-              [columnMode]="'force'"
+              [columnMode]="'flex'"
               [footerHeight]="50"
               [rowHeight]="'auto'"
               [rows]="itemWithoutAsso"
@@ -219,32 +219,32 @@
               [selectionType]="'single'"
                (activate)="item_data($event)">
 
-        <ngx-datatable-column prop="name"  name="ITEM NAME">
+        <ngx-datatable-column     [resizeable]="false" prop="name" [flexGrow]="1"  name="ITEM NAME">
             <ng-template ngx-datatable-cell-template let-row="row">
                 {{row.name }}
             </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="hsnsac" name="HSN">
+        <ngx-datatable-column     [resizeable]="false" prop="hsnsac" [flexGrow]="1" name="HSN">
             <ng-template ngx-datatable-cell-template let-row="row">
                 <span style="font-weight:bold;">{{ row.hsnsac  }}
                 </span>
             </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column  prop="value" alig name="QUANTITY">
+        <ngx-datatable-column     [resizeable]="false"  prop="value" [flexGrow]="1" alig name="QUANTITY">
             <ng-template ngx-datatable-cell-template let-row="row">
             {{row.value}} {{row.uom}}
             </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column  prop="amount" alig name="AMOUNT">
+        <ngx-datatable-column     [resizeable]="false"  prop="amount" [flexGrow]="1" alig name="AMOUNT">
           <ng-template ngx-datatable-cell-template let-row="row">
           {{row.dispatch_amount != null? (row.dispatch_amount| indianCurrency:'1.2-2') : 0 }}
           </ng-template>
       </ngx-datatable-column>
 
-        <ngx-datatable-column   name="TOTAL AMOUNT">
+        <ngx-datatable-column     [resizeable]="false" [flexGrow]="1"  name="TOTAL AMOUNT">
           <ng-template ngx-datatable-cell-template let-row="row">
           {{row.value*row.dispatch_amount | indianCurrency:'1.2-2'}}
           </ng-template>
@@ -261,7 +261,7 @@
         class="custom_table"
         [headerHeight]="50"
         [limit]="8"
-        [columnMode]="'force'"
+        [columnMode]="'flex'"
         [footerHeight]="50"
         [rowHeight]="'auto'"
         [rows]="expense_list"
@@ -269,32 +269,32 @@
         [selectionType]="'single'"
         (activate)="expense_select($event)">
 
-        <ngx-datatable-column prop="exp_account_name"  name="TYPE">
+        <ngx-datatable-column     [resizeable]="false" prop="exp_account_name" [flexGrow]="1" name="TYPE">
             <ng-template ngx-datatable-cell-template let-row="row">
                 {{row.exp_account_name }}
             </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="exp_date"  name="TRANSACTION DATE">
+        <ngx-datatable-column     [resizeable]="false" prop="exp_date" [flexGrow]="1" name="TRANSACTION DATE">
             <ng-template ngx-datatable-cell-template let-row="row">
                 <span style="font-weight:bold;">{{ row.exp_date |date:'dd-MM-YYYY' }}
                 </span>
             </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column  prop="bank_name" alig name="BANK">
+        <ngx-datatable-column     [resizeable]="false"  prop="bank_name" [flexGrow]="1" alig name="BANK">
             <ng-template ngx-datatable-cell-template let-row="row">
             {{row.bank_name}}
             </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column  prop="mode_of_transfer" alig name="MODE">
+        <ngx-datatable-column     [resizeable]="false"  prop="mode_of_transfer" [flexGrow]="1" alig name="MODE">
           <ng-template ngx-datatable-cell-template let-row="row">
           {{row.mode_of_transfer}}
           </ng-template>
       </ngx-datatable-column>
 
-        <ngx-datatable-column  prop="amount" alig name="AMOUNT">
+        <ngx-datatable-column     [resizeable]="false"  prop="amount" [flexGrow]="1" alig name="AMOUNT">
           <ng-template ngx-datatable-cell-template let-row="row">
           {{row.amount|indianCurrency}}
           </ng-template>
@@ -361,7 +361,7 @@
         class="custom_table"
         [headerHeight]="50"
         [limit]="8"
-        [columnMode]="'force'"
+        [columnMode]="'flex'"
         [footerHeight]="50"
         [rowHeight]="'auto'"
         [rows]="byproduct_list"
@@ -369,26 +369,26 @@
         [selectionType]="'single'"
         (activate)="bypro_select($event)">
 
-      <ngx-datatable-column prop="byproduct_category"  name="TYPE">
+      <ngx-datatable-column     [resizeable]="false" prop="byproduct_category" [flexGrow]="2" name="TYPE">
           <ng-template ngx-datatable-cell-template let-row="row">
               {{row.byproduct_category}}
           </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="byproduct_date_time"  name="CREATED DATE">
+      <ngx-datatable-column     [resizeable]="false" prop="byproduct_date_time" [flexGrow]="1"  name="CREATED DATE">
           <ng-template ngx-datatable-cell-template let-row="row">
               <span style="font-weight:bold;">{{ row.byproduct_date_time | date:'dd-MM-YYYY' }}
               </span>
           </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column  prop="byproduct_description"  name="DESCRIPTION">
+      <ngx-datatable-column     [resizeable]="false"  prop="byproduct_description" [flexGrow]="2" name="DESCRIPTION">
           <ng-template ngx-datatable-cell-template let-row="row">
           {{row.byproduct_description}}
           </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column  prop="total_production_cost"  name="ASSOCIATION COST">
+      <ngx-datatable-column     [resizeable]="false"  prop="total_production_cost" [flexGrow]="1"  name="ASSOCIATION COST">
         <ng-template ngx-datatable-cell-template let-row="row">
         {{row.total_production_cost| indianCurrency}}
         </ng-template>
@@ -448,40 +448,40 @@
 
   &nbsp;
 
-  <h5 style="text-align: center;" *ngIf="product_list" > <b>Product List</b></h5>
-      <ngx-datatable *ngIf="product_list"
+  <h5 style="text-align: center;" *ngIf="outward_Product_list" > <b>Product List</b></h5>
+      <ngx-datatable *ngIf="outward_Product_list"
         #table
         class="custom_table"
         [headerHeight]="50"
         [limit]="8"
-        [columnMode]="'force'"
+        [columnMode]="'flex'"
         [footerHeight]="50"
         [rowHeight]="'auto'"
-        [rows]="product_list"
+        [rows]="outward_Product_list"
         [selected]="selected"
         [selectionType]="'single'"
         (activate)="pro_select($event)">
 
-      <ngx-datatable-column prop="name"  name="ITEM NAME">
+      <ngx-datatable-column     [resizeable]="false" prop="name" [flexGrow]="2" name="ITEM NAME">
           <ng-template ngx-datatable-cell-template let-row="row">
               {{row.name}}
           </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="hsnsac"  name="HSN">
+      <ngx-datatable-column     [resizeable]="false" prop="hsnsac" [flexGrow]="1"  name="HSN">
           <ng-template ngx-datatable-cell-template let-row="row">
               <span style="font-weight:bold;">{{ row.hsnsac }}
               </span>
           </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column  prop="qty"  name="QUANTITY">
+      <ngx-datatable-column     [resizeable]="false"  prop="qty"  [flexGrow]="1" name="QUANTITY">
           <ng-template ngx-datatable-cell-template let-row="row">
           {{row.qty}} {{row.uom}}
           </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column  prop="total"  name="AMOUNT">
+      <ngx-datatable-column     [resizeable]="false"  prop="total" [flexGrow]="1"  name="AMOUNT">
         <ng-template ngx-datatable-cell-template let-row="row">
         {{row.store_amount * row.qty | indianCurrency}}
         </ng-template>
@@ -624,26 +624,26 @@
         class="custom_table"
         [headerHeight]="50"
         [limit]="5"
-        [columnMode]="'force'"
+        [columnMode]="'flex'"
         [footerHeight]="50"
         [rowHeight]="'auto'"
         [rows]="project_item_list_dispatch"
         [selected]="selected"
         [selectionType]="'single'">
 
-            <ngx-datatable-column prop="name"  name="BATCH">
+            <ngx-datatable-column     [resizeable]="false" prop="name" [flexGrow]="1" name="BATCH">
                 <ng-template ngx-datatable-cell-template let-row="row">
                     {{row.batch}}
                 </ng-template>
             </ngx-datatable-column>
 
-            <ngx-datatable-column  prop="value"  name="QUANTITY">
+            <ngx-datatable-column     [resizeable]="false"  prop="value" [flexGrow]="1"  name="QUANTITY">
                 <ng-template ngx-datatable-cell-template let-row="row">
                 {{row.value}} {{row.uom}}
                 </ng-template>
             </ngx-datatable-column>
 
-            <ngx-datatable-column  prop="total"  name="AMOUNT">
+            <ngx-datatable-column     [resizeable]="false"  prop="total" [flexGrow]="1"  name="AMOUNT">
               <ng-template ngx-datatable-cell-template let-row="row">
               {{row.amount * row.value | indianCurrency}}
               </ng-template>

@@ -260,6 +260,13 @@ export class SettingsComponent implements OnInit
 
   submit(value)
     {
+
+          const confirmed = confirm("Are you sure you want to update?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
+
           this.loading=true;
           this.api.post('post_update_data.php?table=company_profile&field=id&value=' + this.id + '&authToken=' + environment.authToken, this.profile_update.value).then((data: any) => {
 
@@ -351,7 +358,11 @@ export class SettingsComponent implements OnInit
       if (this.edit_product_prefix.valid)
       {
         console.log(this.edit_product_prefix.value)
-
+        const confirmed = confirm("Are you sure you want to update?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
           this.loading=true;
         await this.api.post('post_update_data.php?table=production_prefix&field=id&value='+this.product_prefix_data.id+'&authToken=' + environment.authToken, this.edit_product_prefix.value).then((data: any) => {
             console.log(data)
@@ -427,6 +438,11 @@ async  submit_Product_prefix()
     {
       if (this.prefix_update.valid)
         {
+          const confirmed = confirm("Are you sure you want to update?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
           this.loading=true;
           this.api.post('post_update_data.php?table=prefix&field=prefix_id&value=' + this.id + '&authToken=' + environment.authToken, this.prefix_update.value).then((data: any) => {
 
@@ -487,6 +503,11 @@ async  submit_Product_prefix()
     {
       if (this.product.valid)
         {
+          const confirmed = confirm("Are you sure you want to update?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
           this.loading=true;
           this.api.post('post_update_data.php?table=product_type&field=id&value=' + this.id + '&authToken=' + environment.authToken, this.product.value).then((data: any) => {
 
@@ -585,6 +606,11 @@ async  submit_Product_prefix()
     {
       if (this.edit_tax.valid)
       {
+        const confirmed = confirm("Are you sure you want to update?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
         this.loading=true;
         this.api.post('post_update_data.php?table=tax&field=id&value=' + this.id + '&authToken=' + environment.authToken, this.edit_tax.value).then((data: any) => {
           if (data.status == "success")
@@ -635,6 +661,11 @@ async  submit_Product_prefix()
     {
       if (this.editUnit.valid)
       {
+        const confirmed = confirm("Are you sure you want to update?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
         this.loading=true;
         this.api.post('post_update_data.php?table=unit&field=id&value=' + this.id + '&authToken=' + environment.authToken, this.editUnit.value).then((data: any) => {
           if (data.status == "success")
@@ -766,6 +797,11 @@ async  submit_Product_prefix()
     {
       if (this.edit_payment.valid)
       {
+        const confirmed = confirm("Are you sure you want to update?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
         this.loading=true;
         this.api.post('post_update_data.php?table=payment_terms&field=id&value=' + this.id + '&authToken=' + environment.authToken, data).then((data: any) => {
           if (data.status == "success")
@@ -1007,6 +1043,11 @@ async  submit_Product_prefix()
 
     submit_useredit(value)
     {
+      const confirmed = confirm("Are you sure you want to update?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
       this.loading=true;
       this.api.post('post_update_data.php?table=user_type&field=id&value=' + this.user_id + '&authToken=' + environment.authToken, value).then((data: any) => {
         if (data.status == "success")
@@ -1065,6 +1106,11 @@ async  submit_Product_prefix()
     submit_payroll_edit(value)
     {
 
+      const confirmed = confirm("Are you sure you want to update?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
       this.loading=true;
       this.api.post('post_update_data.php?table=pay_roll_items&field=id&value=' + this.pay_roll_id + '&authToken=' + environment.authToken, value).then((data: any) => {
 

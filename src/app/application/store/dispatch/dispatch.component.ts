@@ -254,6 +254,11 @@ export class DispatchComponent implements OnInit {
     }
     value['asso_list'] = this.selected;
     value['item_list'] = this.selected_item;
+    const confirmed = confirm("Are you sure you want to update?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
     this.loading = true;
     await this.api.post('mp_dispatch_edit.php?id='+id+'&type='+type+'&delivery='+delivery+'&authToken=' + environment.authToken, value).then((data: any) =>
     {

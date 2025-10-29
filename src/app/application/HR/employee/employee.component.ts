@@ -402,6 +402,11 @@ export class EmployeeComponent implements OnInit
 
   async deleteFile(data)
   {
+    const confirmed = confirm("Are you sure you want to delete this file?");
+        if (!confirmed) {
+
+          return;
+        }
     await this.api.get('delete_data.php?authToken='+environment.authToken+'&table=employee_file&field=id&id='+data.id).then((data_rt: any) =>
     {
       if (data_rt.status == "success") { this.toastrService.success('Document Deleted Succesfully'); }
@@ -413,6 +418,7 @@ export class EmployeeComponent implements OnInit
   async loadData()
   {
     await this.api.get('get_data.php?table=employee&authToken=' + environment.authToken).then((data: any) => {
+      console.log(data)
       this.employee = data;
     }).catch(error => { this.toastrService.error('API Faild : loadData employee'); });
 
@@ -746,6 +752,7 @@ export class EmployeeComponent implements OnInit
 
       await this.api.get('mp_employee_salary_transactions.php?emp_id=' + emp_id + '&authToken=' + environment.authToken).then((data: any) =>
       {
+        console.log(data)
         if(data != null)
         {
               this.salary_details = data;
@@ -779,7 +786,7 @@ export class EmployeeComponent implements OnInit
       {
       this.employee_details     = data[0];
 
-
+      console.log(this.employee_details)
       this.emp_name                             = this.employee_details.name
       this.emp_doj                              = this.employee_details.doj
       this.emp_id                               = this.employee_details.emp_id
@@ -799,7 +806,7 @@ export class EmployeeComponent implements OnInit
       this.emp_mobileNo                         = this.employee_details.mobile_no
       this.emp_dob                              = this.employee_details.dob
       this.emp_emailId                          = this.employee_details.email_id
-      this.emp_password                         = this.employee_details.password
+      this.emp_password                         = this.employee_details.plain_password
       this.emp_empRole_id                       = this.employee_details.user_type_name
       this.emp_empRole                          = this.employee_details.user_type
       this.emp_empType_name                     = this.employee_details.emp_type_name
@@ -810,13 +817,21 @@ export class EmployeeComponent implements OnInit
       this.emp_bank_access                      = this.employee_details.bank_access
       this.emp_userStatus                       = this.employee_details.status
       this.emp_permenantAddress                 = this.employee_details.permenent_address
-      this.emp_AddressForCommunication           = this.employee_details.communication_address
+      this.emp_AddressForCommunication          = this.employee_details.communication_address
       this.emp_jobLocation                      = this.employee_details.job_location
       this.emp_lastWorkingDay                   = this.employee_details.last_working_day
       this.emp_emergency_Con_Person             = this.employee_details.contact_person
       this.emp_emergency_Con_PersonNo           = this.employee_details.contact_personNo
       this.emp_emergency_Con_PersonRelationship = this.employee_details.contact_person_relationship
-      this.img_path                             = environment.baseURL+"download_file.php?path=upload/employee_images/"+this.emp_image+"&authToken="+ environment.authToken;
+        console.log(this.emp_image)
+      if(this.emp_image != null && this.emp_image != "")
+      {
+       this.img_path                            = environment.baseURL+"download_file.php?path=upload/employee_images/"+this.emp_image+"&authToken="+ environment.authToken;
+        console.log(this.img_path)
+      }
+      else{ this.img_path = "../../../../assets/img/profile/default.jpg"
+            console.log(this.img_path) }
+
       // this.emp_salaryGroup_name                 = this.employee_details.salary_group_name
       // this.emp_salaryGroup                      = this.employee_details.salary_group
       this.emp_ot                               = this.employee_details.ot

@@ -33,7 +33,7 @@
         <table style="border: none;">
           <tr style="border: none;">
 
-             <td style="width: 33.1%;border: none">
+             <td style="width: 34%;border: none">
                       <div class="input-group input-group-sm my-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa fa-search"></i></span>
@@ -46,7 +46,7 @@
             </td>
             <!-- <td style="width: 10%;border: none">
             </td> -->
-            <td style="border: none;">
+            <td style="border: none;width: 34%;">
                <div class="btn-group mb-3 col-md-7" role="group" aria-label="Basic example">
 
                 <button type="button" class="btn btn-outline-info fa fa-pencil btn-sm" [disabled]="payment_view ||status == 2 " (click)="editbill()"> Edit</button>
@@ -89,7 +89,7 @@
               <div class="col-md-3 ">{{ row.invoice_date  | date: 'dd-MM-yyyy'}} </div>
             </div>
             <div class="row">
-               <div class="col-md-7"> {{row.reference_number}}</div>
+               <div class="col-md-12"> {{row.reference_number}}</div>
             </div>
            </div>
           </ng-template>
@@ -131,7 +131,7 @@
                   <tr style="border-bottom:none ;">
 
                     <td class="inv_td_bottom" colspan="1" rowspan="1"
-                      style="text-align: left; width: 442px; border-top: 0px solid rgb(255, 255, 255); border-bottom: none; background-color: rgb(119, 180, 58); padding: 0em;">
+                      style="text-align: left; width: 435px; border-top: 0px solid rgb(255, 255, 255); border-bottom: none; background-color: rgb(119, 180, 58); padding: 0em;">
                       <strong>GSTIN: {{invoice.gst_number}}</strong>
                     </td>
 
@@ -153,8 +153,8 @@
                       <b> Pin Code : </b> {{invoice.bill_zip_code}}
                     </td>
                     <td>
-                      <b> Shippment : </b>{{invoice.shipment_mode}}, <br>
-                      <b> Vehicle Number : </b>{{invoice.vehicle_number}},<br>
+                      <!-- <b> Shippment : </b>{{invoice.shipment_mode}}, <br>
+                      <b> Vehicle Number : </b>{{invoice.vehicle_number}},<br> -->
                       <b> Place of Supply : </b> {{invoice.place_from_supply}},<br>
                       <b> Ref No : </b>{{invoice.reference_number }}, <br>
                       <b > Dc No : </b>{{invoice.dc_no}}
@@ -322,6 +322,28 @@
         </div>
         <br><br><br>
       </div>
+
+      <div>
+        <table class="col-md-12" style="border: none; text-align: center;margin: 10px;margin-bottom: 20px;">
+          <thead style="border: none;">
+            <tr  style="border: none;">
+              <th style="border: none;">E way bill number</th>
+              <th style="border: none;">Vehicle number</th>
+              <th style="border: none;">Transport mode</th>
+              <th style="border: none;">Transport charge</th>
+            </tr>
+          </thead>
+          <tbody style="border: none;">
+            <tr style="border: none;" *ngFor="let invoice of invoicePdf">
+              <td style="border: none;">{{ invoice.e_way_bill??"No data found"}}</td>
+              <td style="border: none;">{{ invoice.vehicle_number??"No data found"}}</td>
+              <td style="border: none;">{{ invoice.shipment_mode??"No data found"}}</td>
+              <td style="border: none;">{{ invoice.transport_charge!= null?(invoice.transport_charge|indianCurrency):"No data found"}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
     </div>
   </div>
   &nbsp;
@@ -360,31 +382,31 @@
                     [rowHeight]="50"
                     [rows]="Dispatch_items">
 
-                    <ngx-datatable-column prop="date_time"  [flexGrow]="1"  name="DATE" >
+                    <ngx-datatable-column prop="date_time"   [resizeable]="false" [flexGrow]="1"  name="DATE" >
                         <ng-template ngx-datatable-cell-template let-row = "row">
                             {{row.date_time | date: 'dd-MM-yyyy'}}
                         </ng-template>
                     </ngx-datatable-column>
 
-                    <ngx-datatable-column prop="batch" [flexGrow]="1"  name="BATCH" >
+                    <ngx-datatable-column prop="batch"  [resizeable]="false" [flexGrow]="1"  name="BATCH" >
                         <ng-template ngx-datatable-cell-template let-row = "row">
                             {{row.batch }}
                         </ng-template>
                     </ngx-datatable-column>
 
-                     <ngx-datatable-column prop="name" [flexGrow]="2"  name="ITEM" >
+                     <ngx-datatable-column prop="name"  [resizeable]="false" [flexGrow]="2"  name="ITEM" >
                         <ng-template ngx-datatable-cell-template let-row = "row">
                             {{row.name}}
                         </ng-template>
                     </ngx-datatable-column>
 
-                    <ngx-datatable-column prop="bill_number" [flexGrow]="1"name="BILL" >
+                    <ngx-datatable-column prop="bill_number"  [resizeable]="false" [flexGrow]="1"name="BILL" >
                         <ng-template ngx-datatable-cell-template let-row = "row">
                             {{row.bill_number}}
                         </ng-template>
                     </ngx-datatable-column>
 
-                      <ngx-datatable-column prop="value" [flexGrow]="1" name="QUANTITY" >
+                      <ngx-datatable-column prop="value"  [resizeable]="false" [flexGrow]="1" name="QUANTITY" >
                         <ng-template ngx-datatable-cell-template let-row = "row">
                             {{row.value}} {{row.uom}}
                         </ng-template>
@@ -402,7 +424,7 @@
                         </ng-template>
                     </ngx-datatable-column> -->
 
-                      <ngx-datatable-column  [flexGrow]="1"   name="TOTAL" >
+                      <ngx-datatable-column  [flexGrow]="1"   [resizeable]="false"  name="TOTAL" >
                         <ng-template ngx-datatable-cell-template let-row = "row">
                             {{row.total | indianCurrency}}
                         </ng-template>
@@ -965,13 +987,13 @@
                     [rowHeight]="50"
                     [rows]="payment_transaction">
 
-                    <ngx-datatable-column prop="tran_date"  [flexGrow]="1" name="TRANSACTION DATE" >
+                    <ngx-datatable-column prop="tran_date"  [resizeable]="false"  [flexGrow]="1" name="TRANSACTION DATE" >
                         <ng-template ngx-datatable-cell-template let-row = "row">
                             {{row.tran_date | date: 'dd-MM-yyyy'}}
                         </ng-template>
                     </ngx-datatable-column>
 
-                    <ngx-datatable-column [flexGrow]="1" name="MODE">
+                    <ngx-datatable-column [flexGrow]="1"  [resizeable]="false" name="MODE">
                         <ng-template ngx-datatable-cell-template let-row="row">
                               <span *ngIf="row.tran_mode === 1 " >
                                 Wire
@@ -985,37 +1007,37 @@
                         </ng-template>
                       </ngx-datatable-column>
 
-                    <ngx-datatable-column  [flexGrow]="2" name="REFERENCE">
+                    <ngx-datatable-column  [flexGrow]="2"  [resizeable]="false" name="REFERENCE">
                         <ng-template ngx-datatable-cell-template let-row="row">
                             {{row.reference}}
                         </ng-template>
                     </ngx-datatable-column>
 
-                    <ngx-datatable-column [flexGrow]="1" name="CREDIT">
+                    <ngx-datatable-column [flexGrow]="1"  [resizeable]="false" name="CREDIT">
                         <ng-template ngx-datatable-cell-template let-row="row">
                           <span style="font-weight:bold;"> {{row.credit | indianCurrency}} </span>
                           </ng-template>
                       </ngx-datatable-column>
 
-                    <ngx-datatable-column [flexGrow]="1" name="DEBIT">
+                    <ngx-datatable-column [flexGrow]="1"  [resizeable]="false" name="DEBIT">
                       <ng-template ngx-datatable-cell-template let-row="row">
                         <span style="font-weight:bold;"> {{row.debit | indianCurrency}} </span>
                         </ng-template>
                     </ngx-datatable-column>
 
-                    <ngx-datatable-column [flexGrow]="1" name="BALANCE">
+                    <ngx-datatable-column [flexGrow]="1"  [resizeable]="false" name="BALANCE">
                         <ng-template ngx-datatable-cell-template let-row="row">
                           <span style="font-weight:bold;"> {{row.balance | indianCurrency}} </span>
                           </ng-template>
                     </ngx-datatable-column>
 
-                    <ngx-datatable-column [flexGrow]="1" name="DESCRIPTION">
+                    <ngx-datatable-column [flexGrow]="1"  [resizeable]="false" name="DESCRIPTION">
                         <ng-template ngx-datatable-cell-template let-row="row">
                             {{row.tran_details}}
                         </ng-template>
                     </ngx-datatable-column>
 
-                    <ngx-datatable-column  [flexGrow]="2" name="COMMAND">
+                    <ngx-datatable-column  [flexGrow]="2"  [resizeable]="false" name="COMMAND">
                         <ng-template ngx-datatable-cell-template let-row="row">
                             {{row.notes}}
                           </ng-template>
@@ -1479,9 +1501,24 @@
         <label>Shipment Mode</label>
       </div>
       <div class="form-group col-md-9">
-        <input formControlName="shipment_mode"  placeholder="Enter Shipment Mode" type="text"
-          class="form-control">
+        <!-- <input formControlName="shipment_mode"  placeholder="Enter Shipment Mode" type="text"
+          class="form-control"> -->
+           <select formControlName="shipment_mode"  class=" form-control custom-select">
+                  <option value="Road">Road</option>
+                  <option value="Rail">Rail</option>
+                  <option value="Rail">Air</option>
+                  <option value="Rail">Ship</option>
+            </select>
         <span class="help-block text-danger" *ngIf="e_way_bill.get('shipment_mode').touched && e_way_bill.get('shipment_mode').hasError('required')">Shipment Mode Required !</span>
+      </div>
+
+        <div class="form-group col-md-3">
+        <label>Transport Charge</label>
+      </div>
+      <div class="form-group col-md-9">
+        <input formControlName="amount"  placeholder="Enter Amount" type="number"
+          class="form-control">
+        <span class="help-block text-danger" *ngIf="e_way_bill.get('amount').touched && e_way_bill.get('amount').hasError('required')"> Required !</span>
       </div>
       <div class="col-md-12">
         <div class="row justify-content-center">

@@ -1,4 +1,4 @@
-import { Component, OnInit,ViewChild ,ElementRef} from '@angular/core';
+import { Component, OnInit,ViewChild ,ElementRef, Type} from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
 import { ApiService } from 'src/app/service/api.service';
@@ -180,17 +180,36 @@ async  ngOnInit()
               this.employee_list = data;
       }).catch(error => {this.toastrService.error('Something went wrong ');});
 
-      await   this.api.get('mp_item_list_avg.php?authToken='+environment.authToken).then((data: any) =>
-        {
-          console.log("item data : ",data)
-                this.item_list = data;
-        }).catch(error => {this.toastrService.error('Something went wrong ');});
+      this.itemLoad()
 
       setTimeout(() => {
         this.show = true
        }, 1000);
 
  }
+
+async itemLoad()
+ {
+    await   this.api.get('mp_item_list_avg.php?authToken='+environment.authToken).then((data: any) =>
+        {
+          console.log("item data : ",data)
+                this.item_list = data;
+                if(data != null)
+                this.Itemfilter = [...data]
+        }).catch(error => {this.toastrService.error('Something went wrong ');});
+ }
+
+ Itemfilter:any
+  updateFilter_item(event) {
+    const val = event.target.value.toLowerCase();
+    const temp = this.Itemfilter.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.item_list = temp;
+    this.table.offset = 0;
+  }
 
   groupBy(array: any[], property: string)
   {
@@ -628,6 +647,10 @@ async  ngOnInit()
                  Vendor_Name:'Total',
                  Bill_Amount:this.totalSales,
                  Balance_Amount:this.totalBalance,
+                 E_way_bill:'',
+                 Transport_Mode:'',
+                 Vehicle_Number:'',
+                 Transport_Charge:''
               };
               const totalRow1 = {
                 bill_id:'',
@@ -639,9 +662,11 @@ async  ngOnInit()
                Vendor_Name:'Total',
                Bill_Amount:this.totalSales,
                Balance_Amount:this.totalBalance,
+
             };
               this.print_data.push(totalRow);
               this.sale_by_cust.push(totalRow1);
+              console.log("print data ",this.print_data )
               }
               else
               {
@@ -819,6 +844,7 @@ async  ngOnInit()
                   const totalRow = {
                     Date      : 'Total',
                     DC_Noumber: '',
+                    Type      : '',
                     Customer_Name:'',
                     Amount: this.totalBalance,
                   };
@@ -1197,8 +1223,10 @@ purchase_list_view:boolean=false
 
   set_zero2()
   {
+    this.itemLoad()
     this.purchase_list_view = false
   }
+
   onSubmit_customer(value)
   {
 
@@ -1443,6 +1471,7 @@ purchase_list_view:boolean=false
   {
     this.customer_payment = true;
   }
+
   print()
   {
     if(this.print_data != null)
@@ -1454,6 +1483,7 @@ purchase_list_view:boolean=false
       this.toastrService.warning('No Data ');
     }
   }
+
   print_tax()
   {
     if(this.print_data_type2 != null)
@@ -1699,24 +1729,48 @@ purchase_list_view:boolean=false
     }
   }
 
-  convertToCSV(data: any[]): string
-  {
-    const csvArray = [];
-    const headers = Object.keys(data[0]);
-    csvArray.push(headers.join(','));
+  // convertToCSV(data: any[]): string
+  // {
+  //   const csvArray = [];
+  //   const headers = Object.keys(data[0]);
+  //   csvArray.push(headers.join(','));
 
-    data.forEach(item => {
-      const row = headers.map(key => item[key]);
-      csvArray.push(row.join(','));
+  //   data.forEach(item => {
+  //     const row = headers.map(key => item[key]);
+  //     csvArray.push(row.join(','));
+  //   });
+
+  //   return csvArray.join('\n');
+  // }
+
+  convertToCSV(data: any[]): string {
+  if (!data || !data.length) return '';
+
+  const headers = Object.keys(data[0]);
+  const csvRows = [];
+
+  // Add header row
+  csvRows.push(headers.join(','));
+
+  // Add data rows
+  data.forEach(item => {
+    const values = headers.map(key => {
+      const val = item[key] ?? '';
+      // Escape double quotes by doubling them
+      const escaped = String(val).replace(/"/g, '""');
+      // Wrap fields containing commas or quotes in quotes
+      return /[",\n]/.test(escaped) ? `"${escaped}"` : escaped;
     });
+    csvRows.push(values.join(','));
+  });
 
-    return csvArray.join('\n');
-  }
+  return csvRows.join('\n');
+}
 
   downloadCSVFile(csvData: string, filename: string)
   {
 
-    const csvBlob = new Blob([csvData],  { type: 'text/csv' });
+    const csvBlob = new Blob([csvData],  { type: 'application/vnd.openxmlformats-ficedocument.spreadsheetml.sheet' });
     const url = URL.createObjectURL(csvBlob);
 
     const downloadLink = document.createElement('a');

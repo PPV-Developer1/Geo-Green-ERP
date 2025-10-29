@@ -413,3 +413,43 @@
   cursor: col-resize;
   background: rgba(0, 0, 0, 0.1);
 }
+
+
+/* Ribbon Container */
+.ribbon {
+  width: 20%;
+  height: 20%;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.ribbon span {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 140%;
+  height: 2em; /* controls ribbon thickness */
+  background-color: #2e963dc4;
+  color: #fff;
+  font-weight: bold;
+  transform: rotate(-45deg);
+  top: 35%;
+  left: -55%;
+  box-shadow: 0 0.3em 1em rgba(0, 0, 0, 0.3);
+  font-size: 0.75em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-left: 30%;
+}
+
+.ribbon-close span {
+  background-color: #c42e2ec4;
+}
+
+.ribbon-create span {
+  background-color: #265c9de6;
+}

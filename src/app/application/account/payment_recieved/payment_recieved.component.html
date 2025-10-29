@@ -41,31 +41,31 @@
   [rows]="payment_transaction"
   (activate)="Onclick($event)">
 
-  <ngx-datatable-column prop="tran_date" [flexGrow]="1"  name=" DATE" >
+  <ngx-datatable-column     [resizeable]="false" prop="tran_date" [flexGrow]="1"  name=" DATE" >
       <ng-template ngx-datatable-cell-template let-row = "row">
           {{row.tran_date  | date: 'dd-MM-yyyy'}}
       </ng-template>
   </ngx-datatable-column>
 
-      <ngx-datatable-column [flexGrow]="2" prop="customer_name" name="CUSTOMER" >
+      <ngx-datatable-column     [resizeable]="false" [flexGrow]="2" prop="customer_name" name="CUSTOMER" >
         <ng-template ngx-datatable-cell-template let-row = "row">
             {{row.customer_name}}
         </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column [flexGrow]="2" prop="reference" name="REFERENCE" >
+    <ngx-datatable-column     [resizeable]="false" [flexGrow]="2" prop="reference" name="REFERENCE" >
       <ng-template ngx-datatable-cell-template let-row = "row">
           {{row.reference}}
       </ng-template>
   </ngx-datatable-column>
 
-    <ngx-datatable-column [flexGrow]="1" prop="invoice_number"   name="INVOICE" >
+    <ngx-datatable-column     [resizeable]="false" [flexGrow]="1" prop="invoice_number"   name="INVOICE" >
       <ng-template ngx-datatable-cell-template let-row = "row">
           {{row.invoice_number}}
       </ng-template>
     </ngx-datatable-column>
 
-  <ngx-datatable-column  name="MODE" [flexGrow]="1">
+  <ngx-datatable-column     [resizeable]="false"  name="MODE" [flexGrow]="1">
       <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.tran_mode === 1 " >
               Wire
@@ -79,32 +79,32 @@
       </ng-template>
     </ngx-datatable-column>
 
-  <!-- <ngx-datatable-column  name="REFERENCE">
+  <!-- <ngx-datatable-column     [resizeable]="false"  name="REFERENCE">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.reference}}
       </ng-template>
   </ngx-datatable-column> -->
 
- <ngx-datatable-column prop="debit"  name="RECIEVED" [flexGrow]="1">
+ <ngx-datatable-column     [resizeable]="false" prop="debit"  name="RECIEVED" [flexGrow]="1">
     <ng-template ngx-datatable-cell-template let-row="row">
       <span style="font-weight:bold;"> {{row.debit | indianCurrency}} </span>
       </ng-template>
   </ngx-datatable-column>
 
 
-  <ngx-datatable-column prop="balance" name="BALANCE" [flexGrow]="1">
+  <ngx-datatable-column     [resizeable]="false" prop="balance" name="BALANCE" [flexGrow]="1">
       <ng-template ngx-datatable-cell-template let-row="row">
         <span style="font-weight:bold;"> {{row.balance | indianCurrency}} </span>
         </ng-template>
   </ngx-datatable-column>
 
-  <ngx-datatable-column prop="tran_details" name="DESCRIPTION" [flexGrow]="2">
+  <ngx-datatable-column     [resizeable]="false" prop="tran_details" name="DESCRIPTION" [flexGrow]="2">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.tran_details}}
       </ng-template>
   </ngx-datatable-column>
 
-  <ngx-datatable-column prop="notes"  name="COMMAND" [flexGrow]="2">
+  <ngx-datatable-column     [resizeable]="false" prop="notes"  name="COMMAND" [flexGrow]="2">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.notes}}
         </ng-template>

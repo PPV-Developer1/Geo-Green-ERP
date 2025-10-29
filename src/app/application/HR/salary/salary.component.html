@@ -46,36 +46,36 @@
             [selectionType]="'single'"
             (activate)="onActivate($event)">
 
-            <!-- <ngx-datatable-column name="EMPLOYEE ID" >
+            <!-- <ngx-datatable-column     [resizeable]="false" name="EMPLOYEE ID" >
               <ng-template ngx-datatable-cell-template let-row="row">
                   {{row.emp_id}}
               </ng-template>
             </ngx-datatable-column> -->
 
-            <ngx-datatable-column prop="name" name="EMPLOYEE NAME" [flexGrow]="2">
+            <ngx-datatable-column     [resizeable]="false" prop="name" name="EMPLOYEE NAME" [flexGrow]="2">
                 <ng-template ngx-datatable-cell-template let-row="row">
                     {{row.employee_name}}
                 </ng-template>
             </ngx-datatable-column>
 
-            <ngx-datatable-column prop="from_date" name="FROM" [flexGrow]="1">
+            <ngx-datatable-column     [resizeable]="false" prop="from_date" name="FROM" [flexGrow]="1">
                 <ng-template ngx-datatable-cell-template let-row="row">
                     {{row.from_date  | date: 'dd-MM-yyyy'}}
                 </ng-template>
             </ngx-datatable-column>
 
-            <ngx-datatable-column prop="to_date" name="TO"  [flexGrow]="1">
+            <ngx-datatable-column     [resizeable]="false" prop="to_date" name="TO"  [flexGrow]="1">
               <ng-template ngx-datatable-cell-template let-row="row">
                   {{row.to_date  | date: 'dd-MM-yyyy'}}
               </ng-template>
             </ngx-datatable-column>
 
-            <!-- <ngx-datatable-column prop="salary" name="SALARY">
+            <!-- <ngx-datatable-column     [resizeable]="false" prop="salary" name="SALARY">
                 <ng-template ngx-datatable-cell-template let-row="row">
                 <span style="font-weight:bold;"> {{row.salary | indianCurrency}} </span>
                 </ng-template>
             </ngx-datatable-column> -->
-            <ngx-datatable-column prop="status" name="STATUS" [flexGrow]="1">
+            <ngx-datatable-column     [resizeable]="false" prop="status" name="STATUS" [flexGrow]="1">
               <ng-template ngx-datatable-cell-template let-row="row">
                   <span *ngIf="row.status == 1">Generated</span>
                   <span *ngIf="row.status == 2">Done</span>
@@ -312,26 +312,26 @@
           [selectionType]="'single'"
           (activate)="onAction1($event)">
 
-            <ngx-datatable-column prop="tran_date" name="TRANSACTION DATE" [flexGrow]="1">
+            <ngx-datatable-column     [resizeable]="false" prop="tran_date" name="TRANSACTION DATE" [flexGrow]="1">
               <ng-template ngx-datatable-cell-template let-row="row">
                 <span>{{row.tran_date  | date: 'dd-MM-yyyy'}}</span>
               </ng-template>
             </ngx-datatable-column>
 
-            <ngx-datatable-column prop="utr" name="UTR" [flexGrow]="1">
+            <ngx-datatable-column     [resizeable]="false" prop="utr" name="UTR" [flexGrow]="1">
               <ng-template ngx-datatable-cell-template let-row="row" >
                 <span>{{row.utr}}</span>
               </ng-template>
             </ngx-datatable-column>
 
 
-            <ngx-datatable-column prop="amount" name="AMOUNT" [flexGrow]="1">
+            <ngx-datatable-column     [resizeable]="false" prop="amount" name="AMOUNT" [flexGrow]="1">
               <ng-template ngx-datatable-cell-template let-row="row">
                 <span style="font-weight:bold;">{{row.amount | indianCurrency}}</span>
               </ng-template>
             </ngx-datatable-column>
 
-            <ngx-datatable-column prop="reference" name="REFERENCE" [flexGrow]="1">
+            <ngx-datatable-column     [resizeable]="false" prop="reference" name="REFERENCE" [flexGrow]="1">
               <ng-template ngx-datatable-cell-template let-row="row">
                 <span>{{row.reference}}</span>
               </ng-template>
@@ -430,43 +430,43 @@
                 [selectionType]="'single'"
                 (activate)="onAction($event)">
 
-                  <ngx-datatable-column  prop="emp_id" name="EMPLOYEE ID" [flexGrow]="1">
+                  <ngx-datatable-column     [resizeable]="false"  prop="emp_id" name="EMPLOYEE ID" [flexGrow]="1">
                     <ng-template ngx-datatable-cell-template let-row="row">
                       {{row.emp_id}}
                     </ng-template>
                   </ngx-datatable-column>
 
-                  <ngx-datatable-column prop="name" name="EMPLOYEE NAME" [flexGrow]="2">
+                  <ngx-datatable-column     [resizeable]="false" prop="name" name="EMPLOYEE NAME" [flexGrow]="2">
                     <ng-template ngx-datatable-cell-template let-row="row">
                       <span>{{row.name}}</span>
                     </ng-template>
                   </ngx-datatable-column>
 
-                  <ngx-datatable-column prop="hr" name="ATTENDANCE" [flexGrow]="1">
+                  <ngx-datatable-column     [resizeable]="false" prop="hr" name="ATTENDANCE" [flexGrow]="1">
                     <ng-template ngx-datatable-cell-template let-row="row">
                       <span>{{row.hr}} Hrs</span>
                     </ng-template>
                   </ngx-datatable-column>
 
-                  <ngx-datatable-column prop="ot" name="OVER TIME" [flexGrow]="1">
+                  <ngx-datatable-column     [resizeable]="false" prop="ot" name="OVER TIME" [flexGrow]="1">
                     <ng-template ngx-datatable-cell-template let-row="row">
                       <span>{{row.ot}}  Hrs</span>
                     </ng-template>
                   </ngx-datatable-column>
 
-                  <ngx-datatable-column prop="cl" name="COM-OFF LEAVE" [flexGrow]="1">
+                  <ngx-datatable-column     [resizeable]="false" prop="cl" name="COM-OFF LEAVE" [flexGrow]="1">
                     <ng-template ngx-datatable-cell-template let-row="row">
                       <span>{{row.cl}}  Hrs</span>
                     </ng-template>
                   </ngx-datatable-column>
 
-                  <!-- <ngx-datatable-column prop="sl" name="SICK LEAVE">
+                  <!-- <ngx-datatable-column     [resizeable]="false" prop="sl" name="SICK LEAVE">
                     <ng-template ngx-datatable-cell-template let-row="row">
                       <span>{{row.sl}}  Hrs</span>
                     </ng-template>
                   </ngx-datatable-column> -->
 
-                  <ngx-datatable-column prop="pl" name="PERSONAL LEAVE" [flexGrow]="1">
+                  <ngx-datatable-column     [resizeable]="false" prop="pl" name="PERSONAL LEAVE" [flexGrow]="1">
                     <ng-template ngx-datatable-cell-template let-row="row">
                       <span>{{row.pl}}  Hrs</span>
                     </ng-template>
@@ -1433,26 +1433,26 @@
         [selectionType]="'single'"
         (activate)="onAction1($event)">
 
-          <ngx-datatable-column prop="tran_date" name="TRANSACTION DATE">
+          <ngx-datatable-column     [resizeable]="false" prop="tran_date" name="TRANSACTION DATE">
             <ng-template ngx-datatable-cell-template let-row="row">
               <span>{{row.tran_date}}</span>
             </ng-template>
           </ngx-datatable-column>
 
-          <ngx-datatable-column prop="utr" name="UTR">
+          <ngx-datatable-column     [resizeable]="false" prop="utr" name="UTR">
             <ng-template ngx-datatable-cell-template let-row="row">
               <span>{{row.utr}}</span>
             </ng-template>
           </ngx-datatable-column>
 
 
-          <ngx-datatable-column prop="amount" name="AMOUNT">
+          <ngx-datatable-column     [resizeable]="false" prop="amount" name="AMOUNT">
             <ng-template ngx-datatable-cell-template let-row="row">
               <span style="font-weight:bold;">{{row.amount | indianCurrency}}</span>
             </ng-template>
           </ngx-datatable-column>
 
-          <ngx-datatable-column prop="reference" name="REFERENCE">
+          <ngx-datatable-column     [resizeable]="false" prop="reference" name="REFERENCE">
             <ng-template ngx-datatable-cell-template let-row="row">
               <span>{{row.reference}}</span>
             </ng-template>

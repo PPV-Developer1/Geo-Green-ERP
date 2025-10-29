@@ -181,23 +181,23 @@ export class InvoiceViewComponent implements OnInit {
   todaysDate                = '';
   item_index                : any;
   status                    : any;
-  private startX      : number = 0;
-  private startWidth  : number = 0;
-  private columnIndex : number | null = null;
-  private resizing    = false;
-  tableWidth          : any= 100 ;
-  originalTableHeight : any
-  private dropdownOpen = false;
+  private startX            : number = 0;
+  private startWidth        : number = 0;
+  private columnIndex       : number | null = null;
+  private resizing          = false;
+  tableWidth                : any= 100 ;
+  originalTableHeight       : any
+  private dropdownOpen      = false;
   imgUrl: string = '../../../../assets/img/logo/geogreen.png';
  // imgUrl: string =  'https://chart.googleapis.com/chart?chs=100x100&cht=qr&chl=http://ppvgroups.org/test.php?id=100001';
 
-  invoiceItem = new InvoiceItem();
-  public view_invoice  = localStorage.getItem('view_bill');
-  public uid           = localStorage.getItem('uid');
-  public user          = localStorage.getItem('type');
-  public user_bank_id  = localStorage.getItem('bank_id');
- selectedDCs: any[] = [];  // instead of null
-  temp: any[] = [];
+  invoiceItem           = new InvoiceItem();
+  public view_invoice   = localStorage.getItem('view_bill');
+  public uid            = localStorage.getItem('uid');
+  public user           = localStorage.getItem('type');
+  public user_bank_id   = localStorage.getItem('bank_id');
+ selectedDCs          : any[]  = [];  // instead of null
+  temp                : any[]  = [];
 
   dropdownSettings = {
     singleSelection: false,
@@ -299,6 +299,7 @@ export class InvoiceViewComponent implements OnInit {
         bill_no :[null,Validators.compose([Validators.required])],
         vehicle_no:[null,Validators.compose([Validators.required])],
         shipment_mode:[null,Validators.compose([Validators.required])],
+        amount:[null,Validators.compose([Validators.required])],
       })
 
       this.advance = fb.group({
@@ -542,6 +543,7 @@ fontload()
       this.e_way_bill.controls['bill_no'].setValue(this.invoice_list.e_way_bill);
       this.e_way_bill.controls['vehicle_no'].setValue(this.invoice_list.vehicle_number);
       this.e_way_bill.controls['shipment_mode'].setValue(this.invoice_list.transport_mode);
+      this.e_way_bill.controls['amount'].setValue(this.invoice_list.transport_charge);
       this.customer_address(event.row.customer_id);
       this.Load_dispath_data()
     }
@@ -1080,7 +1082,6 @@ remove_data :any[]=[]
             this.toastrService.error('Something went wrong');
         });
 
-
     }
 
    async Cancel() {
@@ -1539,7 +1540,11 @@ getInvoiceObject(files) {
 
   var test = files[0]
   console.log(test)
- const order_numbers = files[0].dc_data.map(item => item.dc_number.split('/').pop()).join(", ");
+  var order_numbers : any
+  if(files[0].length>0)
+  {
+   order_numbers = files[0].dc_data.map(item => item.dc_number.split('/').pop()).join(", ");
+  }
  console.log(order_numbers)
   return {
 
@@ -2258,6 +2263,7 @@ async onSubmit(bill_data)
        this.e_way_bill.controls['bill_no'].setValue(data[0].e_way_bill);
        this.e_way_bill.controls['vehicle_no'].setValue(data[0].vehicle_number);
        this.e_way_bill.controls['shipment_mode'].setValue(data[0].transport_mode);
+       this.e_way_bill.controls['amount'].setValue(data[0].transport_charge);
 
     }).catch(error => { this.toastrService.error('Something went wrong'); });
   }

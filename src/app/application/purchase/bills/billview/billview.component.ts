@@ -14,6 +14,7 @@ import { formatDate } from '@angular/common';
 import { isNull } from 'util';
 import {   HostListener } from '@angular/core';
 import { NumtowordPipe } from 'src/app/pipe/WORD/numtoword.pipe';
+import { AppState } from 'src/app/app.state';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 pdfMake.fonts = {
   'Roboto': {
@@ -187,11 +188,12 @@ export class BillviewComponent implements OnInit {
   @ViewChild("delete_item",{static:true}) delete_item:ElementRef;
   @ViewChild("use_advancePayment", { static: true }) use_advancePayment: ElementRef;
   constructor(private api: ApiService,private modalService: NgbModal,
-    public toastrService: ToastrService,
-    private imgToBase64: ImgToBase64Service,
-     router:Router,
-     public fb: FormBuilder,
-     private renderer: Renderer2) { this.router = router;
+    public toastrService : ToastrService,
+    private imgToBase64  : ImgToBase64Service,
+    router               : Router,
+    public fb            : FormBuilder,
+    private renderer     : Renderer2,
+    private _state       : AppState) { this.router = router;
 
   this.Edit_bill = fb.group(
     {
@@ -272,6 +274,7 @@ export class BillviewComponent implements OnInit {
         bill_no      :[null, Validators.compose([Validators.required])],
         vehicle_no   :[null, Validators.compose([Validators.required])],
         shipment_mode:[null, Validators.compose([Validators.required])],
+        amount       :[null, Validators.compose([Validators.required])],
       })
 
       this.advance = fb.group({
@@ -290,6 +293,7 @@ export class BillviewComponent implements OnInit {
 
   async ngOnInit()
   {
+    this._state.notifyDataChanged('menu.isCollapsed', true);
     this.loadonce();
     this.LoadVendorBills();
     this.getImageFromService();
@@ -407,7 +411,9 @@ resetTableHeight()  {
       reader.readAsDataURL(image);
     }
   }
-serial_no_list:any
+
+serial_no_list  :any
+temp            :any
   loadonce()
   {
     this.api.get('mp_vendor_bill_pdf.php?value=' + this.view_bill + '&authToken=' + environment.authToken).then((data: any) => {
@@ -433,12 +439,25 @@ serial_no_list:any
       });
   }
 
+    updateFilter(event) {
+
+
+    const val = event.target.value.toLowerCase();
+    const temp = this.temp.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.VendorBillList = temp;
+    this.table.offset = 0;
+  }
   async LoadVendorBills()
   {
     await this.api.get('mp_vendor_bill.php?&authToken=' + environment.authToken).then((data: any) =>
     {
 
       this.VendorBillList = data;
+      this.temp       = [...data];
       var selectedId  = this.view_bill;
       let selectedRow = this.VendorBillList.find(item => item.serial_no == selectedId);
       if (selectedRow)
@@ -478,7 +497,7 @@ serial_no_list:any
       this.e_way_bill.controls['bill_no'].setValue(this.bill_list.e_way_no);
       this.e_way_bill.controls['vehicle_no'].setValue(this.bill_list.vehicle_number);
       this.e_way_bill.controls['shipment_mode'].setValue(this.bill_list.transport_mode);
-
+      this.e_way_bill.controls['amount'].setValue(this.bill_list.transport_charge);
       this.bill_payment.controls['description'].setValue(event.row.bill_number)
 
       this.vendor_address(event.row.vendor_id);
@@ -1001,6 +1020,11 @@ edit_GSTCalculation() {
        });
        if (this.Edit_bill.valid)
          {
+          const confirmed = confirm("Are you sure you want to update this bill?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
 
            value.bill_id =this.invoice_item.bill_id
           this.loading=true;
@@ -1783,6 +1807,11 @@ feedData(data)
                console.log("data")
        if(last_total >= data.amount && last_total >0)
        {
+        const confirmed = confirm("Are you sure you want to confirm this payment?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
           this.loading=true;
               await this.api.post('mp_bill_payment_made.php?value='+bill_id+'&amount='+amount+'&authToken=' + environment.authToken, data).then((data: any) =>
               {
@@ -1862,6 +1891,12 @@ async onSubmit(bill_data)
          }
         if(value == undefined)
          {
+
+           const confirmed = confirm("Are you sure you want to confirm creating this clone?");
+                      console.log(confirmed)
+                      if (!confirmed) {
+                        return;
+                      }
                 this.loading = true;
                 await this.api.post('mp_bill_create.php?type=new_po&authToken=' + environment.authToken, bill_data).then((data: any) =>
                 {
@@ -1907,6 +1942,11 @@ async onSubmit(bill_data)
   {
     let bill_id =this.billPdf[0].bill_id;
     this.view_bill =this.bill_list.serial_no;
+     const confirmed = confirm("Are you sure you want to update this bill?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
     await this.api.post('mp_bill_create.php?bill_id='+bill_id+'&type=e_way&authToken=' + environment.authToken, value).then((data: any) =>
     {
       if (data.status == "success")
@@ -2133,6 +2173,11 @@ async onSubmit(bill_data)
     console.log(this.balance)
     if(select.debit <= this.balance && this.balance>0)
       {
+         const confirmed = confirm("Are you sure you want to confirm this payment?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
          await     this.api.post('mp_advance_amount_to_bill.php?tran_id='+select.tran_id+'&authToken=' + environment.authToken, this.advance.value).then(async (data: any) =>
               {
                 if(data.status == "success")

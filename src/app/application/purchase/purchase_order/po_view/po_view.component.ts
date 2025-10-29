@@ -12,6 +12,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { formatDate } from '@angular/common';
 import { HostListener } from '@angular/core';
 import { NumtowordPipe } from 'src/app/pipe/WORD/numtoword.pipe';
+import { AppState } from 'src/app/app.state';
 
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -180,17 +181,24 @@ export class Po_viewComponent implements OnInit {
   bankData_length     : any;
   edit_status         : any
   private startX      : number = 0;
-  private startWidth: number = 0;
-  private columnIndex: number | null = null;
-  private resizing = false;
-  tableWidth:any = 100
+  private startWidth  : number = 0;
+  private columnIndex : number | null = null;
+  private resizing    = false;
+  tableWidth          : any = 100
+  temp                : any
 
   @ViewChild('tableResponsive', { static: false }) tableResponsive: ElementRef;
   @ViewChild('dropdownPanel', { static: false }) dropdownPanel: ElementRef;
 
-  constructor(private api: ApiService,private modalService: NgbModal,private imgToBase64: ImgToBase64Service,
-     public toastrService: ToastrService, router:Router,
-     public fb: FormBuilder,  private renderer: Renderer2) { this.router = router;
+  constructor(
+    private api: ApiService,
+    private modalService: NgbModal,
+    private imgToBase64: ImgToBase64Service,
+    public toastrService: ToastrService,
+    router:Router,
+    public fb: FormBuilder,
+    private renderer: Renderer2,
+    private _state       : AppState) { this.router = router;
 
   this.Edit_po = fb.group(
     {
@@ -219,7 +227,7 @@ export class Po_viewComponent implements OnInit {
       tax_type  :[null],
       size      : [null],
       deliverytype:[null, Validators.compose([Validators.required])],
-      freight     :[null, Validators.compose([Validators.required])],
+      freight     :[null,Validators.compose([Validators.required])],
       delivery_schedule :[null, Validators.compose([Validators.required])],
       prefix      :[null]
     })
@@ -272,7 +280,7 @@ export class Po_viewComponent implements OnInit {
         }
 
     this.e_way_bill = fb.group({
-      vehicle_no:[null,Validators.compose([Validators.required])],
+      scope:[null,Validators.compose([Validators.required])],
       shipment_mode:[null,Validators.compose([Validators.required])],
     })
   }
@@ -283,6 +291,7 @@ export class Po_viewComponent implements OnInit {
   @ViewChild("addPayment", { static: true }) addPayment : ElementRef;
   async ngOnInit()
   {
+     this._state.notifyDataChanged('menu.isCollapsed', true);
     this.loadonce();
     this.LoadVendorBills();
     this.getImageFromService();
@@ -365,6 +374,19 @@ export class Po_viewComponent implements OnInit {
     document.documentElement.style.setProperty('--table-width', this.tableWidth+'%');
   }
 
+   updateFilter(event) {
+
+
+    const val = event.target.value.toLowerCase();
+    const temp = this.temp.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.VendorBillList = temp;
+    this.table.offset = 0;
+  }
+
   fontloader()
   {
     pdfMake.fonts = {
@@ -421,6 +443,7 @@ export class Po_viewComponent implements OnInit {
     {
 
       this.VendorBillList = data;
+      this.temp = [...data]
       var selectedId  = this.view_bill;
       let selectedRow = this.VendorBillList.find(item => item.serial_no == selectedId);
       if (selectedRow)
@@ -452,7 +475,7 @@ export class Po_viewComponent implements OnInit {
       this.selectEdit_data();
       this.view_bill = event.row.serial_no;
       this.status   = event.row.status;
-      this.e_way_bill.controls['vehicle_no'].setValue(this.po_list.vehicle_number);
+      this.e_way_bill.controls['scope'].setValue(this.po_list.scope);
       this.e_way_bill.controls['shipment_mode'].setValue(this.po_list.transport_mode);
       this.load_paymentTransactiond(event.row.po_id);
       this.vendor_address(event.row.vendor_id);
@@ -973,11 +996,16 @@ async edit_onSubmit(value)
        console.log("enter")
        if (this.Edit_po.valid)
          {
+          const confirmed = confirm("Are you sure you want to update this po?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
           this.loading = true;
 
           await this.api.post('mp_po_edit_data_submit.php?value='+po_id+'&authToken=' + environment.authToken, value).then((data: any) =>
           {
- console.log("data",data)
+            console.log("data",data)
             if (data.status == "success")
             {
               this.loading=false;
@@ -1924,6 +1952,11 @@ async onSubmit(bill_data)
         });
       if(!checking)
        {
+        const confirmed = confirm("Are you sure you want to confirm creating this clone?");
+                      console.log(confirmed)
+                      if (!confirmed) {
+                        return;
+                      }
           this.loading = true;
           await this.api.post('mp_po_create.php?type=new_po&authToken=' + environment.authToken, bill_data).then((data: any) =>
           {
@@ -1962,7 +1995,7 @@ async onSubmit(bill_data)
     this.new_category_id = this.modalService.open(this.ewayBill, { size: 'md' });
     this.api.get('get_data.php?table=po&find=po_id&value='+this.po_id+'&authToken=' + environment.authToken).then((data: any) => {
 
-      this.e_way_bill.controls['vehicle_no'].setValue(data[0].vehicle_number);
+      this.e_way_bill.controls['scope'].setValue(data[0].scope);
       this.e_way_bill.controls['shipment_mode'].setValue(data[0].transport_mode);
      }).catch(error => { this.toastrService.error('Something went wrong'); });
   }
@@ -1972,7 +2005,11 @@ async onSubmit(bill_data)
 
     let po_id =this.poPdf[0].po_id;
     this.view_bill =this.po_list.serial_no;
-
+      const confirmed = confirm("Are you sure you want to update this po?");
+                    console.log(confirmed)
+                    if (!confirmed) {
+                      return;
+                    }
     await this.api.post('mp_po_create.php?po_id='+po_id+'&type=e_way&authToken=' + environment.authToken, value).then((data: any) =>
     {
       if (data.status == "success")
@@ -2062,7 +2099,7 @@ async onSubmit(bill_data)
     }).catch(error => { this.toastrService.error('Something went wrong'); });
 
       let bill_no              = this.bill_list+ 1;
-      console.log("bill_list",this.bill_list)
+      console.log("bill_list",bill_no)
       var invoiceprifix        = this.prefix.bill_year ;
 
        this.new_bill            =  bill_no;
@@ -2085,7 +2122,16 @@ async onSubmit(bill_data)
       const control = this.Edit_po.get(field);
       control.markAsTouched({ onlySelf: true });
     });
-
+    this.Edit_po.value.prefix ="bill"
+    this.Edit_po.get('prefix')?.clearValidators();
+    this.Edit_po.get('prefix')?.updateValueAndValidity();
+    this.Edit_po.get('deliverytype')?.clearValidators();
+    this.Edit_po.get('deliverytype')?.updateValueAndValidity();
+    this.Edit_po.get('delivery_schedule')?.clearValidators();
+    this.Edit_po.get('delivery_schedule')?.updateValueAndValidity();
+    this.Edit_po.get('freight')?.clearValidators();
+    this.Edit_po.get('freight')?.updateValueAndValidity();
+    console.log("bill",this.Edit_po.value)
     if (this.Edit_po.valid)
     {
       const billNoValue = this.new_bill;
@@ -2102,6 +2148,12 @@ async onSubmit(bill_data)
          }
         if(value == undefined)
          {
+
+          const confirmed = confirm("Are you sure you want to confirm converting this bill?");
+                      console.log(confirmed)
+                      if (!confirmed) {
+                        return;
+                      }
            bill.po_number = this.po_list.po_number
              this.loading = true;
               await this.api.post('mp_po_to_bill.php?po_id='+this.po_id+'&authToken=' + environment.authToken, bill).then((data: any) =>
@@ -2342,6 +2394,12 @@ feedData(data)
 
        if(last_total >= data.amount)
        {
+
+        const confirmed = confirm("Are you sure you want to confirm this payment?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
           this.loading=true;
               await this.api.post('mp_po_payment_made.php?value='+po_id+'&amount='+amount+'&authToken=' + environment.authToken, data).then((data: any) =>
               {

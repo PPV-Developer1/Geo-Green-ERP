@@ -558,26 +558,26 @@
                     class="custom_table"
                     [headerHeight]="50"
                     [limit]="10"
-                    [columnMode]="'force'"
+                    [columnMode]="'flex'"
                     [footerHeight]="50"
                     [rowHeight]="50"
                     [rows]="production_prefix_list"
                       (activate)="onActivate_product_prefix($event)">
 
-                    <ngx-datatable-column prop="date_time"    name="DATE" >
+                    <ngx-datatable-column     [resizeable]="false" prop="date_time"    name="DATE"  [flexGrow]="1">
                         <ng-template ngx-datatable-cell-template let-row = "row">
                             {{row.date_time | date: 'dd-MM-yyyy'}}
                         </ng-template>
                     </ngx-datatable-column>
 
-                     <ngx-datatable-column prop="prefix"  name="PREFIX" >
+                     <ngx-datatable-column     [resizeable]="false" prop="prefix"  name="PREFIX" [flexGrow]="1" >
                         <ng-template ngx-datatable-cell-template let-row = "row">
                             {{row.prefix}}
                         </ng-template>
                     </ngx-datatable-column>
 
 
-                      <ngx-datatable-column    name="STATUS" >
+                      <ngx-datatable-column     [resizeable]="false"    name="STATUS" [flexGrow]="1">
                         <ng-template ngx-datatable-cell-template let-row = "row">
                            <span *ngIf="row.status == 1"  style="color: green;font-weight: bold;">Active</span>
                             <span *ngIf="row.status == 0" style="color:red;font-weight: bold;" >InActive</span>
@@ -979,31 +979,31 @@
       class="custom_table"
       [headerHeight]="50"
       [limit]="15"
-      [columnMode]="'force'"
+      [columnMode]="'flex'"
       [footerHeight]="50"
       [rowHeight]="'auto'"
       [rows]="product_list"
       (activate)="onActivate($event)">
 
-        <ngx-datatable-column prop="title" name="NAME">
+        <ngx-datatable-column     [resizeable]="false" prop="title" name="NAME" [flexGrow]="2">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.name}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="type" name="TAX">
+        <ngx-datatable-column     [resizeable]="false" prop="type" name="TAX" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
          {{row.tax}} %
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="hsn_code" name="HSN">
+        <ngx-datatable-column     [resizeable]="false" prop="hsn_code" name="HSN" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
          {{row.hsn_code}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="status" name="STATUS">
+        <ngx-datatable-column     [resizeable]="false" prop="status" name="STATUS" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <label *ngIf="row.status == 0" style="color:red"><strong>Inactive</strong></label>
             <label *ngIf="row.status == 1" style="color:green"><strong>Active</strong></label>
@@ -1063,25 +1063,25 @@
       class="custom_table"
       [headerHeight]="50"
       [limit]="15"
-      [columnMode]="'force'"
+      [columnMode]="'flex'"
       [footerHeight]="50"
       [rowHeight]="'auto'"
       [rows]="tax_list"
       (activate)="onActivate_tax($event)">
 
-        <ngx-datatable-column prop="title" name="NAME">
+        <ngx-datatable-column     [resizeable]="false" prop="title" name="NAME" [flexGrow]="2">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.name}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="type" name="TYPE">
+        <ngx-datatable-column     [resizeable]="false" prop="type" name="TYPE" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
          {{row.type}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="rate" name="RATE">
+        <ngx-datatable-column     [resizeable]="false" prop="rate" name="RATE" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.rate}}
           </ng-template>
@@ -1193,13 +1193,13 @@
       class="custom_table"
       [headerHeight]="50"
       [limit]="15"
-      [columnMode]="'force'"
+      [columnMode]="'flex'"
       [footerHeight]="50"
       [rowHeight]="'auto'"
       [rows]="unit_list"
       (activate)="onActivate_unit($event)">
 
-        <ngx-datatable-column prop="title" name="NAME">
+        <ngx-datatable-column     [resizeable]="false" prop="title" name="NAME" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.name}}
           </ng-template>
@@ -1407,43 +1407,43 @@
       class="custom_table"
       [headerHeight]="50"
       [limit]="15"
-      [columnMode]="'force'"
+      [columnMode]="'flex'"
       [footerHeight]="50"
       [rowHeight]="'auto'"
       [rows]="payment_list"
       (activate)="onActivate_payment($event)">
 
-        <ngx-datatable-column prop="terms" name="TERMS">
+        <ngx-datatable-column     [resizeable]="false" prop="terms" name="TERMS" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.terms }}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="terms_value" name="TERMS VALUE">
+        <ngx-datatable-column     [resizeable]="false" prop="terms_value" name="TERMS VALUE" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.terms_value}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="title" name="TITLE">
+        <ngx-datatable-column     [resizeable]="false" prop="title" name="TITLE" [flexGrow]="2">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.title}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="description" name="DESCRIPTION">
+        <ngx-datatable-column     [resizeable]="false" prop="description" name="DESCRIPTION" [flexGrow]="2">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.description}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="value" name="VALUE">
+        <ngx-datatable-column     [resizeable]="false" prop="value" name="VALUE"[flexGrow]="1" >
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.value}}
           </ng-template>
         </ngx-datatable-column>
 
-        <!-- <ngx-datatable-column name="STATUS">
+        <!-- <ngx-datatable-column     [resizeable]="false" name="STATUS">
           <ng-template ngx-datatable-cell-template let-row="row">
             <label *ngIf="row.status == 0" style="color:red"><strong>Inactive</strong></label>
             <label *ngIf="row.status == 1" style="color:green"><strong>Active</strong></label>
@@ -1603,31 +1603,31 @@
           class="custom_table"
           [headerHeight]="50"
           [limit]="15"
-          [columnMode]="'force'"
+          [columnMode]="'flex'"
           [footerHeight]="50"
           [rowHeight]="'auto'"
           [rows]="user_type_list">
 
-          <!-- <ngx-datatable-column prop="terms" name="ID">
+          <!-- <ngx-datatable-column     [resizeable]="false" prop="terms" name="ID">
             <ng-template ngx-datatable-cell-template let-row="row">
               {{row.id }}
             </ng-template>
           </ngx-datatable-column> -->
 
-          <ngx-datatable-column prop="name" name="USER TYPE">
+          <ngx-datatable-column     [resizeable]="false" prop="name" name="USER TYPE" [flexGrow]="1">
             <ng-template ngx-datatable-cell-template let-row="row">
               {{row.name }}
             </ng-template>
           </ngx-datatable-column>
 
-          <ngx-datatable-column prop="date_time" name="DATE">
+          <ngx-datatable-column     [resizeable]="false" prop="date_time" name="DATE" [flexGrow]="1">
             <ng-template ngx-datatable-cell-template let-row="row">
               {{row.date_time| date: 'dd-MM-yyyy' }}
             </ng-template>
           </ngx-datatable-column>
 
-          <ngx-datatable-column  >
-            <ng-template ngx-datatable-cell-template let-row="row">
+          <ngx-datatable-column     [resizeable]="false"  [flexGrow]="1">
+            <ng-template ngx-datatable-cell-template let-row="row" >
 
               <button class="btn btn-info btn-sm fa fa-file" (click) ="onActivate_user(row)"> Menu view</button>
               &nbsp;
@@ -1637,8 +1637,8 @@
               </ngx-datatable-column>
 
 
-              <ngx-datatable-column  >
-                <ng-template ngx-datatable-cell-template let-row="row">
+              <ngx-datatable-column     [resizeable]="false" [flexGrow]="1" >
+                <ng-template ngx-datatable-cell-template let-row="row" >
 
                   <button class="btn btn-info btn-sm fa fa-file" (click) ="onActivate_user_report(row)"> Report view</button>
                   &nbsp;
@@ -1667,30 +1667,30 @@
         class="custom_table"
         [headerHeight]="50"
         [limit]="24"
-        [columnMode]="'force'"
+        [columnMode]="'flex'"
         [footerHeight]="50"
         [rowHeight]="'auto'"
         [rows]="menu_list">
 
-        <!-- <ngx-datatable-column prop="id" name="ID">
+        <!-- <ngx-datatable-column     [resizeable]="false" prop="id" name="ID">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.reference_number }}
           </ng-template>
         </ngx-datatable-column> -->
 
-        <ngx-datatable-column prop="title" name="MENU">
+        <ngx-datatable-column     [resizeable]="false" prop="title" name="MENU" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.parentId == 0"><b>{{row.title}}</b></span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="title" name="SUB MENU">
+        <ngx-datatable-column     [resizeable]="false" prop="title" name="SUB MENU" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.parentId != 0">{{row.title}}</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="paren" name="STATUS">
+        <ngx-datatable-column     [resizeable]="false" prop="paren" name="STATUS" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
 
             <div class="custom-control custom-switch">
@@ -1790,14 +1790,14 @@
     [rows]="pay_roll_list"
     (activate)="onActivate_payrole($event)">
 
-      <ngx-datatable-column prop="title" name="DATA">
+      <ngx-datatable-column     [resizeable]="false" prop="title" name="DATA">
         <ng-template ngx-datatable-cell-template let-row="row">
           {{row.data}}
         </ng-template>
       </ngx-datatable-column>
 
 
-      <ngx-datatable-column prop="rate" name="VALUES">
+      <ngx-datatable-column     [resizeable]="false" prop="rate" name="VALUES">
         <ng-template ngx-datatable-cell-template let-row="row">
           {{row.values}}
         </ng-template>
@@ -1984,30 +1984,30 @@
         class="custom_table"
         [headerHeight]="50"
         [limit]="24"
-        [columnMode]="'force'"
+        [columnMode]="'flex'"
         [footerHeight]="50"
         [rowHeight]="'auto'"
         [rows]="list_report">
 
-        <!-- <ngx-datatable-column prop="id" name="ID">
+        <!-- <ngx-datatable-column     [resizeable]="false" prop="id" name="ID">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.reference_number }}
           </ng-template>
         </ngx-datatable-column> -->
 
-        <!-- <ngx-datatable-column prop="title" name="MENU">
+        <!-- <ngx-datatable-column     [resizeable]="false" prop="title" name="MENU">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.parentId == 0"><b>{{row.title}}</b></span>
           </ng-template>
         </ngx-datatable-column> -->
 
-        <ngx-datatable-column prop="title" name="REPORT MENU">
+        <ngx-datatable-column     [resizeable]="false" prop="title" name="REPORT MENU" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span>{{row.title}}</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="paren" name="STATUS">
+        <ngx-datatable-column     [resizeable]="false" prop="paren" name="STATUS" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
 
             <div class="custom-control custom-switch">

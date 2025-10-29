@@ -33,6 +33,7 @@ export class TrackingComponent implements OnInit {
   asso_detail_show : boolean=false
   asso_details     : any
   product_list     : any
+  outward_Product_list : any
   byproduct_detail_show:boolean=false
   byproduct_details:any
   product_detail_show:boolean=false
@@ -202,7 +203,12 @@ export class TrackingComponent implements OnInit {
           this.byproduct_detail_show=true
           this.asso_detail_show = false
           this.byproduct_details=event.row
-          this.product_list= event.row.production_list[0].outward_list
+          console.log("byproduct_list : ",this.byproduct_list)
+          if(event.row.production_list != null)
+          {
+            this.outward_Product_list= event.row.production_list[0].outward_list
+          }
+          else{this.outward_Product_list = null}
           console.log("product_list : ",this.product_list)
       }
   }

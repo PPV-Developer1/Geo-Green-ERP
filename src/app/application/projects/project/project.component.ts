@@ -147,7 +147,7 @@ export class ProjectComponent implements OnInit
   {
     this.api.get('mp_project_list.php?authToken='+environment.authToken).then((data: any) =>
     {
-
+      console.log("Project List Data:",data)
       this.rows = data;
       if(data != null)
         this.filter = [...data];
@@ -248,6 +248,11 @@ export class ProjectComponent implements OnInit
       this.ProjectClone.controls['project_id'].setValue(ID)
       if(this.ProjectClone.valid)
       {
+        const confirmed = confirm("Are you sure you want to confirm creating clone?");
+            console.log(confirmed)
+            if (!confirmed) {
+              return;
+            }
           console.log("valid",this.ProjectClone.value)
         await  this.api.post('mp_project_clone_create.php?authToken='+environment.authToken,this.ProjectClone.value).then(async (data: any) =>
           {
@@ -276,6 +281,11 @@ export class ProjectComponent implements OnInit
 
     if (this.AddAssociate.valid)
     {
+            const confirmed = confirm("Are you sure you want to update ?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
       this.loading=true;
         await this.api.post('post_update_data.php?table=project_association&field=id&value='+this.updateID+'&authToken='+environment.authToken,values).then((data: any) =>
         {
@@ -478,6 +488,11 @@ export class ProjectComponent implements OnInit
 
  async delete_associate(id)
   {
+     const confirmed = confirm("Are you sure you want to delete ?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
    await this.api.get('delete_data.php?authToken='+environment.authToken+'&table=project_association&field=id&id='+id).then((data: any) =>
         {
           this.AssoView();
@@ -580,6 +595,11 @@ export class ProjectComponent implements OnInit
 
     if(row.status ===1)
     {
+       const confirmed = confirm("Are you sure you want to delete ?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
       await  this.api.get('delete_data.php?authToken='+environment.authToken+'&table=project_item_list&field=id&id='+row.id).then((data: any) =>
           {
             this.AssoView();
@@ -600,7 +620,11 @@ async  onSubmit_edititem(value)
   {
     console.log("edit : ",value)
 
-
+    const confirmed = confirm("Are you sure you want to update this details?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
         this.loading=true;
           await this.api.post('post_update_data.php?table=project_item_list&field=id&value='+this.edit_itemData.id+'&authToken='+environment.authToken,value).then((data: any) =>
           {
@@ -642,6 +666,11 @@ async  ediProject(event)
   {
     if(this.editProject.valid)
     {
+      const confirmed = confirm("Are you sure you want to update this details?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
       this.loading=true;
         await this.api.post('post_update_data.php?table=projects&field=project_id&value='+this.detail.id+'&authToken=' + environment.authToken, this.editProject.value).then((data: any) =>
         {

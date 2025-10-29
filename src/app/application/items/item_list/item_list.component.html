@@ -19,9 +19,14 @@
         <td style="width: 100px;"> </td>
         <td style="width: 100px; text-align: center; vertical-align: center;">
         </td>
-        <td style="width: 200px; text-align: center; vertical-align: center;">
+        <td style="width: 100px; text-align: center; vertical-align: center;">
           <div class="btn-group" role="group" aria-label="Basic example">
             <button type="button" class="btn btn-success fa fa-plus" (click)="NewSubmitBtn()"> Add Item</button>
+          </div>
+        </td>
+          <td style="width: 100px; text-align: center; vertical-align: center;">
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-success fa fa-download" (click)="download()"> Download </button>
           </div>
         </td>
       </tr>
@@ -41,19 +46,19 @@
       [selected]="selected"
       (activate)="onActivate($event)">
 
-        <ngx-datatable-column prop="item_name" [flexGrow]="2" name="NAME" >
+        <ngx-datatable-column     [resizeable]="false" prop="item_name" [flexGrow]="2" name="NAME" >
           <ng-template ngx-datatable-cell-template let-row="row" >
             {{row.item_name}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column  prop="item_cat" [flexGrow]="2" name="CATEGORY">
+        <ngx-datatable-column     [resizeable]="false"  prop="item_cat" [flexGrow]="2" name="CATEGORY">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.item_cat}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="item_type" [flexGrow]="1" name="TYPE" >
+        <ngx-datatable-column     [resizeable]="false" prop="item_type" [flexGrow]="1" name="TYPE" >
           <ng-template ngx-datatable-cell-template let-row="row">
             <label *ngIf="row.item_type == 1">Raw Material</label>
             <label *ngIf="row.item_type == 2">Product</label>
@@ -61,50 +66,50 @@
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="hsnsac" name="HSN/SAC" [flexGrow]="1" >
+        <ngx-datatable-column     [resizeable]="false" prop="hsnsac" name="HSN/SAC" [flexGrow]="1" >
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.hsnsac}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="price" name="RATE" [flexGrow]="1" >
+        <ngx-datatable-column     [resizeable]="false" prop="price" name="RATE" [flexGrow]="1" >
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.price|indianCurrency}}
           </ng-template>
         </ngx-datatable-column>
-        <ngx-datatable-column prop="uom"  name="UOM" [flexGrow]="1">
+        <ngx-datatable-column     [resizeable]="false" prop="uom"  name="UOM" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.uom}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="tax_percent" name="TAX %"  [flexGrow]="1">
+        <ngx-datatable-column     [resizeable]="false" prop="tax_percent" name="TAX %"  [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.tax_percent}} %
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="description" name="DESCRIPTION"  [flexGrow]="2">
+        <ngx-datatable-column     [resizeable]="false" prop="description" name="DESCRIPTION"  [flexGrow]="2">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.description}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="purchase" name="PURCHASE " [flexGrow]="1" >
+        <ngx-datatable-column     [resizeable]="false" prop="purchase" name="PURCHASE " [flexGrow]="1" >
           <ng-template ngx-datatable-cell-template let-row="row">
             <label *ngIf="row.purchase == 0" style="color:red"><strong>False</strong></label>
             <label *ngIf="row.purchase == 1" style="color:green"><strong>True</strong></label>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="sales" name="SALE" [flexGrow]="1">
+        <ngx-datatable-column     [resizeable]="false" prop="sales" name="SALE" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <label *ngIf="row.sales == 0" style="color:red"><strong>False</strong></label>
             <label *ngIf="row.sales == 1" style="color:green"><strong>True</strong></label>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="status" name="STATUS" [flexGrow]="1">
+        <ngx-datatable-column     [resizeable]="false" prop="status" name="STATUS" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <label *ngIf="row.status == 0" style="color:red"><strong>Inactive</strong></label>
             <label *ngIf="row.status == 1" style="color:green"><strong>Active</strong></label>

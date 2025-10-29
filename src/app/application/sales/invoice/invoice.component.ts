@@ -412,6 +412,7 @@ dropdownSettings = {
         this.invoice.controls['shipFrom'].setValue(null);
         this.company_name       = null;
         this.selected_project   = null;
+
   if(id)
   {
               await this.api.get('mp_invoice.php?&value=' + this.customer_id + '&authToken=' + environment.authToken).then((data: any) =>
@@ -466,12 +467,22 @@ dropdownSettings = {
               this.selectedDCs=[]
               if(this.type == "items")
               {
+                if(this.dc_list == null)
+                {
+                    this.LoadItemDetails()
+                    return
+                }
                 this.Items_DctoInvoice(this.customer_id)
               }
     }
     else{console.log("clear")
        this.selected_project   = null;
+       if(this.type == "items")
+              {
+                  this.LoadItemDetails()
+              }
        this.GSTCalculation();
+        this.isDropdownAppendedToBody = true;
     }
   }
 
@@ -1127,7 +1138,7 @@ async  UnSlecetAllDcitems(event) {
     this.show_new_bill = true;
     this.formShow      = true;
   }
-  
+
   setzero()
   {
      this._state.notifyDataChanged('menu.isCollapsed', false);

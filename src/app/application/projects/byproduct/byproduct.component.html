@@ -28,7 +28,7 @@
         class="custom_table"
         [headerHeight]="50"
         [limit]="15"
-        [columnMode]="'force'"
+        [columnMode]="'flex'"
         [footerHeight]="50"
         [rowHeight]="'auto'"
         [rows]="byproduct_details"
@@ -36,44 +36,44 @@
         [selectionType]="'single'"
         (activate)="onActivate($event)">
 
-        <ngx-datatable-column prop="id" name="ID" >
+        <ngx-datatable-column     [resizeable]="false" prop="id" [flexGrow]="1" name="ID" >
             <ng-template ngx-datatable-cell-template let-row="row">
                 {{row.id}}
             </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="project_name" name="PROJECT NAME">
+        <ngx-datatable-column     [resizeable]="false" prop="project_name" [flexGrow]="2" name="PROJECT NAME">
           <ng-template ngx-datatable-cell-template let-row="row">
               {{row.project_name}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="asso_name" name="ASSOCIATE">
+        <ngx-datatable-column     [resizeable]="false" prop="asso_name" [flexGrow]="2" name="ASSOCIATE">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span style="font-weight:bold;"> {{row.asso_name}}</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="category_name" name="BYPRODUCT">
+        <ngx-datatable-column     [resizeable]="false" prop="category_name"  [flexGrow]="2" name="BYPRODUCT">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span style="font-weight:bold;">{{row.category_name}}</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="description" name="DESCRIPTION" >
+        <ngx-datatable-column     [resizeable]="false" prop="description" [flexGrow]="2" name="DESCRIPTION" >
           <ng-template ngx-datatable-cell-template let-row="row">
               {{row.description}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="production_id" name="PRODUCTION ID" >
+        <ngx-datatable-column     [resizeable]="false" prop="production_id" [flexGrow]="1" name="PRODUCTION ID" >
           <ng-template ngx-datatable-cell-template let-row="row">
              <span *ngIf="row.production_id != null">{{row.production_id}}</span>
              <span *ngIf="row.production_id === null">Not Asign</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="level" name="STATUS">
+        <ngx-datatable-column     [resizeable]="false" prop="level" [flexGrow]="1" name="STATUS">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.level == 0" style="color: red;">Created</span>
             <span *ngIf="row.level == 1" style="color: red;">Moving to Plan</span>

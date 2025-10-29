@@ -33,7 +33,7 @@
     class="custom_table"
     [headerHeight]="50"
     [limit]="20"
-    [columnMode]="'force'"
+    [columnMode]="'flex'"
     [footerHeight]="50"
     [rowHeight]="'auto'"
     [rows]="product_details"
@@ -41,25 +41,25 @@
     [selectionType]="'single'"
     (activate)="onActivate($event)">
 
-    <!-- <ngx-datatable-column  name="ID" >
+    <!-- <ngx-datatable-column     [resizeable]="false"  name="ID" >
         <ng-template ngx-datatable-cell-template let-row="row">
             {{row.id}}
         </ng-template>
     </ngx-datatable-column> -->
 
-    <ngx-datatable-column prop="start_datetime"   name="STARTED AT">
+    <ngx-datatable-column     [resizeable]="false" prop="start_datetime" [flexGrow]="1"   name="STARTED AT">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.start_datetime | date: 'dd-MM-yyyy HH:mm:ss'}}
       </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="assign_name" name="ASSIGN TO">
+    <ngx-datatable-column     [resizeable]="false" prop="assign_name" [flexGrow]="1" name="ASSIGN TO">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.assign_name}}
       </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="project_name" name="PROJECT NAME">
+    <ngx-datatable-column     [resizeable]="false" prop="project_name" [flexGrow]="2" name="PROJECT NAME">
       <ng-template ngx-datatable-cell-template let-row="row">
         <span *ngIf="row.type == 1">{{row.project_name}}</span>
         <span *ngIf="row.type == 2"> <strong>For Store</strong></span>
@@ -67,24 +67,24 @@
     </ngx-datatable-column>
 
 
-    <ngx-datatable-column prop="by_product_no" name="PRODUCT NO">
+    <ngx-datatable-column     [resizeable]="false" prop="by_product_no" [flexGrow]="1" name="PRODUCT NO">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.by_product_no}}
       </ng-template>
     </ngx-datatable-column>
 
-  <ngx-datatable-column prop="by_product_description" name="DESCRIPTION">
+  <ngx-datatable-column     [resizeable]="false" prop="by_product_description" [flexGrow]="2" name="DESCRIPTION">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.by_product_description}}
       </ng-template>
     </ngx-datatable-column>
-    <ngx-datatable-column prop="product_name" name="PRODUCT NAME">
+    <ngx-datatable-column     [resizeable]="false" prop="product_name" [flexGrow]="2" name="PRODUCT NAME">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.product_name}}by_product_description
       </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="level" name="LEVEL">
+    <ngx-datatable-column     [resizeable]="false" prop="level" [flexGrow]="1" name="LEVEL">
       <ng-template ngx-datatable-cell-template let-row="row">
         <span *ngIf="row.level === 1">Created</span>
         <span *ngIf="row.level === 2">Waiting For Approval</span>
@@ -114,7 +114,7 @@
     class="custom_table"
     [headerHeight]="50"
     [limit]="10"
-    [columnMode]="'force'"
+    [columnMode]="'flex'"
     [footerHeight]="50"
     [rowHeight]="'auto'"
     [rows]="outwardList"
@@ -122,44 +122,44 @@
     [selectionType]="'single'"
     (activate)="onIntActive($event)">
 
-    <!-- <ngx-datatable-column name="ID" >
+    <!-- <ngx-datatable-column     [resizeable]="false" name="ID" >
         <ng-template ngx-datatable-cell-template let-row="row">
             {{row.id}}
         </ng-template>
     </ngx-datatable-column> -->
 
-    <ngx-datatable-column prop="date_time" name="DATE & TIME">
+    <ngx-datatable-column     [resizeable]="false" prop="date_time" [flexGrow]="1" name="DATE & TIME">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.date_time | date: 'dd-MM-yyyy HH:mm:ss'}}
       </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="batch" name="BATCH NUMBER">
+    <ngx-datatable-column     [resizeable]="false" prop="batch" [flexGrow]="1" name="BATCH NUMBER">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.batch}}
       </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="item_name" name="ITEM NAME">
+    <ngx-datatable-column     [resizeable]="false" prop="item_name" [flexGrow]="2" name="ITEM NAME">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.item_name}}
       </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="qty" name="QUANTITY">
+    <ngx-datatable-column     [resizeable]="false" prop="qty" [flexGrow]="1" name="QUANTITY">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.qty}}
       </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="notes" name="NOTES">
+    <ngx-datatable-column     [resizeable]="false" prop="notes" [flexGrow]="2" name="NOTES">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.notes}}
       </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column>
-      <ng-template ngx-datatable-cell-template let-row="row">
+    <ngx-datatable-column     [resizeable]="false" [flexGrow]="1" name="ACTIONS">
+      <ng-template ngx-datatable-cell-template let-row="row" >
         <button class="btn btn-danger btn-sm fa fa-trash" (click)="delete_item(row)"> Delete</button>
              &nbsp;
         <button  class="btn btn-info btn-sm fa fa-pencil" (click)="edit(row)" > Edit</button>

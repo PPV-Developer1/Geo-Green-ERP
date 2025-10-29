@@ -75,6 +75,11 @@ export class ByproductComponent implements OnInit
       });
     if(this.AddFromStr.valid)
     {
+    const confirmed = confirm("Are you sure you want to update?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
       let id = this.detail_view['id'];
       this.loading = true;
       await this.api.post('mp_prodiction_move_byproduct.php?id='+id+'&authToken=' + environment.authToken, this.AddFromStr.value).then((data: any) =>
@@ -102,6 +107,7 @@ export class ByproductComponent implements OnInit
 
   AddFromStore()
   {
+
     this.api.get('mp_production_view.php?mode=without&authToken='+environment.authToken).then((data: any) =>
     {
       this.store_list = data;
@@ -127,6 +133,11 @@ export class ByproductComponent implements OnInit
 
   async confirm()
   {
+    //  const confirmed = confirm("Are you sure you want to update?");
+    //           console.log(confirmed)
+    //           if (!confirmed) {
+    //             return;
+    //           }
     this.detail_view['product_no'] = this.Product_no
     this.loading=true;
     await this.api.post('mp_move_to_production.php?authToken=' + environment.authToken, this.detail_view).then((data: any) =>

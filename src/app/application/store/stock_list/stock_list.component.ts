@@ -35,7 +35,7 @@ export class Stock_listComponent implements OnInit {
     ({
       'created_by'  : new FormControl(this.uid),
       'old_stock'   : new FormControl(null),
-      new_stock     : new FormControl(null, [Validators.required, Validators.min(1)]),
+      new_stock     : new FormControl(null, [Validators.required]),
       reason        : new FormControl(null, [Validators.required, Validators.minLength(3)]),
     })
 
@@ -69,10 +69,19 @@ export class Stock_listComponent implements OnInit {
   }
   async SubmitAmendment(value)
   {
-
+    Object.keys(this.StockAmd.controls).forEach(field =>
+      {
+        const control = this.StockAmd.get(field);
+        control.markAsTouched({ onlySelf: true });
+      });
     let id = this.detail_view['id'];
     if(this.StockAmd.valid)
     {
+       const confirmed = confirm("Are you sure you want to update?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
         this.loading=true;
         await this.api.post('mp_stock_amendment.php?stock_id='+id+'&authToken=' + environment.authToken, value).then((data_rt: any) =>
         {
@@ -124,6 +133,7 @@ export class Stock_listComponent implements OnInit {
   {
     if(event.type === "click")
     {
+      console.log("on click : ",event.row);
       this.detail_view = event.row;
       this.TotalAmount = this.detail_view.stock*this.detail_view.amount;
       if(event.row.have_serial_number == 1)
@@ -194,6 +204,11 @@ export class Stock_listComponent implements OnInit {
       });
       if(this.po.valid)
       {
+         const confirmed = confirm("Are you sure you want to create the PO request?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
         this.api.post('post_insert_data.php?table=purchase_request&authToken='+environment.authToken,value).then((data: any) =>
         {
 

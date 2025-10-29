@@ -342,9 +342,20 @@ export class CustomerComponent implements OnInit {
       this.customer_contact = data;
     }).catch(error => { this.toastrService.error('Something went wrong'); });
   }
+
   submitImg(data) {
+    if(data.file == null||data.file == "")
+    {
+      this.toastrService.warning('Image required !');
+      return
+    }
     const formData = new FormData();
     formData.append('file', this.myForm.get('fileSource')?.value);
+     const confirmed = confirm("Are you sure you want to confirm update image?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
     this.loading = true;
     this.api.post('upload_customer_file.php?mode=update&user_id=' + this.customer_id + '&location=upload/customer_images/&table=customers&authToken=' + environment.authToken, formData).then((data: any) => {
       if(data.status == "success")

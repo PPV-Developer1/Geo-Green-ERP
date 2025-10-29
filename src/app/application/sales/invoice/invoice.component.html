@@ -177,7 +177,7 @@
 
 
                     <ng-select formControlName="customerId"  class=" form-control" (change)="VendorSelection($event)"
-                       [clearable]="true" [appendTo]="isDropdownAppendedToBody ? 'body' : null">
+                       [clearable]="true" [appendTo]="'body'" [dropdownPosition]="'bottom'">
                       <ng-option *ngFor="let Customer of vendorDetails" [value]="Customer.customer_id" class="form-control">
                         {{Customer.company_name}}
                       </ng-option>
