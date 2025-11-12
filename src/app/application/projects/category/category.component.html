@@ -37,33 +37,39 @@
     [selectionType]="'single'"
     (activate)="onActivate($event)">
 
-    <!-- <ngx-datatable-column [width]="10" name="ID" >
+    <!-- <ngx-datatable-column     [resizeable]="false"     [resizeable]="false" [width]="10" name="ID" >
         <ng-template ngx-datatable-cell-template let-row="row">
             {{row.id}}
         </ng-template>
     </ngx-datatable-column> -->
 
-    <ngx-datatable-column prop="level" [width]="100" name="LEVEL" >
+    <ngx-datatable-column     [resizeable]="false"     [resizeable]="false" prop="level" [width]="100" name="LEVEL" >
       <ng-template ngx-datatable-cell-template let-row="row">
         <span *ngIf="row.level == 1">Association</span>
         <span *ngIf="row.level == 2">Byproduct</span>
       </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="name" [width]="300" [sortable] = "false" name="NAME">
+    <ngx-datatable-column     [resizeable]="false"     [resizeable]="false" prop="name" [width]="300" [sortable] = "false" name="NAME">
         <ng-template ngx-datatable-cell-template let-row="row">
             <span style="font-weight:bold;">{{row.name}}</span>
         </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="has_sub_item" [width]="300" [sortable] = "false" name="HAS BYPRODUCT">
+    <ngx-datatable-column     [resizeable]="false"     [resizeable]="false" prop="has_sub_item" [width]="300" [sortable] = "false" name="HAS BYPRODUCT">
       <ng-template ngx-datatable-cell-template let-row="row">
         <span *ngIf="row.has_sub_item == 1" style="color: green;"><strong>YES</strong></span>
         <span *ngIf="row.has_sub_item == 0" style="color: red;"><strong>NO</strong></span>
       </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="status" [width]="50" alig name="STATUS">
+    <ngx-datatable-column     [resizeable]="false"     [resizeable]="false" prop="prefix" [width]="50" alig name="PREFIX">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.prifix_name}}
+        </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column     [resizeable]="false"     [resizeable]="false" prop="status" [width]="50" alig name="STATUS">
         <ng-template ngx-datatable-cell-template let-row="row">
           <span *ngIf="row.status == 1" style="color: green;"><strong>Active</strong></span>
           <span *ngIf="row.status == 0" style="color: red;"><strong>Disabled</strong></span>
@@ -97,6 +103,20 @@
           <option value = 1>Association</option>
           <option value = 2>Byproduct</option>
         </select>
+      </div>
+
+      <div class="form-group col-md-4">
+        Prefix
+      </div>
+      <div class="form-group col-md-8">
+          <ng-select formControlName="prefix"  class=" form-control custom-select"   [clearable]="false" >
+          <ng-option *ngFor="let item of prefix_list" [value]="item.id" class="form-control">
+            {{item.prefix}}
+          </ng-option>
+        </ng-select>
+
+         <span class="help-block text-danger" *ngIf="CategoryForm.get('prefix').touched && CategoryForm.get('prefix').hasError('required')"> Required !</span>
+
       </div>
 
       <div class="form-group col-md-4">
@@ -154,6 +174,20 @@
           <option value = 1>Association</option>
           <option value = 2>Byproduct</option>
         </select>
+      </div>
+
+     <div class="form-group col-md-4">
+        Prefix
+      </div>
+      <div class="form-group col-md-8">
+          <ng-select formControlName="prefix"  class=" form-control custom-select"   [clearable]="false" >
+          <ng-option *ngFor="let item of prefix_list" [value]="item.id" class="form-control">
+            {{item.prefix}}
+          </ng-option>
+        </ng-select>
+
+         <span class="help-block text-danger" *ngIf="CategoryForm.get('prefix').touched && CategoryForm.get('prefix').hasError('required')"> Required !</span>
+
       </div>
 
       <div class="form-group col-md-4">

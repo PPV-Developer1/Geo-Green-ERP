@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { AppState } from '../../../app.state';
 import { SidebarService } from '../sidebar/sidebar.service';
 import { Router } from '@angular/router';
@@ -12,7 +12,7 @@ import { environment } from "../../../../environments/environment";
   providers: [ SidebarService ]
 })
 
-export class NavbarComponent {
+export class NavbarComponent  implements OnInit {
     public isMenuCollapsed:boolean = false;
     public user_prefix    = localStorage.getItem('prefix');
     public user_name    = localStorage.getItem('name');
@@ -22,14 +22,14 @@ export class NavbarComponent {
     public last_login   = localStorage.getItem('last_login');
     public logo         = localStorage.getItem('com_logo');
     public icon         = localStorage.getItem('com_icon');
-    
+
 
     public img_call     = environment.baseURL+"upload/employee_images/"+this.user_image;
     public logo_call    = environment.baseURL+"upload/company/"+this.logo;
     public icon_call    = environment.baseURL+"upload/company/"+this.icon;
-    
-    
-    constructor(private router: Router, private _state:AppState, private _sidebarService:SidebarService) 
+
+
+    constructor(private router: Router, private _state:AppState, private _sidebarService:SidebarService)
     {
         this._state.subscribe('menu.isCollapsed', (isCollapsed) => {
             this.isMenuCollapsed = isCollapsed;
@@ -42,8 +42,8 @@ export class NavbarComponent {
     }
 
     public toggleMenu() {
-        this.isMenuCollapsed = !this.isMenuCollapsed; 
-        this._state.notifyDataChanged('menu.isCollapsed', this.isMenuCollapsed);        
+        this.isMenuCollapsed = !this.isMenuCollapsed;
+        this._state.notifyDataChanged('menu.isCollapsed', this.isMenuCollapsed);
     }
 
     logout() {
@@ -51,4 +51,11 @@ export class NavbarComponent {
         this.router.navigate(['/login']);
       }
 
+      ngOnInit() {
+            if(!this.user_image)
+            {
+              console.log("no image")
+              this.img_call ="../../../../assets/img/profile/default.jpg"
+            }
+        }
 }

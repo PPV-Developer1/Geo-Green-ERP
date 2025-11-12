@@ -6,6 +6,7 @@ import { FormGroup, FormBuilder,  Validators,  FormControl } from '@angular/form
 import { ApiService } from "../../../service/api.service";
 import { environment } from "../../../../environments/environment";
 import { ToastrService } from 'ngx-toastr';
+import { group } from 'console';
 
 @Component({
   selector   : 'az-stock_list',
@@ -35,7 +36,7 @@ export class Stock_listComponent implements OnInit {
     ({
       'created_by'  : new FormControl(this.uid),
       'old_stock'   : new FormControl(null),
-      new_stock     : new FormControl(null, [Validators.required, Validators.min(1)]),
+      new_stock     : new FormControl(null, [Validators.required]),
       reason        : new FormControl(null, [Validators.required, Validators.minLength(3)]),
     })
 
@@ -69,10 +70,19 @@ export class Stock_listComponent implements OnInit {
   }
   async SubmitAmendment(value)
   {
-
+    Object.keys(this.StockAmd.controls).forEach(field =>
+      {
+        const control = this.StockAmd.get(field);
+        control.markAsTouched({ onlySelf: true });
+      });
     let id = this.detail_view['id'];
     if(this.StockAmd.valid)
     {
+       const confirmed = confirm("Are you sure you want to update?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
         this.loading=true;
         await this.api.post('mp_stock_amendment.php?stock_id='+id+'&authToken=' + environment.authToken, value).then((data_rt: any) =>
         {
@@ -97,12 +107,15 @@ export class Stock_listComponent implements OnInit {
     this.toastrService.error('Fill the Details');
   }
   }
+
+  total_stocklist : any
   async getProductList()
   {
     await this.api.get('mp_stock_list.php?format=status&authToken='+environment.authToken).then((data: any) =>
     {
       if(data != null)
       {
+        this.total_stocklist = data;
         this.stock_list  = data;
         this.filter_data = [...data];
       }
@@ -124,6 +137,7 @@ export class Stock_listComponent implements OnInit {
   {
     if(event.type === "click")
     {
+      console.log("on click : ",event.row);
       this.detail_view = event.row;
       this.TotalAmount = this.detail_view.stock*this.detail_view.amount;
       if(event.row.have_serial_number == 1)
@@ -133,6 +147,19 @@ export class Stock_listComponent implements OnInit {
         this.serial_number_list = data
         }).catch(error => {this.toastrService.error('Something went wrong');});
       }
+    }
+  }
+
+  GroupStockDetails : any
+
+  onActivate2(event)
+  {
+    if(event.type === "click")
+    {
+      this.detail_view = null
+      console.log("on click : ",event.row);
+      this.GroupStockDetails  = this.total_stocklist.filter(i => i.item_id == event.row.item_list_id)
+      console.log("group stock : ",this.GroupStockDetails)
     }
   }
 
@@ -164,6 +191,8 @@ export class Stock_listComponent implements OnInit {
   set_zero()
   {
     this.selected =[];
+    this.GroupStockDetails = null
+    this.detail_view = null
   }
 
   create_pur_request()
@@ -194,6 +223,11 @@ export class Stock_listComponent implements OnInit {
       });
       if(this.po.valid)
       {
+         const confirmed = confirm("Are you sure you want to create the PO request?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
         this.api.post('post_insert_data.php?table=purchase_request&authToken='+environment.authToken,value).then((data: any) =>
         {
 
@@ -221,11 +255,17 @@ export class Stock_listComponent implements OnInit {
   Order_by_Item()
   {
     this.Type = false
+    this.detail_view = null
     this.getProductList()
   }
 
  async Order_by_Group()
   {
+     const confirmed = confirm("Are you sure you want to change stock grouping type?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
    await  this.api.get('stock_list_by_grouping.php?authToken='+environment.authToken).then((data: any) =>
     {
       console.log(data)

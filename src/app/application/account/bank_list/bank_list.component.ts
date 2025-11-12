@@ -160,24 +160,50 @@ export class Bank_listComponent implements OnInit
       });
     if (this.addAccount.valid)
     {
-      this.loading = true;
-      await this.api.post('post_insert_data.php?table=bank&authToken=' + environment.authToken, addAccount).then((data: any) =>
-      {
-        if(data.status == "success")
-          { this.toastrService.success('Account Added Succesfully');
-            this.loading = false; }
-        else
-        { this.toastrService.error(data.status); }
-        return true;
-      }).catch(error =>
-      {
-          this.toastrService.error('API Faild : newAccount');
-      });
-      this.modalRef.dismiss();
-      this.loadData();
-      this.addAccount.controls['account_name'].reset();
-      this.addAccount.controls['mode'].setValue(0);
-      this.addAccount.controls['opening_balance'].setValue(0);
+        const Value = this.addAccount.value.account_name;
+            function normalizeString(str : any) {
+              return str.replace(/\s+/g, '').toLowerCase();
+            }
+            let checking :any
+            await this.api.get('get_data.php?table=bank&authToken=' + environment.authToken).then((data: any) =>
+
+              {
+                if(data != null)
+                  {
+                     checking = data.some((item: { account_name: any; }) =>  normalizeString(item.account_name) ===  normalizeString(Value) );
+                console.log("checking : ",checking)
+
+                    }
+              }).catch(error =>
+                {
+                    this.toastrService.error('API Faild : Account verification checking failed');
+                    this.loading = false;
+                });
+              if(checking)
+               {
+                this.toastrService.error('Account Name already exists');
+                return
+               }
+
+                  this.loading = true;
+                  await this.api.post('post_insert_data.php?table=bank&authToken=' + environment.authToken, addAccount).then((data: any) =>
+                  {
+                    if(data.status == "success")
+                      { this.toastrService.success('Account Added Succesfully');
+                        this.loading = false; }
+                    else
+                    { this.toastrService.error(data.status); }
+                    return true;
+                  }).catch(error =>
+                  {
+                      this.toastrService.error('API Faild : newAccount');
+                            });
+                      this.modalRef.dismiss();
+                      this.loadData();
+                      this.addAccount.controls['account_name'].reset();
+                      this.addAccount.controls['mode'].setValue(0);
+                      this.addAccount.controls['opening_balance'].setValue(0);
+
     }
     else
     {
@@ -189,6 +215,36 @@ export class Bank_listComponent implements OnInit
   {
     if (this.addAccount.valid)
     {
+       const confirmed = confirm("Are you sure you want to update this account details?");
+        if (!confirmed) {
+          this.modalRef.dismiss();
+          return;
+        }
+         const Value = this.addAccount.value.account_name;
+            function normalizeString(str : any) {
+              return str.replace(/\s+/g, '').toLowerCase();
+            }
+            let checking :any
+            await this.api.get('get_data.php?table=bank&authToken=' + environment.authToken).then((data: any) =>
+
+              {
+                if(data != null)
+                  {
+                     checking = data.some((item: { account_name: any;bank_id:any }) =>  normalizeString(item.account_name) ===  normalizeString(Value)&& item.bank_id != this.detail_view['bank_id'] );
+                console.log("checking : ",checking)
+
+                    }
+              }).catch(error =>
+                {
+                    this.toastrService.error('API Faild : Account verification checking failed');
+                    this.loading = false;
+                });
+              if(checking)
+               {
+                this.toastrService.error('Account Name already exists');
+                return
+               }
+
       this.loading=true;
       await this.api.post('post_update_data.php?table=bank&field=bank_id&value='+this.detail_view['bank_id']+'&authToken=' + environment.authToken, editAccount).then((data: any) =>
       {
@@ -221,6 +277,11 @@ export class Bank_listComponent implements OnInit
   {
     if (this.addExpense.valid)
     {
+      const confirmed = confirm("Are you sure you want to update this account details?");
+        if (!confirmed) {
+          this.modalRef.dismiss();
+          return;
+        }
       await this.api.post('post_update_data.php?table=expense_account&field=id&value='+this.expense_detail_view['id']+'&authToken=' + environment.authToken, editExpense).then((data: any) =>
       {
         if(data.status == "success")
@@ -271,6 +332,11 @@ export class Bank_listComponent implements OnInit
   }
   async DisableAccount()
   {
+    const confirmed = confirm("Confirm in this account as inactive?");
+        if (!confirmed) {
+
+          return;
+        }
     await this.api.get('single_field_update.php?table=bank&field=bank_id&value='+this.detail_view['bank_id']+'&update=0&up_field=status&authToken=' + environment.authToken).then((data: any) =>
       {
         if(data.status == "success")
@@ -294,6 +360,11 @@ export class Bank_listComponent implements OnInit
 
   async EnableAccount()
   {
+     const confirmed = confirm("Confirm in this account as active?");
+        if (!confirmed) {
+
+          return;
+        }
     await this.api.get('single_field_update.php?table=bank&field=bank_id&value='+this.detail_view['bank_id']+'&update=1&up_field=status&authToken=' + environment.authToken).then((data: any) =>
       {
         if(data.status == "success")
@@ -317,6 +388,11 @@ export class Bank_listComponent implements OnInit
 
   async DisableAccount_expense()
   {
+     const confirmed = confirm("Confirm in this account as inactive?");
+        if (!confirmed) {
+
+          return;
+        }
     await this.api.get('single_field_update.php?table=expense_account&field=id&value='+this.expense_detail_view['id']+'&update=0&up_field=status&authToken=' + environment.authToken).then((data: any) =>
       {
         if(data.status == "success")
@@ -343,6 +419,10 @@ export class Bank_listComponent implements OnInit
 
   async EnableAccount_expense()
   {
+     const confirmed = confirm("Confirm in this account as active?");
+        if (!confirmed) {
+          return;
+        }
     await this.api.get('single_field_update.php?table=expense_account&field=id&value='+this.expense_detail_view['id']+'&update=1&up_field=status&authToken=' + environment.authToken).then((data: any) =>
       {
         if(data.status == "success")

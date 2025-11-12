@@ -154,6 +154,12 @@ export class InwardComponent implements OnInit {
       });
       if(this.InwardEntry.valid)
       {
+        const confirmed = confirm("Are you sure you want to inward?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
+
         this.loading = true;
         let batch    = this.InwardEntry.value['batch'];
 

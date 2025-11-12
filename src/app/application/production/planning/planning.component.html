@@ -32,7 +32,7 @@
     class="custom_table"
     [headerHeight]="50"
     [limit]="10"
-    [columnMode]="'force'"
+    [columnMode]="'flex'"
     [footerHeight]="50"
     [rowHeight]="'auto'"
     [rows]="product_details"
@@ -40,44 +40,44 @@
     [selectionType]="'single'"
     (activate)="onActivate($event)">
 
-    <ngx-datatable-column prop="id" name="ID" >
+    <ngx-datatable-column     [resizeable]="false" prop="id" name="ID" [flexGrow]="1" >
         <ng-template ngx-datatable-cell-template let-row="row">
             {{row.id}}
         </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="date_time" name="CREATED AT">
+    <ngx-datatable-column     [resizeable]="false" prop="date_time" name="CREATED AT" [flexGrow]="1">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.date_time| date: 'dd-MM-yyyy HH:mm:ss'}}
       </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="creater_name" name="CREATED BY">
+    <ngx-datatable-column     [resizeable]="false" prop="creater_name" name="CREATED BY" [flexGrow]="1">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.creater_name}}
       </ng-template>
     </ngx-datatable-column>
 
-        <ngx-datatable-column prop="by_product_no" name="PRODUCT NO">
+        <ngx-datatable-column     [resizeable]="false" prop="by_product_no" name="PRODUCT NO" [flexGrow]="1">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.by_product_no}}
       </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="type" name="PROJECT NAME">
+    <ngx-datatable-column     [resizeable]="false" prop="type" name="PROJECT NAME" [flexGrow]="2">
       <ng-template ngx-datatable-cell-template let-row="row">
         <span *ngIf="row.type == 1">{{row.project_name}}</span>
         <span *ngIf="row.type == 2"> <strong>For Store</strong></span>
       </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="product_name" name="PRODUCT NAME">
+    <ngx-datatable-column     [resizeable]="false" prop="product_name" name="PRODUCT NAME" [flexGrow]="2">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.product_name}}
       </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="level" name="LEVEL">
+    <ngx-datatable-column     [resizeable]="false" prop="level" name="LEVEL" [flexGrow]="1">
       <ng-template ngx-datatable-cell-template let-row="row">
         <span *ngIf="row.level === 1">Created</span>
         <span *ngIf="row.level === 2">Waiting For Approval</span>
@@ -91,7 +91,7 @@
   <div class="modal-header">
     <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero($event)"> Back</button>
     <button type="submit" class="btn btn-success fa fa-check pull-right" (click)="move_to_process($event)" *ngIf="detail_view.assign_id === null"> Approve & Move to Process</button>
-    <button class="btn btn-danger fa fa-trash" (click) ="delete_production(detail_view.id)" *ngIf="detail_view.type === 2 && detail_view.assign_id === null"> Delete Production</button>
+    <button class="btn btn-danger fa fa-trash" (click)="delete_production()" *ngIf="detail_view.type === 2 && detail_view.assign_id === null"> Delete Production</button>
 
   </div>
   <div class="row">
@@ -147,6 +147,13 @@
                     <td *ngIf="detail_view.status == 1"> Active </td>
                     <td *ngIf="detail_view.status == 2"> Completed </td>
                   </tr>
+
+                  <tr>
+                  <th>Production No</th>
+                  <td *ngIf="detail_view.by_product_no != null">{{detail_view.by_product_no}}</td>
+
+                </tr>
+
               </tbody>
             </table>
             <table class="table col-md-6">
@@ -188,17 +195,14 @@
                   <td *ngIf="detail_view.level == 3">Move to Production</td>
                   <td *ngIf="detail_view.level == 4">Completed</td>
                 </tr>
-              </tbody>
-            </table>
-            <table class="table col-md-12">
-              <tbody>
-                <tr>
+                 <tr>
                   <th>Production Notes</th>
-                  <td *ngIf="detail_view.notes != null">{{detail_view.notes}}</td>
+                  <td *ngIf="detail_view.notes != null" style="text-align: left;">{{detail_view.notes}}</td>
                   <td *ngIf="detail_view.notes === null">No Notes Available</td>
                 </tr>
               </tbody>
             </table>
+
           </div>
         </div>
       </div>
@@ -218,29 +222,39 @@
       <div class="form-group col-md-4">
         Category Name
       </div>
-      <div class="form-group col-md-6">
+      <div class="form-group col-md-8">
         <!-- <select formControlName="category_id" class="form-control">
           <option *ngFor= "let item of category_list" value={{item.id}}>{{item.name}}</option>
         </select> -->
 
-        <ng-select formControlName="category_id"  class=" form-control custom-select" [clearable]="false" >
+        <ng-select formControlName="category_id"  class=" form-control custom-select" [clearable]="false"  (change)="Batch($event)" >
           <ng-option *ngFor= "let item of category_list" value="{{item.id}}" class="form-control">
               {{item.name}}
           </ng-option>
         </ng-select>
 
       </div>
+
+      <div class="form-group col-md-4">
+        Product Number
+      </div>
+      <div class="form-group col-md-8">
+        <input formControlName="product_no"  class="form-control" [(ngModel)]="Product_no" placeholder="Product Number">
+        <span class="help-block text-danger" *ngIf="CategoryForm.get('product_no').touched && CategoryForm.get('product_no').hasError('required')">Number Required !</span>
+        <span class="help-block text-danger" *ngIf="CategoryForm.get('product_no').touched && CategoryForm.get('product_no').hasError('minlength')">Minimum 3 Letters</span>
+      </div>
+
       <div class="form-group col-md-4">
         Notes
       </div>
-      <div class="form-group col-md-6">
+      <div class="form-group col-md-8">
         <input formControlName="notes" type="account" class="form-control" placeholder="Production Notes">
         <span class="help-block text-danger" *ngIf="CategoryForm.get('notes').touched && CategoryForm.get('notes').hasError('required')">Notes Required !</span>
         <span class="help-block text-danger" *ngIf="CategoryForm.get('notes').touched && CategoryForm.get('notes').hasError('minlength')">Minimum 3 Letters</span>
       </div>
 
-      <div class="form-group col-md-12">
-        <button [disabled]="loading" type="submit" class="btn btn-info pull-right">Add Product <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      <div class="form-group col-md-12" style="text-align: center;">
+        <button [disabled]="loading" type="submit" class="btn btn-info">Add Product <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
       </div>
     </form>
   </div>
@@ -295,6 +309,9 @@
         <span class="help-block text-danger" *ngIf="AssignTo.get('end_date_time').touched && AssignTo.get('end_date_time').hasError('required')">Required !</span>
       </div>
 
+
+
+
       <div class="form-group col-md-4">
         Notes
       </div>
@@ -308,5 +325,19 @@
         <button [disabled]="loading" type="submit" class="btn btn-info pull-right">Add Product <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
       </div>
     </form>
+  </div>
+</ng-template>
+
+<ng-template #delete let-modal>
+  <div class="modal-header state modal-danger">
+    <h4 class="modal-title" id="modal-primary-label">Delete Confirmation</h4>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    Are you sure to delete this Plan!
+  </div>
+  <div class="modal-footer">
+      <button [disabled]="loading" type="button" class="btn btn-danger" data-dismiss="modal" (click)="ReqDelete()">Delete<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      <button type="button" class="btn btn-success" data-dismiss="modal" (click)="modal.dismiss('Cross click')">Close</button>
   </div>
 </ng-template>

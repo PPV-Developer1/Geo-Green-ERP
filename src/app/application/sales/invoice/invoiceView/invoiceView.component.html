@@ -1,13 +1,17 @@
 <div *ngIf="show" class="col-md-12">
 
-  <div class="row">
-    <div class="col-md-5">
+  <!-- <div class="row">
+    <div class="col-md-4">
+        <input class="form-control" type="text" placeholder="Search ..." (keyup)="updateFilter($event)"/>
+    </div>
+
+     <div class="col-md-1">
       <h4 class="ml-4"><b>INVOICE</b></h4>
     </div>
 
     <div class="btn-group mb-3 col-md-7" role="group" aria-label="Basic example">
 
-      <button type="button" class="btn btn-outline-info fa fa-pencil btn-sm" (click)="editbill()"> Edit</button>
+      <button type="button" class="btn btn-outline-info fa fa-pencil btn-sm" [disabled]="payment_view ||status == 2 " (click)="editbill()"> Edit</button>
       <button type="button" class="btn btn-outline-info fa fa-print btn-sm" (click)="download()"> Print</button>
       <button  class="btn btn-outline-info dropdown-toggle fa fa-money btn-sm" [disabled]="payment_view" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">  Payment
     </button>
@@ -23,6 +27,44 @@
       &nbsp;
       &nbsp;
     </div>
+  </div> -->
+
+  <div class="col-md-12" style="padding-left:1.7%;">
+        <table style="border: none;">
+          <tr style="border: none;">
+
+             <td style="width: 34%;border: none">
+                      <div class="input-group input-group-sm my-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-search"></i></span>
+                        </div>
+                        <input class="form-control" type="text" placeholder="Search ..." (keyup)="updateFilter($event)"/>
+                      </div>
+                </td>
+            <td style="width: 38%; text-align: center;border: none">
+              <h4><B>INVOICE LIST</B></h4>
+            </td>
+            <!-- <td style="width: 10%;border: none">
+            </td> -->
+            <td style="border: none;width: 34%;">
+               <div class="btn-group mb-3 col-md-7" role="group" aria-label="Basic example">
+
+                <button type="button" class="btn btn-outline-info fa fa-pencil btn-sm" [disabled]="payment_view ||status == 2 " (click)="editbill()"> Edit</button>
+                <button type="button" class="btn btn-outline-info fa fa-print btn-sm" (click)="download()"> Print</button>
+                <button  class="btn btn-outline-info dropdown-toggle fa fa-money btn-sm" [disabled]="payment_view" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">  Payment
+              </button>
+              <div class="dropdown-menu">
+                  <a  class="dropdown-item" href="javascript:void(0);"  (click)="payment()" >Payment</a>
+                  <a  class="dropdown-item" href="javascript:void(0);" (click)="use_advance()">Use Advance</a>
+              </div>
+                <button type="button" class="btn btn-outline-info fa fa-pencil-square-o btn-sm" (click)="e_bill()"> Transport Vehicle Details</button>
+                <button type="button" class="btn btn-outline-info fa fa-copy btn-sm" (click)="clone()"> Clone</button>
+                <button type="button" class="btn btn-outline-danger fa fa-trash-o btn-sm" (click)="remove()"> Delete</button>
+
+              </div>
+            </td>
+          </tr>
+        </table>
   </div>
 
   <div class="card-group col-md-12">
@@ -34,7 +76,7 @@
 
         <ngx-datatable-column [sortable]="false">
           <ng-template ngx-datatable-cell-template let-row="row">
-           <div  [attr.id]="'invoice-row-' + row.serial_no">
+           <div  [attr.id]="'invoice-row-' + row.serial_no" style="overflow: hidden;">
             <div class="row">
               <input type="hidden" [value]="row.invoice_id">
               <input type="hidden" [value]="row.customer_id">
@@ -43,15 +85,18 @@
               <div class="col-md-3">{{row.total | indianCurrency }} </div>
             </div>
             <div class="row">
-              <div class="col-md-7">{{row.invoice_number}} | {{row.reference_number}}</div>
-              <div class="col-md-5 ">{{ row.invoice_date  | date: 'dd-MM-yyyy'}} </div>
+              <div class="col-md-9">{{row.invoice_number}} </div>
+              <div class="col-md-3 ">{{ row.invoice_date  | date: 'dd-MM-yyyy'}} </div>
+            </div>
+            <div class="row">
+               <div class="col-md-12"> {{row.reference_number}}</div>
             </div>
            </div>
           </ng-template>
         </ngx-datatable-column>
       </ngx-datatable>
     </div>
-    <div class="card col-md-8 vh-100" style="overflow-y: scroll;">
+    <div class="card col-md-8 " style="overflow-y: scroll;">
       <div class="page-content container">
         <div class="container px-0">
           <div class="row mt-4">
@@ -86,7 +131,7 @@
                   <tr style="border-bottom:none ;">
 
                     <td class="inv_td_bottom" colspan="1" rowspan="1"
-                      style="text-align: left; width: 442px; border-top: 0px solid rgb(255, 255, 255); border-bottom: none; background-color: rgb(119, 180, 58); padding: 0em;">
+                      style="text-align: left; width: 435px; border-top: 0px solid rgb(255, 255, 255); border-bottom: none; background-color: rgb(119, 180, 58); padding: 0em;">
                       <strong>GSTIN: {{invoice.gst_number}}</strong>
                     </td>
 
@@ -108,8 +153,8 @@
                       <b> Pin Code : </b> {{invoice.bill_zip_code}}
                     </td>
                     <td>
-                      <b> Shippment : </b>{{invoice.shipment_mode}}, <br>
-                      <b> Vehicle Number : </b>{{invoice.vehicle_number}},<br>
+                      <!-- <b> Shippment : </b>{{invoice.shipment_mode}}, <br>
+                      <b> Vehicle Number : </b>{{invoice.vehicle_number}},<br> -->
                       <b> Place of Supply : </b> {{invoice.place_from_supply}},<br>
                       <b> Ref No : </b>{{invoice.reference_number }}, <br>
                       <b > Dc No : </b>{{invoice.dc_no}}
@@ -277,8 +322,116 @@
         </div>
         <br><br><br>
       </div>
+
+      <div>
+        <table class="col-md-12" style="border: none; text-align: center;margin: 10px;margin-bottom: 20px;">
+          <thead style="border: none;">
+            <tr  style="border: none;">
+              <th style="border: none;">E way bill number</th>
+              <th style="border: none;">Vehicle number</th>
+              <th style="border: none;">Transport mode</th>
+              <th style="border: none;">Transport charge</th>
+            </tr>
+          </thead>
+          <tbody style="border: none;">
+            <tr style="border: none;" *ngFor="let invoice of invoicePdf">
+              <td style="border: none;">{{ invoice.e_way_bill??"No data found"}}</td>
+              <td style="border: none;">{{ invoice.vehicle_number??"No data found"}}</td>
+              <td style="border: none;">{{ invoice.shipment_mode??"No data found"}}</td>
+              <td style="border: none;">{{ invoice.transport_charge!= null?(invoice.transport_charge|indianCurrency):"No data found"}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
     </div>
   </div>
+  &nbsp;
+
+        <div widget class="card" *ngIf="Dispatch_total > 0" >
+            <div class="card-header d-flex justify-content-between align-items-center" >
+
+                  <span class="text-uppercase">Dispatch Details</span>
+                    <!-- <span  style="color: white;" (click)="togglePanel('panel1')">
+                                  <i class="fa" [ngClass]="{'fa-chevron-up': activePanel === 'panel1', 'fa-chevron-down': activePanel !== 'panel1'}"></i>
+                      </span> -->
+              </div>
+
+            &nbsp;
+             <!-- <div class="card-body widget-body"  *ngIf="activePanel === 'panel1'"> -->
+                 <div class="card-body widget-body"  >
+
+                   <div *ngIf="Dispatch_total > 0" class="d-flex " style="gap: 10px; color:midnightblue">
+                      <span> Purchased at {{Dispatch_total | indianCurrency}} and sold at {{this.invoicePdf[0]?.without_tax | indianCurrency}}. The
+                        difference is {{Difference_amount | indianCurrency}} ({{Dispatch_percentage}}%) </span>
+
+                          <!-- <span>-</span> -->
+
+                          <!-- <span> = </span> -->
+                          <span>  </span>
+                    </div>
+                    &nbsp;
+
+                    <ngx-datatable
+                    #table
+                    class="custom_table"
+                    [headerHeight]="50"
+                    [limit]="5"
+                    [columnMode]="'flex'"
+                    [footerHeight]="50"
+                    [rowHeight]="50"
+                    [rows]="Dispatch_items">
+
+                    <ngx-datatable-column prop="date_time"   [resizeable]="false" [flexGrow]="1"  name="DATE" >
+                        <ng-template ngx-datatable-cell-template let-row = "row">
+                            {{row.date_time | date: 'dd-MM-yyyy'}}
+                        </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="batch"  [resizeable]="false" [flexGrow]="1"  name="BATCH" >
+                        <ng-template ngx-datatable-cell-template let-row = "row">
+                            {{row.batch }}
+                        </ng-template>
+                    </ngx-datatable-column>
+
+                     <ngx-datatable-column prop="name"  [resizeable]="false" [flexGrow]="2"  name="ITEM" >
+                        <ng-template ngx-datatable-cell-template let-row = "row">
+                            {{row.name}}
+                        </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column prop="bill_number"  [resizeable]="false" [flexGrow]="1"name="BILL" >
+                        <ng-template ngx-datatable-cell-template let-row = "row">
+                            {{row.bill_number}}
+                        </ng-template>
+                    </ngx-datatable-column>
+
+                      <ngx-datatable-column prop="value"  [resizeable]="false" [flexGrow]="1" name="QUANTITY" >
+                        <ng-template ngx-datatable-cell-template let-row = "row">
+                            {{row.value}} {{row.uom}}
+                        </ng-template>
+                    </ngx-datatable-column>
+
+                     <!-- <ngx-datatable-column    name="AMOUNT" >
+                        <ng-template ngx-datatable-cell-template let-row = "row">
+                            {{row.value*row.amount | indianCurrency}}
+                        </ng-template>
+                    </ngx-datatable-column> -->
+
+                    <!-- <ngx-datatable-column  [width]="100"   name="TAX" >
+                        <ng-template ngx-datatable-cell-template let-row = "row">
+                            {{row.tax_amount | indianCurrency}}
+                        </ng-template>
+                    </ngx-datatable-column> -->
+
+                      <ngx-datatable-column  [flexGrow]="1"   [resizeable]="false"  name="TOTAL" >
+                        <ng-template ngx-datatable-cell-template let-row = "row">
+                            {{row.total | indianCurrency}}
+                        </ng-template>
+                    </ngx-datatable-column>
+                  </ngx-datatable>
+              </div>
+          </div>
 </div>
 
 <div  *ngIf=" show_invoice_edit" >
@@ -728,9 +881,16 @@
   <div class="modal-body">
     <form [formGroup]="invoice_payment" (ngSubmit)="AddNewTrans(invoice_payment.value)">
 
-      <div class="form-group">
+      <div class="form-group ">
         <label for="input-12">Receipt No</label>
-        <input type="text" formControlName="receipt_no" class="form-control">
+          <div class="d-flex">
+            <div class="col-sm-4">
+              <input type="text" readonly formControlName="prefix" [(ngModel)]="prefix" class="form-control text-uppercase" />
+          </div>
+              <div class="col-sm-4">
+                <input type="number" formControlName="receipt_no" [(ngModel)]="receipt_serial_no" class="form-control" />
+              </div>
+         </div>
       </div>
       <div class="form-group">
         <label for="exampleSelect3">Mode of Transfer</label>
@@ -805,74 +965,87 @@
  </ng-template>
  &nbsp;
 
-<div  *ngIf=" show" >
-  <ngx-datatable
-  #table
-  class="custom_table"
-  [headerHeight]="50"
-  [limit]="10"
-  [columnMode]="'force'"
-  [footerHeight]="50"
-  [rowHeight]="50"
-  [rows]="payment_transaction">
+  <div *ngIf=" show" >
+        <div widget class="card">
+            <div class="card-header d-flex justify-content-between align-items-center" >
 
-  <ngx-datatable-column prop="tran_date"  [width]="200"  name="TRANSACTION DATE" >
-      <ng-template ngx-datatable-cell-template let-row = "row">
-          {{row.tran_date | date: 'dd-MM-yyyy'}}
-      </ng-template>
-  </ngx-datatable-column>
+                  <span class="text-uppercase">Payment Transactions</span>
+                    <!-- <span  style="color: white;" (click)="togglePanel('panel1')">
+                                  <i class="fa" [ngClass]="{'fa-chevron-up': activePanel === 'panel1', 'fa-chevron-down': activePanel !== 'panel1'}"></i>
+                      </span> -->
+            </div>
 
-  <ngx-datatable-column [width]="100" name="MODE">
-      <ng-template ngx-datatable-cell-template let-row="row">
-            <span *ngIf="row.tran_mode === 1 " >
-              Wire
-          </span>
-          <span *ngIf="row.tran_mode === 2 " >
-              Cash
-          </span>
-          <span *ngIf="row.tran_mode === 3 " >
-              Cheque
-          </span>
-      </ng-template>
-    </ngx-datatable-column>
+             <!-- <div class="card-body widget-body"  *ngIf="activePanel === 'panel1'"> -->
+                 <div class="card-body widget-body"  >
+                    <ngx-datatable
+                    #table
+                    class="custom_table"
+                    [headerHeight]="50"
+                    [limit]="10"
+                    [columnMode]="'flex'"
+                    [footerHeight]="50"
+                    [rowHeight]="50"
+                    [rows]="payment_transaction">
 
-  <ngx-datatable-column  [width]="200" name="REFERENCE">
-      <ng-template ngx-datatable-cell-template let-row="row">
-          {{row.reference}}
-      </ng-template>
-  </ngx-datatable-column>
+                    <ngx-datatable-column prop="tran_date"  [resizeable]="false"  [flexGrow]="1" name="TRANSACTION DATE" >
+                        <ng-template ngx-datatable-cell-template let-row = "row">
+                            {{row.tran_date | date: 'dd-MM-yyyy'}}
+                        </ng-template>
+                    </ngx-datatable-column>
 
-  <ngx-datatable-column [width]="110" name="CREDIT">
-      <ng-template ngx-datatable-cell-template let-row="row">
-        <span style="font-weight:bold;"> {{row.credit | indianCurrency}} </span>
-        </ng-template>
-    </ngx-datatable-column>
+                    <ngx-datatable-column [flexGrow]="1"  [resizeable]="false" name="MODE">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                              <span *ngIf="row.tran_mode === 1 " >
+                                Wire
+                            </span>
+                            <span *ngIf="row.tran_mode === 2 " >
+                                Cash
+                            </span>
+                            <span *ngIf="row.tran_mode === 3 " >
+                                Cheque
+                            </span>
+                        </ng-template>
+                      </ngx-datatable-column>
 
-  <ngx-datatable-column [width]="110" name="DEBIT">
-    <ng-template ngx-datatable-cell-template let-row="row">
-      <span style="font-weight:bold;"> {{row.debit | indianCurrency}} </span>
-      </ng-template>
-  </ngx-datatable-column>
+                    <ngx-datatable-column  [flexGrow]="2"  [resizeable]="false" name="REFERENCE">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                            {{row.reference}}
+                        </ng-template>
+                    </ngx-datatable-column>
 
-  <ngx-datatable-column name="BALANCE">
-      <ng-template ngx-datatable-cell-template let-row="row">
-        <span style="font-weight:bold;"> {{row.balance | indianCurrency}} </span>
-        </ng-template>
-  </ngx-datatable-column>
+                    <ngx-datatable-column [flexGrow]="1"  [resizeable]="false" name="CREDIT">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                          <span style="font-weight:bold;"> {{row.credit | indianCurrency}} </span>
+                          </ng-template>
+                      </ngx-datatable-column>
 
-  <ngx-datatable-column name="DESCRIPTION">
-      <ng-template ngx-datatable-cell-template let-row="row">
-          {{row.tran_details}}
-      </ng-template>
-  </ngx-datatable-column>
+                    <ngx-datatable-column [flexGrow]="1"  [resizeable]="false" name="DEBIT">
+                      <ng-template ngx-datatable-cell-template let-row="row">
+                        <span style="font-weight:bold;"> {{row.debit | indianCurrency}} </span>
+                        </ng-template>
+                    </ngx-datatable-column>
 
-  <ngx-datatable-column  [width]="200" name="COMMAND">
-      <ng-template ngx-datatable-cell-template let-row="row">
-          {{row.notes}}
-        </ng-template>
-    </ngx-datatable-column>
+                    <ngx-datatable-column [flexGrow]="1"  [resizeable]="false" name="BALANCE">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                          <span style="font-weight:bold;"> {{row.balance | indianCurrency}} </span>
+                          </ng-template>
+                    </ngx-datatable-column>
 
- </ngx-datatable>
+                    <ngx-datatable-column [flexGrow]="1"  [resizeable]="false" name="DESCRIPTION">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                            {{row.tran_details}}
+                        </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column  [flexGrow]="2"  [resizeable]="false" name="COMMAND">
+                        <ng-template ngx-datatable-cell-template let-row="row">
+                            {{row.notes}}
+                          </ng-template>
+                      </ngx-datatable-column>
+
+                  </ngx-datatable>
+              </div>
+          </div>
  </div>
 
 <div *ngIf="clone_invoice_show">
@@ -961,13 +1134,14 @@
 
                 <div class="row mb-3">
                   <label style="color: #e54643" class="col-sm-2 col-form-label col-form-label-sm">Invoice Number*</label>
-                  <div class="col-sm-4">
-                    <input type="text" formControlName="invoiceNo" [(ngModel)]="inv_no"
-                    class="form-control form-control-sm"  />
-                    <span class="help-block text-danger"
-                      *ngIf="Edit_invoice.get('invoiceNo').touched && Edit_invoice.get('invoiceNo').hasError('required')">Enter
-                      INVOICE Number !</span>
-                  </div>
+                   <div class="col-sm-2">
+                          <input type="text" readonly formControlName="prefix" [(ngModel)]="prefix_data" class="form-control form-control-sm" />
+                      </div>
+
+                      <div class="col-sm-1">
+                          <input type="text" formControlName="invoiceNo" [(ngModel)]="inv_no"
+                            class="form-control form-control-sm" />
+                        </div>
                 </div>
 
                 <div class="row mb-3">
@@ -1327,9 +1501,24 @@
         <label>Shipment Mode</label>
       </div>
       <div class="form-group col-md-9">
-        <input formControlName="shipment_mode"  placeholder="Enter Shipment Mode" type="text"
-          class="form-control">
+        <!-- <input formControlName="shipment_mode"  placeholder="Enter Shipment Mode" type="text"
+          class="form-control"> -->
+           <select formControlName="shipment_mode"  class=" form-control custom-select">
+                  <option value="Road">Road</option>
+                  <option value="Rail">Rail</option>
+                  <option value="Rail">Air</option>
+                  <option value="Rail">Ship</option>
+            </select>
         <span class="help-block text-danger" *ngIf="e_way_bill.get('shipment_mode').touched && e_way_bill.get('shipment_mode').hasError('required')">Shipment Mode Required !</span>
+      </div>
+
+        <div class="form-group col-md-3">
+        <label>Transport Charge</label>
+      </div>
+      <div class="form-group col-md-9">
+        <input formControlName="amount"  placeholder="Enter Amount" type="number"
+          class="form-control">
+        <span class="help-block text-danger" *ngIf="e_way_bill.get('amount').touched && e_way_bill.get('amount').hasError('required')"> Required !</span>
       </div>
       <div class="col-md-12">
         <div class="row justify-content-center">

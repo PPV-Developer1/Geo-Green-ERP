@@ -211,8 +211,8 @@ export class EmployeeComponent implements OnInit
       emergency_Con_PersonRelationship: new FormControl('', [Validators.required]),
       hra             : new FormControl('', [Validators.required]),
       allowance       : new FormControl('', [Validators.required]),
-      epf_amount      : new FormControl('', [Validators.required]),
-      professional_tax: new FormControl('', [Validators.required]),
+      epf_amount      : new FormControl(0, [Validators.required]),
+      professional_tax: new FormControl(0 , [Validators.required]),
     })
   constructor(private modalService: NgbModal, public api: ApiService, public toastrService: ToastrService, fb: FormBuilder,private http: HttpClient)
   {
@@ -318,8 +318,8 @@ export class EmployeeComponent implements OnInit
         emp_uan                 : [null],
         emp_hra                 : new FormControl('', [Validators.required]),
         emp_allowance           : new FormControl('', [Validators.required]),
-        emp_epf_amount          : new FormControl('', [Validators.required]),
-        emp_professional_tax    : new FormControl('', [Validators.required]),
+        emp_epf_amount          : new FormControl(0, [Validators.required]),
+        emp_professional_tax    : new FormControl(0, [Validators.required]),
       })
 
       this.createBank_FG = fb.group
@@ -402,6 +402,11 @@ export class EmployeeComponent implements OnInit
 
   async deleteFile(data)
   {
+    const confirmed = confirm("Are you sure you want to delete this file?");
+        if (!confirmed) {
+
+          return;
+        }
     await this.api.get('delete_data.php?authToken='+environment.authToken+'&table=employee_file&field=id&id='+data.id).then((data_rt: any) =>
     {
       if (data_rt.status == "success") { this.toastrService.success('Document Deleted Succesfully'); }
@@ -413,6 +418,7 @@ export class EmployeeComponent implements OnInit
   async loadData()
   {
     await this.api.get('get_data.php?table=employee&authToken=' + environment.authToken).then((data: any) => {
+      console.log(data)
       this.employee = data;
     }).catch(error => { this.toastrService.error('API Faild : loadData employee'); });
 
@@ -547,6 +553,13 @@ export class EmployeeComponent implements OnInit
 
   async updateEmp(updateEmp)
   {
+    const confirmed = confirm("Are you sure you want to update this employee details?");
+       console.log(confirmed)
+      if (!confirmed) {
+        this.employeeLoad(this.emp_id);
+        this.status   = true;
+        return;
+      }
       this.SalEditConv    = this.sal_edit.controls['SalEditConv'];
       this.SalEditSA      = this.sal_edit.controls['SalEditSA'];
       this.SalEditTA      = this.sal_edit.controls['SalEditTA'];
@@ -637,6 +650,7 @@ export class EmployeeComponent implements OnInit
               this.createBank_FG.controls['account_name'].setValue(employee['empName']);
               await this.api.post('post_insert_data.php?table=bank&authToken=' + environment.authToken, this.createBank_FG.value).then((data: any) =>
               {
+                console.log(data)
                 if (data.status == "success")
                 {
                   employee['bank_id'] = data.last_id;
@@ -668,15 +682,16 @@ export class EmployeeComponent implements OnInit
     {
         this.loading=false;
         await this.api.post('post_insert_data.php?table=employee&authToken=' + environment.authToken, data).then((data: any) => {
-
+          console.log(data)
           if (data.status == "success")
           {
             this.toastrService.success('Employee Added Succesfully');
             this.addEmployee.reset();
+            this.addEmployee.controls["created_by"].setValue(this.uid)
             this.loading=false;
             this.loadData();
           }
-          else { this.toastrService.error(data.status);
+          else { this.toastrService.error("Something went wrong");
             this.loading=false;}
           return true;
         }).catch(error => {
@@ -738,6 +753,7 @@ export class EmployeeComponent implements OnInit
 
       await this.api.get('mp_employee_salary_transactions.php?emp_id=' + emp_id + '&authToken=' + environment.authToken).then((data: any) =>
       {
+        console.log(data)
         if(data != null)
         {
               this.salary_details = data;
@@ -771,7 +787,7 @@ export class EmployeeComponent implements OnInit
       {
       this.employee_details     = data[0];
 
-
+      console.log(this.employee_details)
       this.emp_name                             = this.employee_details.name
       this.emp_doj                              = this.employee_details.doj
       this.emp_id                               = this.employee_details.emp_id
@@ -791,7 +807,7 @@ export class EmployeeComponent implements OnInit
       this.emp_mobileNo                         = this.employee_details.mobile_no
       this.emp_dob                              = this.employee_details.dob
       this.emp_emailId                          = this.employee_details.email_id
-      this.emp_password                         = this.employee_details.password
+      this.emp_password                         = this.employee_details.plain_password
       this.emp_empRole_id                       = this.employee_details.user_type_name
       this.emp_empRole                          = this.employee_details.user_type
       this.emp_empType_name                     = this.employee_details.emp_type_name
@@ -802,13 +818,21 @@ export class EmployeeComponent implements OnInit
       this.emp_bank_access                      = this.employee_details.bank_access
       this.emp_userStatus                       = this.employee_details.status
       this.emp_permenantAddress                 = this.employee_details.permenent_address
-      this.emp_AddressForCommunication           = this.employee_details.communication_address
+      this.emp_AddressForCommunication          = this.employee_details.communication_address
       this.emp_jobLocation                      = this.employee_details.job_location
       this.emp_lastWorkingDay                   = this.employee_details.last_working_day
       this.emp_emergency_Con_Person             = this.employee_details.contact_person
       this.emp_emergency_Con_PersonNo           = this.employee_details.contact_personNo
       this.emp_emergency_Con_PersonRelationship = this.employee_details.contact_person_relationship
-      this.img_path                             = environment.baseURL+"download_file.php?path=upload/employee_images/"+this.emp_image+"&authToken="+ environment.authToken;
+        console.log(this.emp_image)
+      if(this.emp_image != null && this.emp_image != "")
+      {
+       this.img_path                            = environment.baseURL+"download_file.php?path=upload/employee_images/"+this.emp_image+"&authToken="+ environment.authToken;
+        console.log(this.img_path)
+      }
+      else{ this.img_path = "../../../../assets/img/profile/default.jpg"
+            console.log(this.img_path) }
+
       // this.emp_salaryGroup_name                 = this.employee_details.salary_group_name
       // this.emp_salaryGroup                      = this.employee_details.salary_group
       this.emp_ot                               = this.employee_details.ot
@@ -908,9 +932,15 @@ export class EmployeeComponent implements OnInit
 
   cancel()
   {
+    const confirmed = confirm("Are you sure you want to cancel the changes?");
+       console.log(confirmed)
+      if (!confirmed) {
+        return;
+      }
     this.show    = true;
     this.status  = true;
     this.dropdown= true;
+    this.employeeLoad(this.emp_id);
   }
 
   set_zero_1()
@@ -921,6 +951,12 @@ export class EmployeeComponent implements OnInit
 
  async professional_tax_change()
   {
+     const confirmed = confirm("Are you sure you want to update professional tax?");
+       console.log(confirmed)
+      if (!confirmed) {
+         this.Perssional_tax_edit = false;
+        return;
+      }
       await  this.api.get('single_field_update.php?table=employee&field=emp_id&value='+this.employee_details.emp_id+'&up_field=professional_tax&update='+this.emp_professional_tax+'&authToken='+environment.authToken).then((data: any) =>
               {
                 console.log(data);
@@ -942,6 +978,12 @@ export class EmployeeComponent implements OnInit
 
   async epf_change()
   {
+     const confirmed = confirm("Are you sure you want to update epf amount?");
+       console.log(confirmed)
+      if (!confirmed) {
+         this.EPF_edit = false;
+        return;
+      }
       await  this.api.get('single_field_update.php?table=employee&field=emp_id&value='+this.employee_details.emp_id+'&up_field=epf_amount&update='+this.emp_epf_amount+'&authToken='+environment.authToken).then((data: any) =>
               {
                 console.log(data);

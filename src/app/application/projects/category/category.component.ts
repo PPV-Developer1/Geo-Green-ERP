@@ -6,6 +6,7 @@ import { environment } from 'src/environments/environment.prod';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormGroup, Validators, FormControl} from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { PrefixNot } from '@angular/compiler';
 
 @Component({
   selector   : 'az-category',
@@ -18,6 +19,7 @@ export class CategoryComponent implements OnInit
   temp        = [];
   detail_view = [];
   selected    = [];
+  prefix_list : any
   openModel   : any;
   loading     : boolean  = false;
   pipe                   = new DatePipe('en-US');
@@ -35,19 +37,36 @@ export class CategoryComponent implements OnInit
         level         : new FormControl(1),
         name          : new FormControl(null, [Validators.required, Validators.minLength(3)]),
         byproduct     : new FormControl(1),
-        status        : new FormControl(1)
+        status        : new FormControl(1),
+        prefix        : new FormControl(null,[Validators.required])
       })
 
   constructor(public api: ApiService, public toastrService: ToastrService, private modalService: NgbModal)
   {}
 
-  ngOnInit()
+async  ngOnInit()
   {
-    this.api.get('get_data.php?table=project_level_category&authToken='+environment.authToken).then((data: any) =>
+
+     await this.api.get('get_data.php?table=production_prefix&authToken='+environment.authToken).then((data: any) =>
     {
-      this.temp = [...data];
-      this.rows = data;
+     this.prefix_list = data
     }).catch(error => {this.toastrService.error('Something went wrong');});
+
+   await this.api.get('get_data.php?table=project_level_category&authToken='+environment.authToken).then((data: any) =>
+    {
+        for(let i=0;i< data.length;i++)
+        {
+           console.log(data[i]['id'])
+          const Prefix = this.prefix_list.find(e => e.id == data[i]['prefix'])
+          console.log(Prefix)
+          if(Prefix)
+          data[i]['prifix_name'] = Prefix.prefix
+        }
+        this.rows = data;
+        this.temp = [...data];
+    }).catch(error => {this.toastrService.error('Something went wrong');});
+
+
   }
 
   openSm(content)
@@ -72,10 +91,11 @@ export class CategoryComponent implements OnInit
   }
   OpenAddCat()
   {
-
-    // this.CategoryForm.controls['created_by'].setValue(this.uid);
-    // this.CategoryForm.controls['byproduct'].setValue(1);
-    // this.CategoryForm.controls['status'].setValue(1);
+      this.CategoryForm.reset()
+          this.CategoryForm.controls['level'].setValue(1);
+          this.CategoryForm.controls['name'].setValue('');
+          this.CategoryForm.controls['byproduct'].setValue(1);
+          this.CategoryForm.controls['status'].setValue(1);
     this.openSm(this.add_category);
   }
   onActivate(event)
@@ -83,11 +103,13 @@ export class CategoryComponent implements OnInit
     if(event.type === "click")
     {
       let data = event.row;
+
       this.detail_view = data;
       this.CategoryForm.controls['level'].setValue(data.level);
       this.CategoryForm.controls['name'].setValue(data.name);
       this.CategoryForm.controls['byproduct'].setValue(data.has_sub_item);
       this.CategoryForm.controls['status'].setValue(data.status);
+      this.CategoryForm.controls['prefix'].setValue(data.prefix);
       this.openSm(this.edit_category);
     }
   }
@@ -108,10 +130,12 @@ export class CategoryComponent implements OnInit
         {
           this.loading = false;
           this.toastrService.success('Project Category Added Succesfully');
+          this.CategoryForm.reset()
           this.CategoryForm.controls['level'].setValue(1);
           this.CategoryForm.controls['name'].setValue('');
           this.CategoryForm.controls['byproduct'].setValue(1);
           this.CategoryForm.controls['status'].setValue(1);
+
         }
         else
         {

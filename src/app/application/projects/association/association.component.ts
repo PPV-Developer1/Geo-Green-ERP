@@ -112,6 +112,11 @@ export class AssociationComponent implements OnInit
   }
   UpdateToStore(value)
   {
+     const confirmed = confirm("Are you sure you want to update?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
     let id       = this.detail_view['id'];
     this.loading = true;
     this.api.post('mp_project_asso_store.php?asso_id='+id+'&authToken='+environment.authToken,value).then((data: any) =>
@@ -139,6 +144,7 @@ export class AssociationComponent implements OnInit
 
   call_edit_level1(row)
   {
+    console.log(row);
     this.level_1_id = row.id;
     this.AddByProduct.controls['category_id'].setValue(row.category_id);
     this.AddByProduct.controls['description'].setValue(row.description);
@@ -189,6 +195,11 @@ export class AssociationComponent implements OnInit
   {
     if (this.AddByProduct.valid)
     {
+       const confirmed = confirm("Are you sure you want to update this details?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
        this.loading=true;
         this.api.post('post_update_data.php?table=project_byproduct&field=id&value='+this.level_1_id+'&authToken='+environment.authToken,values).then((data: any) =>
         {
@@ -222,7 +233,7 @@ export class AssociationComponent implements OnInit
 
   updateFilter(event)
   {
-  
+
     const val = event.target.value.toLowerCase();
     const temp = this.temp.filter((d) => {
       return Object.values(d).some(field =>
@@ -290,6 +301,11 @@ export class AssociationComponent implements OnInit
 
   async delete_level_1(id)
   {
+     const confirmed = confirm("Are you sure you want to delete?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
     await this.api.get('delete_data.php?authToken='+environment.authToken+'&table=project_byproduct&field=id&id='+id).then((data: any) =>
         {
           this.level_1(this.asso_id);

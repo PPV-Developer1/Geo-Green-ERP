@@ -112,11 +112,15 @@ export class ExpenseComponent implements OnInit
   async balanceLoad()
   {
     let bank = this.addExpen.controls['paid_through'].value;
-    this.balance_disp = 1;
-    await this.api.get('get_data.php?table=bank&find=bank_id&value='+bank+'&authToken=' + environment.authToken).then((get_data: any) =>
-      {
-        this.onloadBalance = get_data[0].balance;
-      }).catch(error => { this.toastrService.error('API Faild : balanceLoad'); });
+    this.balance_disp = 0;
+    if(bank != null)
+    {
+      this.balance_disp = 1;
+      await this.api.get('get_data.php?table=bank&find=bank_id&value='+bank+'&authToken=' + environment.authToken).then((get_data: any) =>
+        {
+          this.onloadBalance = get_data[0].balance;
+        }).catch(error => { this.toastrService.error('API Faild : balanceLoad'); });
+    }
   }
 
   async loadData()
@@ -160,6 +164,7 @@ export class ExpenseComponent implements OnInit
 
   tax_calculate()
   {
+
     this.tax_per      = this.addExpen.controls['tax_percent'].value;
     this.cal_amount   = this.addExpen.controls['amount'].value;
     this.cal_percent  = 100;
@@ -387,6 +392,7 @@ export class ExpenseComponent implements OnInit
 
   ReqDelete()
   {
+    
     this.loading= true;
     this.api.post('mp_transaction_delete.php?id='+this.select_id+'&uid='+this.uid+'&authToken=' + environment.authToken, null).then((data: any) =>
       {

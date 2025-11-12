@@ -1,6 +1,6 @@
 <div *ngIf="show" class="col-md-12">
 
-  <div class="row">
+  <!-- <div class="row">
     <div class="col-md-5">
       <h4 class="ml-3"><b>Purchase Order</b></h4>
     </div>
@@ -12,24 +12,57 @@
       <button type="button" class="btn btn-outline-info fa fa-pencil-square-o btn-sm" (click)="e_bill()"> Transport Vehicle Details</button>
       <button type="button" class="btn btn-outline-info fa fa-copy btn-sm"  (click)="clone()"> Clone</button>
       <button type="button" class="btn btn-outline-info fa fa-copy btn-sm" [disabled]="status === 2" (click)="addbill()"> Convert To Bill</button>
-      <button type="button" class="btn btn-outline-danger fa fa-trash-o btn-sm" [disabled]="status === 2" (click)="remove()"> Delete</button>
+      <button type="button" class="btn btn-outline-danger fa fa-trash-o btn-sm" [disabled]="status === 2 ||edit_status > 0" (click)="remove()"> Delete</button>
       &nbsp;
       &nbsp;
       &nbsp;
     </div>
-  </div>
+  </div> -->
 
+
+   <div class="col-md-12" style="padding-left:1.7%;">
+        <table style="border: none;">
+          <tr style="border: none;">
+
+             <td style="width: 38%;border: none">
+                      <div class="input-group input-group-sm my-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-search"></i></span>
+                        </div>
+                        <input class="form-control" type="text" placeholder="Search ..." (keyup)="updateFilter($event)"/>
+                      </div>
+                </td>
+            <td style="width: 30%; text-align: center;border: none">
+              <h4><B>PO LIST</B></h4>
+            </td>
+            <!-- <td style="width: 10%;border: none">
+            </td> -->
+            <td style="border: none;">
+                <div class="btn-group mb-3 col-md-6" role="group" aria-label="Basic example">
+                      <button *ngIf="user =='super_admin'" type="button" class="btn btn-outline-info fa fa-pencil btn-sm" [disabled]="status === 2" (click)="editbill()"> Edit</button>
+                      <button type="button" class="btn btn-outline-info fa fa-print btn-sm" (click)="download()"> Print</button>
+                      <button type="button" class="btn btn-outline-info fa fa-money btn-sm" [disabled]="payment_view === true || status === 2"   (click)="payment()"> Payment</button>
+                      <button type="button" class="btn btn-outline-info fa fa-pencil-square-o btn-sm" (click)="e_bill()"> Transport Vehicle Details</button>
+                      <button type="button" class="btn btn-outline-info fa fa-copy btn-sm"  (click)="clone()"> Clone</button>
+                      <button type="button" class="btn btn-outline-info fa fa-copy btn-sm" [disabled]="status === 2" (click)="addbill()"> Convert To Bill</button>
+                      <button type="button" class="btn btn-outline-danger fa fa-trash-o btn-sm" [disabled]="status === 2 ||edit_status > 0" (click)="remove()"> Delete</button>
+
+                </div>
+            </td>
+          </tr>
+        </table>
+  </div>
 
   <div class="card-group col-md-12">
     <div class="col-md-4">
       <ngx-datatable #table class="custom_table vh-100" [headerHeight]="0" [limit]="5" [columnMode]="'force'"
-        [footerHeight]="50" [rowHeight]="70" [rows]="VendorBillList" [selected]="selected"
+        [footerHeight]="50" [rowHeight]="100" [rows]="VendorBillList" [selected]="selected"
         [selectionType]="SelectionType.single" [scrollbarV]="true" (activate)="onActivate($event)"
         (select)="onSelect($event)">
 
         <ngx-datatable-column [sortable]="false">
           <ng-template ngx-datatable-cell-template let-row="row">
-            <div  [attr.id]="'po-row-' + row.serial_no">
+            <div  [attr.id]="'po-row-' + row.serial_no"  style="overflow: hidden;">
             <div class="row">
               <input type="hidden" [value]="row.po_id">
               <input type="hidden" [value]="row.customer_id">
@@ -37,14 +70,14 @@
               <div class="col-md-9"> <b> {{row.vendor_name | uppercase }} </b> </div>
               <div class="col-md-3">{{row.total | indianCurrency }} </div>
             </div>
-            <div class="row">
-              <div class="col-md-5 ml-2">{{row.po_number}} | {{row.reference_number}}</div>
 
+            <div class="row">
+              <div class="col-md-9 "><b>{{ row.creater_name}}</b> </div>
+              <div class="col-md-3 " >{{ row.po_date | date: 'dd-MM-yyyy'}} </div>
             </div>
 
             <div class="row">
-              <div class="col-md-5 ml-2"><b>{{ row.creater_name}}</b> </div>
-              <div class="col-md-5 ml-2" style="text-align: right;">{{ row.po_date | date: 'dd-MM-yyyy'}} </div>
+              <div class="col-md-12 ">{{row.po_number}}</div>
             </div>
             </div>
           </ng-template>
@@ -136,7 +169,7 @@
                       <b>Contact :</b>{{invoice.ship_phone}}
                     </td>
                     <td style="text-align: left; vertical-align: top;">
-                      
+
                      <b> Mode Of Transport  : </b> {{invoice.shipment_mode}}<br>
                      <b>Delivery Type : </b>{{invoice.delivery_type}}<br>
                      <b>Ref : </b>{{invoice.reference_number}}
@@ -294,6 +327,24 @@
         </div>
         <br><br><br>
       </div>
+
+       <div>
+        <table class="col-md-12" style="border: none; text-align: center;margin-bottom: 20px;">
+          <thead style="border: none;">
+            <tr  style="border: none;">
+              <th style="border: none;">Transport mode</th>
+              <th style="border: none;">Scope</th>
+            </tr>
+          </thead>
+          <tbody style="border: none;">
+            <tr style="border: none;" *ngFor="let invoice of poPdf">
+              <td style="border: none;">{{ invoice.shipment_mode??"No data found"}}</td>
+              <td style="border: none;">{{ invoice.scope??"No data found"}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
     </div>
   </div>
 </div>
@@ -307,18 +358,18 @@
       class="custom_table"
       [headerHeight]="50"
       [limit]="10"
-      [columnMode]="'force'"
+      [columnMode]="'flex'"
       [footerHeight]="50"
       [rowHeight]="50"
       [rows]="payment_transaction">
 
-      <ngx-datatable-column prop="tran_date"  [width]="200"  name="TRANSACTION DATE" >
+      <ngx-datatable-column prop="tran_date"  [resizeable]="false"  [flexGrow]="1"  name="TRANSACTION DATE" >
           <ng-template ngx-datatable-cell-template let-row = "row">
               {{row.tran_date | date: 'dd-MM-yyyy'}}
           </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="tran_mode" [width]="100" name="MODE">
+      <ngx-datatable-column prop="tran_mode"   [resizeable]="false" [flexGrow]="1" name="MODE">
           <ng-template ngx-datatable-cell-template let-row="row">
                 <span *ngIf="row.tran_mode === 1 " >
                   Wire
@@ -332,37 +383,37 @@
           </ng-template>
         </ngx-datatable-column>
 
-      <ngx-datatable-column prop="reference"  [width]="200" name="REFERENCE">
+      <ngx-datatable-column prop="reference"  [resizeable]="false" [flexGrow]="2" name="REFERENCE">
           <ng-template ngx-datatable-cell-template let-row="row">
               {{row.reference}}
           </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="credit" [width]="110" name="CREDIT">
+      <ngx-datatable-column prop="credit"  [resizeable]="false" [flexGrow]="1" name="CREDIT">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span style="font-weight:bold;"> {{row.credit | indianCurrency}} </span>
             </ng-template>
         </ngx-datatable-column>
 
-      <ngx-datatable-column prop="debit" [width]="110" name="DEBIT">
+      <ngx-datatable-column prop="debit"  [resizeable]="false" [flexGrow]="1" name="DEBIT">
         <ng-template ngx-datatable-cell-template let-row="row">
           <span style="font-weight:bold;"> {{row.debit | indianCurrency}} </span>
           </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="balance" name="BALANCE">
+      <ngx-datatable-column prop="balance"  [resizeable]="false" [flexGrow]="1" name="BALANCE">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span style="font-weight:bold;"> {{row.balance | indianCurrency}} </span>
             </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="tran_details" name="DESCRIPTION">
+      <ngx-datatable-column prop="tran_details"  [resizeable]="false" [flexGrow]="2" name="DESCRIPTION">
           <ng-template ngx-datatable-cell-template let-row="row">
               {{row.tran_details}}
           </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="notes" [width]="200" name="COMMAND">
+      <ngx-datatable-column prop="notes"  [resizeable]="false" [flexGrow]="2" name="COMMAND">
           <ng-template ngx-datatable-cell-template let-row="row">
               {{row.notes}}
             </ng-template>
@@ -848,13 +899,15 @@
 
                 <div class="row mb-3">
                   <label style="color: #e54643" class="col-sm-2 col-form-label col-form-label-sm">PO Number*</label>
-                  <div class="col-sm-4">
-                    <input type="text" formControlName="poNo"
-                      class="form-control form-control-sm" [(ngModel)]="inv_no" (ngModelChange)="onInputChange()" />
-                    <span class="help-block text-danger"
-                      *ngIf="Edit_po.get('poNo').touched && Edit_po.get('poNo').hasError('required')">Enter
-                      PO Number !</span>
-                  </div>
+                  <div class="col-sm-2">
+                          <input type="text" readonly formControlName="prefix" [(ngModel)]="po_prefix" class="form-control form-control-sm" />
+                      </div>
+
+                      <div class="col-sm-1">
+                          <input type="text" formControlName="poNo" [(ngModel)]="inv_no"
+                            class="form-control form-control-sm" />
+                          <span class="help-block text-danger" *ngIf="Edit_po.get('poNo').touched && Edit_po.get('poNo').hasError('required')">Enter PO Number !</span>
+                      </div>
                 </div>
 
                 <div class="row mb-3">
@@ -1512,20 +1565,27 @@
       <div class="row">
 
       <div class="form-group col-md-3">
-        <label>Vehicle No</label>
+        <label>Scope</label>
       </div>
       <div class="form-group col-md-9">
-        <input formControlName="vehicle_no"  placeholder=" Enter Vehicle No" type="text"
-          class="form-control">
-        <span class="help-block text-danger" *ngIf="e_way_bill.get('vehicle_no').touched && e_way_bill.get('vehicle_no').hasError('required')">Bill Required !</span>
+       <select formControlName="scope"  class=" form-control custom-select">
+                  <option value="Customer">Customer</option>
+                  <option value="vendor">Vendor</option>
+
+            </select>
+        <span class="help-block text-danger" *ngIf="e_way_bill.get('scope').touched && e_way_bill.get('scope').hasError('required')"> Required !</span>
       </div>
 
       <div class="form-group col-md-3">
         <label>Shipment Mode</label>
       </div>
       <div class="form-group col-md-9">
-        <input formControlName="shipment_mode"  placeholder="Enter Shipment Mode" type="text"
-          class="form-control">
+        <select formControlName="shipment_mode"  class=" form-control custom-select">
+                  <option value="Road">Road</option>
+                  <option value="Rail">Rail</option>
+                  <option value="Rail">Air</option>
+                  <option value="Rail">Ship</option>
+            </select>
         <span class="help-block text-danger" *ngIf="e_way_bill.get('shipment_mode').touched && e_way_bill.get('shipment_mode').hasError('required')">Shipment Mode Required !</span>
       </div>
       <div class="col-md-12">
@@ -1614,7 +1674,14 @@ aria-labelledby="modal-large-label" style="display: none;">
 
       <div class="form-group">
         <label for="input-12">Payment Receipt No</label>
-        <input type="text" formControlName="receipt_no" class="form-control" id="input-12">
+        <div class="d-flex">
+            <div class="col-sm-4">
+              <input type="text" readonly formControlName="prefix" [(ngModel)]="prefix" class="form-control text-uppercase" />
+          </div>
+              <div class="col-sm-4">
+                <input type="number" formControlName="receipt_no" [(ngModel)]="receipt_serial_no" class="form-control" />
+              </div>
+         </div>
       </div>
       <div class="form-group">
         <label for="exampleSelect3">Mode of Transfer</label>

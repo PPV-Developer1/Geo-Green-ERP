@@ -107,7 +107,8 @@ export class SalaryComponent implements OnInit
   cl_available        : any;
   account_balance     : any;
   advance_emp         : any;
-
+  pl_balance          : any;
+  cl_balance          : any;
   advance             : Boolean = false;
   company_total_expence     : any;
   epf_employer_contribution : any;
@@ -142,7 +143,7 @@ month: any;
     (
       {
         ip_salary   : [null],
-        ip_bank_id  : ['', Validators.compose([Validators.required])],
+        ip_bank_id  : [null, Validators.compose([Validators.required])],
         ip_utr      : ['',Validators.compose([Validators.required])],
         ip_reff     : [null],
         ip_tran_mode: ['',Validators.compose([Validators.required])],
@@ -385,6 +386,7 @@ month: any;
   {
     await  this.api.get('mp_payroll_salary_amount.php?value='+id+'&authToken='+ environment.authToken).then((data: any) =>
     {
+      console.log("data : ",data)
       this.account_balance           = data.emp_account
       this.advance_date              = data.from_date+' to '+data.to_date;
       this.final_data                = data;
@@ -469,13 +471,9 @@ salaryCalculate()
         this.cl_available   = data[0].com_off;
 
         this.pay_roll_data = this.salary_details;
-        if( this.pl_available >0)
-        {
-         this.plUseValue       = (this.salary_details['pl']).toFixed(2);
-        }
-        else{
+
           this.plUseValue =0;
-        }
+
         this.clUseValue       = 0;
         this.total_days       = 0;
         this.total_workeddays = parseFloat((this.salary_details['hr']).toFixed(2));
@@ -501,12 +499,8 @@ salaryCalculate()
                  console.log("pl_available",this.pl_available)
                this.payroll_days.controls['pl_available'].setValue(this.pl_available);
         }
-        if(this.salary_details['pl_available']>0)
-        {
-          this.payroll_days.controls['pl_use'].setValue(this.pl_days);
-        }
-
-
+        this.pl_balance = this.pl_available
+        this.payroll_days.controls['pl_use'].setValue(this.plUseValue);
         this.payroll_days.controls['c_off_available'].setValue(data[0].com_off);
         this.payroll_days.controls['c_off_use'].setValue(this.clUseValue);
         this.payroll_days.controls['att_row'].setValue(this.salary_details['att_row']);
@@ -680,6 +674,7 @@ salaryCalculate()
       {
     if(this.amount >= data.ip_salary)
     {
+
     data.created_by = this.uid;
     data.emp_id     = this.detail_view['emp_id'];
     data.row_id     = this.detail_view['row_id'];
@@ -693,6 +688,11 @@ salaryCalculate()
       {
         data.status = 2;
       }
+    const confirmed = confirm("Do you want to proceed with the update?");
+        console.log(confirmed)
+        if (!confirmed) {
+          return;
+        }
          this.loading=true;
     await this.api.post('mp_salary_update.php?authToken='+environment.authToken,data).then((data_rt: any) =>
     {
@@ -759,50 +759,56 @@ salaryCalculate()
   const otHours = parseFloat(this.payroll_days.get('no_of_ot')?.value) || 0;
 
   const compOffAvailable = parseFloat(this.pay_roll_data?.com_off_available || 0);
-    if(pl<plUse && this.pl_available>0)
-    {
-      let plBalance = this.pl_available - pl;
-        this.payroll_days.controls['pl_use'].setValue(pl);
-      this.payroll_days.controls['pl_balance'].setValue(plBalance);
-      return this.toastrService.error('PL Use is greater than PL Earned');
-    }
+  console.log("Pl USE ",plUse)
+   console.log("PL ",pl)
+   console.log("pl_available : ",this.pl_available)
 
-  if(this.pl_available>0)
-  {
-      let plBalance = this.pl_available - plUse;
-      console.log("plUse", plUse);
-        console.log("plEarned", pl);
-      console.log("plBalance", plBalance);
-      if (plBalance <= 0) {
-        plBalance = 0;
-      }
-      this.payroll_days.controls['pl_balance'].setValue(plBalance);
 
-  }
-  else{
-    this.plUseValue=0
-     this.payroll_days.controls['pl_use'].setValue(0);
-      this.payroll_days.controls['pl_balance'].setValue(0);
-      plUse = 0
+  //  Step 1: Validate plUse
+  if (plUse > this.pl_available) {
+    this.toastrService.error('PL Use is greater than PL Available');
+    plUse = this.pl_available;
+    this.payroll_days.controls['pl_use'].setValue(plUse);
   }
 
-  // Total Leave Earned (CL + PL + SL)
-  const totalLeaveEarned = cl + pl + sl;
+  if (plUse > pl) {
+    this.toastrService.error('PL Use is greater than PL Earned');
+    plUse = pl;
+    this.payroll_days.controls['pl_use'].setValue(plUse);
+  }
 
-  // Total Leave Applied (CL Use + PL Use)
-  const totalLeaveApplied = clUse + plUse;
-  const leave =totalHours  - workedHours;
-  let lop = leave-totalLeaveApplied;
-  console.log("totalHours", totalHours);
-  console.log("totalLeaveEarned", totalLeaveEarned);
-  console.log("totalLeaveApplied", totalLeaveApplied);
-  console.log("lop", lop);
-  if (lop < 0) lop = 0;
-  this.payroll_days.controls['lop'].setValue(lop);
+  //  Step 2: Calculate PL balance
+  let plBalance = this.pl_available - plUse;
+  if (plBalance < 0) plBalance = 0;
+  this.payroll_days.controls['pl_balance'].setValue(plBalance);
+  this.pl_balance = plBalance;
 
-  // 🔹 Salary Paid Hours = Worked + CL Use + PL Use + OT (if OT is considered)
-  let salaryPaidHours = workedHours + clUse + plUse ;
-  this.payroll_days.controls['salary_paid_day'].setValue(salaryPaidHours);
+  //  Step 3: Handle zero availability
+  if (this.pl_available <= 0) {
+    plUse = 0;
+    this.plUseValue = 0;
+    this.payroll_days.controls['pl_use'].setValue(0);
+    this.payroll_days.controls['pl_balance'].setValue(0);
+  }
+
+        // Total Leave Earned (CL + PL + SL)
+        const totalLeaveEarned = cl + pl + sl;
+
+        // Total Leave Applied (CL Use + PL Use)
+        const totalLeaveApplied = clUse + plUse;
+        const leave =totalHours  - workedHours;
+        let lop = leave-totalLeaveApplied;
+        console.log("totalHours", totalHours);
+        console.log("totalLeaveEarned", totalLeaveEarned);
+        console.log("totalLeaveApplied", totalLeaveApplied);
+        console.log("lop", lop);
+        if (lop < 0) lop = 0;
+        this.payroll_days.controls['lop'].setValue(lop);
+
+        // 🔹 Salary Paid Hours = Worked + CL Use + PL Use + OT (if OT is considered)
+        let salaryPaidHours = workedHours + clUse + plUse ;
+        this.payroll_days.controls['salary_paid_day'].setValue(salaryPaidHours);
+
 }
 
 
@@ -823,31 +829,35 @@ salaryCalculate()
 
       const compOffAvailable = parseFloat(this.pay_roll_data?.com_off_available || 0);
 
-      if(cl < clUse && this.pay_roll_data.com_off_available > 0)
-    {
-       let compOffBalance = compOffAvailable - clUse;
-        this.payroll_days.controls['c_off_use'].setValue(cl);
-      this.payroll_days.controls['c_off_balance'].setValue(compOffBalance);
-      return this.toastrService.error('CL Use is greater than CL Earned');
-    }
-      // Calculate Comp Off Balance
-      if(this.pay_roll_data.com_off_available > 0 )
-      {
-          let compOffBalance = compOffAvailable - clUse;
-          if (compOffBalance < 0) {
-            compOffBalance = 0;
-          }
-          this.payroll_days.controls['c_off_balance'].setValue(compOffBalance);
-     }
-     else{
-        this.clUseValue=0
-        this.payroll_days.controls['c_off_use'].setValue(0);
-        this.payroll_days.controls['c_off_balance'].setValue(0);
-        clUse = 0
-     }
-      // Total Leave Earned (CL + PL + SL)
-      const totalLeaveEarned = cl + pl + sl;
 
+       //  Step 1: Validate plUse
+        if (clUse > this.cl_available) {
+          this.toastrService.error('Com-off Use is greater than Com-off Available');
+          clUse = this.cl_available;
+          this.payroll_days.controls['c_off_use'].setValue(clUse);
+        }
+
+        if (clUse > cl) {
+          this.toastrService.error('Com-off Use is greater than Com-off Earned');
+          clUse = cl;
+          this.payroll_days.controls['c_off_use'].setValue(clUse);
+        }
+
+          //  Step 2: Calculate PL balance
+        let clBalance = this.cl_available - clUse;
+        if (clBalance < 0) clBalance = 0;
+        this.payroll_days.controls['c_off_balance'].setValue(clBalance);
+        this.cl_balance = clBalance;
+
+        //  Step 3: Handle zero availability
+        if (this.cl_available <= 0) {
+          clUse = 0;
+          this.clUseValue = 0;
+          this.payroll_days.controls['c_off_use'].setValue(0);
+          this.payroll_days.controls['c_off_balance'].setValue(0);
+        }
+
+      const totalLeaveEarned = cl + pl + sl;
       // Total Leave Applied (CL Use + PL Use)
       const totalLeaveApplied = clUse + plUse;
       const leave =totalHours  - workedHours;
@@ -874,6 +884,11 @@ salaryCalculate()
       });
     if(this.payroll_days.valid && value.salary_paid_day > 0 && this.payroll_days.value.no_of_days>0)
       {
+       const confirmed = confirm("  Are you sure you want to submit?");
+       console.log(confirmed)
+      if (!confirmed) {
+        return;
+      }
          const emp_id  = this.salary_details['emp_id'];
         this.loading = true;
     await this.api.post('mp_salary_days_create.php?emp_id='+emp_id+'&value='+this.pay_roll_data.id+'&authToken='+environment.authToken,value).then(async (data_rt: any) =>
@@ -979,7 +994,12 @@ onSubmit(value)
    value.tran_date    = formattedDate;
    value.advance_date = this.advance_date;
    value.created_by   = this.uid;
-
+  const confirmed = confirm("Are you sure you want to submit?");
+       console.log(confirmed)
+      if (!confirmed) {
+          //  this.modaleditatt.close();
+        return;
+      }
    console.log("value",value)
       this.loading = true;
       this.api.post('mp_salary_esi_epf_create.php?table=pay_roll&authToken=' + environment.authToken, value).then((data: any) => {

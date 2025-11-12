@@ -1,6 +1,6 @@
-<div *ngIf="!show_edit_note" class="col-md-12">
+<div *ngIf="!show_edit_note" class="row">
 
-  <div class="row">
+  <!-- <div class="row">
     <div class="col-md-9">
       <h4 class="ml-5"><span>CREDIT NOTE LIST</span></h4>
     </div>
@@ -11,7 +11,35 @@
              <button type="button" class="btn btn-outline-info fa fa-trash-o btn-sm" (click)="remove()"> Delete</button>
     </div>
 
-   </div>
+   </div> -->
+
+    <div class="col-md-12" style="padding-left:1.7%;">
+        <table>
+          <tr>
+
+             <td style="width: 33.5%;">
+                      <div class="input-group input-group-sm my-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-search"></i></span>
+                        </div>
+                        <input class="form-control" type="text" placeholder="Search ..." (keyup)="updateFilter($event)"/>
+                      </div>
+                </td>
+            <td style="width: 38%; text-align: center;">
+              <h4><B>CREDIT NOTE LIST</B></h4>
+            </td>
+            <td style="width: 16%;">
+            </td>
+            <td>
+               <div class="btn-group mb-3 col-md-2  " role="group" aria-label="Basic example">
+                    <button type="button" class="btn btn-outline-info fa fa-pencil btn-sm" (click)="edit()"> Edit</button>
+                    <button type="button" class="btn btn-outline-info fa fa-print btn-sm" (click)="pdfDownload()"> Print</button>
+                    <button type="button" class="btn btn-outline-info fa fa-trash-o btn-sm" (click)="remove()"> Delete</button>
+               </div>
+            </td>
+          </tr>
+        </table>
+  </div>
     <div *ngIf="show" class="card-group col-md-12">
       <div class="col-md-4">
         <ngx-datatable #table class="custom_table vh-100" [headerHeight]="0" [limit]="5" [columnMode]="'force'"
@@ -21,7 +49,7 @@
 
           <ngx-datatable-column [sortable]="false">
             <ng-template ngx-datatable-cell-template let-row="row">
-              <div  [attr.id]="'invoice-row-' + row.id">
+              <div  [attr.id]="'invoice-row-' + row.id" style="overflow: hidden;">
                 <div class="row">
 
                 <input type="hidden" [value]="row.id">
@@ -31,10 +59,8 @@
                 <div class="col-md-3">{{row.total_amount| indianCurrency }} </div>
               </div>
               <div class="row">
-                <div class="col-md-6 ml-2">{{row.credit_note_no}} </div>
-
-                <div class="col-md-3 ml-2"> {{ row.generate_date  | date: 'dd-MM-yyyy'}}  </div>
-
+                <div class="col-md-9">{{row.credit_note_no}} </div>
+                <div class="col-md-3 "> {{ row.generate_date  | date: 'dd-MM-yyyy'}}  </div>
               </div>
               <div class="row">
                 <div class="col-md-8 ml-2"> {{ row.bill_number}}  </div>

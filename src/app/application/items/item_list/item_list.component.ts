@@ -5,7 +5,7 @@ import { environment } from 'src/environments/environment.prod';
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
-
+import * as XLSX from "xlsx";
 
 @Component({
   selector   : 'az-item_list',
@@ -47,11 +47,11 @@ export class Item_listComponent implements OnInit
 
   EditItem = new FormGroup
   ({
-    name           : new FormControl('', [Validators.required, Validators.minLength(3)]),
-    hsnsac         : new FormControl('', [Validators.required, Validators.minLength(3)]),
-    item_cat       : new FormControl('', [Validators.required]),
-    uom            : new FormControl('', [Validators.required]),
-    tax            : new FormControl('', [Validators.required]),
+    name           : new FormControl(null, [Validators.required, Validators.minLength(3)]),
+    hsnsac         : new FormControl(null, [Validators.required, Validators.minLength(3)]),
+    item_cat       : new FormControl(null, [Validators.required]),
+    uom            : new FormControl(null, [Validators.required]),
+    tax            : new FormControl(null, [Validators.required]),
     purchase       : new FormControl(null),
     sale           : new FormControl(null),
     price          : new FormControl('', [Validators.required]),
@@ -62,14 +62,14 @@ export class Item_listComponent implements OnInit
   NewItem = new FormGroup
   ({
     created_by      : new FormControl(this.uid),
-    name            : new FormControl('', [Validators.required, Validators.minLength(3)]),
-    item_cat        : new FormControl('', [Validators.required]),
-    hsnsac          : new FormControl('', [Validators.required, Validators.minLength(4)]),
+    name            : new FormControl(null, [Validators.required, Validators.minLength(3)]),
+    item_cat        : new FormControl(null, [Validators.required]),
+    hsnsac          : new FormControl(null, [Validators.required, Validators.minLength(4)]),
     uom             : new FormControl('Nos', [Validators.required]),
     purchase        : new FormControl(0),
     sale            : new FormControl(0),
     price           : new FormControl('', [Validators.required]),
-    tax_percent     : new FormControl('18'),
+    tax_percent     : new FormControl('18', [Validators.required]),
     description     : new FormControl(null),
     status          : new FormControl(1)
   });
@@ -128,6 +128,11 @@ export class Item_listComponent implements OnInit
 
   async EditSubmit(data)
   {
+    const confirmed = confirm(" Are you sure you want to update these changes?");
+          console.log(confirmed)
+          if (!confirmed) {
+            return;
+          }
     this.loading=true;
     await this.api.post('post_update_data.php?table=item&field=item_id&value=' + this.detail_view['item_id'] + '&authToken=' + environment.authToken, data).then((data_rt: any) =>
     {
@@ -248,5 +253,56 @@ export class Item_listComponent implements OnInit
 
   }
 
+  download()
+  {
+      const confirmed = confirm("Are you sure you want to download?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
 
+    let today = new Date();
+    let year  = today.getFullYear();
+    let month = String(today.getMonth() + 1).padStart(2, '0');
+    let day   = String(today.getDate()).padStart(2, '0');
+
+    let formattedDate = `${year}-${month}-${day}`;
+
+  const exportData = this.item_list.map(item => ({
+    Item_id     : item.item_id,
+    Item_name   : item.item_name,
+    Category    : item.item_cat,
+    Description : item.description,
+    Hsnsac      : item.hsnsac,
+    Uom         : item.uom,
+    Purchase    : item.purchase==1?"Active":"InActive",
+    Sales       : item.sales==1?"Active":"InActive",
+    Price       : item.price,
+    Tax_percent : item.tax_percent,
+    Have_serial : item.have_seriel_number==1?"Yes":"No",
+    Job_material: item.jobworkmaterial==1?"Yes":"No",
+    Status      : item.status==1?"Active":"InActive"
+  }));
+    console.log(exportData);
+       this.exportToExcel(exportData, 'Item List_'+formattedDate+'.xlsx');
+  }
+
+  exportToExcel(data: any[], filename: string)
+    {
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb: XLSX.WorkBook = XLSX.utils.book_new();
+
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+      const excelBlob = new Blob([XLSX.write(wb, { bookType: 'xlsx', type: 'array' })],
+                        {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+      const url = URL.createObjectURL(excelBlob);
+
+      const downloadLink    = document.createElement('a');
+      downloadLink.href     = url;
+      downloadLink.download = filename;
+      downloadLink.click();
+
+      URL.revokeObjectURL(url);
+    }
 }

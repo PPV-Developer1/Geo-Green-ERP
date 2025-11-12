@@ -6,6 +6,8 @@ import { ToastrService } from 'ngx-toastr';                 // For Page Validati
 import { Router , NavigationEnd} from '@angular/router';    // For Page Validation
 import { ActivatedRoute } from '@angular/router';
 import { AfterViewInit } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Service_endComponent } from './service_end/service_end.component';
 @Component({
   selector: 'az-pages',
   encapsulation: ViewEncapsulation.None,
@@ -27,7 +29,8 @@ export class ApplicationComponent implements AfterViewInit
         private _location:Location,
         public api: ApiService,               // For Page Validation
         public toastrService: ToastrService,  // For Page Validation
-        private router: Router                // For Page Validation
+        private router: Router ,               // For Page Validation
+         public modalService: NgbModal
         )
         {
         this._state.subscribe('menu.isCollapsed', (isCollapsed) =>
@@ -48,7 +51,51 @@ export class ApplicationComponent implements AfterViewInit
           }
         }
       });
+        this.service_end()
+      //  const popupShown = localStorage.getItem('serviceEndNoticeShown');
+      //   // if (!popupShown) {
+      //       const modalRef = this.modalService.open(Service_endComponent, {
+      //         backdrop: 'static', // user can’t close by clicking outside
+      //         keyboard: false,    // user can’t close with Esc
+      //         centered: true
+      //       });
+
+            // modalRef.result.finally(() => {
+            //   localStorage.setItem('serviceEndNoticeShown', 'false');
+            // });
+    // }
+  }
+
+  async service_end()
+  {
+    console.log("enter")
+    const serviceEndDate = new Date('2025-11-20'); // 📅 your actual end date
+    const today = new Date();
+
+    // Calculate days remaining
+    const diffDays = Math.ceil((serviceEndDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+console.log("diffDays",diffDays)
+    if (diffDays <= 0) {
+      // Service period has ended
+      const modalRef = this.modalService.open(Service_endComponent, {
+        backdrop: 'static',
+        keyboard: false,
+        centered: true
+      });
+      modalRef.componentInstance.title = '🚫 Service Period Ended';
+      modalRef.componentInstance.message =
+        'Your service period ended on 20 November 2025.';
+    } else if (diffDays <= 12) {
+      // Within 7 days of end date → show warning
+      const modalRef = this.modalService.open(Service_endComponent, {
+        centered: true
+      });
+      modalRef.componentInstance.title = '⚠️ Service Period Ending Soon';
+      modalRef.componentInstance.message =
+        `Your service period will end on 20 November 2025 (in ${diffDays} day${diffDays > 1 ? 's' : ''}).`;
     }
+
+  }
 
     // handleRouteChanges() {
 

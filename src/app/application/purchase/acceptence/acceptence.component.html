@@ -28,31 +28,31 @@
         [selectionType]="'single'"
         (activate)="onActivate($event)">
 
-        <ngx-datatable-column prop="bill_date" name="DATE">
+        <ngx-datatable-column     [resizeable]="false" prop="bill_date" name="DATE">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.bill_date  | date: 'dd-MM-yyyy'}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="bill_number" name="BILL NO">
+        <ngx-datatable-column     [resizeable]="false" prop="bill_number" name="BILL NO">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span style="font-weight:bold;"> {{row.bill_number}}</span>
           </ng-template>
         </ngx-datatable-column>
-        <ngx-datatable-column prop="reference_number" name="REFF NUMBER">
+        <ngx-datatable-column     [resizeable]="false" prop="reference_number" name="REFF NUMBER">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.reference_number != ''"> {{row.reference_number}}</span>
             <span *ngIf="row.reference_number == ''"> Nill</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="name" name="VENDOR NAME">
+        <ngx-datatable-column     [resizeable]="false" prop="name" name="VENDOR NAME">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span style="font-weight:bold;"> {{row.name}}</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="bill_due_date" name="DUE DATE">
+        <ngx-datatable-column     [resizeable]="false" prop="bill_due_date" name="DUE DATE">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.bill_due_date  | date: 'dd-MM-yyyy'}}
           </ng-template>
@@ -86,18 +86,18 @@
       [selectionType]="'single'"
       (activate)="onActivate_1($event)">
 
-      <ngx-datatable-column prop="item_name" name="ITEM">
+      <ngx-datatable-column     [resizeable]="false" prop="item_name" name="ITEM">
         <ng-template ngx-datatable-cell-template let-row="row">
           {{row.item_name}}
         </ng-template>
       </ngx-datatable-column>
 
-      <ngx-datatable-column prop="bill_amount" name="BILL AMOUNT">
+      <ngx-datatable-column     [resizeable]="false" prop="bill_amount" name="BILL AMOUNT">
         <ng-template ngx-datatable-cell-template let-row="row">
           <span style="font-weight:bold;"> {{row.bill_amount}}</span>
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column prop="actual_amount" name="ACTUAL AMOUNT">
+      <ngx-datatable-column     [resizeable]="false" prop="actual_amount" name="ACTUAL AMOUNT">
         <ng-template ngx-datatable-cell-template let-row="row">
            {{row.actual_amount}}
         </ng-template>

@@ -342,9 +342,20 @@ export class CustomerComponent implements OnInit {
       this.customer_contact = data;
     }).catch(error => { this.toastrService.error('Something went wrong'); });
   }
+
   submitImg(data) {
+    if(data.file == null||data.file == "")
+    {
+      this.toastrService.warning('Image required !');
+      return
+    }
     const formData = new FormData();
     formData.append('file', this.myForm.get('fileSource')?.value);
+     const confirmed = confirm("Are you sure you want to confirm update image?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
     this.loading = true;
     this.api.post('upload_customer_file.php?mode=update&user_id=' + this.customer_id + '&location=upload/customer_images/&table=customers&authToken=' + environment.authToken, formData).then((data: any) => {
       if(data.status == "success")
@@ -442,6 +453,11 @@ export class CustomerComponent implements OnInit {
 
       if(this.gst_submit === true &&  this.name_submit === true && this.pan_submit === true)
       {
+        const confirmed = confirm(" Are you sure you want to update these changes?");
+          console.log(confirmed)
+          if (!confirmed) {
+            return;
+          }
         this.loading   = true;
         this.change    = true
         this.stateShow = true;
@@ -667,7 +683,11 @@ export class CustomerComponent implements OnInit {
 
   async submit(updateAddress)
   {
-
+      const confirmed = confirm(" Are you sure you want to update these changes?");
+          console.log(confirmed)
+          if (!confirmed) {
+            return;
+          }
       let id = this.editAddressId;
       this.loading = true;
       this.api.post('post_update_data.php?table=customer_address&field=cust_addr_id&value=' + id + '&authToken=' + environment.authToken, updateAddress).then((data_rt: any) => {
@@ -855,6 +875,12 @@ cancel()
 
 contact_submit(data)
 {
+
+  const confirmed = confirm(" Are you sure you want to update these changes?");
+          console.log(confirmed)
+          if (!confirmed) {
+            return;
+          }
     let id = this.editContactId;
     this.loading=true;
     this.api.post('post_update_data.php?table=customer_contact&field=cust_cont_id&value=' + id + '&authToken=' + environment.authToken, data).then((data: any) => {

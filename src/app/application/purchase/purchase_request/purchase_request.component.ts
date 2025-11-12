@@ -143,7 +143,7 @@ export class Purchase_requestComponent implements OnInit {
     this.po = fb.group(
       {
         created_by : [this.uid],
-        vendorId   : ['', Validators.compose([Validators.required])],
+        vendorId   : [null, Validators.compose([Validators.required])],
         billFrom   : [null],
         shipFrom   : [null],
         poNo       : [null, Validators.compose([Validators.required])],
@@ -162,9 +162,13 @@ export class Purchase_requestComponent implements OnInit {
         total      : [0],
         product    : this.fb.array([]),
         tax_type   :[null],
-        tds_percentage :[0],
-        tcs_percentage :[0],
-        size : [null],
+        tds_percentage    :[0],
+        tcs_percentage    :[0],
+        size              :[null],
+        prefix            :[null],
+        deliverytype      :[null, Validators.compose([Validators.required])],
+        freight           :[null, Validators.compose([Validators.required])],
+        delivery_schedule :[null, Validators.compose([Validators.required])],
       })
   }
 
@@ -363,49 +367,77 @@ resetTableHeight() {
       formArray.removeAt(i);
     }
   }
-
+po_prefix : any
   async VendorSelection(id)
   {
     this.isDropdownAppendedToBody = false;
     this.formShow  = false;
     this.vendor_id = id;
-    await this.api.get('mp_po.php?&value=' + this.vendor_id + '&authToken=' + environment.authToken).then((data: any) =>
+
+        this.bill_addr          = null;
+        this.billFrom           = null;
+        this.billAttention      = null;
+        this.billAddress_line_1 = null;
+        this.billAddress_line_2 = null;
+        this.billCity           = null;
+        this.billState          = null;
+        this.billZipcode        = null;
+        this.po.controls['billFrom'].setValue(null);
+
+        this.shipp_addr         = null;
+        this.shipFrom           = null;
+        this.shipAttention      = null;
+        this.shipAddress_line_1 = null;
+        this.shipAddress_line_2 = null;
+        this.shipCity           = null;
+        this.shipState          = null;
+        this.shipZipcode        = null;
+        this.po.controls['shipFrom'].setValue(null);
+        this.company_name       = null;
+        this.po.controls['notes'].setValue(null);
+        this.po.controls['terms_condition'].setValue(null);
+    if(id)
     {
-      this.FetchAddress(data[0]);
-
-      this.company_name    = data[0].company_name;
-      this.notes           = data[0].notes;
-      this.terms_condition = data[0].terms_condition;
-
-      this.stateCode       = data[0].place_from_supply_code;
-      this.payment_terms   = data[0].payment_terms;
-
-      let MyPaymentTerm    = data[0].my_payment_terms;
-      let po_id            = data[0].serial_no + 1;
-      var po_prifix        = data[0].prefix ;
-      this.po_no           = po_prifix + po_id;
-      this.taxempty        = data[0].tax_mode;
-
-
-      const today = new Date();
-      let date = today.toISOString().split('T')[0];
-      this.po.controls['billDate'].setValue(date);
-      if(MyPaymentTerm != null)
+        await this.api.get('mp_po.php?&value=' + this.vendor_id + '&authToken=' + environment.authToken).then((data: any) =>
         {
-          this.dueDates(MyPaymentTerm, date);
-          this.po.controls['paymentTerms'].setValue(MyPaymentTerm)
-        }
-      if(this.stateCode == 33)
-      {
-        this.LoadGST('GST');
-        this.po.controls['tax_type'].setValue("GST");
+          this.FetchAddress(data[0]);
+
+          this.company_name    = data[0].company_name;
+          this.notes           = data[0].notes;
+          this.terms_condition = data[0].terms_condition;
+
+          this.stateCode       = data[0].place_from_supply_code;
+          this.payment_terms   = data[0].payment_terms;
+
+          let MyPaymentTerm    = data[0].my_payment_terms;
+          let po_id            = data[0].serial_no + 1;
+          this.po_prefix        = data[0].prefix ;
+          this.po_no           =  po_id;
+          this.taxempty        = data[0].tax_mode;
+
+          const today = new Date();
+          let date = today.toISOString().split('T')[0];
+          this.po.controls['billDate'].setValue(date);
+          if(MyPaymentTerm != null)
+            {
+              this.dueDates(MyPaymentTerm, date);
+              this.po.controls['paymentTerms'].setValue(MyPaymentTerm)
+            }
+          if(this.stateCode == 33)
+          {
+            this.LoadGST('GST');
+            this.po.controls['tax_type'].setValue("GST");
+          }
+          else
+          {
+            this.LoadGST('IGST');
+            this.po.controls['tax_type'].setValue("IGST");
+          }
+        }).catch(error => { this.toastrService.error('Something went wrong'); });
       }
-      else
-      {
-        this.LoadGST('IGST');
-        this.po.controls['tax_type'].setValue("IGST");
+      else{
+        this.GSTCalculation()
       }
-    }).catch(error => { this.toastrService.error('Something went wrong'); });
   }
 
   async specItem(item,i)
@@ -746,7 +778,7 @@ resetTableHeight() {
     });
     if (this.po.valid)
     {
-      const billNoValue = this.po_no;
+      const billNoValue = this.po_prefix + this.po_no;
       function normalizeString(str : any) {
         return str.replace(/\s+/g, '').toLowerCase();
       }
@@ -762,9 +794,15 @@ resetTableHeight() {
           });
         if(!checking)
          {
+           const confirmed = confirm("Are you sure you want to generate this po?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
             this.loading = true;
             await this.api.post('mp_po_create.php?type=pr&authToken=' + environment.authToken, bill_data).then((data: any) =>
             {
+              console.log(data)
               if (data.status == "success")
               {
                 this.toastrService.success('PO Added Succesfully');

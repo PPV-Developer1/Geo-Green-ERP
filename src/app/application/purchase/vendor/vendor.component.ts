@@ -360,8 +360,20 @@ export class VendorComponent implements OnInit {
   }
   submitImg(data)
   {
+    console.log(data)
+    if(data.file == null||data.file == "")
+    {
+      this.toastrService.warning('Image required !');
+      return
+    }
           const formData = new FormData();
           formData.append('file', this.myForm.get('fileSource')?.value);
+          const confirmed = confirm("Are you sure you want to confirm update image?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
+
           this.api.post('upload_vendor_file.php?mode=update&user_id=' + this.vendor_id + '&location=upload/vendor_images/&table=vendor&authToken=' + environment.authToken, formData).then((data: any) => {
           this.toastrService.success(' vendor Image Updated Succesfully');
           this.employeeLoad(this.vendor_id);
@@ -431,7 +443,11 @@ export class VendorComponent implements OnInit {
 
                   var data = this.stateName.find(t=>t.state_name == this.place_of_supply);
                   editCustDetail.place_of_supply_code= data.state_code;
-
+                  const confirmed = confirm("Are you sure you want to proceed with the update?");
+                    console.log(confirmed)
+                    if (!confirmed) {
+                      return;
+                    }
                   this.api.post('post_update_data.php?table=vendor&field=vendor_id&value=' + id + '&authToken=' + environment.authToken, editCustDetail).then((data_rt: any) => {
 
                     if (data_rt.status == "success")
@@ -472,6 +488,7 @@ export class VendorComponent implements OnInit {
                   this.toastrService.error('Please Fill All Details');
                 }
   }
+
   updateCust(updateCust) {
                 this.updateVendor = updateCust;
                 this.cust_id = updateCust.vendor_id
@@ -491,7 +508,7 @@ export class VendorComponent implements OnInit {
   {
                 this.status        = false;
                 this.editAddressId = addressId
-                this.api.get('get_data.php?table=vendor_address&find=cust_addr_id&value=' + addressId + '&authToken=' + environment.authToken).then((data: any) => {
+                this.api.get('get_data.php?table=vendor_address&find=vendor_addr_id&value=' + addressId + '&authToken=' + environment.authToken).then((data: any) => {
                   this.addressChange  = data[0];
 
                   this.name           = this.addressChange.attention
@@ -607,6 +624,11 @@ export class VendorComponent implements OnInit {
               if (this.updateAddress.valid)
               {
                 let id = this.editAddressId
+                const confirmed = confirm("Are you sure you want to proceed with the update?");
+                    console.log(confirmed)
+                    if (!confirmed) {
+                      return;
+                    }
                 this.api.post('post_update_data.php?table=vendor_address&field=vendor_addr_id&value=' + id + '&authToken=' + environment.authToken, updateAddress).then((data_rt: any) => {
                   if (data_rt.status == "success")
                   {
@@ -740,6 +762,11 @@ export class VendorComponent implements OnInit {
 contact_submit(data)
 {
                     let id = this.editContactId
+                    const confirmed = confirm("Are you sure you want to proceed with the update?");
+                    console.log(confirmed)
+                    if (!confirmed) {
+                      return;
+                    }
                     this.loading = true;
                     this.api.post('post_update_data.php?table=vendor_contact&field=vendor_cont_id&value=' + id + '&authToken=' + environment.authToken, data).then((data: any) => {
                       if (data.status == "success")

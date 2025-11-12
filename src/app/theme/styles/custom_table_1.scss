@@ -1,4 +1,4 @@
-.ngx-datatable.custom_table 
+.ngx-datatable.custom_table
 {
     background: #fff;
     box-shadow: 0 5px 5px -1px rgba(0, 68, 95, 0.2), 0 8px 10px 1px rgba(0, 68, 95, 0.14), 0 3px 14px 2px rgba(0, 68, 95, 0.12);
@@ -89,7 +89,7 @@
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAABCAYAAAD5PA/NAAAAFklEQVQI12PQkNdi1VTQ5gbSwkAsDQARLAIGtOSFUAAAAABJRU5ErkJggg==); }
   .ngx-datatable.custom_table .datatable-header {
     border-bottom: 1px solid rgba(0, 87, 90, 0.5); }
-    .ngx-datatable.custom_table .datatable-header .datatable-header-cell 
+    .ngx-datatable.custom_table .datatable-header .datatable-header-cell
     {
       text-align: center;
       padding: 0.9rem 1.2rem;
@@ -100,7 +100,8 @@
       font-size: 14px;
       font-weight: bold;
       border-right: 1px solid rgba(255, 255, 255, 0.5);
-      font-weight: 500; 
+      font-weight: 500;
+
     }
       .ngx-datatable.custom_table .datatable-header .datatable-header-cell .datatable-header-cell-wrapper {
         position: relative; }
@@ -143,6 +144,9 @@
       border-top: 0;
       //border-radius: 10px; round Corner
       //margin: 6px 3px; Indiudule cells
+    white-space: normal !important;  /* allow wrapping */
+    word-break: break-word;          /* break long words */
+    line-height: 1.4;
       color: rgb(1, 23, 41);
       transition: width 0.3s ease;
       font-size: 14px;
@@ -284,7 +288,7 @@
       height: 1rem;
       background: #fff;
       cursor: pointer; }
-  
+
   /**
    * Progress bar animations
    */
@@ -295,4 +299,3 @@
     100% {
       opacity: 0;
       transform: translateX(-50%) scale(0, 1); } }
-  

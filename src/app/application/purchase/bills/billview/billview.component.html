@@ -1,13 +1,13 @@
 <div *ngIf="show" class="col-md-12">
 
-  <div class="row">
+  <!-- <div class="row">
     <div class="col-md-5">
       <h4 class="ml-5">BILLS</h4>
     </div>
 
     <div class="btn-group mb-3 col-md-7" role="group" aria-label="Basic example">
 
-      <button *ngIf="user == 'super_admin'" type="button" [disabled]="payment_view" class="btn btn-outline-info fa fa-pencil btn-sm" (click)="editbill()"> Edit</button>
+      <button *ngIf="user == 'super_admin'" type="button" [disabled]="payment_view || Edit_status >0" class="btn btn-outline-info fa fa-pencil btn-sm" (click)="editbill()"> Edit</button>
       <button type="button" class="btn btn-outline-info fa fa-print btn-sm" (click)="download()"> Print</button>
       <button  class="btn btn-outline-info dropdown-toggle fa fa-money btn-sm" [disabled]="payment_view" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         Payment
@@ -18,13 +18,52 @@
       </div>
       <button type="button" class="btn btn-outline-info fa fa-pencil-square-o btn-sm" (click)="e_bill()"> Transport Vehicle Details</button>
       <button type="button" class="btn btn-outline-info fa fa-copy btn-sm" (click)="clone()"> Clone</button>
-      <button type="button" class="btn btn-outline-danger fa fa-trash-o btn-sm" (click)="remove()"> Delete</button>
+      <button type="button" class="btn btn-outline-danger fa fa-trash-o btn-sm" (click)="remove()" [disabled]="payment_view || Edit_status >0"> Delete</button>
 
       &nbsp;
       &nbsp;
       &nbsp;
     </div>
+  </div> -->
+
+   <div class="col-md-12" style="padding-left:1.7%;">
+        <table style="border: none;">
+          <tr style="border: none;">
+
+             <td style="width: 34%;border: none">
+                      <div class="input-group input-group-sm my-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-search"></i></span>
+                        </div>
+                        <input class="form-control" type="text" placeholder="Search ..." (keyup)="updateFilter($event)"/>
+                      </div>
+                </td>
+            <td style="width: 34%; text-align: center;border: none">
+              <h4><B>BILL LIST</B></h4>
+            </td>
+            <!-- <td style="width: 10%;border: none">
+            </td> -->
+            <td style="border: none;">
+                <div class="btn-group mb-3 col-md-7" role="group" aria-label="Basic example">
+                  <button type="button" class="btn btn-outline-info fa fa-location-arrow btn-sm" (click)="final_location()"> File Location</button>
+                    <button *ngIf="user == 'super_admin'" type="button" [disabled]="payment_view || Edit_status >0" class="btn btn-outline-info fa fa-pencil btn-sm" (click)="editbill()"> Edit</button>
+                    <!-- <button type="button" class="btn btn-outline-info fa fa-print btn-sm" (click)="download()"> Print</button> -->
+                    <button  class="btn btn-outline-info dropdown-toggle fa fa-money btn-sm" [disabled]="payment_view" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Payment
+                    </button>
+                    <div class="dropdown-menu">
+                        <a  class="dropdown-item" href="javascript:void(0);"  (click)="payment()" >Payment</a>
+                        <a  class="dropdown-item" href="javascript:void(0);" (click)="use_advance()">Use Advance</a>
+                    </div>
+                    <button type="button" class="btn btn-outline-info fa fa-pencil-square-o btn-sm" (click)="e_bill()"> Transport Vehicle Details</button>
+                    <button type="button" class="btn btn-outline-info fa fa-copy btn-sm" (click)="clone()"> Clone</button>
+                    <button type="button" class="btn btn-outline-danger fa fa-trash-o btn-sm" (click)="remove()" [disabled]="payment_view || Edit_status >0"> Delete</button>
+                </div>
+            </td>
+          </tr>
+        </table>
   </div>
+
 
 
   <div class="card-group col-md-12">
@@ -36,25 +75,22 @@
 
         <ngx-datatable-column [sortable]="false">
           <ng-template ngx-datatable-cell-template let-row="row">
-            <div  [attr.id]="'bill-row-' + row.serial_no">
+            <div  [attr.id]="'bill-row-' + row.serial_no"  style="overflow: hidden;">
             <div class="row">
               <input type="hidden" [value]="row.invoice_id">
               <input type="hidden" [value]="row.customer_id">
 
               <div class="col-md-9"> <b> {{row.vendor_name | uppercase }} </b> </div>
-              <div class="col-md-3" style="text-align: right;">{{row.total | indianCurrency }} </div>
+              <div class="col-md-3">{{row.total | indianCurrency }} </div>
             </div>
             <div class="row">
-              <div class="col-md-12 ">
-                <span *ngIf="row.reference_number != null ">{{row.bill_number}} | {{row.reference_number}}</span>
-                <span *ngIf="row.reference_number == null ">{{row.bill_number}} </span>
-               </div>
-
+              <div class="col-md-9 "> {{row.bill_number}} </div>
+              <div class="col-md-3 "> {{row.bill_date}} </div>
             </div>
 
             <div class="row">
-              <div class="col-md-8"><b>Created By : {{ row.creater_name}}</b> </div>
-              <div class="col-md-4" style="text-align: right;">{{ row.bill_date  | date: 'dd-MM-yyyy'}} </div>
+              <div class="col-md-9"><b>Created By : {{ row.creater_name}}</b> </div>
+              <div class="col-md-3" >{{ row.bill_date  | date: 'dd-MM-yyyy'}} </div>
             </div>
             <div class="row">
               <div class="col-md-12"><b>Purchase For : {{ row.purchase_for}}</b> </div>
@@ -310,6 +346,28 @@
           <span *ngFor="let item of serial_no_list">{{item.serial_no}},</span>
         </div>
       </div>
+
+      <div>
+        <table class="col-md-12" style="border: none; text-align: center;margin: 10px;margin-bottom: 20px;">
+          <thead style="border: none;">
+            <tr  style="border: none;">
+              <th style="border: none;">E way bill number</th>
+              <th style="border: none;">Vehicle number</th>
+              <th style="border: none;">Transport mode</th>
+              <th style="border: none;">Transport charge</th>
+            </tr>
+          </thead>
+          <tbody style="border: none;">
+            <tr style="border: none;" *ngFor="let invoice of billPdf">
+              <td style="border: none;">{{ invoice.e_way_bill??"No data found"}}</td>
+              <td style="border: none;">{{ invoice.vehicle_number??"No data found"}}</td>
+              <td style="border: none;">{{ invoice.shipment_mode??"No data found"}}</td>
+              <td style="border: none;">{{ invoice.transport_charge!= null?(invoice.transport_charge|indianCurrency):"No data found"}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
     </div>
   </div>
 
@@ -691,7 +749,14 @@
 
       <div class="form-group">
         <label for="input-12">Payment Receipt No</label>
-        <input type="text" formControlName="receipt_no" class="form-control" id="input-12">
+        <div class="d-flex">
+            <div class="col-sm-4">
+              <input type="text" readonly formControlName="prefix" [(ngModel)]="prefix" class="form-control text-uppercase" />
+          </div>
+              <div class="col-sm-4">
+                <input type="number" formControlName="receipt_no" [(ngModel)]="receipt_serial_no" class="form-control" />
+              </div>
+         </div>
       </div>
       <div class="form-group">
         <label for="exampleSelect3">Mode of Transfer</label>
@@ -772,18 +837,18 @@
   class="custom_table"
   [headerHeight]="50"
   [limit]="10"
-  [columnMode]="'force'"
+  [columnMode]="'flex'"
   [footerHeight]="50"
   [rowHeight]="50"
   [rows]="payment_transaction">
 
-  <ngx-datatable-column prop="tran_date"  [width]="200"  name="TRANSACTION DATE" >
+  <ngx-datatable-column prop="tran_date"  [resizeable]="false"  [flexGrow]="1"  name="TRANSACTION DATE" >
       <ng-template ngx-datatable-cell-template let-row = "row">
           {{row.tran_date | date: 'dd-MM-yyyy'}}
       </ng-template>
   </ngx-datatable-column>
 
-  <ngx-datatable-column prop="tran_mode" [width]="100" name="MODE">
+  <ngx-datatable-column prop="tran_mode"  [resizeable]="false" [flexGrow]="1" name="MODE">
       <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.tran_mode === 1 " >
               Wire
@@ -797,37 +862,37 @@
       </ng-template>
     </ngx-datatable-column>
 
-  <ngx-datatable-column prop="reference"  [width]="200" name="REFERENCE">
+  <ngx-datatable-column prop="reference"  [resizeable]="false"  [flexGrow]="2" name="REFERENCE">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.reference}}
       </ng-template>
   </ngx-datatable-column>
 
-  <ngx-datatable-column prop="credit" [width]="110" name="CREDIT">
+  <ngx-datatable-column prop="credit"  [resizeable]="false" [flexGrow]="1" name="CREDIT">
       <ng-template ngx-datatable-cell-template let-row="row">
         <span style="font-weight:bold;"> {{row.credit | indianCurrency}} </span>
         </ng-template>
     </ngx-datatable-column>
 
-  <ngx-datatable-column prop="debit" [width]="110" name="DEBIT">
+  <ngx-datatable-column prop="debit"  [resizeable]="false" [flexGrow]="1" name="DEBIT">
     <ng-template ngx-datatable-cell-template let-row="row">
       <span style="font-weight:bold;"> {{row.debit | indianCurrency}} </span>
       </ng-template>
   </ngx-datatable-column>
 
-  <ngx-datatable-column prop="balance" name="BALANCE">
+  <ngx-datatable-column prop="balance"  [resizeable]="false" [flexGrow]="1" name="BALANCE">
       <ng-template ngx-datatable-cell-template let-row="row">
         <span style="font-weight:bold;"> {{row.balance | indianCurrency}} </span>
         </ng-template>
   </ngx-datatable-column>
 
-  <ngx-datatable-column prop="tran_details" name="DESCRIPTION">
+  <ngx-datatable-column prop="tran_details"  [resizeable]="false" [flexGrow]="2" name="DESCRIPTION">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.tran_details}}
       </ng-template>
   </ngx-datatable-column>
 
-  <ngx-datatable-column prop="notes" [width]="200" name="COMMAND">
+  <ngx-datatable-column prop="notes"  [resizeable]="false" [flexGrow]="2" [width]="200" name="COMMAND">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.notes}}
         </ng-template>
@@ -1219,10 +1284,27 @@
         <label>Shipment Mode</label>
       </div>
       <div class="form-group col-md-9">
-        <input formControlName="shipment_mode"  placeholder=" Enter Shipment Mode" type="text"
-          class="form-control">
+        <!-- <input formControlName="shipment_mode"  placeholder=" Enter Shipment Mode" type="text"
+          class="form-control"> -->
+
+            <select formControlName="shipment_mode"  class=" form-control custom-select">
+                  <option value="Road">Road</option>
+                  <option value="Rail">Rail</option>
+                  <option value="Rail">Air</option>
+                  <option value="Rail">Ship</option>
+            </select>
         <span class="help-block text-danger" *ngIf="e_way_bill.get('shipment_mode').touched && e_way_bill.get('shipment_mode').hasError('required')">Shipment Mode Required !</span>
       </div>
+
+       <div class="form-group col-md-3">
+        <label>Transport Charge</label>
+      </div>
+      <div class="form-group col-md-9">
+        <input formControlName="amount"  placeholder="Enter Amount" type="number"
+          class="form-control">
+        <span class="help-block text-danger" *ngIf="e_way_bill.get('amount').touched && e_way_bill.get('amount').hasError('required')"> Required !</span>
+      </div>
+
       <div class="col-md-12">
         <div class="row justify-content-center">
           <button  [disabled]="loading" class="btn btn-success" type="submit">Submit<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
@@ -1331,7 +1413,7 @@ aria-labelledby="modal-large-label" style="display: none;">
             <option *ngFor= "let list of advance_list" value="{{list.id}}" >{{list.debit | indianCurrency}} | {{list.date}}</option>
         </select> -->
 
-        <ng-select formControlName="advance_id"  class="form-control custom-select"   >
+        <ng-select formControlName="advance_id"  class="form-control custom-select" clearable="true" > >
             <ng-option *ngFor= "let list of advance_list" value="{{list.id}}" class="form-control">
               {{list.debit | indianCurrency}} | {{list.date}}
             </ng-option>
@@ -1368,3 +1450,45 @@ aria-labelledby="modal-large-label" style="display: none;">
       <button type="button" class="btn btn-success" data-dismiss="modal" (click)="modal.dismiss('Cross click')">Close</button>
   </div>
 </ng-template>
+
+
+<ng-template #FileLocate let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Bill Location</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <div style="text-align: right;" >
+      <span (click)="fileLocateEdit()" *ngIf="!fileedit" style="color:#055f6bc2 ;"><i class="fa fa-pencil-square-o" ></i> Edit</span>
+        <span *ngIf="fileedit" style="color: brown;" (click)="fileeditclose()"> × cancel</span>
+    </div>
+    <form [formGroup]="File_place" (ngSubmit)="Add_Fileplace(File_place.value)">
+
+      <div class="form-group">
+        <label for="exampleSelect3">File No</label>
+          <input type="text" [readOnly]="!fileedit" formControlName="file_no" class="form-control" id="input-1">
+        <span class="help-block text-danger" *ngIf="File_place.get('file_no').touched && File_place.get('file_no').hasError('required')">Required !</span>
+        <span class="help-block text-danger" *ngIf="File_place.get('file_no').touched && File_place.get('file_no').hasError('min')">Minimum 3 Letters</span>
+      </div>
+
+      <div class="form-group">
+        <label for="input-1">Rack No</label>
+        <input type="text" [readOnly]="!fileedit" formControlName="rack_no" class="form-control" id="input-2">
+        <span class="help-block text-danger" *ngIf="File_place.get('rack_no').touched && File_place.get('rack_no').hasError('required')">Required !</span>
+        <span class="help-block text-danger" *ngIf="File_place.get('rack_no').touched && File_place.get('rack_no').hasError('minlength')">Minimum 3 Letters</span>
+      </div>
+
+        <div class="form-group">
+        <label for="input-1">Section</label>
+        <input type="text" [readOnly]="!fileedit" formControlName="section" class="form-control" id="input-3">
+        <span class="help-block text-danger" *ngIf="File_place.get('section').touched && File_place.get('section').hasError('required')">Required !</span>
+        <span class="help-block text-danger" *ngIf="File_place.get('section').touched && File_place.get('section').hasError('minlength')">Minimum 3 Letters</span>
+      </div>
+
+      <div *ngIf="fileedit" class="form-group">
+        <button [disabled]="loading" class="btn btn-info btn-block" type="submit">Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i> </button>
+    </div>
+  </form>
+  </div>
+ </ng-template>

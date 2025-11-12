@@ -28,7 +28,7 @@
       <ngx-datatable style="cursor: pointer;" #table class="custom_table"
         [headerHeight]="50"
         [limit]="15"
-        [columnMode]="'force'"
+        [columnMode]="'flex'"
         [columns]="columns"
         [footerHeight]="50"
         [rowHeight]="'auto'"
@@ -38,50 +38,50 @@
         (activate)="onActivate($event)"
         (select)='onSelect($event)'>
 
-        <ngx-datatable-column prop="bill_date" name="DATE">
+        <ngx-datatable-column prop="bill_date" [flexGrow]="1" name="DATE">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.bill_date  | date: 'dd-MM-yyyy'}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="bill_number" name="BILL NO">
+        <ngx-datatable-column prop="bill_number" [flexGrow]="1" name="BILL NO">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span style="font-weight:bold;"> {{row.bill_number}}</span>
           </ng-template>
         </ngx-datatable-column>
-        <ngx-datatable-column prop="reference_number" name="REFF NUMBER">
+        <ngx-datatable-column prop="reference_number" [flexGrow]="1" name="REFF NUMBER">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.reference_number != ''"> {{row.reference_number}}</span>
             <span *ngIf="row.reference_number == ''"> Nill</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="vendor_name" name="VENDOR NAME">
+        <ngx-datatable-column prop="vendor_name" [flexGrow]="2" name="VENDOR NAME">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span style="font-weight:bold;"> {{row.vendor_name}}</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="bill_due_date" name="DUE DATE">
+        <ngx-datatable-column prop="bill_due_date" [flexGrow]="1" name="DUE DATE">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.bill_due_date  | date: 'dd-MM-yyyy'}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="total" name="BILL AMOUNT">
+        <ngx-datatable-column prop="total" [flexGrow]="1" name="BILL AMOUNT">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.total | indianCurrency}}
           </ng-template>
         </ngx-datatable-column>
 
 
-        <ngx-datatable-column prop="total" name="BALANCE AMOUNT">
+        <ngx-datatable-column prop="total" [flexGrow]="1" name="BALANCE AMOUNT">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.balance | indianCurrency}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="total" name="PAID AMOUNT">
+        <ngx-datatable-column prop="total" [flexGrow]="1" name="PAID AMOUNT">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.paid_amount | indianCurrency}}
           </ng-template>
@@ -126,7 +126,7 @@
 
 
 
-                    <ng-select formControlName="vendorId"  class=" form-control" (change)="VendorSelection($event)" [clearable]="false"
+                    <ng-select formControlName="vendorId"  class=" form-control" (change)="VendorSelection($event)" [clearable]="true"
                     [appendTo]="isDropdownAppendedToBody ? 'body' : null">
                       <ng-option *ngFor="let Customer of vendorDetails" value="{{Customer.vendor_id}}" class="form-control">
                         {{Customer.company_name}}
@@ -491,7 +491,7 @@
         <select formControlName="invoicetype" class="form-control" (change)="bill_type($event.target.value)">
           <option value = "project">Project</option>
           <option value = "company">Company</option>
-           <option value ="service">Service</option>
+           <option value ="service">Job Work</option>
         </select>
         <span class="help-block text-danger" *ngIf="SelectCategory.get('invoicetype').touched && SelectCategory.get('invoicetype').hasError('required')">Selection Required !</span>
       </div>

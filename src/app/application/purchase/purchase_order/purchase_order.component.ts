@@ -7,6 +7,7 @@ import { environment } from "../../../../environments/environment";
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HostListener } from '@angular/core';
+import { AppState } from 'src/app/app.state';
 
 
 @Component({
@@ -132,6 +133,8 @@ export class Purchase_orderComponent implements OnInit {
   tds_percent              : any=0;
   tcs_percent              : any=0;
   subtotal                 : any;
+  po_prifix                : any;
+
   private startX: number = 0;
   private startWidth: number = 0;
   private columnIndex: number | null = null;
@@ -149,13 +152,14 @@ export class Purchase_orderComponent implements OnInit {
     public  toastrService: ToastrService,
     private api          : ApiService,
     private route: ActivatedRoute,
-    private router: Router, private renderer: Renderer2
+    private router: Router, private renderer: Renderer2,
+    private _state       : AppState
   )
   {
     this.po = fb.group(
       {
         created_by : [this.uid],
-        vendorId   : ['', Validators.compose([Validators.required])],
+        vendorId   : [null, Validators.compose([Validators.required])],
         billFrom   : [null],
         shipFrom   : [null],
         poNo       : ['', Validators.compose([Validators.required])],
@@ -179,7 +183,8 @@ export class Purchase_orderComponent implements OnInit {
         size        :[null],
         deliverytype:[null, Validators.compose([Validators.required])],
         freight     :[null, Validators.compose([Validators.required])],
-        delivery_schedule :[null, Validators.compose([Validators.required])]
+        delivery_schedule :[null, Validators.compose([Validators.required])],
+        prefix      : [null]
       })
   }
 
@@ -285,7 +290,9 @@ export class Purchase_orderComponent implements OnInit {
   {
     await this.api.get('mp_po_bill.php?&authToken=' + environment.authToken).then((data: any) =>
     {
+      console.log(data)
       this.VendorPOList = data;
+      if(data != null)
       this.temp   =[...data]
     }).catch(error => { this.toastrService.error('Something went wrong in LoadVendorBills'); });
   }
@@ -336,7 +343,7 @@ export class Purchase_orderComponent implements OnInit {
   {
     this.formShow  = false;
     this.vendor_id = id;
-    this.isDropdownAppendedToBody = false;
+    this.isDropdownAppendedToBody = true;
     const today = new Date();
     let date = today.toISOString().split('T')[0];
     this.po.reset();
@@ -363,41 +370,67 @@ export class Purchase_orderComponent implements OnInit {
       formArray.removeAt(i);
     }
 
-    await this.api.get('mp_po.php?&value=' + this.vendor_id + '&authToken=' + environment.authToken).then((data: any) =>
+
+        this.bill_addr          = null;
+        this.billFrom           = null;
+        this.billAttention      = null;
+        this.billAddress_line_1 = null;
+        this.billAddress_line_2 = null;
+        this.billCity           = null;
+        this.billState          = null;
+        this.billZipcode        = null;
+        this.po.controls['billFrom'].setValue(null);
+
+        this.shipp_addr         = null;
+        this.shipFrom           = null;
+        this.shipAttention      = null;
+        this.shipAddress_line_1 = null;
+        this.shipAddress_line_2 = null;
+        this.shipCity           = null;
+        this.shipState          = null;
+        this.shipZipcode        = null;
+        this.po.controls['shipFrom'].setValue(null);
+        this.company_name       = null;
+    if(id)
     {
-      this.FetchAddress(data[0]);
+            await this.api.get('mp_po.php?&value=' + this.vendor_id + '&authToken=' + environment.authToken).then((data: any) =>
+            {
+              this.FetchAddress(data[0]);
 
-      this.company_name    = data[0].company_name;
-      this.notes           = data[0].notes;
-      this.terms_condition = data[0].terms_condition;
+              this.company_name    = data[0].company_name;
+              this.notes           = data[0].notes;
+              this.terms_condition = data[0].terms_condition;
 
-      this.stateCode       = data[0].place_from_supply_code;
-      this.payment_terms   = data[0].payment_terms;
+              this.stateCode       = data[0].place_from_supply_code;
+              this.payment_terms   = data[0].payment_terms;
 
-      let MyPaymentTerm    = data[0].my_payment_terms;
-      let po_id            = data[0].serial_no + 1;
-      var po_prifix        = data[0].prefix ;
-      this.po_no           = po_prifix + po_id;
-      this.taxempty        = data[0].tax_mode;
+              let MyPaymentTerm    = data[0].my_payment_terms;
+              let po_id            = data[0].serial_no + 1;
+              this.po_prifix        = data[0].prefix ;
+              this.po_no           = po_id;
+              this.taxempty        = data[0].tax_mode;
 
-      this.po.controls['paymentTerms'].setValue(MyPaymentTerm)
-      const today = new Date();
-      let date = today.toISOString().split('T')[0];
+              this.po.controls['paymentTerms'].setValue(MyPaymentTerm)
+              const today = new Date();
+              let date = today.toISOString().split('T')[0];
 
-      this.dueDates(MyPaymentTerm, date);
+              this.dueDates(MyPaymentTerm, date);
 
-      if(this.stateCode == 33)
-      {
-        this.LoadGST('GST');
-        this.po.controls['tax_type'].setValue("GST");
-      }
-      else
-      {
-        this.LoadGST('IGST');
-        this.po.controls['tax_type'].setValue("IGST");
-      }
-    }).catch(error => { this.toastrService.error('Something went wrong'); });
-
+              if(this.stateCode == 33)
+              {
+                this.LoadGST('GST');
+                this.po.controls['tax_type'].setValue("GST");
+              }
+              else
+              {
+                this.LoadGST('IGST');
+                this.po.controls['tax_type'].setValue("IGST");
+              }
+            }).catch(error => { this.toastrService.error('Something went wrong'); });
+    }
+    else{
+      this.GSTCalculation()
+    }
     //this.specItem(1,0);
   }
 
@@ -481,7 +514,7 @@ export class Purchase_orderComponent implements OnInit {
     });
     if (this.po.valid)
     {
-      const billNoValue = this.po_no;
+      const billNoValue = this.po_prifix+this.po_no;
       function normalizeString(str : any) {
         return str.replace(/\s+/g, '').toLowerCase();
       }
@@ -789,6 +822,7 @@ export class Purchase_orderComponent implements OnInit {
     this.show_new_po = false;
     this.selected=[];
     this.LoadVendorBills();
+    this._state.notifyDataChanged('menu.isCollapsed', false);
   }
 
   onInputChange()

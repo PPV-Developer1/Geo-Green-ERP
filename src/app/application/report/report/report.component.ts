@@ -1,4 +1,5 @@
-import { Component, OnInit,ViewChild ,ElementRef} from '@angular/core';
+import { PdfGeneratorService } from './../../../service/pdf.service';
+import { Component, OnInit,ViewChild ,ElementRef, Type} from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
 import { ApiService } from 'src/app/service/api.service';
@@ -9,6 +10,20 @@ import { DatatableComponent } from '@swimlane/ngx-datatable';
 import * as XLSX from "xlsx";
 import {formatDate } from '@angular/common';
 import { ChangeDetectorRef } from '@angular/core';
+import { jsPDF } from 'jspdf';
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
+pdfMake.fonts = {
+  'Roboto': {
+    //normal: 'https://fonts.googleapis.com/css?family=Roboto',
+    normal:'Roboto-Regular.ttf',
+    bold: 'Roboto-Medium.ttf',
+    italics: 'Roboto-Italic.ttf',
+    bolditalics: 'Roboto-Italic.ttf'
+  }
+};
 
 @Component({
   selector: 'az-report',
@@ -94,15 +109,17 @@ export class ReportComponent implements OnInit {
   tax_show         : Boolean = false;
   loading          : boolean = false;
   opening_balance  : any
-  lastRow: any = null;
-  id     : any = null;
-  title     : any;
-  item_list : any;
+  lastRow     : any = null;
+  id          : any = null;
+  title       : any;
+  item_list   : any;
+  select_data : any;
 
   public user_type = localStorage.getItem('type');
   public uid       = localStorage.getItem('type_id');
 
-  constructor(private modalService: NgbModal, public router: Router, public api: ApiService, public toastrService: ToastrService, private fb: FormBuilder,private cdr: ChangeDetectorRef)
+  constructor(private modalService: NgbModal, public router: Router, public api: ApiService, public toastrService: ToastrService,
+     private fb: FormBuilder,private cdr: ChangeDetectorRef,public pdfservice : PdfGeneratorService)
   {
     this.date = fb.group({
       fromdate: [null],
@@ -180,17 +197,36 @@ async  ngOnInit()
               this.employee_list = data;
       }).catch(error => {this.toastrService.error('Something went wrong ');});
 
-      await   this.api.get('mp_item_list_avg.php?authToken='+environment.authToken).then((data: any) =>
-        {
-          console.log("item data : ",data)
-                this.item_list = data;
-        }).catch(error => {this.toastrService.error('Something went wrong ');});
+      this.itemLoad()
 
       setTimeout(() => {
         this.show = true
        }, 1000);
 
  }
+
+async itemLoad()
+ {
+    await   this.api.get('mp_item_list_avg.php?authToken='+environment.authToken).then((data: any) =>
+        {
+          console.log("item data : ",data)
+                this.item_list = data;
+                if(data != null)
+                this.Itemfilter = [...data]
+        }).catch(error => {this.toastrService.error('Something went wrong ');});
+ }
+
+ Itemfilter:any
+  updateFilter_item(event) {
+    const val = event.target.value.toLowerCase();
+    const temp = this.Itemfilter.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.item_list = temp;
+    this.table.offset = 0;
+  }
 
   groupBy(array: any[], property: string)
   {
@@ -628,6 +664,10 @@ async  ngOnInit()
                  Vendor_Name:'Total',
                  Bill_Amount:this.totalSales,
                  Balance_Amount:this.totalBalance,
+                 E_way_bill:'',
+                 Transport_Mode:'',
+                 Vehicle_Number:'',
+                 Transport_Charge:''
               };
               const totalRow1 = {
                 bill_id:'',
@@ -639,9 +679,11 @@ async  ngOnInit()
                Vendor_Name:'Total',
                Bill_Amount:this.totalSales,
                Balance_Amount:this.totalBalance,
+
             };
               this.print_data.push(totalRow);
               this.sale_by_cust.push(totalRow1);
+              console.log("print data ",this.print_data )
               }
               else
               {
@@ -819,6 +861,7 @@ async  ngOnInit()
                   const totalRow = {
                     Date      : 'Total',
                     DC_Noumber: '',
+                    Type      : '',
                     Customer_Name:'',
                     Amount: this.totalBalance,
                   };
@@ -1197,11 +1240,13 @@ purchase_list_view:boolean=false
 
   set_zero2()
   {
+    this.itemLoad()
     this.purchase_list_view = false
   }
+
   onSubmit_customer(value)
   {
-
+      console.log("onclick",value)
        this.customer_payment = true;
         if(this.customer.valid)
         {
@@ -1224,7 +1269,7 @@ purchase_list_view:boolean=false
                   this.name = foundCustomer.company_name;
                 this.api.get('mp_individual_customer_balance.php?value=' + value.customer_id + '&from_date='+from_date+'&to_date='+to_date+'&authToken=' + environment.authToken).then((data: any) =>
                   {
-
+                    
                     if(data != null)
                     {
                             //this.customer.reset();
@@ -1443,6 +1488,7 @@ purchase_list_view:boolean=false
   {
     this.customer_payment = true;
   }
+
   print()
   {
     if(this.print_data != null)
@@ -1454,6 +1500,7 @@ purchase_list_view:boolean=false
       this.toastrService.warning('No Data ');
     }
   }
+
   print_tax()
   {
     if(this.print_data_type2 != null)
@@ -1488,7 +1535,7 @@ purchase_list_view:boolean=false
       {
         this.name= data.Customer_Name;
         this.customer_payment = true;
-
+        this.select_data = data.Customer_Name;
         this.api.get('mp_customer_payment_received.php?from_date='+this.tran_from_date+'&to_date='+this.tran_to_date+'&value=' + data.Customer_id + '&authToken=' + environment.authToken).then((data: any) =>
         {
           if(data != null)
@@ -1505,6 +1552,7 @@ purchase_list_view:boolean=false
           {
 
             this.name= data.Customer_Name;
+            this.select_data = data.Customer_Name;
             this.customer_payment = true;
             this.totalBalance = 0;
           this.api.get('mp_customer_balance_received_report.php?from_date='+this.tran_from_date+'&to_date='+this.tran_to_date+'&value=' + data.Customer_id + '&authToken=' + environment.authToken).then((data: any) =>
@@ -1546,7 +1594,8 @@ purchase_list_view:boolean=false
 
             if(this.id == "vendor_balances" && data.Vendor_Name  != "Total")
             {
-              this.name= data.Vendor_Name;
+              this.name = data.Vendor_Name;
+              this.select_data = data.Vendor_Name
               this.customer_payment = true;
               this.api.get('mp_vendor_payment_made_report.php?from_date='+this.tran_from_date+'&to_date='+this.tran_to_date+'&value=' + data.Vendor_id + '&authToken=' + environment.authToken).then((data: any) =>
               {
@@ -1590,6 +1639,7 @@ purchase_list_view:boolean=false
           if(event.row.Stock_on_Hand)
           {
             this.name= data.Item_Name;
+            this.select_data = data.Item_Name
             this.customer_payment = true;
             this.api.get('mp_each_item_summary.php?value=' + data.Item_id + '&authToken=' + environment.authToken).then((data: any) =>
             {
@@ -1699,24 +1749,75 @@ purchase_list_view:boolean=false
     }
   }
 
-  convertToCSV(data: any[]): string
+
+  pdf()
   {
-    const csvArray = [];
-    const headers = Object.keys(data[0]);
-    csvArray.push(headers.join(','));
+    const data = this.print_tran_data
+    var ClientName :any;
+    var ClientAddress : any;
+    var NumericField : any
+    var statementName : any;
+    if(this.id == "individual_vendor_balance")
+    {
 
-    data.forEach(item => {
-      const row = headers.map(key => item[key]);
-      csvArray.push(row.join(','));
-    });
-
-    return csvArray.join('\n');
+        ClientName = "PPV Technology";
+        ClientAddress = "Rajas garden, Numbal, Chennai - 600077";
+        NumericField =['Without_Tax', 'Tax','Sales']
+    }
+    this.pdfservice.generateDynamicPdf(
+      'Ledger Statement '+this.customer.value.fromdate+' to '+this.customer.value.todate,   // Title
+      'Geo Green Enviro Engineers',                                   // Company Name
+      'Plot No. 618, Paruthipattu Road, Chennai – 600071',            // Address
+      ClientName,
+      ClientAddress,
+      data,                                                           // Your table data (any JSON)
+      NumericField,                                                   // Numeric columns
+      'open'                                                          // or 'download'
+    );
   }
+
+  // convertToCSV(data: any[]): string
+  // {
+  //   const csvArray = [];
+  //   const headers = Object.keys(data[0]);
+  //   csvArray.push(headers.join(','));
+
+  //   data.forEach(item => {
+  //     const row = headers.map(key => item[key]);
+  //     csvArray.push(row.join(','));
+  //   });
+
+  //   return csvArray.join('\n');
+  // }
+
+  convertToCSV(data: any[]): string {
+  if (!data || !data.length) return '';
+
+  const headers = Object.keys(data[0]);
+  const csvRows = [];
+
+  // Add header row
+  csvRows.push(headers.join(','));
+
+  // Add data rows
+  data.forEach(item => {
+    const values = headers.map(key => {
+      const val = item[key] ?? '';
+      // Escape double quotes by doubling them
+      const escaped = String(val).replace(/"/g, '""');
+      // Wrap fields containing commas or quotes in quotes
+      return /[",\n]/.test(escaped) ? `"${escaped}"` : escaped;
+    });
+    csvRows.push(values.join(','));
+  });
+
+  return csvRows.join('\n');
+}
 
   downloadCSVFile(csvData: string, filename: string)
   {
 
-    const csvBlob = new Blob([csvData],  { type: 'text/csv' });
+    const csvBlob = new Blob([csvData],  { type: 'application/vnd.openxmlformats-ficedocument.spreadsheetml.sheet' });
     const url = URL.createObjectURL(csvBlob);
 
     const downloadLink = document.createElement('a');
@@ -1727,6 +1828,25 @@ purchase_list_view:boolean=false
     URL.revokeObjectURL(url);
   }
 
+   downloadPDF(data: any[], filename: string) {
+    console.log("pdf",data)
+    const doc = new jsPDF();
+    let yPos = 10;
+
+    // Generate headers
+    const headers = Object.keys(data[0]).join(' | ');
+    doc.text(headers, 10, yPos);
+    yPos += 10;
+
+    // Add each row
+    data.forEach((row: any) => {
+      const rowData = Object.values(row).join(' | ');
+      doc.text(rowData, 10, yPos);
+      yPos += 10;
+    });
+
+    doc.save(filename);
+  }
 
   set_zero()
   {
@@ -1991,6 +2111,7 @@ purchase_list_view:boolean=false
 
           this.api.get('mp_tax_report_list.php?find='+this.tax_field+'&value='+this.feild_value+'&authToken='+environment.authToken).then((data: any) =>
           {
+            console.log("vandor data :",data)
             if(data != null)
             {
             this.cust_tran_data   =  data;

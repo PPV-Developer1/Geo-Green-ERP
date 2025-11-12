@@ -28,7 +28,7 @@
       <ngx-datatable style="cursor: pointer;" #table class="custom_table"
         [headerHeight]="50"
         [limit]="15"
-        [columnMode]="'force'"
+        [columnMode]="'flex'"
         [columns]="columns"
         [footerHeight]="50"
         [rowHeight]="'auto'"
@@ -39,37 +39,37 @@
         (activate)="onActivate($event)"
         (select)='onSelect($event)'>
 
-        <ngx-datatable-column prop="po_date" name="DATE">
+        <ngx-datatable-column     [resizeable]="false" prop="po_date" [flexGrow]="1" name="DATE">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.po_date  | date: 'dd-MM-yyyy'}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="po_number" name="PO NO">
+        <ngx-datatable-column     [resizeable]="false" prop="po_number" [flexGrow]="1" name="PO NO">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span style="font-weight:bold;">{{row.po_number}}</span>
           </ng-template>
         </ngx-datatable-column>
-        <ngx-datatable-column prop="reference_number" name="REFF NUMBER">
+        <ngx-datatable-column     [resizeable]="false" prop="reference_number" [flexGrow]="1" name="REFF NUMBER">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.reference_number != ''"> {{row.reference_number}}</span>
             <span *ngIf="row.reference_number == ''"> Nill</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="vendor_name" name="VENDOR NAME">
+        <ngx-datatable-column     [resizeable]="false" prop="vendor_name" [flexGrow]="2" name="VENDOR NAME">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span style="font-weight:bold;">{{row.vendor_name}}</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="bill_due_date" name="DUE DATE">
+        <ngx-datatable-column     [resizeable]="false" prop="bill_due_date" [flexGrow]="1" name="DUE DATE">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.bill_due_date  | date: 'dd-MM-yyyy'}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="total" name="BILL AMOUNT">
+        <ngx-datatable-column     [resizeable]="false" prop="total" [flexGrow]="1" name="BILL AMOUNT">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.total | indianCurrency}}
           </ng-template>
@@ -116,7 +116,7 @@
                     </select> -->
 
                     <ng-select formControlName="vendorId"  class=" form-control " (change)="VendorSelection($event)"
-                    [clearable]="false" [appendTo]="isDropdownAppendedToBody ? 'body' : null">
+                    [clearable]="true" [appendTo]="isDropdownAppendedToBody ? 'body' : null">
                         <ng-option *ngFor="let vendor of vendorDetails" value="{{vendor.vendor_id}}" class="form-control">
                             {{vendor.company_name}}
                         </ng-option>
@@ -177,10 +177,17 @@
 
                   <div class="row mb-3">
                     <label style="color: #e54643"  class="col-sm-2 col-form-label col-form-label-sm">PO Number *</label>
-                    <div class="col-sm-4">
-                      <input type="text" formControlName="poNo"  [(ngModel)]="po_no" placeholder="Enter PO Number" class="form-control form-control-sm" (ngModelChange)="onInputChange()"/>
-                      <span class="help-block text-danger" *ngIf="po.get('poNo').touched && po.get('poNo').hasError('required')">Enter PO Number !</span>
-                    </div>
+
+
+                       <div class="col-sm-2">
+                          <input type="text" readonly formControlName="prefix" [(ngModel)]="po_prifix" class="form-control form-control-sm" />
+                      </div>
+
+                      <div class="col-sm-1">
+                          <input type="text" formControlName="poNo" [(ngModel)]="po_no"
+                            class="form-control form-control-sm" />
+                          <span class="help-block text-danger" *ngIf="po.get('poNo').touched && po.get('poNo').hasError('required')">Enter PO Number !</span>
+                      </div>
                   </div>
 
                   <div class="row mb-3">

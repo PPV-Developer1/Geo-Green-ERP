@@ -37,12 +37,12 @@ export class ApprovalComponent implements OnInit {
 
   async getProductList()
   {
-    await this.api.get('mp_production_view.php?authToken='+environment.authToken).then((data: any) =>
+    await this.api.get('mp_production_view.php?mode=approval&authToken='+environment.authToken).then((data: any) =>
     {
-      function levelFilter(value) { return (value.level === 2); }
-      let get_data          = data.filter(levelFilter)
-      this.product_details  = get_data;
-      this.filter_data      = [...get_data];
+
+      this.product_details  = data;
+      if(data != null)
+      this.filter_data      = [...data];
     }).catch(error => {this.toastrService.error('Something went wrong');});
   }
 
@@ -99,7 +99,7 @@ export class ApprovalComponent implements OnInit {
 
   updateFilter(event)
   {
-   
+
     const val = event.target.value.toLowerCase();
       const temp = this.filter_data.filter((d) => {
         return Object.values(d).some(field =>

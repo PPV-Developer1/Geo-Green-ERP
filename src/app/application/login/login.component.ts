@@ -30,29 +30,30 @@ export class LoginComponent {
     public onSubmit(values): void {
         if (this.form.valid)
         {
-            this.api.get('login.php?email='+values.email).then((data: any) =>
+            this.api.get('login.php?email='+values.email+'&password='+values.password).then((data: any) =>
             {
-
-                if (data[0].password === values.password)
-                { 
-                    if (data[0].status === 1)
+              console.log(data)
+                if (data.message == "success")
+                {
+                  const details = data.data
+                    if (details[0].status === 1)
                     {
-                        localStorage.setItem('uid', data[0].emp_id);
-                        localStorage.setItem('type_id', data[0].user_type);
-                        localStorage.setItem('type', data[0].type);
-                        localStorage.setItem('prefix', data[0].emp_prefix);
-                        localStorage.setItem('name', data[0].name);
-                        localStorage.setItem('last_login', data[0].last_login);
-                        localStorage.setItem('designation', data[0].designation);
-                        localStorage.setItem('image', data[0].image);
-                        localStorage.setItem('bank_id', data[0].bank_id);
+                        localStorage.setItem('uid', details[0].emp_id);
+                        localStorage.setItem('type_id', details[0].user_type);
+                        localStorage.setItem('type', details[0].type);
+                        localStorage.setItem('prefix', details[0].emp_prefix);
+                        localStorage.setItem('name', details[0].name);
+                        localStorage.setItem('last_login', details[0].last_login);
+                        localStorage.setItem('designation', details[0].designation);
+                        localStorage.setItem('image', details[0].image);
+                        localStorage.setItem('bank_id', details[0].bank_id);
 
-                        localStorage.setItem('com_name', data[0].com_name);
-                        localStorage.setItem('com_logo', data[0].com_logo);
-                        localStorage.setItem('com_icon', data[0].com_icon);
+                        localStorage.setItem('com_name', details[0].com_name);
+                        localStorage.setItem('com_logo', details[0].com_logo);
+                        localStorage.setItem('com_icon', details[0].com_icon);
 
                         this.router.navigate(['/app']);
-                        this.toastrService.success('Welcome Back Mr.'+data[0].name);
+                        this.toastrService.success('Welcome Back Mr.'+details[0].name);
                     }
                     else
                     {
@@ -66,9 +67,13 @@ export class LoginComponent {
                         }
                     }
                 }
-                else
+                else if(data.message == "invalid password")
                 {
                     this.toastrService.error('Incorrect Password');
+                }
+              else if(data.message == "invalid user")
+                {
+                    this.toastrService.error('Invalid User');
                 }
                 return true;
             }).catch(error =>

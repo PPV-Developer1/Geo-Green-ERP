@@ -6,6 +6,7 @@ import { ApiService } from "../../../service/api.service";
 import { environment } from "../../../../environments/environment";
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppState } from 'src/app/app.state';
 
 @Component({
   selector   : 'az-delivery_challan',
@@ -150,13 +151,14 @@ export class Delivery_challanComponent implements OnInit {
     public  fb           : FormBuilder,
     public  toastrService: ToastrService,
     private api          : ApiService,
-    private renderer: Renderer2
+    private renderer     : Renderer2,
+    private _state       : AppState
   )
   {
     this.dc = fb.group(
       {
         created_by: [this.uid],
-        customerId: ['', Validators.compose([Validators.required])],
+        customerId: [null, Validators.compose([Validators.required])],
         billFrom  : [null],
         shipFrom  : [null],
         dcNo      : [null, Validators.compose([Validators.required])],
@@ -178,7 +180,9 @@ export class Delivery_challanComponent implements OnInit {
         tax_type  :[null],
         tds_percentage:[0],
         tcs_percentage:[0],
-        size:[null]
+        size  :[null],
+        prefix:[null],
+
       })
 
 
@@ -323,9 +327,11 @@ export class Delivery_challanComponent implements OnInit {
       formArray.removeAt(i);
     }
   }
+
+  prefix_data : any
   async VendorSelection(id)
   {
-    this.isDropdownAppendedToBody = false;
+    this.isDropdownAppendedToBody = true;
     this.formShow = false;
     this.customer_id = id;
     this.tableWidth=100;
@@ -359,71 +365,105 @@ export class Delivery_challanComponent implements OnInit {
       formArray.removeAt(i);
     }
 
-    await this.api.get('mp_dc.php?&value=' + this.customer_id + '&authToken=' + environment.authToken).then((data: any) =>
+
+        this.ItemList           = null;
+        this.bill_addr          = null;
+        this.billFrom           = null;
+        this.billAttention      = null;
+        this.billAddress_line_1 = null;
+        this.billAddress_line_2 = null;
+        this.billCity           = null;
+        this.billState          = null;
+        this.billZipcode        = null;
+        this.dc.controls['billFrom'].setValue(null);
+
+        this.shipp_addr         = null;
+        this.shipFrom           = null;
+        this.shipAttention      = null;
+        this.shipAddress_line_1 = null;
+        this.shipAddress_line_2 = null;
+        this.shipCity           = null;
+        this.shipState          = null;
+        this.shipZipcode        = null;
+        this.dc.controls['shipFrom'].setValue(null);
+        this.company_name       = null;
+
+
+    if(id)
     {
-      this.FetchAddress(data[0]);
+          await this.api.get('mp_dc.php?&value=' + this.customer_id + '&authToken=' + environment.authToken).then((data: any) =>
+          {
+            this.FetchAddress(data[0]);
 
-      this.company_name    = data[0].company_name;
-      this.notes           = data[0].notes;
-      this.terms_condition = data[0].terms_condition;
+            this.company_name    = data[0].company_name;
+            this.notes           = data[0].notes;
+            this.terms_condition = data[0].terms_condition;
 
-      this.stateCode       = data[0].place_from_supply_code;
+            this.stateCode       = data[0].place_from_supply_code;
 
-      this.payment_terms   = data[0].payment_terms;
-      let MyPaymentTerm    = data[0].my_payment_terms;
-      this.taxempty        = data[0].tax_mode;
-      let dc_id   = data[0].serial_no + 1;
-      var dcprifix= data[0].prefix ;
-      this.inv_no = dcprifix  + dc_id;
-      this.dc.controls['paymentTerms'].setValue(MyPaymentTerm)
-      const today = new Date();
-      let date = today.toISOString().split('T')[0];
-      if(MyPaymentTerm != null)
-        {
-          this.dueDates(MyPaymentTerm, date);
+            this.payment_terms   = data[0].payment_terms;
+            let MyPaymentTerm    = data[0].my_payment_terms;
+            this.taxempty        = data[0].tax_mode;
+            let dc_id            = data[0].serial_no + 1;
+            this.prefix_data     = data[0].prefix ;
+            this.inv_no          = dc_id;
+            this.dc.controls['paymentTerms'].setValue(MyPaymentTerm)
+            const today = new Date();
+            let date = today.toISOString().split('T')[0];
+            if(MyPaymentTerm != null)
+              {
+                this.dueDates(MyPaymentTerm, date);
+              }
+
+            if(this.stateCode == 33)
+            {
+              this.LoadGST('GST');
+              this.dc.controls['tax_type'].setValue("GST")
+            }
+            else
+            {
+              this.LoadGST('IGST');
+              this.dc.controls['tax_type'].setValue("IGST")
+            }
+          }).catch(error => { this.toastrService.error('Something went wrong '); });
+
+          if(this.type == "project")
+          {
+          this.api.get('mp_projectList_load.php?value=' + this.customer_id + '&authToken=' + environment.authToken).then((data: any) =>
+            {
+              this.ItemList = null;
+            if(data.status != "no_data")
+            {
+              this.ItemList = data;
+            }
+            else
+            {
+              this.toastrService.warning('No data ');
+            }
+            }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
+          }
+
+          if(this.type == "items")
+          {
+          this.api.get('get_data.php?table=item&authToken=' + environment.authToken).then((data: any) =>
+            {
+              this.ItemList = data;
+            }).catch(error => { this.toastrService.error('Something went wrong in product type'); });
         }
 
-      if(this.stateCode == 33)
-      {
-        this.LoadGST('GST');
-        this.dc.controls['tax_type'].setValue("GST")
-      }
-      else
-      {
-        this.LoadGST('IGST');
-        this.dc.controls['tax_type'].setValue("IGST")
-      }
-    }).catch(error => { this.toastrService.error('Something went wrong '); });
+        if(this.returnable_dc_show === true)
+        {
+          this.patchValues(null,0);
+        }
+    }
+    else{console.log("clear")
 
-    if(this.type == "project")
-    {
-     this.api.get('mp_projectList_load.php?value=' + this.customer_id + '&authToken=' + environment.authToken).then((data: any) =>
+       this.GSTCalculation();
+       if(this.type == "items")
        {
-        this.ItemList = null;
-       if(data.status != "no_data")
-       {
-         this.ItemList = data;
+         this.LoadItemDetails()
        }
-       else
-       {
-        this.toastrService.warning('No data ');
-       }
-       }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
     }
-
-    if(this.type == "product")
-    {
-     this.api.get('get_data.php?table=product_type&authToken=' + environment.authToken).then((data: any) =>
-       {
-         this.ItemList = data;
-       }).catch(error => { this.toastrService.error('Something went wrong in product type'); });
-    }
-
-    if(this.returnable_dc_show === true)
-    {
-      this.patchValues(null,0);
-    }
-
   }
 
 
@@ -508,7 +548,7 @@ export class Delivery_challanComponent implements OnInit {
       const billNoValue = this.inv_no;
       if (this.dc.valid)
         {
-          const billNoValue = this.inv_no;
+          const billNoValue = this.prefix_data+this.inv_no;
           function normalizeString(str : any) {
             return str.replace(/\s+/g, '').toLowerCase();
           }
@@ -888,6 +928,7 @@ export class Delivery_challanComponent implements OnInit {
   }
   setzero()
   {
+    this._state.notifyDataChanged('menu.isCollapsed', false);
     this.show_new_bill = false;
     this.selected = [];
     this.LoadCustomerBills();

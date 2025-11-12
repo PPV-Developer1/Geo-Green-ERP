@@ -10,7 +10,8 @@
   text-align: left;
   border: 1px solid #969696;
   z-index: 1050 !important;
-  
+  padding: 0 !important;              /* Remove padding from the option */
+  margin: 0 !important;               /* Remove margin from the option */
 }
 
 ::ng-deep .ng-dropdown-panel .ng-option.ng-option-marked {

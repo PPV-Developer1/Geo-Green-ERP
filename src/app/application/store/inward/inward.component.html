@@ -29,7 +29,7 @@
     class="custom_table"
     [headerHeight]="50"
     [limit]="20"
-    [columnMode]="'force'"
+    [columnMode]="'flex'"
     [footerHeight]="50"
     [rowHeight]="'auto'"
     [rows]="item_list"
@@ -37,38 +37,38 @@
     [selectionType]="'single'"
     (activate)="onActivate($event)">
 
-    <!-- <ngx-datatable-column name="ID" >
+    <!-- <ngx-datatable-column     [resizeable]="false" name="ID" >
         <ng-template ngx-datatable-cell-template let-row="row">
             {{row.bill_item_id}}
         </ng-template>
     </ngx-datatable-column> -->
 
-    <ngx-datatable-column prop="bill_vendor_name" name="VENDOR NAME">
+    <ngx-datatable-column     [resizeable]="false" prop="company_name" [flexGrow]="2" name="VENDOR NAME">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.company_name}}
       </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="bill_number" name="BILL NUMBER">
+    <ngx-datatable-column     [resizeable]="false" prop="bill_number" [flexGrow]="2" name="BILL NUMBER">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.bill_number}}
       </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="item_list_name" name="ITEM NAME">
+    <ngx-datatable-column     [resizeable]="false" prop="item_list_name" [flexGrow]="2" name="ITEM NAME">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.item_name}}
       </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column prop="item_description" name="ITEM DESCRIPTION">
+    <ngx-datatable-column     [resizeable]="false" prop="item_description" [flexGrow]="2" name="ITEM DESCRIPTION">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.item_description}}
       </ng-template>
     </ngx-datatable-column>
 
 
-    <ngx-datatable-column prop="qty" name="ITEM QTY">
+    <ngx-datatable-column     [resizeable]="false" prop="qty" [flexGrow]="1" name="ITEM QTY">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.qty}}
       </ng-template>

@@ -113,7 +113,7 @@ export class JobsheetComponent implements OnInit {
       inward_at       : new FormControl(null, [Validators.required]),
       notes           : new FormControl(null),
     })
-    
+
   this.todays_Date = formatDate(this.today, 'yyyy-MM-dd HH:mm:ss', 'en-US', '+0530');
   }
 
@@ -235,6 +235,12 @@ async jobsheet_bills()
           });
         if (this.JobsheetEdit.valid)
         {
+
+             const confirmed = confirm("Are you sure you want to update?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
           this.loading=true;
 
           await this.api.post('post_update_data.php?table=jobsheet&field=id&value='+this.selected_data.id+'&authToken='+environment.authToken,this.JobsheetEdit.value).then(async(data: any) =>
@@ -334,11 +340,15 @@ async jobsheet_bills()
 
 async  update(value)
   {
-
+        const confirmed = confirm("Are you sure you want to update?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
           this.loading=true;
               await this.api.post('mp_jobsheet_item_edit.php?id='+this.select_item.id+'&authToken='+environment.authToken,value).then((data: any) =>
                 {
-
+                  console.log(data)
                   if(data.status == "success")
                   {
                     this.loading=false;
@@ -389,6 +399,7 @@ async  update(value)
        const stock = this.batchList.find(i => i.batch == this.Item.value.batch_id)
        console.log(stock)
        this.Item.controls["stock_id"].setValue(stock.stock_id)
+        console.log("item : ",this.Item.value)
       Object.keys(this.Item.controls).forEach(field =>
           {
             const control = this.Item.get(field);
@@ -398,7 +409,7 @@ async  update(value)
         {
           this.loading=true;
 
-          await this.api.post('post_insert_data.php?table=jobsheet_items&authToken='+environment.authToken,this.Item.value).then(async(data: any) =>
+          await this.api.post('job_sheet_create.php?&authToken='+environment.authToken,this.Item.value).then(async(data: any) =>
           {
             console.log(data)
             if(data.status == "success")
@@ -489,7 +500,11 @@ async  update(value)
         });
       if(this.InwardEntry.valid)
       {
-
+          const confirmed = confirm("Are you sure you want to complete?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
           this.loading=true;
           await this.api.post('mp_complete_jobwork.php?id='+this.selected_data.id+'&authToken='+environment.authToken,this.InwardEntry.value).then((data: any) =>
           {

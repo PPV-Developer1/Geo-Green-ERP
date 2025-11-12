@@ -120,7 +120,11 @@ export class Payment_transferComponent implements OnInit
 
     if (this.addTrans.valid)
     {
-
+      const confirmed = confirm("Do you want to proceed with the transaction?");
+        console.log(confirmed)
+        if (!confirmed) {
+          return;
+        }
       this.loading=true;
       await this.api.get('get_data.php?table=bank&find=bank_id&value='+data.from_bank+'&authToken=' + environment.authToken).then((get_data: any) =>
       {
