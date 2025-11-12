@@ -2185,7 +2185,11 @@ async onSubmit(bill_data)
               if (!confirmed) {
                 return;
               }
+<<<<<<< HEAD
          await this.api.post('mp_advance_amount_to_bill.php?tran_id='+select.tran_id+'&authToken=' + environment.authToken, this.advance.value).then(async (data: any) =>
+=======
+         await     this.api.post('mp_advance_amount_to_bill.php?tran_id='+select.tran_id+'&authToken=' + environment.authToken, this.advance.value).then(async (data: any) =>
+>>>>>>> 0e84583114bc683395bd0b0d0a7b5c024a8ad281
               {
                 if(data.status == "success")
                   {

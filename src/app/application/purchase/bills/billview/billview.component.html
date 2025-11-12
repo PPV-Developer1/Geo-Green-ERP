@@ -45,9 +45,14 @@
             </td> -->
             <td style="border: none;">
                 <div class="btn-group mb-3 col-md-7" role="group" aria-label="Basic example">
+<<<<<<< HEAD
                   <button type="button" class="btn btn-outline-info fa fa-location-arrow btn-sm" (click)="final_location()"> File Location</button>
                     <button *ngIf="user == 'super_admin'" type="button" [disabled]="payment_view || Edit_status >0" class="btn btn-outline-info fa fa-pencil btn-sm" (click)="editbill()"> Edit</button>
                     <!-- <button type="button" class="btn btn-outline-info fa fa-print btn-sm" (click)="download()"> Print</button> -->
+=======
+                    <button *ngIf="user == 'super_admin'" type="button" [disabled]="payment_view || Edit_status >0" class="btn btn-outline-info fa fa-pencil btn-sm" (click)="editbill()"> Edit</button>
+                    <button type="button" class="btn btn-outline-info fa fa-print btn-sm" (click)="download()"> Print</button>
+>>>>>>> 0e84583114bc683395bd0b0d0a7b5c024a8ad281
                     <button  class="btn btn-outline-info dropdown-toggle fa fa-money btn-sm" [disabled]="payment_view" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                       Payment
                     </button>

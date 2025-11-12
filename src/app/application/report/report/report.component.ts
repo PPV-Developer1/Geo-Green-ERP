@@ -1,8 +1,11 @@
+<<<<<<< HEAD
 import { PdfGeneratorService } from './../../../service/pdf.service';
+=======
+>>>>>>> 0e84583114bc683395bd0b0d0a7b5c024a8ad281
 import { Component, OnInit,ViewChild ,ElementRef, Type} from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
-import { ApiService } from 'src/app/service/api.service';
+import { ApiService } from 'src/app/service/api.service';   
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment.prod';
 import { FormGroup, FormBuilder, Validators} from '@angular/forms';
@@ -1269,7 +1272,7 @@ purchase_list_view:boolean=false
                   this.name = foundCustomer.company_name;
                 this.api.get('mp_individual_customer_balance.php?value=' + value.customer_id + '&from_date='+from_date+'&to_date='+to_date+'&authToken=' + environment.authToken).then((data: any) =>
                   {
-                    
+
                     if(data != null)
                     {
                             //this.customer.reset();
@@ -1749,6 +1752,7 @@ purchase_list_view:boolean=false
     }
   }
 
+<<<<<<< HEAD
 
   pdf()
   {
@@ -1775,6 +1779,45 @@ purchase_list_view:boolean=false
       'open'                                                          // or 'download'
     );
   }
+=======
+  // convertToCSV(data: any[]): string
+  // {
+  //   const csvArray = [];
+  //   const headers = Object.keys(data[0]);
+  //   csvArray.push(headers.join(','));
+
+  //   data.forEach(item => {
+  //     const row = headers.map(key => item[key]);
+  //     csvArray.push(row.join(','));
+  //   });
+
+  //   return csvArray.join('\n');
+  // }
+
+  convertToCSV(data: any[]): string {
+  if (!data || !data.length) return '';
+
+  const headers = Object.keys(data[0]);
+  const csvRows = [];
+
+  // Add header row
+  csvRows.push(headers.join(','));
+
+  // Add data rows
+  data.forEach(item => {
+    const values = headers.map(key => {
+      const val = item[key] ?? '';
+      // Escape double quotes by doubling them
+      const escaped = String(val).replace(/"/g, '""');
+      // Wrap fields containing commas or quotes in quotes
+      return /[",\n]/.test(escaped) ? `"${escaped}"` : escaped;
+    });
+    csvRows.push(values.join(','));
+  });
+
+  return csvRows.join('\n');
+}
+>>>>>>> 0e84583114bc683395bd0b0d0a7b5c024a8ad281
 
   // convertToCSV(data: any[]): string
   // {

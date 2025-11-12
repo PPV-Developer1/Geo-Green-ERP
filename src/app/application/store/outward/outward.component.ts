@@ -335,7 +335,11 @@ export class OutwardComponent implements OnInit
 
   update(value)
   {
+<<<<<<< HEAD
          const confirmed = confirm("Are you sure you want to Update this item?");
+=======
+         const confirmed = confirm("Are you sure you want to delete this item?");
+>>>>>>> 0e84583114bc683395bd0b0d0a7b5c024a8ad281
               console.log(confirmed)
               if (!confirmed) {
                 return;
