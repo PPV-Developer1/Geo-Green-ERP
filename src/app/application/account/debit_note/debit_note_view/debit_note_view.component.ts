@@ -81,10 +81,10 @@ export class Debit_note_viewComponent implements OnInit {
      {
        message         : ['',Validators.compose([Validators.required])],
        reference       : ['',Validators.compose([Validators.required])],
+       note_date       : ['',Validators.compose([Validators.required])],
        note_no         : [],
        bill_to         : [],
        vendor_id       : [],
-       payment_term    : [],
        bill_number     : [],
        notes           : [],
        terms_condition : [],
@@ -265,6 +265,7 @@ export class Debit_note_viewComponent implements OnInit {
  async  edit()
    {
      console.log("Details",this.Details)
+     this.form.controls['note_date'].setValue(this.Details.generate_date)
      this.form.controls['message'].setValue(this.Details.message)
      this.form.controls['reference'].setValue(this.Details.reference)
      this.form.controls['notes'].setValue(this.Details.note)

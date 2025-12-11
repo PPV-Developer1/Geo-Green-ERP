@@ -42,6 +42,7 @@ export class InvoiceComponent implements OnInit {
   public i_valu            : any;
   CustomerBillList         : any;
   ItemList                 : any;
+  ItemList_temp            : any;
   BillingAddress           : any;
   ShippingAddress          : any;
   GST_Data                 : any;
@@ -150,10 +151,12 @@ export class InvoiceComponent implements OnInit {
 //   { item_id: 3, item_text: 'DC003' }
 // ];
   @ViewChild(DatatableComponent) table: DatatableComponent;
+  //  @ViewChild(DatatableComponent) Itemstable: DatatableComponent;
+  @ViewChild('Itemstable', { static: false }) Itemstable: DatatableComponent;
   @ViewChild("customer_name", { static: true }) customer_name: ElementRef;  // For MODEL Open
   @ViewChild("new_category", { static: true }) new_category   : ElementRef;
   @ViewChild('tableResponsive', { static: false }) tableResponsive: ElementRef;
-
+  @ViewChild("ItemListModel", { static: true }) ItemListModel   : ElementRef;
   constructor
   (
     private modalService : NgbModal,
@@ -285,9 +288,7 @@ adjustTableHeight() {
         }
   }
 
-
 selectedDCs: any[] = [];  // instead of null
-
 
 dropdownSettings = {
   singleSelection: false,
@@ -299,8 +300,6 @@ dropdownSettings = {
   allowSearchFilter: true,
   enableCheckAll: false
 };
-
-
 
   async LoadCustomerBills()
   {
@@ -318,11 +317,14 @@ dropdownSettings = {
       this.vendorDetails = data;
     }).catch(error => { this.toastrService.error('Something went wrong in LoadCustomerDetails'); });
   }
-  async LoadItemDetails()
+ async LoadItemDetails()
   {
-    await this.api.get('get_data.php?table=item&find=sales&value=1&authToken=' + environment.authToken).then((data: any) =>
+    await this.api.get('mp_item_list.php?&authToken=' + environment.authToken).then((data: any) =>
     {
-      this.ItemList = data;
+      console.log("item : ",data)
+      this.ItemList = data.filter(i => i.sales ==1);
+      this.ItemList_temp = [...data.filter(i => i.sales ==1)]
+      console.log("Filter : ",this.ItemList)
     }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
   }
 
@@ -381,6 +383,7 @@ dropdownSettings = {
       this.invoice.controls['tds_percentage'].setValue(0);
       this.invoice.controls['tcs_percentage'].setValue(0);
       this.invoice.controls['project_list'].setValue(null);
+      this.customer_address(id);
     const formArray         = this.invoice.get('product') as FormArray;
     const formArrayLength   = formArray.length;
     const formArrayControls = formArray.controls;
@@ -467,12 +470,13 @@ dropdownSettings = {
               this.selectedDCs=[]
               if(this.type == "items")
               {
+                 this.Items_DctoInvoice(this.customer_id)
                 if(this.dc_list == null)
                 {
                     this.LoadItemDetails()
                     return
                 }
-                this.Items_DctoInvoice(this.customer_id)
+
               }
     }
     else{console.log("clear")
@@ -485,7 +489,54 @@ dropdownSettings = {
         this.isDropdownAppendedToBody = true;
     }
   }
+alldata :any
+alldata1:any
+  customer_address(id)
+  {
+    this.api.get('get_data.php?table=customer_address&find=customer_id&value=' + id + '&find1=type&value1=1&authToken=' + environment.authToken).then((data: any) => {
 
+        this.alldata = data;
+    }).catch(error => { this.toastrService.error('Something went wrong'); });
+
+    this.api.get('get_data.php?table=customer_address&find=customer_id&value=' + id + '&find1=type&value1=2&authToken=' + environment.authToken).then((data: any) => {
+
+      this.alldata1 = data;
+  }).catch(error => { this.toastrService.error('Something went wrong'); });
+  }
+
+  ReloadBillAddr(id)
+  {
+
+    this.api.get('get_data.php?table=customer_address&find=cust_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
+      this.bill_addr = data[0];
+
+      this.billFrom = this.bill_addr.cust_addr_id;
+      this.billAttention = this.bill_addr.attention;
+      this.billAddress_line_1 = this.bill_addr.address_line_1;
+      this.billAddress_line_2 = this.bill_addr.address_line_2;
+      this.billCity = this.bill_addr.city;
+      this.billState = this.bill_addr.state;
+      this.billZipcode = this.bill_addr.zip_code;
+      this.invoice.controls['billFrom'].setValue(this.billFrom);
+    }).catch(error => { this.toastrService.error('Something went wrong'); });
+  }
+
+  ReloadShippAddr(id) {
+
+    this.api.get('get_data.php?table=customer_address&find=cust_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
+      this.shipp_addr = data[0];
+
+      this.shipFrom = this.shipp_addr.cust_addr_id;
+      this.shipAttention = this.shipp_addr.attention;
+      this.shipAddress_line_1 = this.shipp_addr.address_line_1;
+      this.shipAddress_line_2 = this.shipp_addr.address_line_2;
+      this.shipCity = this.shipp_addr.city;
+      this.shipState = this.shipp_addr.state;
+      this.shipZipcode = this.shipp_addr.zip_code;
+      this.invoice.controls['shipFrom'].setValue(this.shipFrom);
+
+    }).catch(error => { this.toastrService.error('Something went wrong'); });
+  }
 
   async  Project_DctoInvoice(event)
   {
@@ -559,13 +610,17 @@ dropdownSettings = {
             // if (this.type == "project") {
             //   product1.clear();
             // }
-            data.forEach((item: any) => {
+            data.forEach(async(item: any) => {
               // Avoid duplicates by item_list_id
               const isDuplicate = product1.controls.some(ctrl =>
                 ctrl.get('items')?.value === item.item_list_id
               );
               // if (isDuplicate) return;
-
+              var item_name :any = null
+          await this.api.get('get_data.php?table=item&find=item_id&value='+ item.item_list_id+'&authToken=' + environment.authToken).then((data: any) =>
+            {
+                    item_name = data[0].name
+            }).catch(error => { this.toastrService.error('Something went wrong in ItemDetails'); });
               // Push new product row
               product1.push(this.fb.group({
                 dc_id       : [event.dc_id],
@@ -575,7 +630,8 @@ dropdownSettings = {
                 price       : [item.amount],
                 quantity    : [item.qty],
                 amount      : [item.total],
-                uom         : [item.uom]
+                uom         : [item.uom],
+                item_name   : [item_name]
               }));
 
             // Call priceChange with latest index
@@ -819,6 +875,7 @@ async  UnSlecetAllDcitems(event) {
     product.push(this.fb.group({
       dc_id       : new FormControl(''),
       items       : new FormControl('',Validators.required),
+      item_name   : new FormControl(''),
       descriptions: new FormControl(''),
       taxes       : new FormControl('', Validators.required),
       price       : new FormControl('', Validators.required),
@@ -828,6 +885,8 @@ async  UnSlecetAllDcitems(event) {
     }))
   }
 
+  item_id: any
+  item_name : any
   patchValues(i)
   {
     console.log()
@@ -839,12 +898,16 @@ async  UnSlecetAllDcitems(event) {
       quantity : this.quantity,
       amount   : this.amount,
       descriptions : this.descriptions,
-      uom      : this.uom
+      uom      : this.uom,
+      items    : this.item_id,
+      item_name: this.item_name
     });
   }
 
   async specItem(item,i)
   {
+    this.item_id = item
+
    await this.api.get('get_data.php?table=item&find=item_id&value=' + item + '&authToken=' + environment.authToken).then((data: any) => {
 
        if(this.taxmode == 1)
@@ -860,6 +923,7 @@ async  UnSlecetAllDcitems(event) {
         this.amount       = data[0].price;
         this.descriptions = data[0].description;
         this.uom          = data[0].uom;
+        this.item_name    = data[0].name
    }).catch(error => { this.toastrService.error('Something went wrong'); });
 
     const formData = {
@@ -869,12 +933,17 @@ async  UnSlecetAllDcitems(event) {
     this.patchValues(i);
     this.SubTotalChange();
     this.GSTCalculation();
+    this.selected_item = null
+    this.new_category_id.close()
+    // this.updateFilter_item(null)
+    this.LoadItemDetails()
     console.log(this.invoice.controls['product'].value)
   }
 
 
   async specProject(item,i)
   {
+    this.item_id = item
    await this.api.get('get_data.php?table=projects&find=project_id&value=' + item + '&authToken=' + environment.authToken).then((data: any) => {
         this.type_id      = data[0].type;
         this.price        = data[0].project_value;
@@ -1106,6 +1175,47 @@ async  UnSlecetAllDcitems(event) {
     this.CustomerBillList = temp;
     this.table.offset = 0;
   }
+
+  updateFilter_item(event)
+  {
+    const val = event.target.value.toLowerCase();
+    const temp = this.ItemList_temp.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.ItemList = temp;
+
+    if (this.Itemstable) {
+      this.Itemstable.offset = 0;
+    }
+
+  }
+
+  selected_item: any
+  insert_index : any
+  ItemSelect(event)
+  {
+    if(event.type == "click")
+    {
+         console.log("",event.row)
+         this.selected_item  = event.row
+    }
+
+  }
+
+ async ItemInsert()
+  {
+    console.log("selected_item", this.selected_item)
+    console.log("selected_item", this.insert_index)
+    const confirmed = confirm("Are you sure you want to add this item?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
+      await this.specItem(this.selected_item.item_id,this.insert_index)
+  }
+
   onFocus($event: Event) {
     this.events.push({ name: '(focus)', value: $event });
   }
@@ -1141,6 +1251,11 @@ async  UnSlecetAllDcitems(event) {
 
   setzero()
   {
+     const confirmed = confirm(" Are you sure you want to go back ?");
+       console.log(confirmed)
+      if (!confirmed) {
+        return;
+      }
      this._state.notifyDataChanged('menu.isCollapsed', false);
     this.show_new_bill = false;
     this.selected      = [];
@@ -1183,6 +1298,11 @@ async  AddSubmit(data)
   }
 
 
-
+  Item_popUp(i)
+  {
+    this.insert_index = i
+    console.log(i)
+    this.new_category_id = this.modalService.open(this.ItemListModel, { size: 'xl' });
+  }
 }
 

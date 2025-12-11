@@ -10,11 +10,17 @@
                   <h5>Account List</h5>
                 </td>
                 <td style="width: 950px;">
-                  <div class="input-group input-group-sm my-3">
+                  <div class="input-group input-group-sm my-1">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="fa fa-search"></i></span>
+                    </div>
+                    <input class="form-control" type="text" placeholder="Search Account Name ..."
+                      (keyup)="updateFilter($event)" />
                   </div>
                 </td>
                 <td style="width: 100px;"> </td>
                 <td style="width: 100px; text-align: center; vertical-align: center;">
+
                 </td>
                 <td style="width: 200px; text-align: center; vertical-align: center;">
                   <div class="btn-group" role="group" aria-label="Basic example">
@@ -90,8 +96,13 @@
                 <h5>Expense List</h5>
               </td>
               <td style="width: 950px;">
-                <div class="input-group input-group-sm my-3">
-                </div>
+                 <div class="input-group input-group-sm my-1">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="fa fa-search"></i></span>
+                    </div>
+                    <input class="form-control" type="text" placeholder="Search Account Name ..."
+                      (keyup)="updateFilter_expense($event)" />
+                  </div>
               </td>
               <td style="width: 100px;"> </td>
               <td style="width: 100px; text-align: center; vertical-align: center;">
@@ -121,6 +132,13 @@
               [selectionType]="'single'"
               (activate)="onActivate_expense($event)">
 
+
+               <ngx-datatable-column     [resizeable]="false" prop="account_name"  name="ACCOUNT NAME"  [flexGrow]="2" >
+                  <ng-template ngx-datatable-cell-template let-row="row">
+                      {{row.account_name}}
+                  </ng-template>
+              </ngx-datatable-column>
+              
               <ngx-datatable-column     [resizeable]="false" prop="account_type"  name="ACCOUNT TYPE"  [flexGrow]="2" >
                 <ng-template ngx-datatable-cell-template let-row="row">
 
@@ -134,11 +152,8 @@
 
                 </ng-template>
             </ngx-datatable-column>
-              <ngx-datatable-column     [resizeable]="false" prop="account_name"  name="ACCOUNT NAME"  [flexGrow]="2" >
-                  <ng-template ngx-datatable-cell-template let-row="row">
-                      {{row.account_name}}
-                  </ng-template>
-              </ngx-datatable-column>
+
+
 
 
               <ngx-datatable-column     [resizeable]="false" name="STATUS"  [flexGrow]="1">

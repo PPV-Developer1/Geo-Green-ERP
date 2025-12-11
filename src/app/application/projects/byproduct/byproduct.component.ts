@@ -8,6 +8,7 @@ import { FormGroup, Validators, FormControl} from '@angular/forms';
 import {Observable} from 'rxjs';
 
 
+
 @Component({
   selector: 'az-byproduct',
   templateUrl: './byproduct.component.html',
@@ -29,7 +30,11 @@ export class ByproductComponent implements OnInit
   add_options         : any;
   production_id       : any;
   store_list          : any;
-
+  Prefix              : any;
+  Serial_no           : any;
+  Product_id          : any;
+  selected_product    : any;
+  selected_product_stock : any;
   rows                = [];
   temp                = [];
   selected            = [];
@@ -44,7 +49,8 @@ export class ByproductComponent implements OnInit
   Product_no      : any
   AddFromStr = new FormGroup
   ({
-    store_id   : new FormControl(null, [Validators.required]),
+    store_id    : new FormControl(null, [Validators.required]),
+    value       : new FormControl(null, [Validators.required])
   })
   constructor(private modalService: NgbModal,public api: ApiService, public toastrService: ToastrService)
   {
@@ -75,34 +81,41 @@ export class ByproductComponent implements OnInit
       });
     if(this.AddFromStr.valid)
     {
-    const confirmed = confirm("Are you sure you want to update?");
+      const confirmed = confirm("Are you sure you want to add this item to this by product, once added it cannot be revoked?");
               console.log(confirmed)
               if (!confirmed) {
                 return;
               }
-      let id = this.detail_view['id'];
-      this.loading = true;
-      await this.api.post('mp_prodiction_move_byproduct.php?id='+id+'&authToken=' + environment.authToken, this.AddFromStr.value).then((data: any) =>
-      {
-        if(data.status == "success")
-          {
-            this.loading = false;
-            this.toastrService.success('Succesfully Linked');
-            this.modalRef.close();
-            this.selected = [];
-            this.getAsso();
-            this.getAsso();
-          }
-        else
-        { this.toastrService.error(data.status);
-          this.loading = false;}
-        return true;
-      }).catch(error =>
-      {
-          this.toastrService.error('API Faild : newAccount');
-          this.loading = false;
-      });
-    }
+
+              if(this.selected_product_stock < this.AddFromStr.value.value)
+              {
+                this.toastrService.error('Quantity exceeds available stock percentage');
+                return;
+              }
+              let id = this.detail_view['id'];
+              this.loading = true;
+              await this.api.post('mp_prodiction_move_byproduct.php?id='+id+'&authToken=' + environment.authToken, this.AddFromStr.value).then((data: any) =>
+              {
+                console.log(data)
+                if(data.status == "success")
+                  {
+                    this.loading = false;
+                    this.toastrService.success('Succesfully Linked');
+                    this.modalRef.close();
+                    this.selected = [];
+                    this.getAsso();
+                    this.getAsso();
+                  }
+                else
+                { this.toastrService.error(data.status);
+                  this.loading = false;}
+                return true;
+              }).catch(error =>
+              {
+                  this.toastrService.error('API Faild : newAccount');
+                  this.loading = false;
+              });
+     }
   }
 
   AddFromStore()
@@ -110,12 +123,25 @@ export class ByproductComponent implements OnInit
 
     this.api.get('mp_production_view.php?mode=without&authToken='+environment.authToken).then((data: any) =>
     {
-      this.store_list = data;
+
+      console.log("data :",data)
+      if(data != null)
+      this.store_list = data.filter(x => x.product_id == this.detail_view['category_id'] && x.stock_percentage > 0);
+
+      console.log("store_list :",this.store_list)
     }).catch(error => {this.toastrService.error('Something went wrong');});
     this.openXl(this.AddStore);
   }
 
 
+
+  select(event)
+  {
+      console.log(event);
+      this.selected_product = this.store_list.find(x => x.id == event);
+      console.log(this.selected_product);
+      this.selected_product_stock = this.selected_product.stock_percentage;
+  }
   // move_to_production()
   // {
   //   const today = new Date();
@@ -205,9 +231,6 @@ export class ByproductComponent implements OnInit
     }
   }
 
-  Prefix      : any
-  Serial_no   : any
-  Product_id  : any
 
   async move_to_production()
   {

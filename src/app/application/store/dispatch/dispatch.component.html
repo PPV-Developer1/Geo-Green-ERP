@@ -644,7 +644,7 @@
                     </select> -->
 
                     <ng-select formControlName="dispatch_incharge"  class=" form-control custom-select" [clearable]="false" >
-                      <ng-option *ngFor= "let list of employee_list" value="{{list.emp_id}}" class="form-control">
+                      <ng-option *ngFor = "let list of employee_list" [value]="list.emp_id" class="form-control">
                         {{list.name}}
                       </ng-option>
                     </ng-select>

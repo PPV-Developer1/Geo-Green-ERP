@@ -8,6 +8,7 @@ import { environment } from 'src/environments/environment.prod';
 import { HttpClient } from '@angular/common/http';
 import { Unary } from '@angular/compiler';
 import { hasOwnProp } from 'fullcalendar/src/util';
+import { event } from 'd3';
 
 @Component({
   selector    : 'az-salary',
@@ -99,7 +100,12 @@ export class EmployeeComponent implements OnInit
   transeaction_det          : any;
   bank_details              : any;
   filter                    : any[];
-
+  emp_gender                : any;
+  emp_job_description       : any;
+  emp_depended_person       : any;
+  emp_nominee_name          : any;
+  emp_nominee_contact_no    : any;
+  emp_login_id              : any;
   public file               : any;
   public image              : any;
   public editEmpDetails     : FormGroup;
@@ -183,8 +189,9 @@ export class EmployeeComponent implements OnInit
       nationality     : new FormControl('Indian'),
       qualification   : new FormControl(null),
       emailId         : new FormControl('',Validators.compose([ Validators.pattern("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$")])),
+      login_id        : new FormControl(null),
       password        : new FormControl(''),
-      empRole         : new FormControl('', [Validators.required]),
+      empRole         : new FormControl('0', [Validators.required]),
       empType         : new FormControl('', [Validators.required]),
       bankAccountNo   : new FormControl(null),
       bankName        : new FormControl(null),
@@ -213,6 +220,11 @@ export class EmployeeComponent implements OnInit
       allowance       : new FormControl('', [Validators.required]),
       epf_amount      : new FormControl(0, [Validators.required]),
       professional_tax: new FormControl(0 , [Validators.required]),
+      gender          : new FormControl('', [Validators.required]),
+      job_description : new FormControl('', [Validators.required]),
+      depended_person : new FormControl('', [Validators.required]),
+      nominee_name    : new FormControl('', [Validators.required]),
+      nominee_contact_no : new FormControl('', [Validators.required]),
     })
   constructor(private modalService: NgbModal, public api: ApiService, public toastrService: ToastrService, fb: FormBuilder,private http: HttpClient)
   {
@@ -284,17 +296,18 @@ export class EmployeeComponent implements OnInit
         emp_pan                 : ['', Validators.compose([Validators.required ,Validators.pattern("^[A-Z]{5}[0-9]{4}[A-Z]{1}$")])],
         emp_aadhar              : [null, Validators.compose([Validators.required])],
         emp_status              : [null, Validators.compose([Validators.required])],
-        emp_bank_account_no     : [null, Validators.compose([Validators.required])],
-        emp_bank_name           : [null, Validators.compose([Validators.required])],
-        emp_ifsc                : [null, Validators.compose([Validators.required])],
-        emp_branch              : [null, Validators.compose([Validators.required])],
+        emp_bank_account_no     : [null],
+        emp_bank_name           : [null],
+        emp_ifsc                : [null],
+        emp_branch              : [null],
         emp_basic_salary        : [null, Validators.compose([Validators.required])],
-        emp_portal_access       : [null, Validators.compose([Validators.required])],
+        emp_portal_access       : [null],
         emp_father_guardianName : [null],
         emp_maritalStatus       : [null],
         emp_mobileNo            : [null],
         emp_dob                 : [null],
         emp_emailId             : [null],
+        emp_login_id            : [null],
         emp_password            : [null],
         emp_empRole             : [null],
         emp_empType             : [null],
@@ -320,6 +333,11 @@ export class EmployeeComponent implements OnInit
         emp_allowance           : new FormControl('', [Validators.required]),
         emp_epf_amount          : new FormControl(0, [Validators.required]),
         emp_professional_tax    : new FormControl(0, [Validators.required]),
+        emp_gender              : new FormControl(''),
+        emp_job_description     : new FormControl(''),
+        emp_depended_person     : new FormControl(''),
+        emp_nominee_name        : new FormControl(''),
+        emp_nominee_contact_no  : new FormControl(''),
       })
 
       this.createBank_FG = fb.group
@@ -353,6 +371,60 @@ export class EmployeeComponent implements OnInit
           this.file = input.files[0].name;
 
       }
+  }
+
+  Portal_access:boolean = false;
+  onPortalAccessChange(event:any)
+  {
+    this.Portal_access = event.target.checked ? true : false;
+    if(this.Portal_access)
+    {
+       const login = this.addEmployee.get('login_id');
+      const password = this.addEmployee.get('password');
+      login?.setValidators([Validators.required]);
+      login?.updateValueAndValidity();
+      password?.setValidators([Validators.required]);
+      password?.updateValueAndValidity();
+    }
+    else
+    {
+      const login = this.addEmployee.get('login_id');
+      const password = this.addEmployee.get('password');
+      login?.clearValidators();
+      login?.updateValueAndValidity();
+      password?.clearValidators();
+      password?.updateValueAndValidity();
+       this.addEmployee.controls['login_id'].setValue(null)
+       this.addEmployee.controls['login_id'].setValue(null)
+       this.addEmployee.controls['empRole'].setValue(null)
+    }
+  }
+
+  Portal_access_edit()
+  {
+
+    if(this.emp_portal_access)
+    {
+       const login = this.editEmpDetails.get('emp_login_id');
+      const password = this.editEmpDetails.get('emp_password');
+      login?.setValidators([Validators.required]);
+      login?.updateValueAndValidity();
+      password?.setValidators([Validators.required]);
+      password?.updateValueAndValidity();
+    }
+    else
+    {
+      this.editEmpDetails.controls['emp_login_id'].setValue(null)
+      this.editEmpDetails.controls['emp_password'].setValue(null)
+      this.editEmpDetails.controls['emp_empRole'].setValue(null)
+      const login = this.editEmpDetails.get('emp_login_id');
+      const password = this.editEmpDetails.get('emp_password');
+      login?.clearValidators();
+      login?.updateValueAndValidity();
+      password?.clearValidators();
+      password?.updateValueAndValidity();
+
+    }
   }
 
   removeFile():void
@@ -419,7 +491,25 @@ export class EmployeeComponent implements OnInit
   {
     await this.api.get('get_data.php?table=employee&authToken=' + environment.authToken).then((data: any) => {
       console.log(data)
+      if(data && data.length >0)
+      {
+        for (let i = 0; i < data.length; i++) {
+
+            // Convert to string to check length
+            let id = String(data[i]['emp_id']);
+
+            // If single digit, add leading zero
+            if (id.length === 1) {
+                id = "0" + id;
+            }
+
+            // Add prefix
+            data[i]['id'] = `ggee-${id}`;
+}
+
+      }
       this.employee = data;
+      this.temp = [...data];
     }).catch(error => { this.toastrService.error('API Faild : loadData employee'); });
 
     // await this.api.get('get_data.php?table=salary_group&authToken=' + environment.authToken).then((data: any) => {
@@ -429,13 +519,24 @@ export class EmployeeComponent implements OnInit
     await this.api.get('get_data.php?table=user_type&authToken=' + environment.authToken).then((data: any) => {
       this.user_type_list = data;
     }).catch(error => { this.toastrService.error('API Faild : loadData User type'); });
+  }
 
 
+    updateFilter(event) {
+    const val = event.target.value.toLowerCase();
+    const temp = this.temp.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.employee = temp;
+    this.table.offset = 0;
   }
 
   async emp_type()
   {
     await this.api.get('get_data.php?table=employee_type&find=status&value=1&authToken=' + environment.authToken).then((data: any) => {
+      console.log("Employee type",data)
       this.emp_type_list = data;
     }).catch(error => { this.toastrService.error('API Faild : loadData Employee type'); });
   }
@@ -479,6 +580,34 @@ export class EmployeeComponent implements OnInit
         fileSource: file
       });
       const fileSourceValue = this.myForm.get('fileSource')?.value;
+    }
+  }
+
+  Employee_type_create : boolean = false
+  Onselect(event)
+  {
+    console.log(event)
+    if(event == 1 || event == 2 || event == 3 )
+    {
+      this.Employee_type_create = true
+    }
+    if(event == 4 || event == 5 || event == 6)
+    {
+      this.Employee_type_create = false
+    }
+  }
+
+  Employee_type_edit : boolean = false
+
+  EditEmployeeType()
+  {
+    if(this.emp_empType == 1 || this.emp_empType == 2 || this.emp_empType == 3 )
+    {
+      this.Employee_type_edit = true
+    }
+    if(this.emp_empType == 4 || this.emp_empType == 5 || this.emp_empType == 6 )
+    {
+      this.Employee_type_edit = false
     }
   }
 
@@ -553,6 +682,14 @@ export class EmployeeComponent implements OnInit
 
   async updateEmp(updateEmp)
   {
+     Object.keys(this.editEmpDetails.controls).forEach(field =>
+    {
+      const control = this.editEmpDetails.get(field);
+      control.markAsTouched({ onlySelf: true });
+    });
+
+    if(this.editEmpDetails.valid)
+      {
     const confirmed = confirm("Are you sure you want to update this employee details?");
        console.log(confirmed)
       if (!confirmed) {
@@ -582,6 +719,7 @@ export class EmployeeComponent implements OnInit
               this.loading  = false;
               this.status   = true;
               this.dropdown = true;
+              this.stateShow  = true;
               this.ngOnInit();
               this.employeeLoad(this.emp_id);
             }
@@ -592,6 +730,7 @@ export class EmployeeComponent implements OnInit
             this.toastrService.error('API Faild : Update Employee');
             this.loading=false;
           });
+        }
   }
 
   async onInsert(data)
@@ -688,6 +827,18 @@ export class EmployeeComponent implements OnInit
             this.toastrService.success('Employee Added Succesfully');
             this.addEmployee.reset();
             this.addEmployee.controls["created_by"].setValue(this.uid)
+            this.addEmployee.controls["empPrefix"].setValue('Mr')
+            this.addEmployee.controls["fatherPrefix"].setValue('Mr')
+            this.addEmployee.controls["bloodGroup"].setValue('A+')
+            this.addEmployee.controls["nationality"].setValue('Indian')
+            this.addEmployee.controls["bank_access"].setValue('1')
+            this.addEmployee.controls["userStatus"].setValue('1')
+            this.addEmployee.controls["status"].setValue('1')
+            this.addEmployee.controls["jobLocation"].setValue('Chennai')
+            this.addEmployee.controls["epf_amount"].setValue(0)
+            this.addEmployee.controls["professional_tax"].setValue(0)
+            this.addEmployee.controls["empRole"].setValue('0')
+
             this.loading=false;
             this.loadData();
           }
@@ -708,8 +859,9 @@ export class EmployeeComponent implements OnInit
   set_zero()
   {
     this.selected   = [];
-    this.status     = false;
+    this.status     = true;
     this.show       = true;
+    this.stateShow  = true;
   }
 
   CallSalEdit(event)
@@ -824,6 +976,13 @@ export class EmployeeComponent implements OnInit
       this.emp_emergency_Con_Person             = this.employee_details.contact_person
       this.emp_emergency_Con_PersonNo           = this.employee_details.contact_personNo
       this.emp_emergency_Con_PersonRelationship = this.employee_details.contact_person_relationship
+      this.emp_gender                          = this.employee_details.gender
+      this.emp_job_description                 = this.employee_details.job_description
+      this.emp_depended_person                 = this.employee_details.depended_person
+      this.emp_nominee_name                    = this.employee_details.nominee_name
+      this.emp_nominee_contact_no              = this.employee_details.nominee_contact_no
+      this.emp_login_id                         = this.employee_details.login_id
+      console.log(this.emp_gender)
         console.log(this.emp_image)
       if(this.emp_image != null && this.emp_image != "")
       {
@@ -846,6 +1005,7 @@ export class EmployeeComponent implements OnInit
       this.emp_epf_amount                       = this.employee_details.epf_amount,
       this.emp_uan                              = this.employee_details.uan,
       this.emp_designation_name                 = this.employee_details.designation_name
+      this.Portal_access_edit()
       }
       else
       {
@@ -896,6 +1056,8 @@ export class EmployeeComponent implements OnInit
       this.emp_pl                               = null
       this.emp_cl                               = null
       }
+
+       this.EditEmployeeType()
     }).catch(error => { this.toastrService.error('API Faild : employeeLoad'); });
   }
 
@@ -940,6 +1102,7 @@ export class EmployeeComponent implements OnInit
     this.show    = true;
     this.status  = true;
     this.dropdown= true;
+    this.stateShow = true;
     this.employeeLoad(this.emp_id);
   }
 

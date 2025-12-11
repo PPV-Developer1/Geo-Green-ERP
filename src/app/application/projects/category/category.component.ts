@@ -166,6 +166,7 @@ async  ngOnInit()
     this.loading = true;
     this.api.post('post_update_data.php?authToken=' + environment.authToken + '&table=project_level_category&field=id&value=' + this.detail_view['id'], FormData).then((data: any) =>
     {
+      console.log(data)
       if (data.status == "success")
       {
         this.loading = false;

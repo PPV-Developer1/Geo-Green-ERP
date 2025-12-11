@@ -1,7 +1,19 @@
 
  <div *ngIf="!show" class="row">
 
-  <div class="col-11" style="text-align: right;">
+  <div class="col-2">
+    <h5>EXPENSE LIST</h5>
+  </div>
+  <div class="col-8">
+          <div class="input-group input-group-sm my-1">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
+              </div>
+              <input class="form-control" type="text" placeholder="Search expense ..."
+                (keyup)="updateFilter($event)" />
+        </div>
+  </div>
+  <div class="col-2" style="text-align: right;">
     <button type="submit"  class="btn btn-success fa fa-plus pull-right" (click)="add_expense()"> New Expense </button>
   </div>
   <div class="col-1"></div>
@@ -12,7 +24,7 @@
       #table
       class="custom_table"
       [headerHeight]="50"
-      [limit]="10"
+      [limit]="15"
       [columnMode]="'flex'"
       [footerHeight]="50"
       [rowHeight]="'auto'"

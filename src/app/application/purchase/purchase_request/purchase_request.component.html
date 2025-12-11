@@ -81,7 +81,7 @@
 
           <ngx-datatable-column     [resizeable]="false" prop="qty" [flexGrow]="1" name="QUANTITY">
             <ng-template ngx-datatable-cell-template let-row="row">
-              {{row.qty}}
+              {{row.qty}} {{row.uom}}
             </ng-template>
           </ngx-datatable-column>
 
@@ -91,10 +91,90 @@
             </ng-template>
           </ngx-datatable-column>
 
-          <ngx-datatable-column     [resizeable]="false" prop="project_name" name="PROJECT " [flexGrow]="2">
+          <ngx-datatable-column    [resizeable]="false" prop="project_name" name="PROJECT " [flexGrow]="2">
             <ng-template ngx-datatable-cell-template let-row="row">
               <label  *ngIf="row.project_name != null">{{row.project_name}}</label>
               <label  *ngIf="row.project_name == null">Store</label>
+            </ng-template>
+          </ngx-datatable-column>
+
+        </ngx-datatable>
+      </div>
+    </div>
+  </div>
+  </div>
+
+&nbsp;
+
+  <div class="row">
+
+  <div class="col">
+    <div widget class="card">
+      <div class="card-header">
+        <span class="text-uppercase">Project Product Requirement List</span>
+        <div class="widget-controls">
+          <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+          <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+          <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+          <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+          <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+        </div>
+      </div>
+      <div class="card-body widget-body">
+
+        <div>
+           <div class="input-group input-group-sm my-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="fa fa-search"></i></span>
+                </div>
+                <input class="form-control" type="text" placeholder="Search  Item Name ..." (keyup)="updateFilter_project_item($event)" />
+           </div>
+        </div>
+        <ngx-datatable
+        #table
+        class="custom_table"
+        [headerHeight]="50"
+        [limit]="10"
+        [columnMode]="'flex'"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [rows]="project_item_list"
+        [selected]="selected"
+        >
+
+          <ngx-datatable-column     [resizeable]="false" prop="item_name" [flexGrow]="2" name="ITEM NAME">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.name}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column     [resizeable]="false" prop="qty" [flexGrow]="1" name="REQUIRE QUANTITY">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.total_count | number:'1.0-2'}} {{row.uom}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column     [resizeable]="false" prop="stock" [flexGrow]="1" name="STOCK">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.stock | number:'1.0-2'}}  {{row.uom}}
+            </ng-template>
+          </ngx-datatable-column>
+
+           <ngx-datatable-column     [resizeable]="false" prop="purchase_processed" [flexGrow]="1" name="PR GENERATED">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.purchase_processed | number:'1.0-2'}}  {{row.uom}}
+            </ng-template>
+          </ngx-datatable-column>
+
+           <ngx-datatable-column     [resizeable]="false" prop="require_qty" [flexGrow]="1" name="PR REQUIRE QTY">
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.require_qty | number:'1.0-2'}}  {{row.uom}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column     [resizeable]="false"  [flexGrow]="1" name="ACTION" >
+            <ng-template ngx-datatable-cell-template let-row="row" style="text-align: center;">
+              <button type="button"  class="btn btn-primary btn-sm" (click)="Add_Requirement_To_PR(row)">Add to PR Request</button>
             </ng-template>
           </ngx-datatable-column>
 
@@ -157,6 +237,8 @@
                           <div class="col-md-3">
                             <div class="row">
                               <h5 class="ml-2" style="color:gray;">BILL FROM ADDRESS</h5>
+                               <i class="fa fa-pencil ml-2 mt-1" data-toggle="modal1" data-target="#nofooter-modal"
+                                style="cursor:pointer;" aria-hidden="true" data-toggle="modal" data-target="#lg-modal"></i>
                             </div>
                             <div>
                               <input type="hidden">
@@ -181,6 +263,9 @@
                           <div class="col-md-5">
                             <div class="row">
                               <h5 class="ml-2" style="color:gray;">SHIP FROM ADDRESS</h5>
+                               <i class="fa fa-pencil ml-2 mt-1" data-toggle="modal2" data-target="#nofooter-modal"
+                                style="cursor:pointer;" aria-hidden="true" data-toggle="modal"
+                                data-target="#ship-address"></i>
                             </div>
                             <div>
                               <input type="hidden">
@@ -253,11 +338,11 @@
                       <div class="row mb-3">
                         <label style="color:#d64830" class="col-sm-2 col-form-label col-form-label-sm">Bill Date*</label>
                         <div class="col-sm-4">
-                          <input type="date" #BillDate (change)="Billdate(BillDate.value)" formControlName="billDate"
+                          <input type="date" #BillDate formControlName="billDate"
                             class="form-control form-control-sm" />
                         </div>
 
-                        <div class="row col-sm-3">
+                        <!-- <div class="row col-sm-3">
                           <label class="col-sm-5 col-form-label col-form-label-sm">Terms</label>
                           <div class="col-sm-7">
 
@@ -270,9 +355,9 @@
 
                             <span class="help-block text-danger" *ngIf="po.get('paymentTerms').touched && po.get('paymentTerms').hasError('required')">Required !</span>
                           </div>
-                        </div>
+                        </div> -->
 
-                        <div class="row col-sm-3">
+                        <!-- <div class="row col-sm-3">
                           <label class="col-sm-5 col-form-label col-form-label-sm">Due Date</label>
                           <div class="col-sm-7">
                             <input type="date" [(ngModel)]="fullDate" (change)="dueDateChange()" formControlName="dueDate"
@@ -283,7 +368,7 @@
                             *ngIf="po.get('dueDate').touched && po.get('dueDate').hasError('required')">Enter
                             due date !</span>
                           </div>
-                        </div>
+                        </div> -->
                       </div>
                       <div class="row" >
                         <div class="col-md-10" style="text-align: right;">
@@ -317,12 +402,15 @@
                               <tbody formArrayName="product">
                                 <tr *ngFor="let product of po.get('product')['controls']; let i = index;" [formGroupName]="i">
                                   <td style="width: 350px;" class="dropdown-wrapper">
-                                    <ng-select formControlName="items" class="form-control custom-select " (click)="adjustTableHeight()"
+                                    <!-- <ng-select formControlName="items" class="form-control custom-select " (click)="adjustTableHeight()"
                                      style=" text-align: left;" (change)="specItem($event, i)" [clearable]="false">
                                       <ng-option *ngFor="let item of ItemList" [value]="item.item_id" class="form-control">
                                         {{item.name}}
                                       </ng-option>
-                                    </ng-select>
+                                    </ng-select> -->
+
+                                      <input type="text" readonly (click)="Item_popUp(i)" (input)="Item_popUp(i)" class="form-control form-control-sm"
+                                         placeholder="Click to select an item" formControlName="item_name">
                                   </td>
                                   <td style="width: 350px;">
                                     <textarea type="text" class="form-control form-control-sm" formControlName="descriptions"></textarea>
@@ -498,3 +586,194 @@
     </div>
   </div>
 </div>
+
+
+<ng-template #ItemListModel let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Item List</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+            <div class="row" *ngIf="selected_item">
+
+              <!-- Left column -->
+              <div class="col-md-6">
+                <div class="row mb-2">
+                  <div class="col-4 ">Item Name</div>
+                  <div class="col-8">{{ selected_item.name }}</div>
+                </div>
+
+                <div class="row mb-2">
+                  <div class="col-4 ">HSN</div>
+                  <div class="col-8">{{ selected_item.hsnsac }}</div>
+                </div>
+              </div>
+
+              <!-- Right column -->
+              <div class="col-md-6">
+                <div class="row mb-2">
+                  <div class="col-4 fw-bold">Category</div>
+                  <div class="col-8">{{ selected_item.item_cat }}</div>
+                </div>
+
+                <div class="row mb-2">
+                  <div class="col-4 fw-bold">Stock on Hand</div>
+                  <div class="col-8"><span  [ngStyle]="{'color': selected_item.stock_status == 0 ? 'red' : 'green'}"> {{ selected_item.stock_status }} </span> {{ selected_item.uom ?? "" }}</div>
+                </div>
+              </div>
+
+              <!-- Description (full width) -->
+              <div class="col-12 mt-2">
+                <div class="row">
+                  <div class="col-2 fw-bold">Description</div>
+                  <div class="col-10">{{ selected_item.description }}</div>
+                </div>
+              </div>
+
+              <!-- Button -->
+              <div class="col-12 text-center mt-3">
+                <button [disabled]="loading" type="submit" class="btn btn-info" (click)="ItemInsert()">
+                  Insert
+                  <i class="fa fa-spinner fa-spin" *ngIf="loading"></i>
+                </button>
+              </div>
+
+            </div>
+
+        <div>
+      <div  class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input class="form-control" type="text" placeholder="Search Items by Key words - Item Name (or) HSN/SAC (or) Description" (keyup)="updateFilter_item($event)" />
+          </div>
+    </div>
+
+ <div class="row">
+    <div class="col-md-12">
+      <ngx-datatable
+      #Itemstable
+      class="custom_table"
+      [headerHeight]="50"
+      [limit]="10"
+      [columnMode]="'flex'"
+      [footerHeight]="50"
+      [rowHeight]="'auto'"
+      [rows]="ItemList"
+      [selected]="selected"
+      (activate)="ItemSelect($event)">
+
+        <ngx-datatable-column     [resizeable]="false" prop="name" [flexGrow]="2" name="NAME" >
+          <ng-template ngx-datatable-cell-template let-row="row" >
+            {{row.name}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column     [resizeable]="false" prop="hsnsac" name="HSN/SAC" [flexGrow]="1" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.hsnsac}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column     [resizeable]="false" prop="price" name="RATE" [flexGrow]="1" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.price|indianCurrency}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column     [resizeable]="false" prop="description" name="DESCRIPTION"  [flexGrow]="2">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.description}}
+          </ng-template>
+        </ngx-datatable-column>
+
+      </ngx-datatable>
+    </div>
+  </div>
+  </div>
+</ng-template>
+
+
+<div class="modal fade" id="lg-modal" tabindex="-1" role="dialog" aria-labelledby="modal-large-label"
+  style="display: none;">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header state modal-primary">
+          <h4 class="modal-title" id="modal-large-label">Select Your Bill Address</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">×</span></button>
+        </div>
+        <div class="modal-body">
+          <select  class="form-control w-500 col-md-12" (click)="ReloadBillAddr($event.target.value)">
+            <option *ngFor=" let addr of alldata" [value]="addr.vendor_addr_id">
+              {{addr.attention + " "+ addr.address_line_1 +" "+ addr.address_line_2 +" "+
+              addr.city +" "+ addr.state +" "+ addr.zip_code }}</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ship-address" tabindex="-1" role="dialog"
+aria-labelledby="modal-large-label" style="display: none;">
+<div class="modal-dialog modal-lg" role="document">
+  <div class="modal-content">
+    <div class="modal-header state modal-primary">
+      <h4 class="modal-title" id="modal-large-label">Select Your Ship Address</h4>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+          aria-hidden="true">×</span></button>
+    </div>
+    <div class="modal-body">
+      <select  class="form-control w-500 col-md-12" (click)="ReloadShippAddr($event.target.value)">
+        <option *ngFor=" let addr of alldata1" value="{{addr.vendor_addr_id}}">
+          {{addr.attention + " "+ addr.address_line_1 +" "+ addr.address_line_2 +" "+
+          addr.city +" "+ addr.state +" "+ addr.zip_code }}</option>
+      </select>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<ng-template #purchaseorder let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">PURCHASE REQUEST</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="po_request" (ngSubmit)="Submit(po_request.value)">
+      <div class="row">
+
+        <div class="form-group col-4">
+           Requested Value
+        </div>
+        <div class="form-group col-6">
+          <input formControlName="quantity" type="number" class="form-control" id="input-11">
+          <span class="help-block text-danger" *ngIf="po_request.get('quantity').touched && po_request.get('quantity').hasError('required')">Enter the Quantity!</span>
+        </div>
+        <div class="form-group col-4">
+          Description
+        </div>
+        <div class="form-group col-6">
+          <input formControlName="description" type="text" class="form-control" id="input-11" placeholder="Enter Description">
+          <span class="help-block text-danger" *ngIf="po_request.get('description').touched && po_request.get('description').hasError('required')">Enter New Stock Qty!</span>
+          <span class="help-block text-danger" *ngIf="po_request.get('description').touched && po_request.get('description').hasError('minlength')">Minimum 3 Letters</span>
+        </div>
+        <div class="col-12">
+          <div class="row justify-content-center">
+            <button [disabled]="loading" type="submit" class="btn btn-success">Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>

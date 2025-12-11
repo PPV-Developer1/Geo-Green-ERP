@@ -1,11 +1,8 @@
-<<<<<<< HEAD
 import { PdfGeneratorService } from './../../../service/pdf.service';
-=======
->>>>>>> 0e84583114bc683395bd0b0d0a7b5c024a8ad281
 import { Component, OnInit,ViewChild ,ElementRef, Type} from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
-import { ApiService } from 'src/app/service/api.service';   
+import { ApiService } from 'src/app/service/api.service';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment.prod';
 import { FormGroup, FormBuilder, Validators} from '@angular/forms';
@@ -112,11 +109,14 @@ export class ReportComponent implements OnInit {
   tax_show         : Boolean = false;
   loading          : boolean = false;
   opening_balance  : any
-  lastRow     : any = null;
-  id          : any = null;
-  title       : any;
-  item_list   : any;
-  select_data : any;
+  lastRow          : any = null;
+  id               : any = null;
+  title            : any;
+  item_list        : any;
+  select_data      : any;
+  company_datails  : any;
+  vendor_details   : any;
+
 
   public user_type = localStorage.getItem('type');
   public uid       = localStorage.getItem('type_id');
@@ -1279,7 +1279,8 @@ purchase_list_view:boolean=false
                             this.cust_tran_data   =  data['report'];
                             this.print_tran_data  =  data['download_report'];
                             let due_balance       =  data['balance_due'];
-
+                            this.company_datails  =  data['company_details'];
+                            this.vendor_details   =  data['customer_details'];
                             const totalRow = {
                             Date:'',
                             Transaction:'',
@@ -1328,6 +1329,8 @@ purchase_list_view:boolean=false
                               this.cust_tran_data   =  data['report'];
                               this.print_tran_data  =  data['download_report'];
                               let due_balance       =  data['balance_due'];
+                              this.company_datails  =  data['company_details'];
+                              this.vendor_details   =  data['vendor_details'];
 
                               const totalRow = {
                               Date:'',
@@ -1752,34 +1755,68 @@ purchase_list_view:boolean=false
     }
   }
 
-<<<<<<< HEAD
+
 
   pdf()
   {
     const data = this.print_tran_data
+    console.log(this.print_tran_data)
+    if( this.print_tran_data == null || this.print_tran_data == undefined )
+    { this.toastrService.warning("List Empty")
+      return }
+
+    for(let i=0;i< this.print_tran_data.length;i++)
+    {
+      console.log(i)
+      if((i>0 ||i<this.print_tran_data.length-1) && !(i==0 ||i == this.print_tran_data.length-1))
+      {
+            this.print_tran_data[i]['Amount'] = '₹' + Number(this.print_tran_data[i]['Amount']).toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,')
+            this.print_tran_data[i]['Payments'] = '₹' + Number(this.print_tran_data[i]['Payments']).toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,')
+            this.print_tran_data[i]['Balance'] = '₹' + Number(this.print_tran_data[i]['Balance']).toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,')
+            console.log("first", this.print_tran_data[i])
+      }
+
+        if(i==0 ||i == this.print_tran_data.length-1)
+        {
+          this.print_tran_data[i]['Balance'] = '₹' + Number(this.print_tran_data[i]['Balance']).toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,')
+          console.log("second", this.print_tran_data[i])
+        }
+    }
+
+    console.log(this.print_tran_data)
     var ClientName :any;
     var ClientAddress : any;
+    var CompanyAddress : any = `${this.company_datails.address_1}, ${this.company_datails.address_2}, ${this.company_datails.city} - ${this.company_datails.pincode}`
     var NumericField : any
-    var statementName : any;
     if(this.id == "individual_vendor_balance")
     {
-
-        ClientName = "PPV Technology";
-        ClientAddress = "Rajas garden, Numbal, Chennai - 600077";
-        NumericField =['Without_Tax', 'Tax','Sales']
+        ClientName = this.vendor_details.company_name;
+        ClientAddress = `${this.vendor_details.address_line_1}, ${this.vendor_details.address_line_2}, ${this.vendor_details.city} - ${this.vendor_details.zip_code}`;
+        NumericField =['Amount', 'Balance','Payments']
     }
-    this.pdfservice.generateDynamicPdf(
-      'Ledger Statement '+this.customer.value.fromdate+' to '+this.customer.value.todate,   // Title
-      'Geo Green Enviro Engineers',                                   // Company Name
-      'Plot No. 618, Paruthipattu Road, Chennai – 600071',            // Address
-      ClientName,
-      ClientAddress,
-      data,                                                           // Your table data (any JSON)
-      NumericField,                                                   // Numeric columns
-      'open'                                                          // or 'download'
-    );
+
+    if(this.id == "individual_customer_balance")
+    {
+        ClientName = this.vendor_details.company_name;
+        ClientAddress = `${this.vendor_details.address_line_1}, ${this.vendor_details.address_line_2}, ${this.vendor_details.city} - ${this.vendor_details.zip_code}`;
+        NumericField =['Amount', 'Balance','Payments']
+    }
+    console.log(CompanyAddress)
+        setTimeout(() => {
+          this.pdfservice.generateDynamicPdf(
+          'Ledger Statement ',                                         // Title
+          this.company_datails.company_name,                            // Company Name
+          CompanyAddress,                                               // Address
+          ClientName,
+          ClientAddress,
+          data,                                                           // Your table data (any JSON)
+          NumericField,                                                   // Numeric columns
+          'open'                                                          // or 'download'
+        );
+     }, 500);
+
   }
-=======
+
   // convertToCSV(data: any[]): string
   // {
   //   const csvArray = [];
@@ -1793,31 +1830,6 @@ purchase_list_view:boolean=false
 
   //   return csvArray.join('\n');
   // }
-
-  convertToCSV(data: any[]): string {
-  if (!data || !data.length) return '';
-
-  const headers = Object.keys(data[0]);
-  const csvRows = [];
-
-  // Add header row
-  csvRows.push(headers.join(','));
-
-  // Add data rows
-  data.forEach(item => {
-    const values = headers.map(key => {
-      const val = item[key] ?? '';
-      // Escape double quotes by doubling them
-      const escaped = String(val).replace(/"/g, '""');
-      // Wrap fields containing commas or quotes in quotes
-      return /[",\n]/.test(escaped) ? `"${escaped}"` : escaped;
-    });
-    csvRows.push(values.join(','));
-  });
-
-  return csvRows.join('\n');
-}
->>>>>>> 0e84583114bc683395bd0b0d0a7b5c024a8ad281
 
   // convertToCSV(data: any[]): string
   // {

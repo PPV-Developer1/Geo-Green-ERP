@@ -195,6 +195,8 @@ export class TrackingComponent implements OnInit {
 
   }
 
+  product_type:any
+  product_percentage:any
 
   bypro_select(event)
   {
@@ -203,10 +205,14 @@ export class TrackingComponent implements OnInit {
           this.byproduct_detail_show=true
           this.asso_detail_show = false
           this.byproduct_details=event.row
-          console.log("byproduct_list : ",this.byproduct_list)
+          console.log("byproduct_details : ",event.row)
           if(event.row.production_list != null)
           {
             this.outward_Product_list= event.row.production_list[0].outward_list
+            this.product_type = event.row.production_list[0].production_type
+            this.product_percentage = parseFloat(event.row.production_list[0].stock_percentage)
+            console.log("production_type : ",this.product_type)
+            console.log("product_percentage : ",this.product_percentage)
           }
           else{this.outward_Product_list = null}
           console.log("product_list : ",this.product_list)
@@ -222,7 +228,7 @@ export class TrackingComponent implements OnInit {
         this.byproduct_detail_show=false
         this.asso_detail_show = false
         this.product_details=event.row
-
+        console.log("product_details : ",this.product_details)
       }
   }
 

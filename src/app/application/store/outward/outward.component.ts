@@ -42,6 +42,7 @@ export class OutwardComponent implements OnInit
       batch_id      : new FormControl(null, [Validators.required]),
       quantity      : new FormControl(null, [Validators.required]),
       notes         : new FormControl(null),
+      type          : new FormControl(null),
       'status'      : new FormControl('1')
     })
 
@@ -105,7 +106,8 @@ export class OutwardComponent implements OnInit
             this.category_list  = get_data;
 
       }).catch(error => {this.toastrService.error('Something went wrong ');});
-    this.openSm(this.AddOutward);
+
+     this.openModel = this.modalService.open(this.AddOutward, { size: 'xl'});
   }
 
   async LoadBatch(item_id)
@@ -144,10 +146,13 @@ export class OutwardComponent implements OnInit
     });
 
     this.Outward.controls['production_id'].setValue(this.detail_view['id']);
+    this.Outward.controls['type'].setValue(this.detail_view['type']);
+
     this.Outward.controls['assign_to'].setValue(this.detail_view['assign_id']);
     if(FormData.quantity <= this.batchQty)
     {
      this.loading=true;
+
       this.api.post('mp_outward_entry.php?authToken='+environment.authToken, this.Outward.value).then((data: any) =>
       {
         if(data.status == "success")
@@ -181,6 +186,8 @@ export class OutwardComponent implements OnInit
       this.QtyError = true;
     }
   }
+
+
   OpenStatusUpdate()
   {
     const now = new Date();
@@ -208,25 +215,50 @@ export class OutwardComponent implements OnInit
     {
         let id = this.detail_view['id'];
         this.loading=true;
-        await this.api.post('post_update_data.php?table=production_material_update&field=id&value='+id+'&authToken='+environment.authToken,value).then((data: any) =>
+        if(this.detail_view['type'] == 1)
         {
-          if(data.status == "success")
+          await this.api.post('post_update_data.php?table=production_material_update&field=id&value='+id+'&authToken='+environment.authToken,value).then((data: any) =>
           {
-            this.loading=false;
-            this.toastrService.success('Product Completed Succesfully');
-            this.openModel.dismiss();
-            this.selected = [];
-            this.getProductList();
-            this.getProductList();
-          }
-          else { this.toastrService.error('Something went wrong : onUpdate');
-          this.loading = false;}
-          return true;
-        }).catch(error =>
+            if(data.status == "success")
+            {
+              this.loading=false;
+              this.toastrService.success('Product Completed Succesfully');
+              this.openModel.dismiss();
+              this.selected = [];
+              this.getProductList();
+              this.getProductList();
+            }
+            else { this.toastrService.error('Something went wrong : onUpdate');
+            this.loading = false;}
+            return true;
+          }).catch(error =>
+          {
+              this.toastrService.error('API Faild : onUpdate');
+              this.loading = false;
+          });
+      }
+      if(this.detail_view['type'] == 2)
         {
-            this.toastrService.error('API Faild : onUpdate');
-            this.loading = false;
-        });
+          await this.api.post('post_update_data.php?table=Store_production_complete&field=id&value='+id+'&authToken='+environment.authToken,value).then((data: any) =>
+          {
+            if(data.status == "success")
+            {
+              this.loading=false;
+              this.toastrService.success('Product Completed Succesfully');
+              this.openModel.dismiss();
+              this.selected = [];
+              this.getProductList();
+              this.getProductList();
+            }
+            else { this.toastrService.error('Something went wrong : onUpdate');
+            this.loading = false;}
+            return true;
+          }).catch(error =>
+          {
+              this.toastrService.error('API Faild : onUpdate');
+              this.loading = false;
+          });
+      }
    }
    else
    {
@@ -236,12 +268,16 @@ export class OutwardComponent implements OnInit
   async LoadOutward()
   {
     let id = this.detail_view['id'];
-    await this.api.get('mp_outward_list.php?production_id='+id+'&authToken='+environment.authToken).then((data: any) =>
+    await this.api.get('mp_outward_list.php?production_id='+id+'&type='+this.detail_view['type']+'&authToken='+environment.authToken).then((data: any) =>
       {
         this.outwardList = data;
       }).catch(error => {this.toastrService.error('Something went wrong ');});
 
   }
+
+
+  store_details:any
+  store_filter:any
   async getProductList()
   {
     await this.api.get('mp_production_view.php?authToken='+environment.authToken).then((data: any) =>
@@ -258,6 +294,21 @@ export class OutwardComponent implements OnInit
         this.product_details = null;
       }
     }).catch(error => {this.toastrService.error('Something went wrong 1');});
+
+     await this.api.get('mp_production_view.php?mode=store_monitor&authToken='+environment.authToken).then((data: any) =>
+    {
+      if(data != null)
+      {
+        function levelFilter(value) { return (value.level === 3); }
+        let get_data = data.filter(levelFilter)
+        this.store_details = get_data;
+        this.store_filter      = [...get_data];
+      }
+      else
+      {
+        this.store_details = null;
+      }
+    }).catch(error => {this.toastrService.error('Something went wrong');});
   }
   async onActivate(event)
   {
@@ -319,6 +370,18 @@ export class OutwardComponent implements OnInit
     this.table.offset = 0;
   }
 
+  updateFilter_store(event)
+  {
+    const val = event.target.value.toLowerCase();
+    const temp = this.store_filter.filter((d) => {
+          return Object.values(d).some(field =>
+            field != null && field.toString().toLowerCase().indexOf(val) !== -1
+          );
+        });
+    this.store_details = temp;
+    this.table.offset = 0;
+  }
+
   delete_item(row)
   {
 
@@ -335,11 +398,8 @@ export class OutwardComponent implements OnInit
 
   update(value)
   {
-<<<<<<< HEAD
+
          const confirmed = confirm("Are you sure you want to Update this item?");
-=======
-         const confirmed = confirm("Are you sure you want to delete this item?");
->>>>>>> 0e84583114bc683395bd0b0d0a7b5c024a8ad281
               console.log(confirmed)
               if (!confirmed) {
                 return;

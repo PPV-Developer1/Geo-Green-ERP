@@ -18,6 +18,7 @@ export class PlanningComponent implements OnInit {
   public now             = Date.now();
   public myFormattedDate = this.pipe.transform(this.now, 'dd/MM/yyyy HH:mm:ss');
   public uid             = localStorage.getItem('uid');
+  public Date           =   this.pipe.transform(this.now, 'yyyy-MM-dd');
 
   @ViewChild(DatatableComponent) table: DatatableComponent;
   @ViewChild("add_product",{static:true}) add_product:ElementRef;
@@ -27,12 +28,17 @@ export class PlanningComponent implements OnInit {
   selected        = [];
   product_details = [];
   filter_data     = [];
+  filter_data_store = [];
   category_list   = [];
   employee_list   = [];
   detail_view     : any;
   openModel       : any;
   Product_no      : any;
   loading:boolean = false;
+  Prefix          : any
+  Serial_no       : any
+  Product_id      : any
+  Store_production: any
 
   CategoryForm = new FormGroup
   ({
@@ -71,9 +77,7 @@ export class PlanningComponent implements OnInit {
     this.openModel = this.modalService.open(content, { size: 'md'});
   }
 
-  Prefix      : any
-  Serial_no   : any
-  Product_id  : any
+
 
  async Batch(event)
   {
@@ -89,6 +93,8 @@ export class PlanningComponent implements OnInit {
       }).catch(error => {this.toastrService.error('Something went wrong');});
     // this.Product_no = formattedDate
   }
+
+
   async MoveToSubmit(FormData)
   {
     Object.keys(this.AssignTo.controls).forEach(field =>
@@ -98,34 +104,67 @@ export class PlanningComponent implements OnInit {
       });
     if(this.AssignTo.valid)
     {
-      this.loading=true;
-      await this.api.post('post_update_data.php?table=production_material&field=id&value='+this.detail_view.id+'&authToken='+environment.authToken,FormData).then((data: any) =>
+      if(this.detail_view.type === 1)
       {
-        if(data.status == "success")
+        this.loading=true;
+        await this.api.post('post_update_data.php?table=production_material&field=id&value='+this.detail_view.id+'&authToken='+environment.authToken,FormData).then((data: any) =>
         {
-          this.loading=false;
-          this.AssignTo.controls['assign_to'].reset();
-          this.AssignTo.controls['start_date_time'].reset();
-          this.AssignTo.controls['end_date_time'].reset();
-          this.AssignTo.controls['notes'].reset();
-          this.AssignTo.controls['batch'].reset();
-          this.getProductList();
-          this.getProductList();
-          this.openModel.dismiss();
-          this.toastrService.success('Task Assign Succesfully');
-          this.selected = [];
-        }
-        else { this.toastrService.error('Something went wrong : onUpdate');
-        this.loading = false;}
+          if(data.status == "success")
+          {
+            this.loading=false;
+            this.AssignTo.controls['assign_to'].reset();
+            this.AssignTo.controls['start_date_time'].reset();
+            this.AssignTo.controls['end_date_time'].reset();
+            this.AssignTo.controls['notes'].reset();
+            this.AssignTo.controls['batch'].reset();
+            this.getProductList();
+            this.getProductList();
+            this.openModel.dismiss();
+            this.toastrService.success('Task Assign Succesfully');
+            this.selected = [];
+          }
+          else { this.toastrService.error('Something went wrong : onUpdate');
+          this.loading = false;}
 
-        return true;
-      }).catch(error =>
-      {
-          this.toastrService.error('API Faild : onUpdate');
-          this.loading = false;
-      });
+          return true;
+        }).catch(error =>
+        {
+            this.toastrService.error('API Faild : onUpdate');
+            this.loading = false;
+        });
+      }
+      else if(this.detail_view.type === 2)
+        {
+          this.loading=true;
+          await this.api.post('post_update_data.php?table=store_production&field=id&value='+this.detail_view.id+'&authToken='+environment.authToken,FormData).then((data: any) =>
+            {
+              if(data.status == "success")
+              {
+                this.loading=false;
+                this.AssignTo.controls['assign_to'].reset();
+                this.AssignTo.controls['start_date_time'].reset();
+                this.AssignTo.controls['end_date_time'].reset();
+                this.AssignTo.controls['notes'].reset();
+                this.AssignTo.controls['batch'].reset();
+                this.getProductList();
+                this.getProductList();
+                this.openModel.dismiss();
+                this.toastrService.success('Task Assign Succesfully');
+                this.selected = [];
+              }
+              else { this.toastrService.error('Something went wrong : onUpdate');
+              this.loading = false;}
+
+              return true;
+            }).catch(error =>
+            {
+                this.toastrService.error('API Faild : onUpdate');
+                this.loading = false;
+            });
+        }
     }
   }
+
   async getProductList()
   {
     await this.api.get('mp_production_view.php?mode=planning&authToken='+environment.authToken).then((data: any) =>
@@ -134,6 +173,16 @@ export class PlanningComponent implements OnInit {
       console.log(data)
       if(data != null)
       this.filter_data      = [...data];
+
+    }).catch(error => {this.toastrService.error('Something went wrong');});
+
+     await this.api.get('mp_production_view.php?mode=store_production&authToken='+environment.authToken).then((data: any) =>
+    {
+      console.log("data :",data)
+      this.Store_production  = data;
+      console.log(data)
+      if(data != null)
+      this.filter_data_store  = [...data];
 
     }).catch(error => {this.toastrService.error('Something went wrong');});
   }
@@ -181,8 +230,9 @@ export class PlanningComponent implements OnInit {
               {
                 this.loading=true;
 
-                this.api.post('post_insert_data.php?table=production_material&authToken='+environment.authToken,FormData).then((data: any) =>
+              await  this.api.post('post_insert_data.php?table=store_production&authToken='+environment.authToken,FormData).then(async (data: any) =>
                 {
+                  console.log(data)
                   if(data.status == "success")
                   {
                     this.loading=false;
@@ -190,7 +240,7 @@ export class PlanningComponent implements OnInit {
                     this.CategoryForm.controls['product_no'].reset();
                     this.CategoryForm.controls['category_id'].reset();
                     this.CategoryForm.controls['notes'].reset();
-                      this.api.get('single_field_update.php?table=production_prefix&field=id&value='+this.Product_id+'&up_field=last_serial_no&update='+this.Serial_no+'&authToken='+environment.authToken)
+                    await  this.api.get('single_field_update.php?table=production_prefix&field=id&value='+this.Product_id+'&up_field=last_serial_no&update='+this.Serial_no+'&authToken='+environment.authToken)
                         .then((data:any) =>
                         { console.log(data) });
                     this.getProductList();
@@ -235,11 +285,28 @@ export class PlanningComponent implements OnInit {
     this.table.offset = 0;
   }
 
+  updateFilter_store(event)
+  {
+    const val = event.target.value.toLowerCase();
+    const temp = this.filter_data_store.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.Store_production = temp;
+    this.table.offset = 0;
+  }
+
   move_to_process(value)
   {
     this.api.get('mp_get_employee_type.php?table=employee&find=status&value=1&authToken='+environment.authToken).then((data: any) =>
     {
-      this.employee_list = data;
+      console.log(this.Date)
+      if(data != null)
+      {
+        this.employee_list = data.filter(emp => emp.doj <= this.Date && (emp.last_working_day >= this.Date || emp.last_working_day == null || emp.last_working_day == '')&& emp.status ==1 );
+      }
+      else{this.employee_list =null}
     }).catch(error => {this.toastrService.error('Something went wrong');});
 
     this.AssignTo.controls['notes'].setValue(this.detail_view.notes);

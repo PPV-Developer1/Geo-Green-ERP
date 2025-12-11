@@ -340,7 +340,13 @@
                               {{Details.debit_note_no}}
                     </div>
                   </div>
-
+                  <div class="row mb-3">
+                      <label style="color: #e54643"  class="col-sm-2 col-form-label col-form-label-sm">Debit Note Date *</label>
+                        <div class="col-sm-4">
+                          <input type="date" formControlName="note_date"  class="form-control form-control-sm" />
+                          <span class="help-block text-danger" *ngIf="form.get('note_date').touched && form.get('note_date').hasError('required')">Enter Debit Note Date !</span>
+                      </div>
+                  </div>
 
                   <div class="row mb-3">
                     <label class="col-sm-2 col-form-label col-form-label-sm">Message </label>

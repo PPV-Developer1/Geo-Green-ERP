@@ -10,9 +10,15 @@
             <h5>EMPLOYEE LIST</h5>
           </td>
           <td style="width: 1100px;">
-
+                    <div class="input-group input-group-sm my-1">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="fa fa-search"></i></span>
+                        </div>
+                        <input class="form-control" type="text" placeholder="Search Employee Name ..."
+                          (keyup)="updateFilter($event)" />
+                  </div>
           </td>
-          <td style="width: 100px;"> </td>
+
           <td style="width: 100px; text-align: center; vertical-align: center;">
           </td>
           <td style="width: 200px; text-align: center; vertical-align: center;">
@@ -39,11 +45,11 @@
           [selectionType]="'single'"
           (activate)="onActivate($event)">
 
-          <!-- <ngx-datatable-column     [resizeable]="false" name="EMP ID">
+          <ngx-datatable-column  [flexGrow]="1"   [resizeable]="false" name="EMP ID">
             <ng-template ngx-datatable-cell-template let-row="row">
-              {{row.emp_id}}
+              {{row.id}}
             </ng-template>
-          </ngx-datatable-column> -->
+          </ngx-datatable-column>
 
           <ngx-datatable-column     [resizeable]="false" prop="name" name="EMPLOYEE NAME" [flexGrow]="2">
             <ng-template ngx-datatable-cell-template let-row="row">
@@ -182,19 +188,46 @@
                                                         <td>
                                                             <input type="text" style="border: none;" [readonly]="status" [(ngModel)]="emp_name"
                                                             formControlName="emp_name" placeholder="Enter Employee name">
+                                                            <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_name').touched && editEmpDetails.get('emp_name').hasError('required')">Required !</span>
                                                         </td>
                                                   </tr>
+
+                                                   <tr>
+                                                    <th>Gender</th>
+                                                    <td>
+                                                              <input type="text" formControlName="emp_gender" style="border: none;" [readonly]="status" *ngIf="status"
+                                                                  [(ngModel)]="emp_gender" placeholder="Enter your Gender">
+
+
+                                                      <div style="display: flex; gap: 15px; margin-top: 5px;" *ngIf="dropdown == false">
+
+                                                          <label *ngIf="dropdown == false">
+                                                            <input type="radio"  formControlName="emp_gender"  value="Male"     [disabled]="!status"> Male
+                                                          </label>
+
+                                                          <label *ngIf="dropdown == false">
+                                                            <input type="radio" formControlName="emp_gender" value="Female" [disabled]="!status" >  Female
+                                                          </label>
+
+                                                           <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_gender').touched && editEmpDetails.get('emp_gender').hasError('required')">Required !</span>
+                                                        </div>
+                                                    </td>
+                                                </tr>
 
                                                   <tr>
                                                     <th>Email ID</th>
                                                     <td><input type="text" formControlName="emp_emailId" style="border: none;" [readonly]="status"
-                                                      [(ngModel)]="emp_emailId" placeholder="Enter your Email id"></td>
+                                                      [(ngModel)]="emp_emailId" placeholder="Enter your Email id">
+                                                       <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_emailId').touched && editEmpDetails.get('emp_emailId').hasError('required')">Required !</span>
+                                                    </td>
                                                 </tr>
 
                                                   <tr>
                                                     <th>Mobile No</th>
                                                     <td><input type="text" formControlName="emp_mobileNo" style="border: none;" [readonly]="status"
-                                                        [(ngModel)]="emp_mobileNo" placeholder="Enter your Mobile number"></td>
+                                                        [(ngModel)]="emp_mobileNo" placeholder="Enter your Mobile number">
+                                                          <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_mobileNo').touched && editEmpDetails.get('emp_mobileNo').hasError('required')">Required !</span>
+                                                      </td>
                                                   </tr>
 
 
@@ -203,16 +236,21 @@
                                               <tr>
                                                 <th>Job Location</th>
                                                 <td><input type="text" formControlName="emp_jobLocation" style="border: none;" [readonly]="status"
-                                                    [(ngModel)]="emp_jobLocation" placeholder="Enter your Job Location"></td>
+                                                    [(ngModel)]="emp_jobLocation" placeholder="Enter your Job Location">
+                                                     <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_jobLocation').touched && editEmpDetails.get('emp_jobLocation').hasError('required')">Required !</span>
+                                                  </td>
                                               </tr>
 
                                                <tr>
                                               <th>Employee Type</th>
                                               <td><input type="text" *ngIf="dropdown"  name="" id="" style="border: none;" [readonly]="status"
                                                 [(ngModel)]="emp_empType_name" formControlName="emp_empType" placeholder="Select Employee Type">
-                                                <select  formControlName="emp_empType" [readonly]="status" *ngIf="dropdown==false"  [(ngModel)]="emp_empType" class="form-control" >
+                                                <select  formControlName="emp_empType" [readonly]="status" *ngIf="dropdown==false"  [(ngModel)]="emp_empType"
+                                                  (change)="EditEmployeeType()" class="form-control" >
                                                   <option *ngFor= "let view of emp_type_list" value="{{view.id}}" >{{view.type | uppercase}}</option>
                                                 </select>
+
+                                                  <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_empType').touched && editEmpDetails.get('emp_empType').hasError('required')">Required !</span>
                                               </td>
                                             </tr>
 
@@ -221,6 +259,8 @@
                                                     <td>
                                                       <input type="text" formControlName="emp_cl" style="border: none;" readonly
                                                           [(ngModel)]="emp_cl" placeholder="Enter Com_Off">
+
+                                                           <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_cl').touched && editEmpDetails.get('emp_cl').hasError('required')">Required !</span>
                                                     </td>
                                                   </tr>
 
@@ -229,6 +269,8 @@
                                                       <td>
                                                         <input type="text" formControlName="emp_pl" style="border: none;" readonly
                                                             [(ngModel)]="emp_pl" placeholder="Enter PL Leave">
+
+                                                             <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_pl').touched && editEmpDetails.get('emp_pl').hasError('required')">Required !</span>
                                                       </td>
                                               </tr>
                                                 </table>
@@ -240,93 +282,140 @@
                                                         <th>Designation</th>
                                                         <td><input type="text" name="" id="" style="border: none;" [readonly]="status"
                                                             [(ngModel)]="emp_designation" formControlName="emp_designation"
-                                                            placeholder="Enter Your designation"></td>
+                                                            placeholder="Enter Your designation">
+                                                             <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_designation').touched && editEmpDetails.get('emp_designation').hasError('required')">Required !</span>
+                                                          </td>
                                                     </tr>
+
                                                   <tr>
                                                       <th>DOJ</th>
                                                       <td>
                                                         <input type="date" style="border: none;" formControlName="emp_doj" [readonly]="status"
                                                           [(ngModel)]="emp_doj">
+                                                            <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_doj').touched && editEmpDetails.get('emp_doj').hasError('required')">Required !</span>
                                                       </td>
                                                  </tr>
 
-                                                    <tr>
-                                                      <th>Password</th>
-                                                      <td>
-                                                        <span *ngIf="status">
-                                                          <input type="text"  value = "*********" style="border: none;" [readonly]="status"
-                                                                placeholder="Enter Password">
-                                                        </span>
-
-                                                        <span *ngIf="!status">
-                                                          <input type="text" formControlName="emp_password" style="border: none;" [readonly]="status"
-                                                                [(ngModel)]="emp_password" placeholder="Enter Password">
-                                                        </span>
-                                                      </td>
-
-                                                    </tr>
-
                                                   <tr>
                                                       <th>LastWorking Day</th>
-                                                      <td><input type="text" formControlName="emp_lastWorkingDay" style="border: none;" [readonly]="status"
-                                                          [(ngModel)]="emp_lastWorkingDay" placeholder="Enter your Last Working Day"></td>
+                                                      <td><input type="date" formControlName="emp_lastWorkingDay" style="border: none;" [readonly]="status"
+                                                          [(ngModel)]="emp_lastWorkingDay" placeholder="Enter your Last Working Day">
+                                                           <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_lastWorkingDay').touched && editEmpDetails.get('emp_lastWorkingDay').hasError('required')">Required !</span>
+                                                        </td>
                                                     </tr>
 
-
-                                                  <tr>
+                                                  <tr *ngIf="emp_portal_access">
                                                       <th>Portal Access Type</th>
                                                       <td><input type="text" *ngIf="dropdown"  name="" id="" style="border: none;" [readonly]="status"
                                                         [(ngModel)]="emp_empRole_id" formControlName="emp_empRole" placeholder="select Employee type">
                                                         <select  formControlName="emp_empRole" [readonly]="status" *ngIf="dropdown==false"  [(ngModel)]="emp_empRole" class="form-control" >
                                                           <option *ngFor= "let view of user_type_list" value="{{view.id}}" >{{view.name | uppercase}}</option>
                                                         </select>
+
+                                                         <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_empRole').touched && editEmpDetails.get('emp_empRole').hasError('required')">Required !</span>
                                                       </td>
                                                </tr>
 
                                                  <tr>
-                                                    <th>portal access</th>
+                                                    <th>Portal access</th>
                                                     <td>
                                                       <span *ngIf="emp_portal_access == '1'">
-                                                        <span *ngIf="stateShow"> ACTIVE </span>
+                                                        <span *ngIf="stateShow" style="color: green;"> Enabled </span>
                                                       </span>
 
                                                       <span *ngIf="emp_portal_access == '0'">
-                                                        <span *ngIf="stateShow"> INACTIVE </span>
+                                                        <span *ngIf="stateShow" style="color: red;"> Disabled </span>
                                                       </span>
 
                                                       <div *ngIf="!stateShow" class="custom-control custom-switch">
                                                         <input type="checkbox" formControlName="emp_portal_access" [(ngModel)]="emp_portal_access"
-                                                          class="custom-control-input" id="customSwitch3" />
+                                                          class="custom-control-input" id="customSwitch3" (change)="Portal_access_edit($event)" />
                                                         <label class="custom-control-label" for="customSwitch3"></label>
                                                       </div>
+
+                                                       <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_portal_access').touched && editEmpDetails.get('emp_portal_access').hasError('required')">Required !</span>
                                                     </td>
                                               </tr>
 
                                             <tr>
-                                              <th>status</th>
+                                              <th>Status</th>
                                               <td>
                                                 <span *ngIf="emp_status == '1'">
-                                                  <span *ngIf="stateShow"> ACTIVE </span>
+                                                  <span *ngIf="stateShow" style="color: green;"> Active </span>
                                                 </span>
                                                 <span *ngIf="emp_status == '0'">
-                                                  <span *ngIf="stateShow"> INACTIVE </span>
+                                                  <span *ngIf="stateShow" style="color: red;"> InActive </span>
                                                 </span>
 
                                                 <div *ngIf="!stateShow" class="custom-control custom-switch">
                                                   <input type="checkbox" formControlName="emp_status" [(ngModel)]="emp_status"
                                                     class="custom-control-input" id="customSwitch1" />
                                                   <label class="custom-control-label" for="customSwitch1"></label>
+
+                                                  <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_status').touched && editEmpDetails.get('emp_status').hasError('required')">Required !</span>
                                                 </div>
                                               </td>
                                             </tr>
+
+                                              <tr>
+                                                        <th>Job Description</th>
+                                                        <td><textarea type="text" name="" id="" style="border: none;" [readonly]="status"
+                                                            [(ngModel)]="emp_job_description" formControlName="emp_job_description"
+                                                            placeholder="Enter Description"></textarea>
+                                                            <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_job_description').touched && editEmpDetails.get('emp_job_description').hasError('required')">Required !</span>
+                                                          </td>
+                                                    </tr>
+
                                                   </table>
                                               </div>
                                           </div>
                                       </div>
 
+                                  <div *ngIf="emp_portal_access == '1'" style="border: 1px solid gainsboro; border-radius: 10px; padding: 10px; margin-bottom: 20px;margin-left: 10px;">
+                                             <h5><b>Login Details </b>  </h5>
+                                           <div class="row">
+                                             <div class="col-md-6">
+                                                <table class="table">
+                                                  <tr>
+                                                    <th> Login ID
 
+                                                    </th>
+                                                        <td>
+                                                            <input type="text" formControlName="emp_login_id" style="border: none;" [readonly]="status"
+                                                              [(ngModel)]="emp_login_id" placeholder="Enter Login ID">
+                                                            <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_login_id').touched && editEmpDetails.get('emp_login_id').hasError('required')">Required !</span>
+                                                            </td>
+                                                    </tr>
+                                                  </table>
+                                            </div>
 
-                                        <div style="border: 1px solid gainsboro; border-radius: 10px; padding: 10px; margin-bottom: 20px;margin-left: 10px;">
+                                            <div class="col-md-6">
+                                                <table class="table">
+                                                   <tr>
+                                                      <th>Password</th>
+                                                      <td>
+                                                        <span *ngIf="status">
+                                                          <input type="text"  value = "*********" style="border: none;" [readonly]="status"
+                                                                placeholder="Enter Password">
+
+                                                        </span>
+
+                                                        <span *ngIf="!status">
+                                                          <input type="text" formControlName="emp_password" style="border: none;" [readonly]="status"
+                                                                [(ngModel)]="emp_password" placeholder="Enter Password">
+
+                                                          <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_password').touched && editEmpDetails.get('emp_password').hasError('required')">Required !</span>
+                                                        </span>
+                                                      </td>
+
+                                                    </tr>
+
+                                                  </table>
+                                            </div>
+                                          </div>
+                                   </div>
+
+                                        <div *ngIf="Employee_type_edit" style="border: 1px solid gainsboro; border-radius: 10px; padding: 10px; margin-bottom: 20px;margin-left: 10px;">
                                              <h5><b>Statutory Details </b>  </h5>
                                            <div class="row">
                                              <div class="col-md-6">
@@ -338,12 +427,14 @@
                                                   [(ngModel)]="emp_esiNo" placeholder="Enter ESI"></td>
                                             </tr>
 
-                                            <tr>
-                                              <th> EPF Number</th>
-                                              <td><input type="text" name="" id="" style="border: none;" [readonly]="status"
-                                                  formControlName="emp_pfNo" [(ngModel)]="emp_pfNo"
-                                                  placeholder="Enter your PF No" (input)=" formatInput_edit($event)" > </td>
-                                            </tr>
+                                              <tr>
+                                                      <th > EPF Number</th>
+                                                      <td >
+                                                        <label for="" *ngIf="status">{{emp_pfNo}}</label>
+                                                        <input type="text" *ngIf="!status" name="" id="" style="border: none;" [readonly]="status"
+                                                          formControlName="emp_pfNo" [(ngModel)]="emp_pfNo"
+                                                          placeholder="Enter your PF No" (input)=" formatInput_edit($event)" > </td>
+                                                    </tr>
 
                                                   </table>
                                               </div>
@@ -361,6 +452,7 @@
                                                     </tr>
                                                   </table>
                                               </div>
+
                                             </div>
                                         </div>
 
@@ -374,7 +466,8 @@
                                                                 <th>Basic Salary</th>
                                                                 <td><input type="text" name="" id="" style="border: none;" [readonly]="status"
                                                                     formControlName="emp_basic_salary" [(ngModel)]="emp_basic_salary"
-                                                                    placeholder="Enter your Salary"> </td>
+                                                                    placeholder="Enter your Salary">
+                                                                   <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_basic_salary').touched && editEmpDetails.get('emp_basic_salary').hasError('required')">Required !</span> </td>
                                                             </tr>
 
                                                               <tr>
@@ -382,6 +475,7 @@
                                                                     <td>
                                                                       <input type="text" formControlName="emp_hra" style="border: none;" [readonly]="status"
                                                                           [(ngModel)]="emp_hra" placeholder="Enter HRA">
+                                                                          <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_hra').touched && editEmpDetails.get('emp_hra').hasError('required')">Required !</span>
                                                                     </td>
                                                               </tr>
 
@@ -390,6 +484,7 @@
                                                                     <td>
                                                                       <input type="text" formControlName="emp_allowance" style="border: none;" [readonly]="status"
                                                                           [(ngModel)]="emp_allowance" placeholder="Enter Allowance">
+                                                                           <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_allowance').touched && editEmpDetails.get('emp_allowance').hasError('required')">Required !</span>
                                                                     </td>
                                                               </tr>
                                                           </table>
@@ -401,7 +496,9 @@
                                                             <tr>
                                                               <th>Over Time Hours</th>
                                                               <td><input type="text" formControlName="emp_ot" style="border: none;" [readonly]="status"
-                                                                  [(ngModel)]="emp_ot" placeholder="Enter OT"></td>
+                                                                  [(ngModel)]="emp_ot" placeholder="Enter OT">
+                                                                   <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_ot').touched && editEmpDetails.get('emp_ot').hasError('required')">Required !</span>
+                                                                </td>
                                                             </tr>
 
                                                               <tr>
@@ -409,14 +506,17 @@
                                                                     <td>
                                                                       <input type="text" formControlName="emp_professional_tax" style="border: none;" [readonly]="status"
                                                                           [(ngModel)]="emp_professional_tax" placeholder="Enter Tax">
+
+                                                                           <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_professional_tax').touched && editEmpDetails.get('emp_professional_tax').hasError('required')">Required !</span>
                                                                     </td>
                                                               </tr>
 
-                                                               <tr>
+                                                               <tr *ngIf="Employee_type_edit">
                                                                     <th>EPF Amount </th>
                                                                     <td>
                                                                       <input type="text" formControlName="emp_epf_amount" style="border: none;" [readonly]="status"
                                                                           [(ngModel)]="emp_epf_amount" placeholder="Enter Amount">
+                                                                           <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_epf_amount').touched && editEmpDetails.get('emp_epf_amount').hasError('required')">Required !</span>
                                                                     </td>
                                                               </tr>
                                                           </table>
@@ -434,7 +534,9 @@
                                                                   <th>Father/Gaurdian Name</th>
                                                                   <td><input type="text" name="" id="" style="border: none;" [readonly]="status"
                                                                       [(ngModel)]="emp_father_guardianName" formControlName="emp_father_guardianName"
-                                                                      placeholder="Enter Name"></td>
+                                                                      placeholder="Enter Name">
+                                                                        <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_father_guardianName').touched && editEmpDetails.get('emp_father_guardianName').hasError('required')">Required !</span>
+                                                                    </td>
                                                             </tr>
 
                                                             <tr>
@@ -442,31 +544,61 @@
                                                               <td>
                                                                 <input type="text" formControlName="emp_qualification" style="border: none;" [readonly]="status"
                                                                     [(ngModel)]="emp_qualification" placeholder="Enter Qualification">
+
+                                                                    <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_qualification').touched && editEmpDetails.get('emp_qualification').hasError('required')">Required !</span>
                                                               </td>
                                                             </tr>
 
                                                           <tr>
                                                             <th>Emergency Contact Person Relationship</th>
                                                             <td><input type="text" formControlName="emp_emergency_Con_PersonRelationship" style="border: none;" [readonly]="status"
-                                                                [(ngModel)]="emp_emergency_Con_PersonRelationship" placeholder="Enter Contact Number"></td>
+                                                                [(ngModel)]="emp_emergency_Con_PersonRelationship" placeholder="Enter Contact Number">
+
+                                                                 <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_emergency_Con_PersonRelationship').touched && editEmpDetails.get('emp_emergency_Con_PersonRelationship').hasError('required')">Required !</span>
+                                                              </td>
                                                           </tr>
 
                                                           <tr>
                                                             <th>Emergency Contact Person</th>
                                                             <td><input type="text" formControlName="emp_emergency_Con_Person" style="border: none;" [readonly]="status"
-                                                                [(ngModel)]="emp_emergency_Con_Person" placeholder="Enter your Name"></td>
+                                                                [(ngModel)]="emp_emergency_Con_Person" placeholder="Enter your Name">
+                                                               <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_emergency_Con_Person').touched && editEmpDetails.get('emp_emergency_Con_Person').hasError('required')">Required !</span>
+                                                              </td>
                                                           </tr>
 
                                                             <tr>
                                                               <th>Emergency Contact Person No</th>
-                                                              <td><input type="text" formControlName="emp_emergency_Con_PersonNo" style="border: none;" [readonly]="status"
-                                                                  [(ngModel)]="emp_emergency_Con_PersonNo" placeholder="Enter Contact Number"></td>
+                                                              <td><input type="number" formControlName="emp_emergency_Con_PersonNo" style="border: none;" [readonly]="status"
+                                                                  [(ngModel)]="emp_emergency_Con_PersonNo" placeholder="Enter Contact Number">
+                                                                   <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_emergency_Con_PersonNo').touched && editEmpDetails.get('emp_emergency_Con_PersonNo').hasError('required')">Required !</span>
+                                                                </td>
                                                             </tr>
 
                                                               <tr>
                                                                   <th>DoB</th>
                                                                   <td><input type="date" formControlName="emp_dob" style="border: none;" [readonly]="status"
-                                                                      [(ngModel)]="emp_dob" placeholder="Enter your DoB"></td>
+                                                                      [(ngModel)]="emp_dob" placeholder="Enter your DoB">
+                                                                        <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_dob').touched && editEmpDetails.get('emp_dob').hasError('required')">Required !</span>
+                                                                    </td>
+                                                                </tr>
+
+                                                                  <tr>
+                                                                     <th>Nominee Name</th>
+                                                                      <td><input type="text" formControlName="emp_nominee_name" style="border: none;" [readonly]="status"
+                                                                      [(ngModel)]="emp_nominee_name" placeholder="Enter Nominee Name">
+                                                                        <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_nominee_name').touched && editEmpDetails.get('emp_nominee_name').hasError('required')">Required !</span>
+
+                                                                    </td>
+                                                                </tr>
+
+                                                                 <tr>
+                                                                     <th>Nominee Contact</th>
+                                                                      <td><input type="text" formControlName="emp_nominee_contact_no" style="border: none;" [readonly]="status"
+                                                                      [(ngModel)]="emp_nominee_contact_no" placeholder="Enter Nominee Contact">
+
+                                                                       <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_nominee_contact_no').touched && editEmpDetails.get('emp_nominee_contact_no').hasError('required')">Required !</span>
+
+                                                                    </td>
                                                                 </tr>
                                                           </table>
                                                       </div>
@@ -476,26 +608,33 @@
                                                            <tr>
                                                               <th>Aadhar</th>
                                                               <td><input type="text" formControlName="emp_aadhar" style="border: none;" [readonly]="status"
-                                                                  [(ngModel)]="emp_aadhar" placeholder="Enter your Aadhar number"></td>
+                                                                  [(ngModel)]="emp_aadhar" placeholder="Enter your Aadhar number">
+                                                                    <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_aadhar').touched && editEmpDetails.get('emp_aadhar').hasError('required')">Required !</span>
+                                                                </td>
                                                             </tr>
 
 
                                                             <tr>
                                                               <th>PAN</th>
                                                               <td><input type="text" formControlName="emp_pan" style="border: none;" [readonly]="status"
-                                                                  [(ngModel)]="emp_pan" placeholder="Enter your Pan number"></td>
+                                                                  [(ngModel)]="emp_pan" placeholder="Enter your Pan number">
+                                                                 <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_pan').touched && editEmpDetails.get('emp_pan').hasError('required')">Required !</span></td>
                                                             </tr>
 
                                                             <tr>
                                                                 <th>Communication Address</th>
                                                                 <td><input type="text" formControlName="emp_AddressForCommunication" style="border: none;" [readonly]="status"
-                                                                    [(ngModel)]="emp_AddressForCommunication" placeholder="Enter your Address"></td>
+                                                                    [(ngModel)]="emp_AddressForCommunication" placeholder="Enter your Address">
+                                                                     <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_AddressForCommunication').touched && editEmpDetails.get('emp_AddressForCommunication').hasError('required')">Required !</span>
+                                                                  </td>
                                                               </tr>
 
                                                               <tr>
                                                                 <th>Permenent Address</th>
                                                                 <td><input type="text" formControlName="emp_permenantAddress" style="border: none;" [readonly]="status"
-                                                                    [(ngModel)]="emp_permenantAddress" placeholder="Enter your PermenantAddress"></td>
+                                                                    [(ngModel)]="emp_permenantAddress" placeholder="Enter your PermenantAddress">
+                                                                     <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_permenantAddress').touched && editEmpDetails.get('emp_permenantAddress').hasError('required')">Required !</span>
+                                                                  </td>
                                                             </tr>
 
                                                             <tr>
@@ -513,6 +652,8 @@
                                                                     <option value="B -">B -</option>
                                                                     <option value="AB -">AB -</option>
                                                                   </select>
+
+                                                                   <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_bloodgroup').touched && editEmpDetails.get('emp_bloodgroup').hasError('required')">Required !</span>
                                                                 </td>
                                                             </tr>
 
@@ -524,7 +665,21 @@
                                                                           <option value="Married">Married</option>
                                                                           <option value="UnMarried">UnMarried</option>
                                                                         </select>
+
+                                                                         <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_maritalStatus').touched && editEmpDetails.get('emp_maritalStatus').hasError('required')">Required !</span>
                                                                       </td>
+                                                                </tr>
+
+                                                                 <tr>
+                                                                     <th>Depended Person</th>
+                                                                      <td><input type="text" formControlName="emp_depended_person" style="border: none;" [readonly]="status"
+                                                                      [(ngModel)]="emp_depended_person" placeholder="Enter Depended Person">
+                                                                        <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_depended_person').touched && editEmpDetails.get('emp_depended_person').hasError('required')">Required !</span>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                  <th>&nbsp;</th>
+                                                                  <td>&nbsp;</td>
                                                                 </tr>
 
                                                           </table>
@@ -542,26 +697,33 @@
                                                         <th>Bank Account Number</th>
                                                         <td><input type="text" name="" id="" style="border: none;" [readonly]="status"
                                                             [(ngModel)]="emp_bank_account_no" formControlName="emp_bank_account_no"
-                                                            placeholder="Enter your Account Number"></td>
+                                                            placeholder="Enter your Account Number">
+                                                             <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_bank_account_no').touched && editEmpDetails.get('emp_bank_account_no').hasError('required')">Required !</span>
+                                                          </td>
                                                       </tr>
 
                                                       <tr>
                                                         <th>Bank Name</th>
                                                         <td><input type="text" name="" id="" style="border: none;" [readonly]="status"
                                                             [(ngModel)]="emp_bank_name" formControlName="emp_bank_name"
-                                                            placeholder="Enter your Bank Name"></td>
+                                                            placeholder="Enter your Bank Name">
+                                                             <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_bank_name').touched && editEmpDetails.get('emp_bank_name').hasError('required')">Required !</span>
+                                                          </td>
                                                       </tr>
 
                                                       <tr>
                                                         <th>IFSC</th>
                                                         <td><input type="text" name="" id="" style="border: none;" [readonly]="status"
-                                                            [(ngModel)]="emp_ifsc" formControlName="emp_ifsc" placeholder="Enter your IFSC "></td>
+                                                            [(ngModel)]="emp_ifsc" formControlName="emp_ifsc" placeholder="Enter your IFSC ">
+                                                             <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_ifsc').touched && editEmpDetails.get('emp_ifsc').hasError('required')">Required !</span>
+                                                          </td>
                                                       </tr>
 
                                                       <tr>
                                                         <th>BRANCH</th>
                                                         <td><input type="text" name="" id="" style="border: none;" [readonly]="status"
-                                                            [(ngModel)]="emp_branch" formControlName="emp_branch" placeholder="Enter  Branch"></td>
+                                                            [(ngModel)]="emp_branch" formControlName="emp_branch" placeholder="Enter  Branch">
+                                                          <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_branch').touched && editEmpDetails.get('emp_branch').hasError('required')">Required !</span></td>
                                                       </tr>
 
                                                         <!-- <tr>
@@ -1077,6 +1239,23 @@
                                 </div>
                               </div>
 
+                                <div class="row mt-3">
+                                    <div class="col-md-6 mt-2">
+                                      <b>Gender </b>
+                                      <span class="help-block text-danger" *ngIf="addEmployee.get('gender').touched && addEmployee.get('gender').hasError('required')">Required !</span>
+
+                                    </div>
+                                   <div class="col-md-6" style="display: flex; gap: 10px;">
+                                        <label>
+                                          <input type="radio" formControlName="gender" value="Male"> Male
+                                        </label>
+
+                                        <label>
+                                          <input type="radio" formControlName="gender" value="Female"> Female
+                                        </label>
+                                      </div>
+
+                                  </div>
                                <div class="row mt-3">
                                     <div class="col-md-6 mt-2">
                                       <b>Email Id </b>
@@ -1108,7 +1287,7 @@
 
                                 </div>
                                 <div class="col-md-6">
-                                  <select formControlName="empType" class="form-control">
+                                  <select formControlName="empType" class="form-control" (change)="Onselect($event.target.value)">
                                     <option *ngFor= "let view of emp_type_list" value="{{view.id}}" >{{view.type | uppercase}}</option>
                                   </select>
                                 </div>
@@ -1150,8 +1329,18 @@
                                 </div>
 
 
+                                 <div class="row mt-3">
+                                  <div class="col-md-6 mt-2">
+                                    <b>Job Description </b>
+                                    <span class="help-block text-danger" *ngIf="addEmployee.get('job_description').touched && addEmployee.get('job_description').hasError('required')">Required !</span>
+                                  </div>
+                                  <div class="col-md-6">
+                                     <textarea formControlName="job_description" class="form-control" placeholder="Enter job description"></textarea>
+                                  </div>
+                                </div>
 
-                              <div class="row mt-3">
+
+                              <!-- <div class="row mt-3">
                               <div class="col-md-6 mt-2">
                                 <b>Password </b>
                                 <span class="help-block text-danger" *ngIf="addEmployee.get('password').touched && addEmployee.get('password').hasError('required')">Required !</span>
@@ -1159,11 +1348,19 @@
                               <div class="col-md-6">
                                 <input type="text" formControlName="password" class="form-control" placeholder="Enter Password"/>
                               </div>
-                             </div>
-
+                             </div> -->
 
 
                             <div class="row mt-3">
+                                    <div class="col-md-6 mt-2">
+                                          <b>Last Working Day</b>
+                                          <span class="help-block text-danger" *ngIf="addEmployee.get('lastWorkingDay').touched && addEmployee.get('lastWorkingDay').hasError('required')">Required !</span>
+                                        </div>
+                                        <div class="col-md-6">
+                                          <input type="date" formControlName="lastWorkingDay" class="form-control"/>
+                                        </div>
+                                    </div>
+                            <div class="row mt-3" *ngIf="Portal_access">
                               <div class="col-md-6 mt-2">
                                 <b>Portal Access Type </b>
                                 <span class="help-block text-danger" *ngIf="addEmployee.get('empRole').touched && addEmployee.get('empRole').hasError('required')">Required !</span>
@@ -1176,15 +1373,7 @@
                                  </div>
                               </div>
 
-                                  <div class="row mt-3">
-                                    <div class="col-md-6 mt-2">
-                                          <b>Last Working Day</b>
-                                          <span class="help-block text-danger" *ngIf="addEmployee.get('lastWorkingDay').touched && addEmployee.get('lastWorkingDay').hasError('required')">Required !</span>
-                                        </div>
-                                        <div class="col-md-6">
-                                          <input type="date" formControlName="lastWorkingDay" class="form-control"/>
-                                        </div>
-                                    </div>
+
 
                               <div class="row mt-3">
                                   <div class="col-md-6 mt-2">
@@ -1192,7 +1381,7 @@
                               </div>
                               <div class="col-md-6">
                                 <div class="custom-control custom-switch">
-                                  <input type="checkbox" formControlName="portalAccess" class="custom-control-input"
+                                  <input type="checkbox" (change)="onPortalAccessChange($event)" formControlName="portalAccess" class="custom-control-input"
                                     style="width: 100px" id="customSwitch2" />
                                   <label class="custom-control-label" for="customSwitch2"></label>
                                 </div>
@@ -1217,6 +1406,37 @@
                   </div>
           </div>
 
+           <div *ngIf="Portal_access" style="border: 1px solid gainsboro; border-radius: 10px; padding: 10px;margin-bottom: 20px;">
+                <h5><b> Login Details </b> </h5>
+                    <div class="row">
+                          <div class="col-md-6">
+                                <div class="row">
+                                      <div class="col-md-6 mt-2">
+                                          <b> Login ID </b>
+                                            <span class="help-block text-danger" *ngIf="addEmployee.get('login_id').touched && addEmployee.get('login_id').hasError('required')">Required !</span>
+                                        </div>
+
+                                    <div class="col-md-6">
+                                      <input type="number" formControlName="login_id" class="form-control" placeholder="Enter Login ID"/>
+                                    </div>
+                                </div>
+                          </div>
+
+                            <div class="col-md-6">
+                                <div class="row">
+                                      <div class="col-md-6 mt-2">
+                                          <b> Password </b>
+                                            <span class="help-block text-danger" *ngIf="addEmployee.get('password').touched && addEmployee.get('password').hasError('required')">Required !</span>
+                                        </div>
+
+                                    <div class="col-md-6">
+                                      <input type="password" formControlName="password" class="form-control" placeholder="Enter Password"/>
+                                    </div>
+                                </div>
+                          </div>
+
+                      </div>
+              </div>
            <div style="border: 1px solid gainsboro; border-radius: 10px; padding: 10px;margin-bottom: 20px;">
                 <h5><b> Salary Details </b> </h5>
 
@@ -1277,7 +1497,7 @@
                                     </div>
                                 </div>
 
-                                 <div class="row mt-3">
+                                 <div class="row mt-3" *ngIf="Employee_type_create ">
                                     <div class="col-md-6 mt-2">
                                       <b>EPF Amount</b>
                                       <span class="help-block text-danger" *ngIf="addEmployee.get('epf_amount').touched && addEmployee.get('epf_amount').hasError('required')">Required !</span>
@@ -1291,7 +1511,7 @@
                     </div>
           </div>
 
-           <div style="border: 1px solid gainsboro; border-radius: 10px; padding: 10px;margin-bottom: 20px;">
+           <div style="border: 1px solid gainsboro; border-radius: 10px; padding: 10px;margin-bottom: 20px;" *ngIf="Employee_type_create ">
                 <h5><b> Statutory Details </b> </h5>
 
                     <div class="row">
@@ -1414,7 +1634,7 @@
                                   <span class="help-block text-danger" *ngIf="addEmployee.get('emergency_Con_PersonNo').touched && addEmployee.get('emergency_Con_PersonNo').hasError('required')">Required !</span>
                                 </div>
                                 <div class="col-md-6">
-                                  <input type="text" formControlName="emergency_Con_PersonNo" onKeyPress="if(this.value.length==10) return false;" class="form-control" placeholder="Enter Contact PersonNo"/>
+                                  <input type="number" formControlName="emergency_Con_PersonNo" onKeyPress="if(this.value.length==10) return false;" class="form-control" placeholder="Enter Contact PersonNo"/>
                                 </div>
                               </div>
 
@@ -1425,6 +1645,26 @@
                                 </div>
                                 <div class="col-md-6">
                                   <input type="text" formControlName="emergency_Con_PersonRelationship" class="form-control" placeholder="Enter Relationship"/>
+                                </div>
+                              </div>
+
+                              <div class="row mt-3">
+                                <div class="col-md-6 mt-2">
+                                  <b>Nominee Name </b>
+                                  <span class="help-block text-danger" *ngIf="addEmployee.get('nominee_name').touched && addEmployee.get('nominee_name').hasError('required')">Required !</span>
+                                </div>
+                                <div class="col-md-6">
+                                  <input type="text" formControlName="nominee_name" class="form-control" placeholder="Enter Nominee"/>
+                                </div>
+                              </div>
+
+                                <div class="row mt-3">
+                                <div class="col-md-6 mt-2">
+                                  <b>Depended Person </b>
+                                  <span class="help-block text-danger" *ngIf="addEmployee.get('depended_person').touched && addEmployee.get('depended_person').hasError('required')">Required !</span>
+                                </div>
+                                <div class="col-md-6">
+                                  <input type="text" formControlName="depended_person" class="form-control" placeholder="Enter Depended Person"/>
                                 </div>
                               </div>
                         </div>
@@ -1501,6 +1741,17 @@
                                     </div>
                                     <div class="col-md-6">
                                       <input type="text" formControlName="nationality" class="form-control" placeholder=" Enter Nationality"/>
+                                    </div>
+                                  </div>
+
+
+                                  <div class="row mt-3">
+                                    <div class="col-md-6 mt-2">
+                                      <b>Nominee Contact Number </b>
+                                      <span class="help-block text-danger" *ngIf="addEmployee.get('nominee_contact_no').touched && addEmployee.get('nominee_contact_no').hasError('required')"> Required !</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                      <input type="text" formControlName="nominee_contact_no" class="form-control" placeholder=" Enter Nominee Contact Number"/>
                                     </div>
                                   </div>
 

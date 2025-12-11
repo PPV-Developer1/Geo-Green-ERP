@@ -8,6 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HostListener } from '@angular/core';
 import { AppState } from 'src/app/app.state';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 
 @Component({
@@ -134,7 +135,14 @@ export class Purchase_orderComponent implements OnInit {
   tcs_percent              : any=0;
   subtotal                 : any;
   po_prifix                : any;
-
+  selected_item            : any;
+  insert_index             : any;
+  popup                    : any;
+  ItemList_temp            : any;
+  alldata                  : any;
+  alldata1                 : any;
+  item_id                  : any;
+  item_name    : any;
   private startX: number = 0;
   private startWidth: number = 0;
   private columnIndex: number | null = null;
@@ -146,6 +154,8 @@ export class Purchase_orderComponent implements OnInit {
   @ViewChild("customer_name", { static: true }) customer_name: ElementRef;
   @ViewChild('tableResponsive', { static: false }) tableResponsive: ElementRef;
   @ViewChild('dropdownPanel', { static: false }) dropdownPanel: ElementRef;
+   @ViewChild("ItemListModel", { static: true }) ItemListModel   : ElementRef;
+   @ViewChild('Itemstable', { static: false }) Itemstable: DatatableComponent;
   constructor
   (
     public  fb           : FormBuilder,
@@ -153,7 +163,8 @@ export class Purchase_orderComponent implements OnInit {
     private api          : ApiService,
     private route: ActivatedRoute,
     private router: Router, private renderer: Renderer2,
-    private _state       : AppState
+    private _state       : AppState,
+    public modalService  : NgbModal
   )
   {
     this.po = fb.group(
@@ -165,8 +176,6 @@ export class Purchase_orderComponent implements OnInit {
         poNo       : ['', Validators.compose([Validators.required])],
         reference_number: [null],
         billDate   : [(new Date()).toISOString().substring(0, 10)],
-        paymentTerms: ['', Validators.compose([Validators.required])],
-        dueDate    : [(new Date()).toISOString().substring(0, 10)],
         subTotal   : [0],
         shippingCharge: [0],
         TCS        : [0],
@@ -283,9 +292,6 @@ export class Purchase_orderComponent implements OnInit {
         }
   }
 
-
-
-
   async LoadVendorBills()
   {
     await this.api.get('mp_po_bill.php?&authToken=' + environment.authToken).then((data: any) =>
@@ -296,6 +302,7 @@ export class Purchase_orderComponent implements OnInit {
       this.temp   =[...data]
     }).catch(error => { this.toastrService.error('Something went wrong in LoadVendorBills'); });
   }
+
   async LoadVendorDetails()
   {
     await this.api.get('get_data.php?table=vendor&authToken=' + environment.authToken).then((data: any) =>
@@ -303,11 +310,15 @@ export class Purchase_orderComponent implements OnInit {
       this.vendorDetails = data;
     }).catch(error => { this.toastrService.error('Something went wrong in LoadVendorDetails'); });
   }
+
   async LoadItemDetails()
   {
-    await this.api.get('get_data.php?table=item&find=purchase&value=1&authToken=' + environment.authToken).then((data: any) =>
+     await this.api.get('mp_item_list.php?&authToken=' + environment.authToken).then((data: any) =>
     {
-      this.ItemList = data;
+      console.log("item : ",data)
+      this.ItemList = data.filter(i => i.purchase ==1);
+      this.ItemList_temp = [...data.filter(i => i.purchase ==1)]
+      console.log("Filter : ",this.ItemList)
     }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
   }
 
@@ -410,7 +421,7 @@ export class Purchase_orderComponent implements OnInit {
               this.po_no           = po_id;
               this.taxempty        = data[0].tax_mode;
 
-              this.po.controls['paymentTerms'].setValue(MyPaymentTerm)
+              // this.po.controls['paymentTerms'].setValue(MyPaymentTerm)
               const today = new Date();
               let date = today.toISOString().split('T')[0];
 
@@ -432,6 +443,7 @@ export class Purchase_orderComponent implements OnInit {
       this.GSTCalculation()
     }
     //this.specItem(1,0);
+    this.vendor_address(this.vendor_id);
   }
 
   async LoadGST(mode)
@@ -487,7 +499,7 @@ export class Purchase_orderComponent implements OnInit {
 
   Billdate(a)
   {
-    this.dueDateChange();
+    // this.dueDateChange();
     this.invoiceDate  = a;
     var current       = new Date(this.invoiceDate);
     this.followingDay = new Date(current.getTime() + (this.dueValues * 24 * 60 * 60 * 1000));
@@ -561,10 +573,12 @@ export class Purchase_orderComponent implements OnInit {
       this.toastrService.error('Please Fill All Details');
     }
   }
+
   initProduct()
   {
     let product = this.po.get('product') as FormArray;
     product.push(this.fb.group({
+      item_name:new  FormControl(null),
       items   : new FormControl('', Validators.required),
       descriptions: new FormControl(''),
       taxes   : new FormControl('', Validators.required),
@@ -589,6 +603,8 @@ export class Purchase_orderComponent implements OnInit {
       uom      : this.uom,
       discount_1: 0,
       discount_2: 0,
+      items     : this.item_id,
+      item_name : this.item_name
     });
   }
   async specItem(item,i)
@@ -608,6 +624,8 @@ export class Purchase_orderComponent implements OnInit {
         this.amount   = data[0].price;
         this.descriptions = data[0].description;
         this.uom      = data[0].uom;
+        this.item_name = data[0].name;
+        this.item_id   = item;
     }).catch(error => { this.toastrService.error('Something went wrong'); });
 
     const formData = {
@@ -616,6 +634,9 @@ export class Purchase_orderComponent implements OnInit {
     this.patchValues(item,i);
     this.SubTotalChange();
     this.GSTCalculation();
+    this.LoadItemDetails();
+    this.selected_item = null;
+    this.popup.close();
   }
 
   SubTotalChange()
@@ -819,6 +840,11 @@ export class Purchase_orderComponent implements OnInit {
   }
   setzero()
   {
+    const confirmed = confirm(" Are you sure you want to go back to this?");
+       console.log(confirmed)
+      if (!confirmed) {
+        return;
+      }
     this.show_new_po = false;
     this.selected=[];
     this.LoadVendorBills();
@@ -840,5 +866,102 @@ export class Purchase_orderComponent implements OnInit {
         {
         }
     }
+  }
+
+
+
+   vendor_address(id)
+  {
+    this.api.get('get_data.php?table=vendor_address&find=vendor_id&value=' + id + '&find1=type&value1=1&authToken=' + environment.authToken).then((data: any) => {
+
+        this.alldata = data;
+    }).catch(error => { this.toastrService.error('Something went wrong 1'); });
+
+    this.api.get('get_data.php?table=vendor_address&find=vendor_id&value=' + id + '&find1=type&value1=2&authToken=' + environment.authToken).then((data: any) => {
+
+      this.alldata1 = data;
+  }).catch(error => { this.toastrService.error('Something went wrong 2'); });
+
+  }
+
+
+  ItemSelect(event)
+  {
+    if(event.type == "click")
+    {
+         console.log("",event.row)
+         this.selected_item  = event.row
+    }
+
+  }
+
+ async ItemInsert()
+  {
+    console.log("selected_item", this.selected_item)
+    console.log("selected_item", this.insert_index)
+    const confirmed = confirm("Are you sure you want to add this item?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
+      await this.specItem(this.selected_item.item_id,this.insert_index)
+  }
+
+  Item_popUp(i)
+  {
+    this.insert_index = i
+    console.log(i)
+    console.log("item list : ",this.ItemList)
+    this.popup = this.modalService.open(this.ItemListModel, { size: 'xl' });
+  }
+
+  updateFilter_item(event)
+  {
+    const val = event.target.value.toLowerCase();
+    const temp = this.ItemList_temp.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.ItemList = temp;
+
+    if (this.Itemstable) {
+      this.Itemstable.offset = 0;
+    }
+
+  }
+
+  ReloadBillAddr(id)
+  {
+    console.log("ReloadBillAddr id : ",id)
+    this.api.get('get_data.php?table=vendor_address&find=vendor_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
+      this.bill_addr = data[0];
+
+      this.billFrom = this.bill_addr.vendor_addr_id;
+      this.billAttention = this.bill_addr.attention;
+      this.billAddress_line_1 = this.bill_addr.address_line_1;
+      this.billAddress_line_2 = this.bill_addr.address_line_2;
+      this.billCity = this.bill_addr.city;
+      this.billState = this.bill_addr.state;
+      this.billZipcode = this.bill_addr.zip_code;
+      this.po.controls['billFrom'].setValue(this.billFrom);
+    }).catch(error => { this.toastrService.error('Something went wrong'); });
+  }
+
+  ReloadShippAddr(id) {
+
+    this.api.get('get_data.php?table=vendor_address&find=vendor_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
+      this.shipp_addr = data[0];
+
+      this.shipFrom = this.shipp_addr.vendor_addr_id;
+      this.shipAttention = this.shipp_addr.attention;
+      this.shipAddress_line_1 = this.shipp_addr.address_line_1;
+      this.shipAddress_line_2 = this.shipp_addr.address_line_2;
+      this.shipCity = this.shipp_addr.city;
+      this.shipState = this.shipp_addr.state;
+      this.shipZipcode = this.shipp_addr.zip_code;
+      this.po.controls['shipFrom'].setValue(this.shipFrom);
+
+    }).catch(error => { this.toastrService.error('Something went wrong'); });
   }
 }

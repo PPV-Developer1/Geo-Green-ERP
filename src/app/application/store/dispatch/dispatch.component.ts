@@ -9,6 +9,7 @@ import * as XLSX from "xlsx";
 import { dispatch } from 'd3';
 import { formatDate } from 'fullcalendar';
 import { error } from 'console';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'az-dispatch',
@@ -96,6 +97,9 @@ export class DispatchComponent implements OnInit {
   DriverDetails         : FormGroup;
   dropdownSettings      : any = {};
   list_view             : Boolean = false
+   pipe                 = new DatePipe('en-US');
+  public now            = Date.now();
+  public Date           = this.pipe.transform(this.now, 'yyyy-MM-dd');
 
   Outward = new FormGroup
   ({
@@ -749,9 +753,14 @@ async  update(Batch)
       this.tax_list  = data;
     }).catch(error => {this.toastrService.error('Something went wrong');});
 
-   await this.api.get('get_data.php?table=employee&authToken='+environment.authToken).then((data: any) =>
+   await this.api.get('get_data.php?table=employee&find=status&value=1&authToken='+environment.authToken).then((data: any) =>
     {
-      this.employee_list = data;
+
+      if(data != null)
+      {
+        this.employee_list = data.filter(emp => emp.doj <= this.Date && (emp.last_working_day >= this.Date || emp.last_working_day == null || emp.last_working_day == '') );
+      }
+      else{this.employee_list =null}
     }).catch(error => {this.toastrService.error('Something went wrong');});
   }
 

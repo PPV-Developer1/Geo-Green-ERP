@@ -25,6 +25,8 @@ export class MoniterComponent implements OnInit {
   batchQty        : any;
   openModel       : any;
   InOnActive      : any;
+  store_details   = [];
+  store_filter    = [];
 
   QtyError        : boolean = false;
   loading         : boolean = false;
@@ -86,11 +88,11 @@ export class MoniterComponent implements OnInit {
 
 
 
- 
+
   async LoadOutward()
   {
     let id = this.detail_view['id'];
-    await this.api.get('mp_outward_list.php?production_id='+id+'&authToken='+environment.authToken).then((data: any) =>
+    await this.api.get('mp_outward_list.php?production_id='+id+'&type='+this.detail_view['type']+'&authToken='+environment.authToken).then((data: any) =>
       {
         this.outwardList = data;
       }).catch(error => {this.toastrService.error('Something went wrong ');});
@@ -111,7 +113,22 @@ export class MoniterComponent implements OnInit {
       {
         this.product_details = null;
       }
-    }).catch(error => {this.toastrService.error('Something went wrong 1');});
+    }).catch(error => {this.toastrService.error('Something went wrong');});
+
+    await this.api.get('mp_production_view.php?mode=store_monitor&authToken='+environment.authToken).then((data: any) =>
+    {
+      if(data != null)
+      {
+        function levelFilter(value) { return (value.level === 3); }
+        let get_data = data.filter(levelFilter)
+        this.store_details = get_data;
+        this.store_filter      = [...get_data];
+      }
+      else
+      {
+        this.store_details = null;
+      }
+    }).catch(error => {this.toastrService.error('Something went wrong');});
   }
   async onActivate(event)
   {
@@ -153,6 +170,18 @@ export class MoniterComponent implements OnInit {
           );
         });
     this.product_details = temp;
+    this.table.offset = 0;
+  }
+
+   updateFilter_store(event)
+  {
+    const val = event.target.value.toLowerCase();
+    const temp = this.store_filter.filter((d) => {
+          return Object.values(d).some(field =>
+            field != null && field.toString().toLowerCase().indexOf(val) !== -1
+          );
+        });
+    this.store_details = temp;
     this.table.offset = 0;
   }
 

@@ -81,10 +81,10 @@ export class Credit_note_viewComponent implements OnInit {
     {
       message         : ['',Validators.compose([Validators.required])],
       reference       : ['',Validators.compose([Validators.required])],
+      note_date       : ['',Validators.compose([Validators.required])],
       note_no         : [],
       bill_to         : [],
       vendor_id       : [],
-      payment_term    : [],
       bill_number     : [],
       notes           : [],
       terms_condition : [],
@@ -92,7 +92,6 @@ export class Credit_note_viewComponent implements OnInit {
       type            : [],
       subTotal        : [],
       product         : this.fb.array([]),
-
     })
   }
 
@@ -255,6 +254,7 @@ export class Credit_note_viewComponent implements OnInit {
           console.log(this.Details)
         }
     }
+
   onSelect(event)
   {
 
@@ -267,6 +267,7 @@ async  edit()
     this.form.controls['message'].setValue(this.Details.message)
     this.form.controls['reference'].setValue(this.Details.reference)
     this.form.controls['notes'].setValue(this.Details.note)
+    this.form.controls['note_date'].setValue(this.Details.generate_date)
     this.notes =this.Details.note
 
     // this.modalRef = this.modalService.open(this.add, { size: 'md' });
@@ -343,7 +344,17 @@ async  edit()
 async specItem(item,i)
   {
     console.log(item)
+    const items = this.form.controls['product'].value
+      console.log("items ",items)
+      if(items.filter((it,index) => it.items == item && index != i).length > 0)
+      {
+        this.toastrService.error("Item already selected")
+          let product = this.form.get('product') as FormArray;
+         product.removeAt(i);
+        return;
+      }
       const data = this.ItemList.find(i=> i.item_list_id == item)
+
         this.taxes        = data.tax_percent;
         this.price        = data.amount;
         this.quantity     = data.qty;
@@ -872,7 +883,7 @@ getItemsObject() {
   {
   return {
   table: {
-    widths: [10, 112, 40,27, 27, 35, 19, 33, 19, 33,60],
+    widths: [11, 104, 40, 20, 24, 54, 12, 39, 12, 39, 60],
     body: [
       [
         { text: '#', border: [false, true, true, false],fillColor: '#CCCCCC', fontSize: 8, bold: true , alignment: 'center'},
@@ -913,9 +924,9 @@ getItemsObject() {
           { text: ed.qty,border:cellBorder, fontSize: 8 , alignment: 'center'},
           { text: ed.uom,border:cellBorder, fontSize: 8 , alignment: 'center'},
           { text: ed.amount.toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,'),border:cellBorder, fontSize: 8 , alignment: 'center'},
-          { text: ed.tax_percent/2 +'%',border:cellBorder, fontSize: 8 ,alignment: 'center'},
+          { text: ed.tax_percent/2 ,border:cellBorder, fontSize: 8 ,alignment: 'center'},
           { text: (ed.tax_amount/2).toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,'),border:cellBorder, fontSize: 8 , alignment: 'center'},
-          { text: ed.tax_percent/2 +'%',border:cellBorder, fontSize: 8 , alignment: 'center'},
+          { text: ed.tax_percent/2 ,border:cellBorder, fontSize: 8 , alignment: 'center'},
           { text: (ed.tax_amount/2).toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,'),border:cellBorder, fontSize: 8 , alignment: 'center'},
           { text: ed.total.toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,'), border: [true, true, false, false], fontSize: 8,  alignment: 'right'}]
         },
@@ -929,7 +940,7 @@ getItemsObject() {
     {
     return {
     table: {
-      widths: [11, 130, 57, 35, 32, 40, 30,43,55],
+      widths: [11, 130, 40, 35, 32, 57, 30,43,55],
       body: [
         [
           { text: '#', border: [false, true, true, false],fillColor: '#CCCCCC', fontSize: 10, bold: true , alignment: 'center'},

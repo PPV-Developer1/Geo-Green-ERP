@@ -18,7 +18,8 @@ export class ApprovalComponent implements OnInit {
   selected        = [];
   product_details = [];
   filter_data     = [];
-
+  store_details   = [];
+  store_filter    = [];
   detail_view    : any;
   openModel      : any;
 
@@ -44,6 +45,14 @@ export class ApprovalComponent implements OnInit {
       if(data != null)
       this.filter_data      = [...data];
     }).catch(error => {this.toastrService.error('Something went wrong');});
+
+    await this.api.get('mp_production_view.php?mode=approval_store&authToken='+environment.authToken).then((data: any) =>
+    {
+
+      this.store_details  = data;
+      if(data != null)
+      this.store_filter      = [...data];
+    }).catch(error => {this.toastrService.error('Something went wrong');});
   }
 
   openSm(content)
@@ -64,37 +73,75 @@ export class ApprovalComponent implements OnInit {
   {
     let data = 0;
     this.loading= true;
-    await this.api.post('single_field_update.php?table=production_material&field=id&value='+this.detail_view.id+'&up_field=level&update=3&authToken='+environment.authToken,data).then((data: any) =>
-      {
-        if(data.status == "success")
-          {
-            this.api.post('single_field_update.php?table=production_material&field=id&value='+this.detail_view.id+'&up_field=approved_by&update='+this.uid+'&authToken='+environment.authToken,data).then((data: any) =>
+    if(this.detail_view.type === 1)
+    {
+      await this.api.post('single_field_update.php?table=production_material&field=id&value='+this.detail_view.id+'&up_field=level&update=3&authToken='+environment.authToken,data).then((data: any) =>
+        {
+          if(data.status == "success")
             {
-              if(data.status == "success")
+              this.api.post('single_field_update.php?table=production_material&field=id&value='+this.detail_view.id+'&up_field=approved_by&update='+this.uid+'&authToken='+environment.authToken,data).then((data: any) =>
               {
-                this.loading = false;
-                this.getProductList();
-                this.getProductList();
-                this.openModel.dismiss();
-                this.toastrService.success('Product Approved Succesfully');
-                this.selected = [];
-              }
-              else { this.toastrService.error('Something went wrong : confirm');
-              this.loading = false; }
-            }).catch(error =>
-            {
+                if(data.status == "success")
+                {
+                  this.loading = false;
+                  this.getProductList();
+                  this.getProductList();
+                  this.openModel.dismiss();
+                  this.toastrService.success('Product Approved Succesfully');
+                  this.selected = [];
+                }
+                else { this.toastrService.error('Something went wrong : confirm');
+                this.loading = false; }
+              }).catch(error =>
+              {
+              this.toastrService.error('API Faild : confirm');
+              this.loading = false;
+              });
+            }
+            else { this.toastrService.error('Something went wrong : confirm Stage ');
+            this.loading = false; }
+          return true;
+        }).catch(error =>
+        {
             this.toastrService.error('API Faild : confirm');
             this.loading = false;
-            });
-          }
-          else { this.toastrService.error('Something went wrong : confirm Stage ');
-          this.loading = false; }
-        return true;
-      }).catch(error =>
-      {
-          this.toastrService.error('API Faild : confirm');
-          this.loading = false;
-      });
+        });
+    }
+
+    if(this.detail_view.type === 2)
+    {
+      await this.api.post('single_field_update.php?table=store_production&field=id&value='+this.detail_view.id+'&up_field=level&update=3&authToken='+environment.authToken,data).then((data: any) =>
+        {
+          if(data.status == "success")
+            {
+              this.api.post('single_field_update.php?table=store_production&field=id&value='+this.detail_view.id+'&up_field=approved_by&update='+this.uid+'&authToken='+environment.authToken,data).then((data: any) =>
+              {
+                if(data.status == "success")
+                {
+                  this.loading = false;
+                  this.getProductList();
+                  this.getProductList();
+                  this.openModel.dismiss();
+                  this.toastrService.success('Product Approved Succesfully');
+                  this.selected = [];
+                }
+                else { this.toastrService.error('Something went wrong : confirm');
+                this.loading = false; }
+              }).catch(error =>
+              {
+              this.toastrService.error('API Faild : confirm');
+              this.loading = false;
+              });
+            }
+            else { this.toastrService.error('Something went wrong : confirm Stage ');
+            this.loading = false; }
+          return true;
+        }).catch(error =>
+        {
+            this.toastrService.error('API Faild : confirm');
+            this.loading = false;
+        });
+    }
   }
 
   updateFilter(event)
@@ -107,6 +154,19 @@ export class ApprovalComponent implements OnInit {
         );
       });
       this.product_details = temp;
+      this.table.offset = 0;
+  }
+
+  updateFilterStore(event)
+  {
+
+    const val = event.target.value.toLowerCase();
+      const temp = this.store_filter.filter((d) => {
+        return Object.values(d).some(field =>
+          field != null && field.toString().toLowerCase().indexOf(val) !== -1
+        );
+      });
+      this.store_details = temp;
       this.table.offset = 0;
   }
 }

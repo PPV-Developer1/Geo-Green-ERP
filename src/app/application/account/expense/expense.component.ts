@@ -1,10 +1,12 @@
+import { ToasterComponent } from './../../../pages/tools/toaster/toaster.component';
 import { Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import { environment } from "../../../../environments/environment";
 import { ApiService } from "../../../service/api.service";
 import { ToastrService } from 'ngx-toastr';
 import { FormGroup, FormBuilder, Validators} from '@angular/forms';
-import {formatDate } from '@angular/common';
+import {DatePipe, formatDate } from '@angular/common';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { DatatableComponent } from '@swimlane/ngx-datatable';
 
 
 @Component({
@@ -15,11 +17,13 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 export class ExpenseComponent implements OnInit
 {
   @ViewChild("delete", { static: true }) delete   : ElementRef;
-
+  @ViewChild(DatatableComponent) table: DatatableComponent;
   public user_bank_id = localStorage.getItem('bank_id');
   public user_type    = localStorage.getItem('type');
   public uid          = localStorage.getItem('uid');
-
+   pipe                 = new DatePipe('en-US');
+  public now            = Date.now();
+  public Date           = this.pipe.transform(this.now, 'yyyy-MM-dd');
   today               = new Date();
   todaysDate          = '';
 
@@ -63,7 +67,7 @@ export class ExpenseComponent implements OnInit
   other_expense          =[];
   expense                =[];
   employee_account       =[];
-
+  temp                  =[];
   constructor
   (
     public fb           : FormBuilder,
@@ -107,6 +111,8 @@ export class ExpenseComponent implements OnInit
       {
 
         this.expense_list = data;
+        this.temp = [...data];
+
       }).catch(error => {this.toastrService.error('API Faild : loadData tax'); });
   }
   async balanceLoad()
@@ -125,12 +131,10 @@ export class ExpenseComponent implements OnInit
 
   async loadData()
   {
-    await this.api.get('get_data.php?table=bank&find=status&value=1&authToken=' + environment.authToken).then((data: any) =>
+   await this.api.get('mp_bank_list.php?table=employee&authToken=' + environment.authToken).then((data: any) =>
     {
-      let value = data ;
-      this.feedData(value) ;
-    }).catch(error =>
-      {   this.toastrService.error('API Faild : loadData bank'); });
+        this.feedData(data) ;
+    }).catch(error => { this.toastrService.error('API Faild : loadData bank account ');});
 
     await this.api.get('get_data.php?table=expense_account&find=status&value=1&authToken=' + environment.authToken).then((exp_acc: any) =>
     {
@@ -162,6 +166,16 @@ export class ExpenseComponent implements OnInit
   load_transaction()
   {}
 
+  updateFilter(event) {
+    const val = event.target.value.toLowerCase();
+    const temp = this.temp.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.expense_list = temp;
+    this.table.offset = 0;
+  }
   tax_calculate()
   {
 
@@ -175,9 +189,21 @@ export class ExpenseComponent implements OnInit
 
   feedData(data)
   {
+    console.log("bank data api : ",data)
+    this.bankData = [];
+   for (let i = 0; i<data.length; i++) {
+      console.log("element : ",data[i].mode)
+         if (data[i].type == 1 && data[i].mode == 3)
+        {
+          if (data[i].employee_status ==1 &&  data[i].doj <= this.Date && (data[i].last_working_day >= this.Date || data[i].last_working_day == null || data[i].last_working_day === '') )
+            { this.bankData.push(data[i]); }
+        }
+        else{
+          this.bankData.push(data[i]);
+        }
 
-    this.bankData = data;
-    this.bankData_length = data.length;
+    };
+    this.bankData_length = this.bankData.length;
     let i = 0 ; let j = 0 ; let k = 0; let l = 0; let m = 0; let n=0; let p =0;
     for (i = 0; i<this.bankData_length; i++)
       {
@@ -392,7 +418,7 @@ export class ExpenseComponent implements OnInit
 
   ReqDelete()
   {
-    
+
     this.loading= true;
     this.api.post('mp_transaction_delete.php?id='+this.select_id+'&uid='+this.uid+'&authToken=' + environment.authToken, null).then((data: any) =>
       {

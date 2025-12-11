@@ -63,8 +63,8 @@
                 <div class="col-md-3 "> {{ row.generate_date  | date: 'dd-MM-yyyy'}}  </div>
               </div>
               <div class="row">
-                <div class="col-md-8 ml-2"> {{ row.bill_number}}  </div>
-                <div class="col-md-2 ml-2"> </div>
+                <div class="col-md-12 ">Bill No : {{ row.bill_number}}  </div>
+
               </div>
               </div>
             </ng-template>
@@ -334,6 +334,13 @@
                     </div>
                   </div>
 
+                  <div class="row mb-3">
+                    <label style="color: #e54643"  class="col-sm-2 col-form-label col-form-label-sm">Credit Note Date *</label>
+                        <div class="col-sm-4">
+                          <input type="date" formControlName="note_date"  class="form-control form-control-sm" />
+                          <span class="help-block text-danger" *ngIf="form.get('note_date').touched && form.get('note_date').hasError('required')">Enter Credit Note Date !</span>
+                      </div>
+                  </div>
 
                   <div class="row mb-3">
                     <label class="col-sm-2 col-form-label col-form-label-sm">Message </label>

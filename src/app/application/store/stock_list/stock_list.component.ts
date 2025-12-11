@@ -46,7 +46,7 @@ export class Stock_listComponent implements OnInit {
       quantity      : new FormControl(null, [Validators.required]),
       description   : new FormControl(null),
       item          : new FormControl(null, [Validators.required]),
-      'type'        : new FormControl('store'),
+      'type'        : new FormControl('Store'),
       project_id    : new FormControl(null)
     })
   constructor

@@ -13,20 +13,20 @@ export const routes: Routes = [
   { path: '', redirectTo: 'drag-drop', pathMatch: 'full'},
   { path: 'drag-drop', component: DragDropComponent, data: { breadcrumb: 'Drag and Drop' } },
   { path: 'resizable', component: ResizableComponent, data: { breadcrumb: 'Resizable' } },
-  { path: 'toaster', component: ToasterComponent, data: { breadcrumb: 'Toaster' } }  
+  { path: 'toaster', component: ToasterComponent, data: { breadcrumb: 'Toaster' } }
 ];
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
-    DragulaModule.forRoot(),  
+    DragulaModule.forRoot(),
     ResizableModule,
     NgScrollbarModule,
     RouterModule.forChild(routes)
   ],
   declarations: [
-    ResizableComponent, 
+    ResizableComponent,
     DragDropComponent,
     ToasterComponent
   ]

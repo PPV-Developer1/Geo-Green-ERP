@@ -159,7 +159,12 @@ export class Po_viewComponent implements OnInit {
   taxempty                  : any;
   po_number                 : any;
   total_tax                 : any;
-
+  selected_item             : any;
+  insert_index              : any;
+  popup                     : any;
+  ItemList_temp             : any;
+  item_id                   : any;
+  item_name                 : any;
   today                     = new Date();
   todaysDate                = '';
 
@@ -189,7 +194,8 @@ export class Po_viewComponent implements OnInit {
 
   @ViewChild('tableResponsive', { static: false }) tableResponsive: ElementRef;
   @ViewChild('dropdownPanel', { static: false }) dropdownPanel: ElementRef;
-
+  @ViewChild("ItemListModel", { static: true }) ItemListModel   : ElementRef;
+   @ViewChild('Itemstable', { static: false }) Itemstable: DatatableComponent;
   constructor(
     private api: ApiService,
     private modalService: NgbModal,
@@ -198,6 +204,7 @@ export class Po_viewComponent implements OnInit {
     router:Router,
     public fb: FormBuilder,
     private renderer: Renderer2,
+
     private _state       : AppState) { this.router = router;
 
   this.Edit_po = fb.group(
@@ -209,8 +216,8 @@ export class Po_viewComponent implements OnInit {
       poNo      : [null, Validators.compose([Validators.required])],
       reference_number: [null],
       billDate  : [(new Date()).toISOString().substring(0, 10)],
-      paymentTerms: ['', Validators.compose([Validators.required])],
-      dueDate   : [(new Date()).toISOString().substring(0, 10)],
+      paymentTerms: [null],
+      dueDate   : [null],
       subTotal  : [0],
       shippingCharge: [0],
       TCS       : [0],
@@ -415,6 +422,8 @@ export class Po_viewComponent implements OnInit {
       reader.readAsDataURL(image);
     }
   }
+
+
   loadonce()
   {
 
@@ -437,6 +446,7 @@ export class Po_viewComponent implements OnInit {
        this.toastrService.error('Something went wrong');
       });
   }
+
   async LoadVendorBills()
   {
     await this.api.get('mp_po_bill.php?&authToken=' + environment.authToken).then((data: any) =>
@@ -506,20 +516,26 @@ onSelect({ selected }) {
   this.selected.push(...selected);
   this.show_edit_btn=true;
 }
+
 editbill()
 {
   this.show_po_edit = true;
   this.show         = false;
   this.edit_dataload();
   this.LoadItemDetails();
+
 }
-async LoadItemDetails()
-{
-  await this.api.get('get_data.php?table=item&find=purchase&value=1&authToken=' + environment.authToken).then((data: any) =>
+
+  async LoadItemDetails()
   {
-    this.ItemList = data;
-  }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
-}
+     await this.api.get('mp_item_list.php?&authToken=' + environment.authToken).then((data: any) =>
+    {
+      console.log("item : ",data)
+      this.ItemList = data.filter(i => i.purchase ==1);
+      this.ItemList_temp = [...data.filter(i => i.purchase ==1)]
+      console.log("Filter : ",this.ItemList)
+    }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
+  }
 
 async edit_dataload()
 {
@@ -555,6 +571,7 @@ async edit_dataload()
      }
      this.load_invoicenumber( this.po_item);
      this.load_invoicenumber( this.po_item);
+     this.vendor_address(this.po_list.vendor_id);
 }
 
 clone_address(id)
@@ -659,6 +676,7 @@ async FetchAddress(data)
   {
     let product = this.Edit_po.get('product') as FormArray;
     product.push(this.fb.group({
+       item_name  : new  FormControl(null),
       type        :"new",
       id          : new FormControl(''),
       items       : new FormControl('', Validators.required),
@@ -759,6 +777,7 @@ load_editpage()
       amount      : [item.total],
       discount_1  : [item.discount_1],
       discount_2  : [item.discount_2],
+      item_name   : [item.item_name],
     }));
 
      let qty   = item.qty;
@@ -792,7 +811,8 @@ async edit_specItem(item,j)
       this.quantity  = 1;
       this.amount    = data[0].price;
       this.descriptions = data[0].description;
-
+      this.item_id    = item;
+      this.item_name = data[0].name;
     }).catch(error => { this.toastrService.error('Something went wrong 5'); });
     const formData = {
       taxes: item,
@@ -800,6 +820,9 @@ async edit_specItem(item,j)
     this.edit_patchValues(item,j);
     this.edit_SubTotalChange();
     this.edit_GSTCalculation();
+     this.LoadItemDetails();
+    this.selected_item = null;
+    this.popup.close();
   }
 
   edit_patchValues(id,j)
@@ -814,6 +837,8 @@ async edit_specItem(item,j)
       descriptions : this.descriptions,
       discount_1   :0,
       discount_2   :0,
+      items       : this.item_id,
+      item_name    : this.item_name
     });
   }
 
@@ -1990,15 +2015,32 @@ async onSubmit(bill_data)
    }
  }
 
+  e_way_bill_status:boolean = false;
+
   e_bill()
   {
+    this.e_way_bill_status = true;
     this.new_category_id = this.modalService.open(this.ewayBill, { size: 'md' });
     this.api.get('get_data.php?table=po&find=po_id&value='+this.po_id+'&authToken=' + environment.authToken).then((data: any) => {
 
       this.e_way_bill.controls['scope'].setValue(data[0].scope);
       this.e_way_bill.controls['shipment_mode'].setValue(data[0].transport_mode);
+      if(data[0].e_way_bill == null && data[0].vehicle_number == null&& data[0].transport_mode == null && data[0].transport_charge == null)
+        {
+          this.e_way_bill_status = false;
+        }
      }).catch(error => { this.toastrService.error('Something went wrong'); });
   }
+
+  ewayEdit()
+{
+  this.e_way_bill_status = false;
+}
+
+editclose()
+{
+  this.e_way_bill_status = true;
+}
 
   async billSubmit(value)
   {
@@ -2123,6 +2165,11 @@ async onSubmit(bill_data)
       control.markAsTouched({ onlySelf: true });
     });
     this.Edit_po.value.prefix ="bill"
+
+    this.Edit_po.get('paymentTerms')?.setValidators([Validators.required]);
+    this.Edit_po.get('paymentTerms')?.updateValueAndValidity();
+    this.Edit_po.get('dueDate')?.setValidators([Validators.required]);
+    this.Edit_po.get('dueDate')?.updateValueAndValidity();
     this.Edit_po.get('prefix')?.clearValidators();
     this.Edit_po.get('prefix')?.updateValueAndValidity();
     this.Edit_po.get('deliverytype')?.clearValidators();
@@ -2155,6 +2202,7 @@ async onSubmit(bill_data)
                         return;
                       }
            bill.po_number = this.po_list.po_number
+           bill.type      = "Company"
              this.loading = true;
               await this.api.post('mp_po_to_bill.php?po_id='+this.po_id+'&authToken=' + environment.authToken, bill).then((data: any) =>
               {
@@ -2185,15 +2233,15 @@ async onSubmit(bill_data)
      }
    }
 
-  vendor_address(id)
+ async vendor_address(id)
   {
-    this.api.get('get_data.php?table=vendor_address&find=vendor_id&value=' + id + '&find1=type&value1=1&authToken=' + environment.authToken).then((data: any) => {
-
+   await this.api.get('get_data.php?table=vendor_address&find=vendor_id&value=' + id + '&find1=type&value1=1&authToken=' + environment.authToken).then((data: any) => {
+        console.log("address 1 ",data)
         this.alldata = data;
     }).catch(error => { this.toastrService.error('Something went wrong 1'); });
 
-    this.api.get('get_data.php?table=vendor_address&find=vendor_id&value=' + id + '&find1=type&value1=2&authToken=' + environment.authToken).then((data: any) => {
-
+  await this.api.get('get_data.php?table=vendor_address&find=vendor_id&value=' + id + '&find1=type&value1=2&authToken=' + environment.authToken).then((data: any) => {
+        console.log("address 2",data)
       this.alldata1 = data;
   }).catch(error => { this.toastrService.error('Something went wrong 2'); });
 
@@ -2201,7 +2249,12 @@ async onSubmit(bill_data)
 
   ReloadBillAddr(id)
   {
-
+     const confirmed = confirm("Are you sure you want to update this address?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
+    console.log("address 1 ",this.alldata)
     this.api.get('get_data.php?table=vendor_address&find=vendor_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
       this.bill_addr = data[0];
 
@@ -2217,8 +2270,13 @@ async onSubmit(bill_data)
   }
 
   ReloadShippAddr(id) {
-
-    this.api.get('get_data.php?table=vendor_address&find=vendor_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
+     const confirmed = confirm("Are you sure you want to update this address?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
+      console.log("address 2 ",this.alldata1)
+     this.api.get('get_data.php?table=vendor_address&find=vendor_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
       this.shipp_addr = data[0];
 
       this.shipFrom = this.shipp_addr.vendor_addr_id;
@@ -2431,4 +2489,49 @@ feedData(data)
      }
   }
 
+  ItemSelect(event)
+  {
+    if(event.type == "click")
+    {
+         console.log("",event.row)
+         this.selected_item  = event.row
+    }
+
+  }
+
+ async ItemInsert()
+  {
+    console.log("selected_item", this.selected_item)
+    console.log("selected_item", this.insert_index)
+    const confirmed = confirm("Are you sure you want to add this item?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
+      await this.edit_specItem(this.selected_item.item_id,this.insert_index)
+  }
+
+  Item_popUp(i)
+  {
+    this.insert_index = i
+    console.log(i)
+    console.log("item list : ",this.ItemList)
+    this.popup = this.modalService.open(this.ItemListModel, { size: 'xl' });
+  }
+
+  updateFilter_item(event)
+  {
+    const val = event.target.value.toLowerCase();
+    const temp = this.ItemList_temp.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.ItemList = temp;
+
+    if (this.Itemstable) {
+      this.Itemstable.offset = 0;
+    }
+
+  }
 }

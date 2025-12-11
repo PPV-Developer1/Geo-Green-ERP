@@ -344,6 +344,7 @@ month: any;
           {
             var name = this.employee.find(t=>t.emp_id == this.SalaryList[i]['emp_id']);
             data[i]['employee_name'] = name.name
+            data[i]['emp_type']  = name.emp_type
             this.temp =[...data];
           }
       }
@@ -360,7 +361,7 @@ month: any;
     this.salary_credit = false;
     this.advance = false;
   }
-
+  Employee_type : any
   async onActivate(event)
   {
     if(event.type === "click" || event.type === "dblclick")
@@ -368,9 +369,10 @@ month: any;
 
       if(this.user_type === "super_admin")
       {
+        console.log(event.row)
         this.payroll_amount.controls['emp_id'].setValue(event.row.emp_id);
         this.payroll_amount.controls['attendance_id'].setValue(event.row.id);
-
+        this.Employee_type = event.row.emp_type
         this.payment_data(event.row.id);
         this.load_salary(event.row.emp_id);
 
@@ -426,6 +428,7 @@ month: any;
       if(data != null)
       {
         this.payment = data[0];
+        console.log(data[0])
         this.status = true;
       }
       else
@@ -471,8 +474,10 @@ salaryCalculate()
         this.cl_available   = data[0].com_off;
 
         this.pay_roll_data = this.salary_details;
-
-          this.plUseValue =0;
+        this.employee_type = data[0]['emp_type']
+        console.log("employee type",this.employee_type )
+        console.log(data[0])
+        this.plUseValue =0;
 
         this.clUseValue       = 0;
         this.total_days       = 0;

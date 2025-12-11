@@ -7,6 +7,7 @@ import { DirectivesModule } from '../../../theme/directives/directives.module';
 import { Purchase_requestComponent } from './purchase_request.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { INRModule } from 'src/app/pipe/INR/INR.module';
 
 type PathMatch = "full" | "prefix" | undefined;
 export const routes = [
@@ -22,7 +23,8 @@ export const routes = [
     DirectivesModule,
     RouterModule.forChild(routes),
     ReactiveFormsModule,
-    NgSelectModule
+    NgSelectModule,
+    INRModule
   ],
   declarations: [Purchase_requestComponent]
 })

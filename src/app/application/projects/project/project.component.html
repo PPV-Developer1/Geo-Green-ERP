@@ -337,7 +337,7 @@
 
         <ngx-datatable-column     [resizeable]="false" prop="value" [flexGrow]="1" name="QUANTITY">
           <ng-template ngx-datatable-cell-template let-row="row">
-            {{row.value}}
+            {{row.value}} {{row.uom}}
           </ng-template>
         </ngx-datatable-column>
 
@@ -405,7 +405,7 @@
 
         <ngx-datatable-column     [resizeable]="false" prop="value" [flexGrow]="1" name="QUANTITY">
           <ng-template ngx-datatable-cell-template let-row="row">
-            {{row.value}}
+            {{row.value}} {{row.uom}}
           </ng-template>
         </ngx-datatable-column>
 

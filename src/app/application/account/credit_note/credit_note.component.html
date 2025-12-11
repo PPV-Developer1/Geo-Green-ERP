@@ -136,7 +136,7 @@
             <form class="mt-3" [formGroup]="DebitNoteForm">
 
               <div class="col" >
-                  <div class="row mb-1"  *ngIf="type =='vendor'">
+                  <div class="row mb-1"  *ngIf="type =='vendor' ">
                      <label style="color: red" class="col-sm-2 mt-2 col-form-label col-form-label-sm">Vendor *</label>
                       <div class="col-sm-7 mb-5">
                         <ng-select formControlName="vendor_id"  class=" form-control " (change)="Selection($event)"
@@ -167,7 +167,7 @@
               </div>
 
               <div class="col">
-                <div class="row mb-1"  *ngIf="type =='vendor'">
+                <div class="row mb-1"  *ngIf="type =='vendor' && customer_id != null">
 
 
                   <label style="color: red" class="col-sm-2 mt-2 col-form-label col-form-label-sm">Bill *</label>
@@ -186,7 +186,7 @@
                   </div>
                 </div>
 
-                <div class="row mb-1" *ngIf="type =='customer'" >
+                <div class="row mb-1" *ngIf="type =='customer' && customer_id != null" >
                   <label style="color: red" class="col-sm-2 mt-2 col-form-label col-form-label-sm">Invoice *</label>
                   <div class="col-sm-7 mb-5">
 
@@ -258,6 +258,7 @@
                     </div>
                   </div>
 
+
                   <div class="row mb-3">
                     <label style="color: #e54643"  class="col-sm-2 col-form-label col-form-label-sm">Credit Note Number *</label>
                         <div class="col-sm-2">
@@ -270,6 +271,13 @@
                     </div>
                   </div>
 
+                  <div class="row mb-3">
+                    <label style="color: #e54643"  class="col-sm-2 col-form-label col-form-label-sm">Credit Note Date *</label>
+                        <div class="col-sm-4">
+                          <input type="date" formControlName="note_date"  class="form-control form-control-sm" />
+                          <span class="help-block text-danger" *ngIf="DebitNoteForm.get('note_date').touched && DebitNoteForm.get('note_date').hasError('required')">Enter Credit Note Date !</span>
+                      </div>
+                  </div>
 
                   <div class="row mb-3">
                     <label class="col-sm-2 col-form-label col-form-label-sm">Message </label>

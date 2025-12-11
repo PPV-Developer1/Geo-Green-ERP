@@ -965,8 +965,18 @@
           </div>
 
           <div class="col-md-1" style="padding-top: 20PX;">
-            <label></label>
-            <button *ngIf="id !='tds_tcs'"  class="btn btn-main form-control"  class="btn btn-success fa fa-download  pull-right" type="submit" (click)="print_balan()" > Download</button>
+            <!-- <label></label>
+            <button *ngIf="id !='tds_tcs'"  class="btn btn-main form-control"  class="btn btn-success fa fa-download  pull-right" type="submit" (click)="print_balan()" > Download</button> -->
+
+             <div class="btn-group" *ngIf="id !='tds_tcs'" role="group" aria-label="Basic example">
+                  <button class="btn btn-success fa fa-download dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Download
+                </button>
+                <div class="dropdown-menu">
+                    <a  class="dropdown-item" href="javascript:void(0);" (click)="print_balan()">Xlsx</a>
+                    <a  class="dropdown-item" href="javascript:void(0);"  (click)="pdf()">PDF</a>
+                </div>
+              </div>
           </div>
         </form>
       </div>

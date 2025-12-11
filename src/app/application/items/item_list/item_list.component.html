@@ -1,3 +1,115 @@
+
+
+
+
+<div *ngIf="detail_view ">
+
+            <div class="row">
+                  <div class="col-10" >
+                      <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero()"> Back</button>
+                  </div>
+                  <div  class="col-2" style="text-align: right; margin-bottom:10px;">
+                      <button type="button" class="btn btn-primary fa fa-edit" (click)="Edit()"> Edit Item</button>
+                  </div>
+            </div>
+ <div  widget class="card">
+
+            <div class="card-header">
+              <span>ITEM DATA</span>
+            </div>
+            <div class="card-body widget-body">
+
+              <div class="row">
+                <table class="table col-md-6">
+                  <tbody>
+                    <tr>
+                      <th>Item ID</th>
+                      <td>{{detail_view.item_id}}</td>
+                    </tr>
+
+                    <tr>
+                      <th>Item Name</th>
+                      <td>{{detail_view.item_name}}</td>
+                    </tr>
+                     <tr>
+                      <th>Category</th>
+                      <td>{{detail_view.item_cat}}</td>
+                    </tr>
+                    <tr>
+                      <th>Rate</th>
+                      <td>{{detail_view.price}}</td>
+                    </tr>
+
+                     <tr>
+                      <th>Uom</th>
+                      <td>{{detail_view.uom}}</td>
+                    </tr>
+                      <tr>
+                      <th>Item Tax</th>
+                      <td>{{detail_view.tax_percent}}</td>
+                    </tr>
+
+                    <tr>
+                      <th>Item Description</th>
+                      <td>{{detail_view.description}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <table class="table col-md-6">
+                  <tbody>
+                    <tr>
+                      <th>Item HSN/SAC</th>
+                      <td>{{detail_view.hsnsac}}</td>
+                    </tr>
+                     <tr>
+                      <th>Item Type</th>
+                      <td>
+                         <span *ngIf="detail_view.item_type == 1">Raw Material</span>
+                          <span *ngIf="detail_view.item_type == 2">Product</span>
+                           <span *ngIf="detail_view.item_type == 3">Service</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                      <th>Minimum Stock</th>
+                      <td>{{detail_view.minimum_stock}}</td>
+                    </tr>
+                    <tr>
+                        <th>Minimum Stock Status</th>
+                        <td>
+                          <span *ngIf="detail_view.minimum_stock_status == 1" style="color:green">Enabled</span>
+                          <span *ngIf="detail_view.minimum_stock_status == 0" style="color:red">Disabled</span>
+                        </td>
+                    </tr>
+                    <tr>
+                      <th>Purchase Status</th>
+                      <td>
+                        <span *ngIf="detail_view.purchase == 1"  style="color:green">Enabled</span>
+                        <span *ngIf="detail_view.purchase == 0"  style="color:red">Disabled</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>Sales Status</th>
+                      <td>
+                        <span *ngIf="detail_view.sales == 1"  style="color:green">Enabled</span>
+                        <span *ngIf="detail_view.sales == 0"  style="color:red">Disabled</span>
+                      </td>
+                      </tr>
+                      <tr>
+                      <th>Item Status</th>
+                      <td>
+                        <span  *ngIf="detail_view.status == 1"  style="color:green">Active</span>
+                        <span *ngIf="detail_view.status == 0"  style="color:red">Inactive</span>
+                      </td>
+
+                  </tbody>
+                </table>
+              </div>
+          </div>
+</div>
+</div>
+
+
 <div>
   <div class="col-md-12">
     <table>
@@ -77,11 +189,11 @@
             {{row.price|indianCurrency}}
           </ng-template>
         </ngx-datatable-column>
-        <ngx-datatable-column     [resizeable]="false" prop="uom"  name="UOM" [flexGrow]="1">
+        <!-- <ngx-datatable-column     [resizeable]="false" prop="uom"  name="UOM" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.uom}}
           </ng-template>
-        </ngx-datatable-column>
+        </ngx-datatable-column> -->
 
         <ngx-datatable-column     [resizeable]="false" prop="tax_percent" name="TAX %"  [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
@@ -201,6 +313,21 @@
         <span class="help-block text-danger" *ngIf="NewItem.get('description').touched && NewItem.get('description').hasError('minlength')">Minimum 5 Letters</span>
       </div>
 
+
+      <div *ngIf="minimum_stock_status" class="form-group col-md-12">
+        <label for="name">Minimum Stock</label>
+        <input formControlName="minimum_stock"  type="number" class="form-control" placeholder="Enter Minimum Stock">
+         <span class="help-block text-danger" *ngIf="NewItem.get('minimum_stock').touched && NewItem.get('minimum_stock').hasError('required')">Required !</span>
+      </div>
+
+      <div class="col-md-1"></div>
+      <div class="custom-control custom-switch col-md-11">
+        <input type="checkbox" formControlName="minimum_stock_status" (change)="select($event)" class="custom-control-input" id="customSwitch5" />
+        <label class="custom-control-label" for="customSwitch5">Minimum Stock Status</label>
+      </div>
+
+
+
       <div class="col-md-1"></div>
       <div class="custom-control custom-switch col-md-11">
         <input type="checkbox" formControlName="purchase" class="custom-control-input" id="customSwitch3" />
@@ -218,6 +345,8 @@
         <input type="checkbox" formControlName="status" class="custom-control-input" id="customSwitch2" />
         <label class="custom-control-label" for="customSwitch2">Status</label>
       </div>
+
+
       <div class="col-md-7">
       <button [disabled]="loading" class="btn btn-primary pull-right" type="submit" >Submit <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
     </div>
@@ -295,6 +424,20 @@
         <input formControlName="description"  type="text" class="form-control" placeholder="Enter Description">
       </div>
 
+
+
+      <div *ngIf="minimum_stock_edit_status" class="form-group col-md-12">
+        <label for="name">Minimum Stock</label>
+        <input formControlName="minimum_stock"  type="number" class="form-control" placeholder="Enter Minimum Stock">
+         <span class="help-block text-danger" *ngIf="NewItem.get('minimum_stock').touched && NewItem.get('minimum_stock').hasError('required')">Required !</span>
+      </div>
+
+      <div class="col-md-1"></div>
+      <div class="custom-control custom-switch col-md-11">
+        <input type="checkbox" formControlName="minimum_stock_status" (change)="Edit_minimum($event)" class="custom-control-input" id="customSwitch5" />
+        <label class="custom-control-label" for="customSwitch5">Minimum Stock Status</label>
+      </div>
+
       <div class="col-md-1"></div>
       <div class="custom-control custom-switch col-md-11">
         <input type="checkbox" formControlName="purchase" class="custom-control-input" id="customSwitch3" />
@@ -306,6 +449,7 @@
         <input type="checkbox" formControlName="sale" class="custom-control-input" id="customSwitch4" />
         <label class="custom-control-label" for="customSwitch4">Sales</label>
       </div>
+
 
       <div class="col-md-1"></div>
       <div class="custom-control custom-switch col-md-11">

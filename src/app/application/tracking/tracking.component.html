@@ -423,8 +423,6 @@
                     <td>{{byproduct_details.byproduct_description}}</td>
                   </tr>
 
-
-
               </tbody>
             </table>
             <table class="table col-md-6">
@@ -477,13 +475,15 @@
 
       <ngx-datatable-column     [resizeable]="false"  prop="qty"  [flexGrow]="1" name="QUANTITY">
           <ng-template ngx-datatable-cell-template let-row="row">
-          {{row.qty}} {{row.uom}}
+          <span *ngIf="product_type == 2">{{row.qty*product_percentage | number : '1.0-2'}} {{row.uom}}</span>
+                     <span *ngIf="product_type == 1"> {{row.qty }} {{row.uom}}</span>
           </ng-template>
       </ngx-datatable-column>
 
       <ngx-datatable-column     [resizeable]="false"  prop="total" [flexGrow]="1"  name="AMOUNT">
         <ng-template ngx-datatable-cell-template let-row="row">
-        {{row.store_amount * row.qty | indianCurrency}}
+       <span *ngIf="product_type == 2"> {{row.total*product_percentage | indianCurrency}}</span>
+        <span *ngIf="product_type == 1"> {{row.total | indianCurrency}}</span>
         </ng-template>
     </ngx-datatable-column>
     </ngx-datatable>
@@ -536,16 +536,24 @@
               <tbody>
                     <tr>
                       <th>Item Rate</th>
-                      <td>{{product_details.store_amount| indianCurrency}}</td>
+                      <td>
+                         <span *ngIf="product_type == 2">{{product_details.store_amount*product_percentage| indianCurrency}}</span>
+                          <span *ngIf="product_type == 1">{{product_details.store_amount| indianCurrency}}</span>
+                        </td>
                   </tr>
 
                   <tr>
                     <th>Quantity</th>
-                    <td>{{product_details.qty}} {{product_details.uom}}</td>
+                    <td>
+                      <span *ngIf="product_type == 2">{{product_details.qty*product_percentage}} {{product_details.uom}}</span>
+                     <span *ngIf="product_type == 1"> {{product_details.qty }} {{product_details.uom}}</span> </td>
                   </tr>
                   <tr>
                     <th>Total </th>
-                    <td>{{product_details.store_amount*product_details.qty | indianCurrency}}</td>
+                    <td>
+                       <span *ngIf="product_type == 2"> {{product_details.store_amount*product_percentage*product_details.qty | indianCurrency}}</span>
+                        <span *ngIf="product_type == 1"> {{product_details.store_amount*product_details.qty | indianCurrency}}</span>
+                    </td>
                   </tr>
                   <tr>
                     <th>Vendor </th>

@@ -87,7 +87,7 @@ export class DashboardComponent implements OnInit  {
       }).catch();
 
       this.chartData();
-      this.chart_disp = 1; 
+      this.chart_disp = 1;
     }
 
 
@@ -299,5 +299,10 @@ export class DashboardComponent implements OnInit  {
 
    }
 
+   page_routing(page)
+   {
+    console.log(page);
+       this.router.navigate([`/${page}`]);
+   }
 }
 

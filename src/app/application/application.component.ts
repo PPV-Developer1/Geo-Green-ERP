@@ -51,7 +51,8 @@ export class ApplicationComponent implements AfterViewInit
           }
         }
       });
-        this.service_end()
+        // this.service_end()
+        
       //  const popupShown = localStorage.getItem('serviceEndNoticeShown');
       //   // if (!popupShown) {
       //       const modalRef = this.modalService.open(Service_endComponent, {

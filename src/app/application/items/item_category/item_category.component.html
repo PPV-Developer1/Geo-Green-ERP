@@ -1,3 +1,70 @@
+
+
+<div *ngIf="detail_view ">
+
+            <div class="row">
+                  <div class="col-10" >
+                      <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero()"> Back</button>
+                  </div>
+                  <div  class="col-2" style="text-align: right; margin-bottom:10px;">
+                      <button type="button" class="btn btn-primary fa fa-edit" (click)="Edit()"> Edit Item</button>
+                  </div>
+            </div>
+ <div  widget class="card">
+
+            <div class="card-header">
+              <span>ITEM DATA</span>
+            </div>
+            <div class="card-body widget-body">
+
+              <div class="row">
+                <table class="table col-md-6">
+                  <tbody>
+                    <tr>
+                      <th>Name</th>
+                      <td>{{detail_view.title}}</td>
+                    </tr>
+
+                    <tr>
+                      <th>Have Serial Number</th>
+                      <td>
+                         <span  *ngIf="detail_view.have_seriel_number == 1"  style="color:green">Enabled</span>
+                          <span  *ngIf="detail_view.have_seriel_number == 0"  style="color:red">Disabled</span>
+                      </td>
+                    </tr>
+
+                     <tr>
+                      <th>Jobwork Material</th>
+                        <td>
+                          <span  *ngIf="detail_view.jobworkmaterial == 1"  style="color:green">Enabled</span>
+                          <span  *ngIf="detail_view.jobworkmaterial == 0"  style="color:red">Disabled</span>
+                        </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <table class="table col-md-6">
+                  <tbody>
+                    <tr>
+                      <th>Type </th>
+                      <td>{{detail_view.type}}</td>
+                    </tr>
+                    <tr>
+                      <th>Status</th>
+                      <td>
+                        <span  *ngIf="detail_view.status == 1"  style="color:green">Active</span>
+                        <span *ngIf="detail_view.status == 0"  style="color:red">Inactive</span>
+                      </td>
+                      <tr>
+                        <th>&nbsp;</th>
+                        <td>&nbsp;</td>
+                      </tr>
+                  </tbody>
+                </table>
+              </div>
+          </div>
+      </div>
+</div>
+
 <div>
   <div class="col-md-12">
     <table>
