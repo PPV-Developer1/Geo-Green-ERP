@@ -6,6 +6,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { formatDate } from '@angular/common';
 import { DatePipe } from '@angular/common';
 
+
 @Component({
   selector     : 'az-payment_transfer',
   templateUrl  : './payment_transfer.component.html',
@@ -66,38 +67,43 @@ export class Payment_transferComponent implements OnInit
   }
   async loadData()
   {
-    await this.api.get('get_data.php?table=bank&authToken=' + environment.authToken).then((data: any) =>
+    await this.api.get('get_data.php?table=bank&authToken=' + environment.authToken).then(async (data: any) =>
     {
-      // this.feedData(data) ;
+      // await this.feedData(data) ;
     }).catch(error => { });
 
-    await this.api.get('mp_bank_list.php?table=employee&authToken=' + environment.authToken).then((data: any) =>
+    await this.api.get('mp_bank_list.php?table=employee&authToken=' + environment.authToken).then(async (data: any) =>
     {
-        this.feedData(data) ;
+      await  this.feedData(data) ;
     }).catch(error => { });
   }
 
-  feedData(data)
+ async feedData(data)
   {
     console.log("bank data api : ",data)
     this.bankData = [];
    for (let i = 0; i<data.length; i++) {
-      console.log("element : ",data[i].mode)
+      console.log("element : ",data[i])
+       console.log("type : ",data[i].type)
          if (data[i].type == 1 && data[i].mode == 3)
         {
 
           if (data[i].employee_status ==1 &&  data[i].doj <= this.Date && (data[i].last_working_day >= this.Date || data[i].last_working_day == null || data[i].last_working_day === '') )
-            { this.bankData.push(data[i]); }
+            {
+              this.bankData.push(data[i]);
+            }
         }
-
         else{
           this.bankData.push(data[i]);
         }
 
     };
+
+     console.log("bank data : ",this.bankData)
+   
     // this.bankData        = data;
-    this.bankData_length = this.bankData_length.length;
-    console.log("bank data : ",this.bankData)
+    this.bankData_length = this.bankData.length;
+
     let j = 0 ; let k = 0; let l = 0; let m = 0; let n=0; let p=0
     for (let i = 0; i<=this.bankData.length; i++)
       {
