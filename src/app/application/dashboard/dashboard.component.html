@@ -1,6 +1,6 @@
 <div *ngIf="this.user_type == 'super_admin'" class="row">
 
-  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30">
+  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30" (click)="page_routing('app/sales/invoice')" >
     <div class="card small-info-box rounded">
       <div class="media">
         <span class="media-left">
@@ -14,7 +14,7 @@
     </div>
   </div>
 
-  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30">
+  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30" (click)="page_routing('app/purchase/bills')" >
     <div class="card small-info-box rounded">
       <div class="media">
         <span class="media-left">
@@ -28,7 +28,7 @@
     </div>
   </div>
 
-  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30">
+  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30" (click)="page_routing('app/projects/project')">
     <div class="card small-info-box rounded">
       <div class="media">
         <span class="media-left">
@@ -42,7 +42,7 @@
     </div>
   </div>
 
-  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30">
+  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30" (click)="page_routing('app/store/dispatch')">
     <div class="card small-info-box rounded">
       <div class="media">
         <span class="media-left">
@@ -56,7 +56,7 @@
     </div>
   </div>
 
-  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30">
+  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30" (click)="page_routing('app/sales/customer')">
     <div class="card small-info-box rounded">
       <div class="media">
         <span class="media-left">
@@ -70,7 +70,7 @@
     </div>
   </div>
 
-  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30">
+  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30" (click)="page_routing('app/purchase/vendor')">
     <div class="card small-info-box rounded">
       <div class="media">
         <span class="media-left">
@@ -85,7 +85,7 @@
   </div>
 </div>
 
-<div *ngIf="this.user_type != 'super_admin'" class="row">
+<div *ngIf="this.user_type != 'super_admin'" class="row"    >
   <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30">
     <div class="card small-info-box rounded">
       <div class="media">
@@ -100,7 +100,7 @@
     </div>
   </div>
 
-  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30">
+  <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 bottom-30" >
     <div class="card small-info-box rounded">
       <div class="media">
         <span class="media-left">
@@ -118,7 +118,7 @@
 
 <div *ngIf="this.user_type == 'super_admin'" class="row">
 
-  <div class="col-xl-3 col-lg-6 col-md-6 bottom-30">
+  <div class="col-xl-3 col-lg-6 col-md-6 bottom-30"  (click)="page_routing('app/accounts/payment_received')">
     <div class="card card-primary text-center info-box rounded">
       <div class="card-body">
         <div class="row">
@@ -136,7 +136,7 @@
     </div>
   </div>
 
-  <div class="col-xl-3 col-lg-6 col-md-6 bottom-30">
+  <div class="col-xl-3 col-lg-6 col-md-6 bottom-30"   (click)="page_routing('app/accounts/payment_made')">
      <div class="card card-danger text-center info-box rounded">
       <div class="card-body">
         <div class="row">
@@ -153,7 +153,7 @@
       </div>
     </div>
   </div>
-  <div class="col-xl-3 col-lg-6 col-md-6 bottom-30">
+  <div class="col-xl-3 col-lg-6 col-md-6 bottom-30"  (click)="page_routing('app/store/stock_list')">
     <div class="card card-warning text-center info-box rounded">
      <div class="card-body">
        <div class="row">
@@ -170,7 +170,7 @@
      </div>
    </div>
  </div>
- <div class="col-xl-3 col-lg-6 col-md-6 bottom-30">
+ <div class="col-xl-3 col-lg-6 col-md-6 bottom-30 "  (click)="page_routing('app//accounts/bank')">
   <div class="card card-success text-center info-box rounded">
    <div class="card-body">
      <div class="row">

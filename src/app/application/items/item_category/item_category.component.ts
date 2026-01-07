@@ -15,7 +15,7 @@ export class Item_categoryComponent implements OnInit {
 
   rows               = [];
   temp               = [];
-  detail_view        = [];
+  detail_view        : any;
   selected           = [];
   category_list      = [];
   category_filter    = [];
@@ -92,42 +92,62 @@ export class Item_categoryComponent implements OnInit {
     if(event.type === "click")
     {
       this.detail_view = event.row;
+
+    }
+  }
+
+  set_zero()
+  {
+    this.detail_view = null;
+  }
+
+  Edit()
+  {
       this.EditCategory.controls['name'].setValue(this.detail_view['title']);
       this.EditCategory.controls['type'].setValue(this.detail_view['type']);
       this.EditCategory.controls['HaveSerialNumber'].setValue(this.detail_view['have_seriel_number']);
       this.EditCategory.controls['JobworkMaterial'].setValue(this.detail_view['jobworkmaterial']);
       this.EditCategory.controls['status'].setValue(this.detail_view['status']);
       this.OpenCatEdit();
-    }
   }
 
   async EditSubmit(data)
   {
-    const confirmed = confirm(" Are you sure you want to update these changes?");
+
+      Object.keys(this.EditCategory.controls).forEach(field =>
+      {
+        const control = this.EditCategory.get(field);
+        control.markAsTouched({ onlySelf: true });
+      });
+    if(this.EditCategory.valid)
+    {
+      const confirmed = confirm(" Are you sure you want to update these changes?");
           console.log(confirmed)
           if (!confirmed) {
             return;
           }
-    this.loading = true;
-    await this.api.post('post_update_data.php?table=item_category&field=cat_id&value='+this.detail_view['cat_id']+'&authToken=' + environment.authToken, this.EditCategory.value).then((data: any) =>
-      {
-        if(data.status == "success")
-          {
-            this.loading = false;
-            this.toastrService.success('Item Category Updated Succesfully');
-            this.load_item();
-            this.update_categogy_id.close();
-          }
-        else
-        { this.toastrService.error(data.status);
-          this.loading = false;}
+      this.loading = true;
+      await this.api.post('post_update_data.php?table=item_category&field=cat_id&value='+this.detail_view['cat_id']+'&authToken=' + environment.authToken, this.EditCategory.value).then((data: any) =>
+        {
+          if(data.status == "success")
+            {
+              this.loading = false;
+              this.toastrService.success('Item Category Updated Succesfully');
+              this.load_item();
+              this.update_categogy_id.close();
+            }
+          else
+          { this.toastrService.error(data.status);
+            this.loading = false;}
 
-        return true;
-      }).catch(error =>
-      {
-          this.toastrService.error('API Faild : Item Category Update');
-          this.loading = false;
-      });
+          return true;
+        }).catch(error =>
+        {
+            this.toastrService.error('API Faild : Item Category Update');
+            this.loading = false;
+        });
+    }
+    else{}
   }
 
   async AddSubmit(data)

@@ -8,10 +8,8 @@ import { FormControl, FormGroup,FormBuilder, FormArray, Validators, AbstractCont
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { ImgToBase64Service } from "src/app/service/img-to-base64.service";
-import { IndianCurrency } from 'src/app/pipe/INR/indianCurrency.pipe';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { formatDate } from '@angular/common';
-import { isNull } from 'util';
 import {   HostListener } from '@angular/core';
 import { NumtowordPipe } from 'src/app/pipe/WORD/numtoword.pipe';
 import { AppState } from 'src/app/app.state';
@@ -155,11 +153,18 @@ export class BillviewComponent implements OnInit {
   originalTableHeight       : any;
   item_DeleteId             : any;
   item_index                : any;
-
+ selected_item            : any;
+  insert_index             : any;
+  popup                    : any;
+  ItemList_temp            : any;
+  item_id                  : any;
+  item_name                : any;
   clone_bill             : FormGroup;
   bill_payment           : FormGroup;
   e_way_bill             : FormGroup;
   advance                : FormGroup;
+  File_place             : FormGroup;
+
   private startX: number = 0;
   private startWidth: number = 0;
   private columnIndex: number | null = null;
@@ -187,6 +192,8 @@ export class BillviewComponent implements OnInit {
   @ViewChild("delete_bill",{static:true}) delete_bill:ElementRef;
   @ViewChild("delete_item",{static:true}) delete_item:ElementRef;
   @ViewChild("use_advancePayment", { static: true }) use_advancePayment: ElementRef;
+   @ViewChild("ItemListModel", { static: true }) ItemListModel   : ElementRef;
+   @ViewChild('Itemstable', { static: false }) Itemstable: DatatableComponent;
   constructor(private api: ApiService,private modalService: NgbModal,
     public toastrService : ToastrService,
     private imgToBase64  : ImgToBase64Service,
@@ -221,7 +228,8 @@ export class BillviewComponent implements OnInit {
       tcs_percentage:[0],
       project_id : [null],
       tax_type   :[null],
-      size : [null]
+      size : [null],
+      type       : [null]
     })
 
     this.clone_bill = fb.group(
@@ -251,6 +259,7 @@ export class BillviewComponent implements OnInit {
         tds_percentage:[0],
         tcs_percentage:[0],
         tax_type      :[null],
+        type          : [null]
       })
 
     {
@@ -283,6 +292,12 @@ export class BillviewComponent implements OnInit {
         bill_id      :[null],
         description  :[null,Validators.compose([Validators.required])],
       })
+
+      this.File_place = fb.group({
+        file_no :[null],
+        rack_no :[null],
+        section :[null]
+      })
   }
 
   @ViewChild(DatatableComponent) table: DatatableComponent;
@@ -290,6 +305,7 @@ export class BillviewComponent implements OnInit {
   @ViewChild("ewayBill", { static: true }) ewayBill     : ElementRef;
   @ViewChild('tableResponsive', { static: false }) tableResponsive: ElementRef;
   @ViewChild('dropdownPanel', { static: false }) dropdownPanel: ElementRef;
+  @ViewChild("FileLocate", { static: true }) FileLocate     : ElementRef;
 
   async ngOnInit()
   {
@@ -432,7 +448,7 @@ temp            :any
       this.bill_number = data[0].bill_number;
       this.taxempty = data[0].tax_mode;
       this.stateCode =data[0].state_code;
-
+      this.bill_list = data[0]
       this.bill_payment.controls['description'].setValue(data[0].bill_number)
      }).catch(error => {
        this.toastrService.error('Something went wrong 1');
@@ -481,6 +497,7 @@ temp            :any
   {
     if (event.type === "click")
     {
+      console.log("event.row", event.row);
       this.bill_id   = event.row.bill_id
       this.bill_list = event.row
       this.name      = event.row.vendor_name;
@@ -577,11 +594,14 @@ editbill()
 
 async LoadItemDetails()
 {
-  await this.api.get('get_data.php?table=item&find=purchase&value=1&authToken=' + environment.authToken).then((data: any) =>
-  {
-    this.ItemList = data;
-  }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
-}
+   await this.api.get('mp_item_list.php?&authToken=' + environment.authToken).then((data: any) =>
+    {
+      console.log("item : ",data)
+      this.ItemList = data.filter(i => i.purchase ==1);
+      this.ItemList_temp = [...data.filter(i => i.purchase ==1)]
+      console.log("Filter : ",this.ItemList)
+    }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
+  }
 
 async edit_dataload()
 {
@@ -597,6 +617,7 @@ async edit_dataload()
 
      this.Edit_bill.controls['vendorId'].setValue(this.bill_list.vendor_id);
      this.Edit_bill.controls['bill_id'].setValue(this.bill_list.bill_id);
+     this.Edit_bill.controls['type'].setValue(this.invoice_item.type);
      if(this.clone_bill_show == false)
      {
       this.FetchAddress(this.invoice_item);
@@ -735,6 +756,7 @@ async FetchAddress(data)
       amount      : new FormControl('', Validators.required),
       discount_1  : 0,
       discount_2  : 0,
+      item_name   : new FormControl(''),
     }))
     this.adjustTableHeight()
   }
@@ -782,7 +804,7 @@ async FetchAddress(data)
     this.Edit_bill.controls['project_id'].setValue(this.bill_list.project_id);
     this.Edit_bill.controls['created_by'].setValue(this.uid);
     this.Edit_bill.controls['notes'].setValue(this.bill_list.note);
-
+    this.Edit_bill.controls['type'].setValue(this.bill_list.type);
   const product1 = this.Edit_bill.get('product') as FormArray;
   product1.clear();
   this.invoiceitem_list.forEach((item,j) => {
@@ -790,6 +812,7 @@ async FetchAddress(data)
       type        : "edit",
       id          : [item.bill_item_id],
       items       : [item.item_list_id],
+      item_name   : [item.item_name],
       descriptions: [item.item_description],
       taxes       : [item.tax_percent],
       price       : [item.amount],
@@ -811,6 +834,7 @@ async FetchAddress(data)
       this.edit_GSTCalculation();
     }
   }, 100);
+  this.vendor_address(this.vendor_id);
 }
 
 async edit_specItem(item,j)
@@ -832,6 +856,8 @@ async edit_specItem(item,j)
       this.quantity  = 1;
       this.amount    = data[0].price;
       this.descriptions = data[0].description;
+      this.item_id   = data[0].item_id;
+      this.item_name = data[0].name;
     }).catch(error => { this.toastrService.error('Something went wrong '); });
     const formData = {
       taxes: item,
@@ -840,6 +866,9 @@ async edit_specItem(item,j)
     this.edit_SubTotalChange();
     this.edit_GSTCalculation();
     this.resetTableHeight();
+    this.selected_item = null;
+    this.popup.close();
+    this.LoadItemDetails()
   }
 
   edit_patchValues(id,j)
@@ -854,6 +883,8 @@ async edit_specItem(item,j)
     descriptions : this.descriptions,
     discount_1   : 0,
     discount_2   : 0,
+    items        : this.item_id,
+    item_name    : this.item_name,
     });
   }
 
@@ -1900,6 +1931,7 @@ async onSubmit(bill_data)
                 this.loading = true;
                 await this.api.post('mp_bill_create.php?type=new_po&authToken=' + environment.authToken, bill_data).then((data: any) =>
                 {
+                  console.log(data)
                   if (data.status == "success")
                   {
                     this.toastrService.success('Bill Added Succesfully');
@@ -1926,16 +1958,34 @@ async onSubmit(bill_data)
     }
   }
 
+  e_way_bill_status:boolean = false;
+
   e_bill()
   {
+    this.e_way_bill_status = true;
     this.new_category_id = this.modalService.open(this.ewayBill, { size: 'md' });
     this.api.get('get_data.php?table=bill&find=bill_id&value='+this.bill_id+'&authToken=' + environment.authToken).then((data: any) => {
 
       this.e_way_bill.controls['bill_no'].setValue(data[0].e_way_no);
       this.e_way_bill.controls['vehicle_no'].setValue(data[0].vehicle_number);
       this.e_way_bill.controls['shipment_mode'].setValue(data[0].transport_mode);
+      this.e_way_bill.controls['amount'].setValue(data[0].transport_charge);
 
+       if(data[0].e_way_no == null && data[0].vehicle_number == null&& data[0].transport_mode == null && data[0].transport_charge == null)
+        {
+          this.e_way_bill_status = false;
+        }
      }).catch(error => { this.toastrService.error('Something went wrong'); });
+  }
+
+   ewayEdit()
+  {
+    this.e_way_bill_status = false;
+  }
+
+  editclose()
+  {
+    this.e_way_bill_status = true;
   }
 
   async billSubmit(value)
@@ -2089,7 +2139,11 @@ async onSubmit(bill_data)
 
   ReloadBillAddr(id)
   {
-
+        const confirmed = confirm("Are you sure you want to update this address?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
     this.api.get('get_data.php?table=vendor_address&find=vendor_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
       this.bill_addr = data[0];
 
@@ -2105,7 +2159,11 @@ async onSubmit(bill_data)
   }
 
   ReloadShippAddr(id) {
-
+            const confirmed = confirm("Are you sure you want to update this address?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
     this.api.get('get_data.php?table=vendor_address&find=vendor_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
       this.shipp_addr = data[0];
 
@@ -2178,6 +2236,7 @@ async onSubmit(bill_data)
               if (!confirmed) {
                 return;
               }
+
          await     this.api.post('mp_advance_amount_to_bill.php?tran_id='+select.tran_id+'&authToken=' + environment.authToken, this.advance.value).then(async (data: any) =>
               {
                 if(data.status == "success")
@@ -2208,5 +2267,116 @@ async onSubmit(bill_data)
   else{
     this.toastrService.error('No select the payament');
   }
+  }
+
+  final_location()
+  {
+     this.fileedit = false
+    console.log("enter")
+     this.File_place.controls["file_no"].setValue(this.bill_list.file_no);
+     this.File_place.controls["rack_no"].setValue(this.bill_list.rack_no);
+      this.File_place.controls["section"].setValue(this.bill_list.section);
+      console.log("bill_list",this.bill_list)
+      if(this.bill_list.file_no== null && this.bill_list.rack_no== null &&this.bill_list.section == null)
+      {
+        console.log("entry")
+        this.fileedit = true
+      }
+    this.add_payment = this.modalService.open(this.FileLocate,{size:"sm"})
+  }
+
+  fileedit : boolean = false
+  fileLocateEdit()
+  {
+
+    console.log("edit")
+    this.fileedit = true
+  }
+
+  fileeditclose()
+  {
+    this.fileedit = false
+  }
+
+
+ async Add_Fileplace()
+  {
+        const confirmed = confirm("Are you sure you want to confirm this update?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
+
+              this.loading = true
+              await this.api.post('post_update_data_2.php?table=bill&field=bill_id&value='+this.bill_id+'&authToken=' + environment.authToken, this.File_place.value).then(async (data: any) =>
+                    {
+                      console.log(data)
+                      if(data.status == "success")
+                        {
+                             this.fileedit = false
+                              this.loading = false;
+                               this.add_payment.close();
+                              await this.File_place.reset()
+                               this.loadonce()
+                              this.toastrService.success('Updated Succesfully');
+
+                        }
+                      else
+                      { this.toastrService.error(data.status);
+                        this.loading = false;}
+
+                      return true;
+              }).catch(error =>
+              {
+                  this.toastrService.error('API Faild : Advance Update');
+                  this.loading = false;
+              });
+  }
+
+
+  ItemSelect(event)
+  {
+    if(event.type == "click")
+    {
+         console.log("",event.row)
+         this.selected_item  = event.row
+    }
+
+  }
+
+ async ItemInsert()
+  {
+    console.log("selected_item", this.selected_item)
+    console.log("selected_item", this.insert_index)
+    const confirmed = confirm("Are you sure you want to add this item?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
+      await this.edit_specItem(this.selected_item.item_id,this.insert_index)
+  }
+
+  Item_popUp(i)
+  {
+    this.insert_index = i
+    console.log(i)
+    console.log("item list : ",this.ItemList)
+    this.popup = this.modalService.open(this.ItemListModel, { size: 'xl' });
+  }
+
+  updateFilter_item(event)
+  {
+    const val = event.target.value.toLowerCase();
+    const temp = this.ItemList_temp.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.ItemList = temp;
+
+    if (this.Itemstable) {
+      this.Itemstable.offset = 0;
+    }
+
   }
 }

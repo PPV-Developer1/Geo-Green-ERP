@@ -4,6 +4,8 @@ import { environment } from "../../../../environments/environment";
 import { ToastrService } from 'ngx-toastr';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { formatDate } from '@angular/common';
+import { DatePipe } from '@angular/common';
+
 
 @Component({
   selector     : 'az-payment_transfer',
@@ -20,7 +22,7 @@ export class Payment_transferComponent implements OnInit
   today               = new Date();
   todaysDate          = '';
 
-  bankData            : any;
+  bankData            = [];
   bankData_length     : any;
   all_account         = [];
   user_account        = [];
@@ -28,10 +30,15 @@ export class Payment_transferComponent implements OnInit
   cash_account        = [];
   gst_account         = [];
   employee_account    = [];
-
+  employee_list       : any;
   balance             : any;
   addTrans            : FormGroup;
   loading             : boolean=false;
+   pipe                 = new DatePipe('en-US');
+  public now            = Date.now();
+  public Date           = this.pipe.transform(this.now, 'yyyy-MM-dd');
+
+
   constructor
   (
     public fb           : FormBuilder,
@@ -60,20 +67,47 @@ export class Payment_transferComponent implements OnInit
   }
   async loadData()
   {
-    await this.api.get('get_data.php?table=bank&authToken=' + environment.authToken).then((data: any) =>
+    await this.api.get('get_data.php?table=bank&authToken=' + environment.authToken).then(async (data: any) =>
     {
-      this.feedData(data) ;
+      // await this.feedData(data) ;
+    }).catch(error => { });
+
+    await this.api.get('mp_bank_list.php?table=employee&authToken=' + environment.authToken).then(async (data: any) =>
+    {
+      await  this.feedData(data) ;
     }).catch(error => { });
   }
 
-  feedData(data)
+ async feedData(data)
   {
-    this.bankData        = data;
-    this.bankData_length = data.length;
+    console.log("bank data api : ",data)
+    this.bankData = [];
+   for (let i = 0; i<data.length; i++) {
+      console.log("element : ",data[i])
+       console.log("type : ",data[i].type)
+         if (data[i].type == 1 && data[i].mode == 3)
+        {
+
+          if (data[i].employee_status ==1 &&  data[i].doj <= this.Date && (data[i].last_working_day >= this.Date || data[i].last_working_day == null || data[i].last_working_day === '') )
+            {
+              this.bankData.push(data[i]);
+            }
+        }
+        else{
+          this.bankData.push(data[i]);
+        }
+
+    };
+
+     console.log("bank data : ",this.bankData)
+   
+    // this.bankData        = data;
+    this.bankData_length = this.bankData.length;
 
     let j = 0 ; let k = 0; let l = 0; let m = 0; let n=0; let p=0
-    for (let i = 0; i<=this.bankData_length; i++)
+    for (let i = 0; i<=this.bankData.length; i++)
       {
+
         if (this.bankData[i].type == 1 && this.bankData[i].mode == 1 && this.bankData[i].status == 1 )
         {
           this.company_account[j] = this.bankData[i];
@@ -84,8 +118,9 @@ export class Payment_transferComponent implements OnInit
           this.cash_account[k] = this.bankData[i];
           k++;
         }
-        if (this.bankData[i].type == 1 && this.bankData[i].mode == 3 && this.bankData[i].status == 1 )
+        if (this.bankData[i].type == 1 && this.bankData[i].mode == 3 && this.bankData[i].status == 1 && this.bankData[i].employee_status == 1)
         {
+
           this.all_account[l] = this.bankData[i];
           l++;
         }

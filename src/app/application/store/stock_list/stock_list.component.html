@@ -39,7 +39,7 @@
     <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero($event)"> Back</button>
           <span><button type="submit" class="btn btn-warning fa fa-plus pull-right" (click)="create_pur_request()"> Create Purchase Request</button></span>
   </div>
-  <div *ngIf="!Type" class="row">
+  <div *ngIf="(!Type && detail_view != null) || (detail_view != null && GroupStockDetails)" class="row">
     <div class="col-lg-12">
       <div widget class="card">
         <div class="card-header">
@@ -190,19 +190,84 @@
 
           <ngx-datatable-column     [resizeable]="false" name="LOT QUANTITY" [flexGrow]="1" >
             <ng-template ngx-datatable-cell-template let-row="row">
-              {{row.inward_qty}} {{row.uom}}
+              {{row.inward_qty | number:'1.2-2'}} {{row.uom}}
             </ng-template>
           </ngx-datatable-column>
 
           <ngx-datatable-column     [resizeable]="false" name="STOCK ON HAND" [flexGrow]="1" >
             <ng-template ngx-datatable-cell-template let-row="row">
-              {{row.stock}} {{row.uom}}
+              {{row.stock | number:'1.2-2'}} {{row.uom}}
             </ng-template>
           </ngx-datatable-column>
 
           <ngx-datatable-column     [resizeable]="false" name="UNIT USED" [flexGrow]="1" >
             <ng-template ngx-datatable-cell-template let-row="row">
-              {{row.inward_qty - row.stock}} {{row.uom}}
+              {{row.inward_qty - row.stock | number:'1.2-2' }} {{row.uom}}
+            </ng-template>
+          </ngx-datatable-column>
+        </ngx-datatable>
+  </div>
+</div>
+
+<div *ngIf="Type && GroupStockDetails" class="row" style="margin-bottom: 2%;">
+  <div class="col">
+        <ngx-datatable
+          #table class="custom_table"
+          [headerHeight]="50"
+          [limit]="20"
+          [columnMode]="'flex'"
+          [footerHeight]="50"
+          [rowHeight]="'auto'"
+          [rows]="GroupStockDetails"
+          [selected]="selected"
+          [selectionType]="'single'"
+          (activate)="onActivate($event)"> <!-- Enable Short-->
+
+        <!--  <ngx-datatable-column     [resizeable]="false" name="ID" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.id}}
+            </ng-template>
+          </ngx-datatable-column> -->
+
+          <ngx-datatable-column     [resizeable]="false" prop="batch" [flexGrow]="1" name="BATCH" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.batch}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column     [resizeable]="false" prop="item_name" [flexGrow]="2" name="ITEM NAME" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              <span style="font-weight:bold;">{{row.item_name}}</span>
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column     [resizeable]="false" prop="item_description" [flexGrow]="2" name="DESCRIPTION" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.item_description}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column     [resizeable]="false" prop="hsn" name="HSN" [flexGrow]="1" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.hsn}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column     [resizeable]="false" name="LOT QUANTITY" [flexGrow]="1" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.inward_qty | number:'1.2-2'}} {{row.uom}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column     [resizeable]="false" name="STOCK ON HAND" [flexGrow]="1" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.stock | number:'1.2-2'}} {{row.uom}}
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column     [resizeable]="false" name="UNIT USED" [flexGrow]="1" >
+            <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.inward_qty - row.stock | number:'1.2-2' }} {{row.uom}}
             </ng-template>
           </ngx-datatable-column>
         </ngx-datatable>
@@ -221,7 +286,7 @@
           [rows]="stock_list"
           [selected]="selected"
           [selectionType]="'single'"
-          (activate)="onActivate($event)"> <!-- Enable Short-->
+          (activate)="onActivate2($event)"> <!-- Enable Short-->
 
         <!--  <ngx-datatable-column     [resizeable]="false" name="ID" >
             <ng-template ngx-datatable-cell-template let-row="row">
@@ -255,19 +320,19 @@
 
           <ngx-datatable-column     [resizeable]="false" name="LOT QUANTITY" [flexGrow]="1" >
             <ng-template ngx-datatable-cell-template let-row="row">
-              {{row.inward_qty}} {{row.uom}}
+              {{row.inward_qty | number:'1.2-2'}} {{row.uom}}
             </ng-template>
           </ngx-datatable-column>
 
           <ngx-datatable-column     [resizeable]="false" name="STOCK ON HAND" [flexGrow]="1">
             <ng-template ngx-datatable-cell-template let-row="row">
-              {{row.stock}} {{row.uom}}
+              {{row.stock | number:'1.2-2'}} {{row.uom}}
             </ng-template>
           </ngx-datatable-column>
 
           <ngx-datatable-column     [resizeable]="false" name="UNIT USED"  [flexGrow]="1">
             <ng-template ngx-datatable-cell-template let-row="row">
-              {{row.inward_qty - row.stock}} {{row.uom}}
+              {{row.inward_qty - row.stock | number:'1.2-2' }} {{row.uom}}
             </ng-template>
           </ngx-datatable-column>
         </ngx-datatable>

@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment';
 import { ToastrService } from 'ngx-toastr';
 import { FormGroup, FormBuilder, FormArray, Validators, FormControl } from '@angular/forms';
 import { HostListener } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector   : 'az-purchase_request',
@@ -125,6 +126,8 @@ export class Purchase_requestComponent implements OnInit {
   subtotal                    : any;
   taxempty                    : any;
   total_tax                   : any;
+  item_id                    : any;
+  item_name                  : any;
   private startX: number = 0;
   private startWidth: number = 0;
   private columnIndex: number | null = null;
@@ -132,13 +135,28 @@ export class Purchase_requestComponent implements OnInit {
   tableWidth:any = 100
   dropdownOpen : boolean = false
   po                         :FormGroup;
-  public uid = localStorage.getItem('uid');
+  project_item_list            : any;
+  ItemList_temp : any;
+  pro_temp   = []
+  alldata: any;
+  alldata1: any;
 
+  public uid = localStorage.getItem('uid');
+  po_request = new FormGroup
+    ({
+      'created_by'  : new FormControl(this.uid),
+      quantity      : new FormControl(null, [Validators.required]),
+      description   : new FormControl(null),
+      item          : new FormControl(null, [Validators.required]),
+      'type'        : new FormControl('Project Requirement'),
+    })
   @ViewChild(DatatableComponent) table: DatatableComponent;
   @ViewChild('tableResponsive', { static: false }) tableResponsive: ElementRef;
   @ViewChild('dropdownPanel', { static: false }) dropdownPanel: ElementRef;
-
-  constructor(private api:ApiService,public toastrService: ToastrService,public fb :FormBuilder,  private renderer: Renderer2) {
+  @ViewChild("ItemListModel", { static: true }) ItemListModel   : ElementRef;
+  @ViewChild('Itemstable', { static: false }) Itemstable: DatatableComponent;
+  @ViewChild('purchaseorder', { static: false }) purchaseorder: DatatableComponent;
+  constructor(private api:ApiService,public toastrService: ToastrService,public fb :FormBuilder,  private renderer: Renderer2, private modalService: NgbModal) {
 
     this.po = fb.group(
       {
@@ -178,6 +196,17 @@ export class Purchase_requestComponent implements OnInit {
    await this.LoadVendorDetails();
    await this.initProduct();
    await this.LoadItemDetails()
+   await this.Project_item();
+  }
+
+  async Project_item()
+  {
+    await this.api.get('project_product_requirement_list.php?&authToken=' + environment.authToken).then((data: any) =>
+      {
+        console.log("project item list : ",data)
+        this.project_item_list = data;
+        this.pro_temp = [...data]
+      }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
   }
 
   @HostListener('mousedown', ['$event'])
@@ -249,11 +278,15 @@ resetTableHeight() {
     }
 }
 
+
  async LoadItemDetails()
   {
-    await this.api.get('get_data.php?table=item&find=purchase&value=1&authToken=' + environment.authToken).then((data: any) =>
+      await this.api.get('mp_item_list.php?&authToken=' + environment.authToken).then((data: any) =>
     {
-      this.ItemList = data;
+      console.log("item : ",data)
+      this.ItemList = data.filter(i => i.purchase ==1);
+      this.ItemList_temp = [...data.filter(i => i.purchase ==1)]
+      console.log("Filter : ",this.ItemList)
     }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
   }
 
@@ -291,6 +324,7 @@ resetTableHeight() {
           {
             var item_name = this.item_data.find(t=>t.item_id == this.item_list[i]['item_id']);
             this.item_list[i]['item_name'] = item_name['name'];
+             this.item_list[i]['uom'] = item_name['uom'];
           }
         }
     }).catch(error => {this.toastrService.error('Something went wrong');});
@@ -438,12 +472,29 @@ po_prefix : any
       else{
         this.GSTCalculation()
       }
+      this.vendor_address(this.vendor_id)
   }
+
+   vendor_address(id)
+  {
+    this.api.get('get_data.php?table=vendor_address&find=vendor_id&value=' + id + '&find1=type&value1=1&authToken=' + environment.authToken).then((data: any) => {
+
+        this.alldata = data;
+    }).catch(error => { this.toastrService.error('Something went wrong 1'); });
+
+    this.api.get('get_data.php?table=vendor_address&find=vendor_id&value=' + id + '&find1=type&value1=2&authToken=' + environment.authToken).then((data: any) => {
+
+      this.alldata1 = data;
+  }).catch(error => { this.toastrService.error('Something went wrong 2'); });
+
+  }
+
+
 
   async specItem(item,i)
   {
     await this.api.get('get_data.php?table=item&find=item_id&value=' + item + '&authToken=' + environment.authToken).then((data: any) => {
-
+        console.log("item data : ",data)
       if(this.taxempty == 1)
       {
         this.taxes    = data[0].tax_percent;
@@ -457,6 +508,8 @@ po_prefix : any
         this.amount   = data[0].price;
         this.descriptions = data[0].description;
         this.uom      = data[0].uom;
+        this.item_id = data[0].item_id;
+        this.item_name  = data[0].name;
     }).catch(error => { this.toastrService.error('Something went wrong'); });
 
     const formData = {
@@ -465,6 +518,9 @@ po_prefix : any
     this.patchValues(item,i);
     this.SubTotalChange();
     this.GSTCalculation();
+    this.popup.close();
+    this.LoadItemDetails()
+    this.selected_item = null
   }
 
   async LoadGST(mode)
@@ -545,19 +601,20 @@ po_prefix : any
   {
     let product = this.po.get('product') as FormArray;
     product.push(this.fb.group({
-      item_name:new  FormControl(null),
-      items   : new FormControl('', Validators.required),
+      item_name :new  FormControl(null),
+      items     : new FormControl('', Validators.required),
       descriptions: new FormControl(''),
-      taxes   : new FormControl('', Validators.required),
-      price   : new FormControl('', Validators.required),
-      uom     : new FormControl('', Validators.required),
-      quantity: new FormControl('', Validators.required),
-      amount  : new FormControl('', Validators.required),
+      taxes     : new FormControl('', Validators.required),
+      price     : new FormControl('', Validators.required),
+      uom       : new FormControl('', Validators.required),
+      quantity  : new FormControl('', Validators.required),
+      amount    : new FormControl('', Validators.required),
       discount_1 : new FormControl(0),
       discount_2 : new FormControl(0),
     }))
     this.adjustTableHeight()
   }
+
   patchValues(id,i)
   {
     let x = (<FormArray>this.po.controls['product']).at(i);
@@ -570,6 +627,8 @@ po_prefix : any
       descriptions : this.descriptions,
       discount_1: 0,
       discount_2: 0,
+      item_name : this.item_name,
+      items     : this.item_id
     });
   }
 
@@ -727,6 +786,18 @@ po_prefix : any
         );
       });
       this.item_list = temp;
+      this.table.offset = 0;
+  }
+
+  updateFilter_project_item(event)
+  {
+     const val = event.target.value.toLowerCase();
+      const temp = this.pro_temp.filter((d) => {
+        return Object.values(d).some(field =>
+          field != null && field.toString().toLowerCase().indexOf(val) !== -1
+        );
+      });
+      this.project_item_list = temp;
       this.table.offset = 0;
   }
 
@@ -901,4 +972,135 @@ po_prefix : any
        }
   }
 
+
+  selected_item: any
+  insert_index : any
+  popup : any;
+  ItemSelect(event)
+  {
+    if(event.type == "click")
+    {
+         console.log("",event.row)
+         this.selected_item  = event.row
+    }
+
+  }
+
+ async ItemInsert()
+  {
+    console.log("selected_item", this.selected_item)
+    console.log("selected_item", this.insert_index)
+    const confirmed = confirm("Are you sure you want to add this item?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
+      await this.specItem(this.selected_item.item_id,this.insert_index)
+  }
+
+  Item_popUp(i)
+  {
+    this.insert_index = i
+    console.log(i)
+    console.log("item list : ",this.ItemList)
+    this.popup = this.modalService.open(this.ItemListModel, { size: 'xl' });
+  }
+
+  updateFilter_item(event)
+  {
+    const val = event.target.value.toLowerCase();
+    const temp = this.ItemList_temp.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.ItemList = temp;
+
+    if (this.Itemstable) {
+      this.Itemstable.offset = 0;
+    }
+
+  }
+
+  ReloadBillAddr(id)
+  {
+
+    this.api.get('get_data.php?table=vendor_address&find=vendor_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
+      this.bill_addr = data[0];
+
+      this.billFrom = this.bill_addr.vendor_addr_id;
+      this.billAttention = this.bill_addr.attention;
+      this.billAddress_line_1 = this.bill_addr.address_line_1;
+      this.billAddress_line_2 = this.bill_addr.address_line_2;
+      this.billCity = this.bill_addr.city;
+      this.billState = this.bill_addr.state;
+      this.billZipcode = this.bill_addr.zip_code;
+      this.po.controls['billFrom'].setValue(this.billFrom);
+    }).catch(error => { this.toastrService.error('Something went wrong'); });
+  }
+
+  ReloadShippAddr(id) {
+
+    this.api.get('get_data.php?table=vendor_address&find=vendor_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
+      this.shipp_addr = data[0];
+
+      this.shipFrom = this.shipp_addr.vendor_addr_id;
+      this.shipAttention = this.shipp_addr.attention;
+      this.shipAddress_line_1 = this.shipp_addr.address_line_1;
+      this.shipAddress_line_2 = this.shipp_addr.address_line_2;
+      this.shipCity = this.shipp_addr.city;
+      this.shipState = this.shipp_addr.state;
+      this.shipZipcode = this.shipp_addr.zip_code;
+      this.po.controls['shipFrom'].setValue(this.shipFrom);
+
+    }).catch(error => { this.toastrService.error('Something went wrong'); });
+  }
+
+  Add_Requirement_To_PR(row)
+  {
+    console.log("Selected Project Item : ",row)
+    this.po_request.controls['item'].setValue(row.item_id);
+    this.po_request.controls['quantity'].setValue(row.require_qty);
+    this.po_request.controls['type'].setValue('Project Requirement');
+    this.popup= this.modalService.open(this.purchaseorder, { size: 'xl' });
+  }
+
+async   Submit(value)
+  {
+    Object.keys(this.po_request.controls).forEach(field =>
+      {
+        const control = this.po_request.get(field);
+        control.markAsTouched({ onlySelf: true });
+      });
+      console.log("PO Request Data : ",value)
+      if(this.po_request.valid)
+      {
+         const confirmed = confirm("Are you sure you want to create the PO request?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
+      await  this.api.post('post_insert_data.php?table=purchase_request&authToken='+environment.authToken,this.po_request.value).then((data: any) =>
+        {
+          if(data.status == "success")
+          {
+            this.loading = false;
+            this.toastrService.success('Purchase Created Succesfully');
+            this.Loaditem();
+            this.Project_item()
+            this.popup.dismiss();
+            this.po_request.controls['item'].reset();
+            this.po_request.controls['description'].reset();
+            this.po_request.controls['quantity'].reset();
+          }
+          else { this.toastrService.error('Something went wrong : PR Create');
+          this.loading = false;}
+          return true;
+        }).catch(error =>
+        {
+            this.toastrService.error('API Faild : PO Create');
+            this.loading = false;
+        });
+      }
+ }
 }

@@ -22,6 +22,12 @@ export class AttendanceComponent implements OnInit
 
   @Output() shareCheckedList = new EventEmitter();
   @Output() shareIndividualCheckedList = new EventEmitter();
+
+  pipe                   = new DatePipe('en-US');
+  public now             = Date.now();
+  public myFormattedDate = this.pipe.transform(this.now, 'dd/MM/yyyy HH:mm:ss');
+  public Date           =   this.pipe.transform(this.now, 'yyyy-MM-dd');
+
   employee               : any;
   modaladdatt            : any;
   modaleditatt           : any;
@@ -70,7 +76,7 @@ export class AttendanceComponent implements OnInit
   public att_edit_val_cl : AbstractControl;
   public att_edit_notes  : AbstractControl;
   public loading         : boolean=false;
-
+  temp: any [];
   @ViewChild(DatatableComponent) table: DatatableComponent;
 
   @ViewChild("add_att",{static:true})  add_att :ElementRef;
@@ -148,7 +154,8 @@ export class AttendanceComponent implements OnInit
     this.api.get('get_data.php?table=employee&authToken='+environment.authToken).then((data: any) =>
     {
       this.employee_list = data;
-      this.Admin_employee_list = this.employee_list.filter(d => d.emp_type == 2)
+      this.temp = [...data];
+      this.Admin_employee_list = this.employee_list.filter(emp => emp.emp_type == 2&& emp.doj <= this.Date && (emp.last_working_day >= this.Date || emp.last_working_day == null || emp.last_working_day == '')&& emp.status ==1)
       console.log(this.Admin_employee_list)
     }).catch(error => {this.toastrService.error('Something went wrong');
     this.loading=false;});
@@ -256,6 +263,7 @@ export class AttendanceComponent implements OnInit
         this.api.get('mp_attendance.php?date='+data.date_val+'&authToken='+environment.authToken).then((data: any) =>
         {
           this.att_list   = data;
+          this.temp = [...data];
           this.att_window = 1;
           this.loading=false;
         }).catch(error => {this.toastrService.error('Something went wrong');
@@ -265,6 +273,18 @@ export class AttendanceComponent implements OnInit
     else{this.toastrService.error('Select date');
     this.loading=false;};
   }
+
+    updateFilter(event) {
+    const val = event.target.value.toLowerCase();
+    const temp = this.temp.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.att_list = temp;
+    this.table.offset = 0;
+  }
+
 
   async onSubmit(data)
   {
@@ -945,9 +965,9 @@ export class AttendanceComponent implements OnInit
     this.shareIndividualCheckedList.emit(this.currentSelected);
  }
 
- update()
+ async update()
  {
-  if(this.days != ''  && this.checkedList.length != 0)
+  if(this.days != '' )
   {
   this.length = 0;
     const confirmed = confirm("Are you sure you want to add a compensatory off to this employee?");
@@ -956,43 +976,62 @@ export class AttendanceComponent implements OnInit
         return;
       }
   // Use Promise.all to handle multiple asynchronous calls
-  const promises = this.checkedList.map(async empId =>
-  await  this.api.post(`mp_employee_com_off_update.php?table=employee&field=emp_id&value=${empId}&up_field=com_off&update=${this.days}&authToken=${environment.authToken}`, null));
+  // const promises = this.checkedList.map(async empId =>
+  // await  this.api.post(`mp_employee_com_off_update.php?table=employee&field=emp_id&value=${empId}&up_field=com_off&update=${this.days}&authToken=${environment.authToken}`, null));
 
-  Promise.all(promises)
-    .then(results => {
+  // Promise.all(promises)
+  //   .then(results => {
 
-      results.forEach(data_rt => {
-        if (data_rt.status === 'success') {
-          this.length++;
-        } else {
-          this.toastrService.error('Something went wrong');
+  //     results.forEach(data_rt => {
+  //       if (data_rt.status === 'success') {
+  //         this.length++;
+  //       } else {
+  //         this.toastrService.error('Something went wrong');
+  //       }
+  //     });
+
+  //     if (this.checkedList.length === this.length)
+  //     {
+  //       this.toastrService.success('Com Off Added Successfully');
+  //        this.ngOnInit()
+  //       this.clearCheckboxes();
+  //       this.currentSelected = { checked: false, emp_id: '' };
+  //       this.shareCheckedlist();
+  //       this.shareIndividualStatus();
+  //       this.days = '';
+  //       this.modaleditatt.close();
+  //     }
+  //     else
+  //     {
+  //       this.toastrService.warning('Com Off Not Assigned to All');
+  //     }
+  //   }).catch(error => {
+  //     this.toastrService.error('Something went wrong');
+  //     this.loading = false;
+  //   });
+  // }
+  // else{
+  //   this.toastrService.warning('Enter the days and Select the Employee List');
+
+
+  await this.api.get('mp_employee_com_off_update.php?table=employee&field=emp_id&value='+this.employee+'&up_field=com_off&update='+this.days+'&authToken=' + environment.authToken).then((data: any) =>
+
+        {
+
+          this.toastrService.success('Com Off Added Successfully');
+          this.ngOnInit()
+          this.clearCheckboxes();
+          this.currentSelected = { checked: false, emp_id: '' };
+          this.shareCheckedlist();
+          this.shareIndividualStatus();
+          this.days = '';
+          this.modaleditatt.close();
+        }).catch(error =>
+          {
+              this.toastrService.error('Something went wrong');
+              this.loading = false;
+          });
         }
-      });
-
-      if (this.checkedList.length === this.length)
-      {
-        this.toastrService.success('Com Off Added Successfully');
-         this.ngOnInit()
-        this.clearCheckboxes();
-        this.currentSelected = { checked: false, emp_id: '' };
-        this.shareCheckedlist();
-        this.shareIndividualStatus();
-        this.days = '';
-        this.modaleditatt.close();
-      }
-      else
-      {
-        this.toastrService.warning('Com Off Not Assigned to All');
-      }
-    }).catch(error => {
-      this.toastrService.error('Something went wrong');
-      this.loading = false;
-    });
-  }
-  else{
-    this.toastrService.warning('Enter the days and Select the Employee List');
-  }
  }
 
  clearCheckboxes() {

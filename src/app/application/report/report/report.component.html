@@ -49,8 +49,11 @@
     <button type="submit" *ngIf="!customer_payment" class="btn btn-info fa fa-arrow-left"  (click)="set_zero()"> Back </button>
     <button type="submit" *ngIf="customer_payment && !purchase_list_view" class="btn btn-info fa fa-arrow-left" (click)="set_zero1()"> Back </button>
 <div class="row" >
- <div class="col-4"></div>
- <div ><h5><span class="text-uppercase"><b>{{title}}</b></span></h5></div>
+
+    <div class="col-md-10" style="text-align: center;">
+      <h5><span class="text-uppercase"><b>{{ title }}</b></span></h5>
+    </div>
+
 </div>
 
   <div *ngIf="!customer_payment">
@@ -72,8 +75,17 @@
             <div class="form-group col-md-2">
                 <button class="btn btn-main" class="btn btn-success fa fa-print"  type="submit" (click)="download(date.value)" > Report</button>
               </div>
-              <div *ngIf="id !='tax_report'" class=" form-group pull-right">
+              <div *ngIf="id !='tax_report'" class="pull-right">
                 <button *ngIf="id !='tds_tcs'" class="btn btn-main"  class="btn btn-success fa fa-download pull-right" type="submit" (click)="print()" > Download</button>
+                <!-- <div class="btn-group" role="group" aria-label="Basic example">
+                  <button class="btn btn-success fa fa-download dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Download
+                </button>
+                <div class="dropdown-menu">
+                    <a  class="dropdown-item" href="javascript:void(0);" (click)="print()">Xlsx</a>
+                    <a  class="dropdown-item" href="javascript:void(0);"  (click)="pdf()">PDF</a>
+                </div>
+              </div> -->
               </div>
         </form>
         &nbsp;
@@ -333,6 +345,8 @@
 
 
           <div *ngIf="id =='inventory_summary'">
+
+
             <ngx-datatable style="cursor: pointer;" #table class="custom_table"
             [headerHeight]="50"
             [limit]="20"
@@ -703,7 +717,11 @@
 
     <div *ngIf="customer_payment && id=='sales_by_customer' && view">
       <div class="row">
-          <div class=" form-group col-11">
+
+        <div class="col-md-10" style="text-align: center;">
+                <h5 style="color: rgb(77, 77, 145);">{{select_data}}</h5>
+            </div>
+          <div class=" form-group col-md-1">
 
             <button class="btn btn-main" class="btn btn-success fa fa-download pull-right" type="submit" (click)="print_tran()" > Download</button>
           </div>
@@ -725,11 +743,15 @@
                 </ng-template>
               </ngx-datatable-column>
 
+<<<<<<< HEAD
+               <!-- <ngx-datatable-column     [resizeable]="false" prop="Customer_Name" [flexGrow]="2" name="CUSTOMER NAME">
+=======
                <ngx-datatable-column     [resizeable]="false" prop="Customer_Name" [flexGrow]="2" name="CUSTOMER NAME">
+>>>>>>> 0e84583114bc683395bd0b0d0a7b5c024a8ad281
                 <ng-template ngx-datatable-cell-template let-row="row">
                   {{row.Customer_Name}}
                 </ng-template>
-              </ngx-datatable-column>
+              </ngx-datatable-column> -->
 
               <ngx-datatable-column     [resizeable]="false" prop="Reference_Number" [flexGrow]="2" name="REFERENCE NUMBER">
                 <ng-template ngx-datatable-cell-template let-row="row">
@@ -772,7 +794,11 @@
   <!-- <input class="form-control" type="text" placeholder="Search Vendor Name...."
   (keyup)="updateFilter($event)" /> -->
 
-  <div class=" form-group col-12">
+    <div class="col-md-10" style="text-align: center;">
+                <h5 style="color: rgb(77, 77, 145);">{{select_data}}</h5>
+            </div>
+
+  <div class=" form-group col-1">
 <!-- <span>Opening Balance: {{opening_balance| indianCurrency}}</span> -->
     <button class="btn btn-main" class="btn btn-success fa fa-download pull-right" type="submit" (click)="print_tran()" > Download</button>
   </div>
@@ -830,6 +856,11 @@
  </div>
 
 <div *ngIf=" customer_payment && id=='vendor_balances'" >
+
+   <div class="col-md-10" style="text-align: center;">
+                <h5 style="color: rgb(77, 77, 145);">{{select_data}}</h5>
+            </div>
+
 <div class="row">
         <div class=" form-group col-11">
               <button class="btn btn-main" class="btn btn-success fa fa-download pull-right" type="submit" (click)="print_tran()" > Download</button>
@@ -934,8 +965,18 @@
           </div>
 
           <div class="col-md-1" style="padding-top: 20PX;">
-            <label></label>
-            <button *ngIf="id !='tds_tcs'"  class="btn btn-main form-control"  class="btn btn-success fa fa-download  pull-right" type="submit" (click)="print_balan()" > Download</button>
+            <!-- <label></label>
+            <button *ngIf="id !='tds_tcs'"  class="btn btn-main form-control"  class="btn btn-success fa fa-download  pull-right" type="submit" (click)="print_balan()" > Download</button> -->
+
+             <div class="btn-group" *ngIf="id !='tds_tcs'" role="group" aria-label="Basic example">
+                  <button class="btn btn-success fa fa-download dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Download
+                </button>
+                <div class="dropdown-menu">
+                    <a  class="dropdown-item" href="javascript:void(0);" (click)="print_balan()">Xlsx</a>
+                    <a  class="dropdown-item" href="javascript:void(0);"  (click)="pdf()">PDF</a>
+                </div>
+              </div>
           </div>
         </form>
       </div>
@@ -1039,9 +1080,18 @@
             <button [disabled]="loading" class="btn btn-info btn-block" type="submit">Load <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
           </div>
 
-          <div class="col-md-1" style="padding-top: 20PX;">
+          <div class="col-md-1" >
             <label></label>
-            <button *ngIf="id !='tds_tcs'"  class="btn btn-main form-control"  class="btn btn-success fa fa-download pull-right" type="submit" (click)="print_balan()" > Download</button>
+            <!-- <button *ngIf="id !='tds_tcs'"  class="btn btn-main form-control"  class="btn btn-success fa fa-download pull-right" type="submit" (click)="print_balan()" > Download</button> -->
+            <div class="btn-group" *ngIf="id !='tds_tcs'" role="group" aria-label="Basic example">
+                  <button class="btn btn-success fa fa-download dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Download
+                </button>
+                <div class="dropdown-menu">
+                    <a  class="dropdown-item" href="javascript:void(0);" (click)="print_balan()">Xlsx</a>
+                    <a  class="dropdown-item" href="javascript:void(0);"  (click)="pdf()">PDF</a>
+                </div>
+              </div>
           </div>
         </form>
   </div>
@@ -1115,8 +1165,11 @@
 
  <div *ngIf="customer_payment && id =='inventory_summary' && view">
     <div class="row">
-        <div class="col-md-11">
+          <div class="col-md-10" style="text-align: center;">
+                <h5 style="color: rgb(77, 77, 145);">{{select_data}}</h5>
+            </div>
 
+        <div class="col-md-2">
           <button class="btn btn-main" class="btn btn-success fa fa-download pull-right" type="submit" (click)="print_balan()" > Download</button>
         </div>
         &nbsp;
@@ -1137,11 +1190,15 @@
           (activate)="onActivate($event)" >
 
 
+<<<<<<< HEAD
+     <!-- <ngx-datatable-column     [resizeable]="false" prop="Item_Name" [flexGrow]="2" name="ITEM NAME">
+=======
      <ngx-datatable-column     [resizeable]="false" prop="Item_Name" [flexGrow]="2" name="ITEM NAME">
+>>>>>>> 0e84583114bc683395bd0b0d0a7b5c024a8ad281
       <ng-template ngx-datatable-cell-template let-row="row">
         {{row.Item_Name}}
       </ng-template>
-    </ngx-datatable-column>
+    </ngx-datatable-column> -->
 
     <ngx-datatable-column     [resizeable]="false" prop="Batch_Number" [flexGrow]="1" name="BATCH">
       <ng-template ngx-datatable-cell-template let-row="row">
@@ -2250,7 +2307,9 @@
 
 
 <div class="row" *ngIf=" customer_payment && id =='invoice_details'">
-  <div class="col-md-12" ></div>&nbsp;
+ <div class="col-md-10" style="text-align: center;">
+                <h5 style="color: rgb(77, 77, 145);">{{select_data}}</h5>
+            </div>&nbsp;
     <div class="col-md-12" >
           <ngx-datatable
           #table

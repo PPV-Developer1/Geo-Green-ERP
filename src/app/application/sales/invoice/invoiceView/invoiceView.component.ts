@@ -188,6 +188,8 @@ export class InvoiceViewComponent implements OnInit {
   tableWidth                : any= 100 ;
   originalTableHeight       : any
   private dropdownOpen      = false;
+  e_way_bill_status :boolean = false;
+
   imgUrl: string = '../../../../assets/img/logo/geogreen.png';
  // imgUrl: string =  'https://chart.googleapis.com/chart?chs=100x100&cht=qr&chl=http://ppvgroups.org/test.php?id=100001';
 
@@ -196,9 +198,9 @@ export class InvoiceViewComponent implements OnInit {
   public uid            = localStorage.getItem('uid');
   public user           = localStorage.getItem('type');
   public user_bank_id   = localStorage.getItem('bank_id');
- selectedDCs          : any[]  = [];  // instead of null
-  temp                : any[]  = [];
-
+  selectedDCs             : any[]  = [];  // instead of null
+  temp                    : any[]  = [];
+  ItemList_temp           : any[]  = [];
   dropdownSettings = {
     singleSelection: false,
     idField: 'dc_id',
@@ -210,6 +212,8 @@ export class InvoiceViewComponent implements OnInit {
     enableCheckAll: false
   };
 
+  @ViewChild("ItemListModel", { static: true }) ItemListModel   : ElementRef;
+  @ViewChild('Itemstable', { static: false }) Itemstable: DatatableComponent;
   @ViewChild("delete",{static:true}) delete:ElementRef;
   @ViewChild('tableResponsive', { static: false }) tableResponsive: ElementRef;
   @ViewChild("delete_item",{static:true}) delete_item:ElementRef;
@@ -453,9 +457,22 @@ fontload()
       this.invoicePdf   = data;
       this.status   = data[0].status
         console.log("invoicePdf ",this.invoicePdf)
-      if(this.invoicePdf[0].dc_data != null)
-      this.invoicePdf[0]['dc_no'] =this.invoicePdf[0].dc_data.map(item => item.dc_number).join(", ");
-        console.log(this.invoicePdf[0]);
+       if(this.invoicePdf[0].dc_data != null)
+         {
+            const dcNumbers = this.invoicePdf[0].dc_data.map(item => item.dc_number);
+
+                  if (dcNumbers.length > 0) {
+                    const parts = dcNumbers[0].split('/');
+                    const prefix = parts.slice(0, -1).join('/') + '/';
+
+                    const formattedDcNo =
+                      prefix +
+                      dcNumbers.map(dc => dc.split('/').pop()).join(', ');
+
+                    this.invoicePdf[0]['dc_no'] = `${formattedDcNo}`;
+                    console.log("Formatted DC No:", formattedDcNo);
+                  }
+          }
       this.company_pdf_logo = this.invoicePdf[0].company_details[0].logo;
       this.company_pdf_logo = environment.baseURL + "download_file.php?path=upload/company/" +  this.company_pdf_logo + "&authToken=" + environment.authToken
 
@@ -560,8 +577,24 @@ fontload()
         this.invoicePdf = data;
         console.log("invoicePdf ",this.invoicePdf)
         this.status   = data[0].status
-        if(this.invoicePdf[0].dc_data != null)
-        this.invoicePdf[0]['dc_no'] =this.invoicePdf[0].dc_data.map(item => item.dc_number).join(", ");
+        // if(this.invoicePdf[0].dc_data != null)
+        // this.invoicePdf[0]['dc_no'] =this.invoicePdf[0].dc_data.map(item => item.dc_number).join(", ");
+         if(this.invoicePdf[0].dc_data != null)
+         {
+            const dcNumbers = this.invoicePdf[0].dc_data.map(item => item.dc_number);
+
+                  if (dcNumbers.length > 0) {
+                    const parts = dcNumbers[0].split('/');
+                    const prefix = parts.slice(0, -1).join('/') + '/';
+
+                    const formattedDcNo =
+                      prefix +
+                      dcNumbers.map(dc => dc.split('/').pop()).join(', ');
+
+                    this.invoicePdf[0]['dc_no'] = `${formattedDcNo}`;
+                    console.log("Formatted DC No:", formattedDcNo);
+                  }
+          }
         console.log(this.invoicePdf[0]);
         this.invoiceItems     = this.invoicePdf[0].invoiceItems;
         this.taxempty         = this.invoicePdf[0].tax_mode;
@@ -590,13 +623,24 @@ editbill()
   this.show = false;
 }
 
+// async LoadItemDetails()
+// {
+//   await this.api.get('get_data.php?table=item&find=sales&value=1&authToken=' + environment.authToken).then((data: any) =>
+//   {
+//     this.ItemList = data;
+//   }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
+// }
+
 async LoadItemDetails()
-{
-  await this.api.get('get_data.php?table=item&find=sales&value=1&authToken=' + environment.authToken).then((data: any) =>
   {
-    this.ItemList = data;
-  }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
-}
+    await this.api.get('mp_item_list.php?&authToken=' + environment.authToken).then((data: any) =>
+    {
+      console.log("item : ",data)
+      this.ItemList = data.filter(i => i.sales ==1);
+      this.ItemList_temp = [...data.filter(i => i.sales ==1)]
+      console.log("Filter : ",this.ItemList)
+    }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
+  }
 
 async edit_dataload()
 {
@@ -642,6 +686,23 @@ async edit_dataload()
      this.load_invoicenumber( this.invoice_item);
 
 }
+
+ updateFilter_item(event)
+  {
+    const val = event.target.value.toLowerCase();
+    const temp = this.ItemList_temp.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.ItemList = temp;
+
+    if (this.Itemstable) {
+      this.Itemstable.offset = 0;
+    }
+
+  }
+
 
 clone_address(id)
 {
@@ -758,6 +819,7 @@ async FetchAddress(data)
       id          : [''],
       dc_id       : [0],
       items       : new FormControl('', Validators.required),
+      item_name   : new FormControl(''),
       descriptions: new FormControl(''),
       taxes       : new FormControl('', Validators.required),
       price       : new FormControl('', Validators.required),
@@ -817,12 +879,14 @@ async FetchAddress(data)
 
   const product1 = this.Edit_invoice.get('product') as FormArray;
   product1.clear();
+  console.log(this.invoiceitem_list)
   this.invoiceitem_list.forEach((item,j) => {
     product1.push(this.fb.group({
       dc_id       : [item.dc_id],
       type        : "edit",
       id          : [item.invoice_item_id],
       items       : [item.item_list_id],
+      item_name   : [item.item_name],
       descriptions: [item.item_description],
       taxes       : [item.tax_percent],
       price       : [item.amount],
@@ -915,13 +979,17 @@ async FetchAddress(data)
               const idValue   = savedIds?.[0] ?? '';
                 console.log('Saved types before clear: idValue', idValue);
               console.log('Saved ids before clear: typeValue', typeValue);
-            data.forEach((item: any) => {
+            data.forEach(async(item: any) => {
               // Avoid duplicates by item_list_id
               const isDuplicate = product1.controls.some(ctrl =>
                 ctrl.get('items')?.value === item.item_list_id
               );
               // if (isDuplicate) return;
-
+               var item_name :any = null
+          await this.api.get('get_data.php?table=item&find=item_id&value='+ item.item_list_id+'&authToken=' + environment.authToken).then((data: any) =>
+            {
+                    item_name = data[0].name
+            }).catch(error => { this.toastrService.error('Something went wrong in ItemDetails'); });
               // Push new product row
               product1.push(this.fb.group({
                 dc_id       : [event.dc_id],
@@ -933,7 +1001,8 @@ async FetchAddress(data)
                 price       : [item.amount],
                 quantity    : [item.qty],
                 amount      : [item.total],
-                uom         : [item.uom]
+                uom         : [item.uom],
+                item_name   : [item_name]
               }));
 
             // Call priceChange with latest index
@@ -993,13 +1062,17 @@ async FetchAddress(data)
             if (product1.length === 1 && !product1.at(0).get('items')?.value) {
               product1.clear();
             }
-            data.forEach((item: any) => {
+            data.forEach(async(item: any) => {
               // Avoid duplicates by item_list_id
               const isDuplicate = product1.controls.some(ctrl =>
                 ctrl.get('items')?.value === item.item_list_id
               );
               // if (isDuplicate) return;
-
+              var item_name :any = null
+          await this.api.get('get_data.php?table=item&find=item_id&value='+ item.item_list_id+'&authToken=' + environment.authToken).then((data: any) =>
+            {
+                    item_name = data[0].name
+            }).catch(error => { this.toastrService.error('Something went wrong in ItemDetails'); });
               // Push new product row
               product1.push(this.fb.group({
                  dc_id      : [element.dc_id],
@@ -1009,7 +1082,8 @@ async FetchAddress(data)
                 price       : [item.amount],
                 quantity    : [item.qty],
                 amount      : [item.total],
-                uom         : [item.uom]
+                uom         : [item.uom],
+                item_name   : [item_name]
               }));
 
             // Call priceChange with latest index
@@ -1072,6 +1146,13 @@ remove_data :any[]=[]
         {
              this.new_category_id.close();
              this.loading = false
+              for (let i = editproduct.length - 1; i >= 0; i--) {
+                    const ctrl = editproduct.at(i);
+                    console.log(ctrl.value)
+                    if (ctrl.get('dc_id')?.value === this.dc_id) {
+                      editproduct.removeAt(i);
+                    }
+                  }
               editproduct.removeAt(this.item_index)
               this.toastrService.success('Item Deleted Successful');
 
@@ -1132,7 +1213,8 @@ async  UnSlecetAllDcitems(event) {
        await this.edit_SubTotalChange();
 }
 
-
+item_id: any
+item_name : any
 async edit_specItem(item,j)
   {
    await this.api.get('get_data.php?table=item&find=item_id&value=' + item + '&authToken=' + environment.authToken).then((data: any) => {
@@ -1151,6 +1233,8 @@ async edit_specItem(item,j)
      this.amount    = data[0].price;
      this.descriptions = data[0].description;
      this.uom       = data[0].uom;
+     this.item_name = data[0].name
+     this.item_id   = item
    }).catch(error => { this.toastrService.error('Something went wrong'); });
    const formData = {
      taxes: item,
@@ -1159,11 +1243,15 @@ async edit_specItem(item,j)
    this.edit_patchValues(item,j);
    this.edit_SubTotalChange();
    this.edit_GSTCalculation();
+   this.new_category_id.close();
+   this.selected_item = null
+   this.LoadItemDetails()
   }
 
 
   async specProject(item,i)
   {
+    this.item_id = item
    await this.api.get('get_data.php?table=projects&find=project_id&value=' + item + '&authToken=' + environment.authToken).then((data: any) => {
         this.type_id      = data[0].type;
         this.price        = data[0].project_value;
@@ -1196,7 +1284,9 @@ async edit_specItem(item,j)
       quantity     : this.quantity,
       amount       : this.amount,
       descriptions : this.descriptions,
-      uom          : this.uom
+      uom          : this.uom,
+      items        : this.item_id,
+      item_name    : this.item_name
     });
   }
 
@@ -1541,59 +1631,50 @@ getInvoiceObject(files) {
   var test = files[0]
   console.log(test)
   var order_numbers : any
-  if(files[0].length>0)
-  {
-   order_numbers = files[0].dc_data.map(item => item.dc_number.split('/').pop()).join(", ");
-  }
- console.log(order_numbers)
+          if (test?.dc_data && test.dc_data.length > 0) {
+
+          const dcNumbers = test.dc_data
+            .map(item => item.dc_number)
+            .filter(Boolean);
+
+          if (dcNumbers.length > 0) {
+            const parts = dcNumbers[0].split('/');
+            const prefix = parts.slice(0, -1).join('/') + '/';
+
+            order_numbers =
+              prefix + dcNumbers.map(dc => dc.split('/').pop()).join(', ');
+
+            console.log("Formatted DC No:", order_numbers);
+          }
+        }
+
+    console.log(order_numbers);
   return {
 
     table: {
       widths: ['*', '*'],
       body: [
         [
+          [
+               { text: 'Invoice No : '+test.invoice_number, fontSize: 9, },
+                { text: 'Invoice Date : '+ test.invoice_date, fontSize: 9 },
+                { text: 'State : '+test.bill_state, fontSize: 9 },
+                { text: 'Pin Code : '+test.bill_zip_code, fontSize: 9 },
+          ],
           {
             columns: [
-              [
-                { text: 'Invoice No :', fontSize: 10 },
-                { text: 'Invoice Date :', fontSize: 10 },
-                { text: 'State: ', fontSize: 10 },
-                { text: 'Pin Code : ', fontSize: 10 },
+              [ { text: test.shipment_mode ? 'Shipment : '+test.shipment_mode : '', fontSize:9 },
+                { text: test.vehicle_number ? 'Vehicle Number : '+test.vehicle_number : '', fontSize: 9 },
+                { text: 'Place of Supply : '+test.place_from_supply, fontSize: 9 },
+                { text: order_numbers ? 'DC No : '+order_numbers : '', fontSize: 9 },
+                { text: 'ref : '+test.reference_number, fontSize: 9 },
               ],
-              [
-                { text: test.invoice_number, fontSize: 10 },
-                { text: test.invoice_date, fontSize: 10 },
-                { text: test.bill_state, fontSize: 10 },
-                { text: test.bill_zip_code, fontSize: 10 },
-              ]
-
-            ]
-          },
-
-          {
-            columns: [
-              [
-                { text: test.shipment_mode ? 'Shipment :' : '', fontSize: 10 },
-                { text: test.vehicle_number ? 'Vehicle Number :' : '', fontSize: 10 },
-                { text: 'Place of Supply :', fontSize: 10 },
-                { text: order_numbers ? 'DC No :' : '', fontSize: 10 },
-                { text: 'ref  :', fontSize: 10 },
-
-
-              ],
-              [
-                { text: test.shipment_mode, fontSize: 10 },
-                { text: test.vehicle_number, fontSize: 10 },
-                { text: test.place_from_supply, fontSize: 10 },
-                { text:order_numbers, fontSize: 10 },
-                { text: test.reference_number, fontSize: 10 },
-
-              ]
             ]
           },
         ],
       ]
     },
+
     layout: {
       layout: 'lightHorizontalLines',
       hLineWidth: function (i, node) {
@@ -1613,24 +1694,24 @@ getBillObject(files) {
       body: [
         [
           [
-            { text: 'Bill to party:', bold: true, fontSize: 10 },
-            { text: test.bill_attention, bold: true, fontSize: 10 },
-            { text: test.bill_address_line_1, fontSize: 10 },
-            { text: test.bill_address_line_2, fontSize: 10 },
-            { text: 'GST NO :' + test.customer_gst, fontSize: 10, bold: true },
-            { text: test.customer_udyam ? 'Udyam No :'+test.customer_udyam : '', fontSize: 10 ,bold:true},
-            { text: 'State :' + test.bill_state, fontSize: 10, bold: true },
-            { text: 'Pin Code :' + test.bill_zip_code, alignment: 'left', bold: true, fontSize: 10 },
+            { text: 'Bill to party :', bold: true, fontSize: 9 },
+            { text: test.bill_attention, bold: true, fontSize: 9 },
+            { text: test.bill_address_line_1, fontSize: 9 },
+            { text: test.bill_address_line_2, fontSize: 9 },
+            { text: 'GST NO:' + test.customer_gst, fontSize: 9, bold: true },
+            { text: test.customer_udyam ? 'Udyam No :'+test.customer_udyam : '', fontSize: 9 ,bold:true},
+            { text: 'State:' + test.bill_state, fontSize: 9, bold: true },
+            { text: 'Pin Code:' + test.bill_zip_code, alignment: 'left', bold: true, fontSize: 9 },
           ],
           {
             columns: [
-              [{ text: 'Ship to party:', bold: true, fontSize: 10 },
-              { text: test.ship_attention, bold: true, fontSize: 10 },
-              { text: test.ship_address_line_1, fontSize: 10 },
-              { text: test.ship_address_line_2, fontSize: 10 },
-              { text: 'GST NO :' + test.customer_gst, fontSize: 10, bold: true },
-              { text: 'State :' + test.ship_state, fontSize: 10, bold: true },
-              { text: 'Pin Code :' + test.ship_zip_code, alignment: 'left', bold: true, fontSize: 10 },
+              [{ text: 'Ship to party :', bold: true, fontSize: 9 },
+              { text: test.ship_attention, bold: true, fontSize: 9 },
+              { text: test.ship_address_line_1, fontSize: 9 },
+              { text: test.ship_address_line_2, fontSize: 9 },
+              { text: 'GST NO:' + test.customer_gst, fontSize: 9, bold: true },
+              { text: 'State:' + test.ship_state, fontSize: 9, bold: true },
+              { text: 'Pin Code:' + test.ship_zip_code, alignment: 'left', bold: true, fontSize: 9 },
               ],
             ]
           },
@@ -1653,7 +1734,7 @@ getItemsObject(files) {
   {
   return {
   table: {
-    widths: [21, 103, 31, 27, 26, 35, 22, 32, 22, 32, 64],
+    widths: [11, 104, 42, 20, 26, 54, 8, 39, 8, 39, 64],
     body: [
       [
         { text: '#', border: [true, true, true, false],fillColor: '#CCCCCC', fontSize: 10, bold: true , alignment: 'center'},
@@ -1688,17 +1769,17 @@ getItemsObject(files) {
           }
 
         return [
-          { text:  serialNumber++,border:cellBorder, fontSize: 10 , alignment: 'center'},
-          { text: [{ text: ed.item_name,bold: true },{ text: '\n' }, { text: ed.item_description },{ text: '\n' },{text:ed.serial_number?"SN : "+ed.serial_number:''}], border: cellBorder, fontSize: 10, alignment: 'left' },
-          { text: ed.hsn,border:cellBorder, fontSize: 10 , alignment: 'center'},
-          { text: ed.qty,border:cellBorder, fontSize: 10 , alignment: 'center'},
-          { text: ed.uom,border:cellBorder, fontSize: 10 , alignment: 'center'},
-          { text: ed.amount.toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,'),border:cellBorder, fontSize: 10 , alignment: 'center'},
-          { text: ed.tax_percent/2 +'%',border:cellBorder, fontSize: 10 ,alignment: 'center'},
-          { text: (ed.item_tax/2).toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,'),border:cellBorder, fontSize: 10 , alignment: 'center'},
-          { text: ed.tax_percent/2 +'%',border:cellBorder, fontSize: 10 , alignment: 'center'},
-          { text: (ed.item_tax/2).toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,'),border:cellBorder, fontSize: 10 , alignment: 'center'},
-          { text: ed.total.toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,'), border: [true, true, true, false], fontSize: 10,  alignment: 'right'}]
+          { text:  serialNumber++,border:cellBorder, fontSize: 9 , alignment: 'center'},
+          { text: [{ text: ed.item_name,bold: true ,fontSize: 9,},{ text: '\n' }, { text: ed.item_description ,fontSize: 8,},{ text: '\n' },{text:ed.serial_number?"SN : "+ed.serial_number:'',fontSize: 8,}], border: cellBorder,  alignment: 'left' },
+          { text: ed.hsn,border:cellBorder, fontSize: 9 , alignment: 'center'},
+          { text: ed.qty,border:cellBorder, fontSize: 9 , alignment: 'center'},
+          { text: ed.uom,border:cellBorder, fontSize: 9 , alignment: 'center'},
+          { text: ed.amount.toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,'),border:cellBorder, fontSize: 9 , alignment: 'center'},
+          { text: ed.tax_percent/2,border:cellBorder, fontSize: 9 ,alignment: 'center'},
+          { text: (ed.item_tax/2).toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,'),border:cellBorder, fontSize: 9 , alignment: 'center'},
+          { text: ed.tax_percent/2 ,border:cellBorder, fontSize: 9 , alignment: 'center'},
+          { text: (ed.item_tax/2).toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,'),border:cellBorder, fontSize: 9 , alignment: 'center'},
+          { text: ed.total.toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,'), border: [true, true, true, false], fontSize: 9,  alignment: 'right'}]
 
 
         },
@@ -1712,7 +1793,7 @@ getItemsObject(files) {
     {
     return {
     table: {
-      widths: [21, 103, 49, 32, 30, 40, 30,63,65],
+      widths: [11,127,49,25,25,60,20,50,66],
       body: [
         [
           { text: '#', border: [true, true, true, false],fillColor: '#CCCCCC', fontSize: 10, bold: true , alignment: 'center'},
@@ -1745,15 +1826,15 @@ getItemsObject(files) {
             }
 
           return [
-            { text:  serialNumber++,border:cellBorder, fontSize: 10 , alignment: 'center'},
-            { text: [{ text: ed.item_name,bold: true },{ text: '\n' }, { text: ed.item_description },{ text: '\n' },{text:ed.serial_number?"SN : "+ed.serial_number:''}], border: cellBorder, fontSize: 10, alignment: 'left' },
-            { text: ed.hsn,border:cellBorder, fontSize: 10 , alignment: 'center'},
-            { text: ed.qty,border:cellBorder, fontSize: 10 , alignment: 'center'},
-            { text: ed.uom,border:cellBorder, fontSize: 10 , alignment: 'center'},
-            { text: ed.amount.toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,'),border:cellBorder, fontSize: 10 , alignment: 'center'},
-            { text: ed.tax_percent +'%',border:cellBorder, fontSize: 10 ,alignment: 'center'},
-            { text: (ed.item_tax).toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,'),border:cellBorder, fontSize: 10 , alignment: 'center'},
-            { text: ed.total.toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,'), border: [true, true, true, false], fontSize: 10,  alignment: 'right'}]
+            { text:  serialNumber++,border:cellBorder, fontSize: 9 , alignment: 'center'},
+            { text: [{ text: ed.item_name,bold: true,fontSize: 9 },{ text: '\n' }, { text: ed.item_description,fontSize: 8 },{ text: '\n' },{text:ed.serial_number?"SN : "+ed.serial_number:'',fontSize: 8}], border: cellBorder, alignment: 'left' },
+            { text: ed.hsn,border:cellBorder, fontSize: 9 , alignment: 'center'},
+            { text: ed.qty,border:cellBorder, fontSize: 9 , alignment: 'center'},
+            { text: ed.uom,border:cellBorder, fontSize: 9 , alignment: 'center'},
+            { text: ed.amount.toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,'),border:cellBorder, fontSize: 9 , alignment: 'center'},
+            { text: ed.tax_percent ,border:cellBorder, fontSize: 9 ,alignment: 'center'},
+            { text: (ed.item_tax).toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,'),border:cellBorder, fontSize: 9 , alignment: 'center'},
+            { text: ed.total.toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,'), border: [true, true, true, false], fontSize: 9,  alignment: 'right'}]
 
           },
           )
@@ -1783,77 +1864,77 @@ getItemstotalObject(files) {
 
   var rows = [
     [
-      { text: 'Total Amount Before Tax', fontSize: 10, colSpan: 11, alignment: 'right' },
+      { text: 'Total Amount Before Tax', fontSize: 9, colSpan: 11, alignment: 'right' },
       '', '', '', '', '', '', '', '', '', '',
-      { text: without_tax, fontSize: 10 ,alignment: 'right'}
+      { text: without_tax, fontSize: 9 ,alignment: 'right'}
     ],
 
   ];
 
   if (tax.tax_5 > 0) {
     rows.push([
-      { text: 'GST (5%)', fontSize: 10, colSpan: 11, alignment: 'right' },
+      { text: 'GST (5%)', fontSize: 9, colSpan: 11, alignment: 'right' },
       '', '', '', '', '', '', '', '', '', '',
-      { text: tax_5, fontSize: 10 ,alignment: 'right'}
+      { text: tax_5, fontSize: 9 ,alignment: 'right'}
     ]);
   }
 
   if (tax.tax_12 > 0) {
     rows.push([
-      { text: 'GST (12%)', fontSize: 10, colSpan: 11, alignment: 'right' },
+      { text: 'GST (12%)', fontSize: 9, colSpan: 11, alignment: 'right' },
       '', '', '', '', '', '', '', '', '', '',
-      { text: tax_12, fontSize: 10, alignment: 'right'}
+      { text: tax_12, fontSize: 9, alignment: 'right'}
     ]);
   }
 
   if (tax.tax_18 > 0) {
     rows.push([
-      { text: 'GST (18%)', fontSize: 10, colSpan: 11, alignment: 'right' },
+      { text: 'GST (18%)', fontSize: 9, colSpan: 11, alignment: 'right' },
       '', '', '', '', '', '', '', '', '', '',
-      { text: tax_18, fontSize: 10, alignment: 'right' }
+      { text: tax_18, fontSize: 9, alignment: 'right' }
     ]);
   }
 
   if (tax.tax_28 > 0) {
     rows.push([
-      { text: 'GST (28%)', fontSize: 10, colSpan: 11, alignment: 'right' },
+      { text: 'GST (28%)', fontSize: 9, colSpan: 11, alignment: 'right' },
       '', '', '', '', '', '', '', '', '', '',
-      { text:tax_28, fontSize: 10, alignment: 'right' }
+      { text:tax_28, fontSize: 9, alignment: 'right' }
     ]);
   }
 
   if (test.transport > 0) {
     rows.push([
-      { text: 'Shipping Charge', fontSize: 10, colSpan: 11, alignment: 'right' },
+      { text: 'Shipping Charge', fontSize: 9, colSpan: 11, alignment: 'right' },
       '', '', '', '', '', '', '', '', '', '',
-      { text:transport, fontSize: 10, alignment: 'right' }
+      { text:transport, fontSize: 9, alignment: 'right' }
     ]);
   }
   if (test.tds > 0) {
       rows.push([
-        { text: 'TDS('+test.tds_percent+'%)', fontSize: 10, colSpan: 11, alignment: 'right' },
+        { text: 'TDS('+test.tds_percent+'%)', fontSize: 9, colSpan: 11, alignment: 'right' },
         '', '', '', '', '', '', '', '', '', '',
-        { text:tds, fontSize: 10, alignment: 'right' }
+        { text:tds, fontSize: 9, alignment: 'right' }
       ]);
     }
 
   if (test.tcs > 0) {
     rows.push([
-      { text: 'TCS('+test.tcs_percent+'%)', fontSize: 10, colSpan: 11, alignment: 'right' },
+      { text: 'TCS('+test.tcs_percent+'%)', fontSize: 9, colSpan: 11, alignment: 'right' },
       '', '', '', '', '', '', '', '', '', '',
-      { text:tcs, fontSize: 10, alignment: 'right' }
+      { text:tcs, fontSize: 9, alignment: 'right' }
     ]);
   }
   rows.push([
 
-      { text: 'Round off',  fontSize: 10, colSpan: 11, alignment: 'right' },
+      { text: 'Round off',  fontSize: 9, colSpan: 11, alignment: 'right' },
       '', '', '', '', '', '', '', '', '', '',
-      { text: round_off, fontSize: 10, alignment: 'right' }
+      { text: round_off, fontSize: 9, alignment: 'right' }
     ],
     [
-      { text: 'Total', fontSize: 10, colSpan: 11, alignment: 'right',  },
+      { text: 'Total', fontSize: 9, colSpan: 11, alignment: 'right',  },
       '', '', '', '', '', '', '', '', '', '',
-      { text: total, fontSize: 10, alignment: 'right' }
+      { text: total, fontSize: 9, alignment: 'right' }
     ]);
 
   return {
@@ -1879,10 +1960,10 @@ getBankObject(files) {
         [
           [
             [
-              { text: 'Bank Details :', bold: 'true', fontSize: '10', alignment: 'left' },
-              { text: 'Bank Name           : ' + test.bank_name, fontSize: '10', alignment: 'left' },
-              { text: 'Account Number : ' + test.account_no, fontSize: '10', alignment: 'left' },
-              { text: 'IFSC CODE            : ' + test.ifsc_code, fontSize: '10', alignment: 'left' },
+              { text: 'Bank Details :', bold: 'true', fontSize: '9', alignment: 'left' },
+              { text: 'Bank Name           : ' + test.bank_name, fontSize: '9', alignment: 'left' },
+              { text: 'Account Number : ' + test.account_no, fontSize: '9', alignment: 'left' },
+              { text: 'IFSC CODE            : ' + test.ifsc_code, fontSize: '9', alignment: 'left' },
             ]
           ],
 
@@ -1890,10 +1971,10 @@ getBankObject(files) {
 
           [
             [
-              { text: 'Terms of Payment :', bold: true, fontSize: '10', alignment: 'left' },
-              { text: terms.payment_term1, margin: [0, 5], fontSize: '10', alignment: 'left' },
-              { text: terms.payment_term2, margin: [0, 5], fontSize: '10', alignment: 'left' },
-              { text: terms.payment_term3, margin: [0, 5], fontSize: '10', alignment: 'left' }
+              { text: 'Terms of Payment :', bold: true, fontSize: '9', alignment: 'left' },
+              { text: terms.payment_term1, margin: [0, 5], fontSize: '9', alignment: 'left' },
+              { text: terms.payment_term2, margin: [0, 5], fontSize: '9', alignment: 'left' },
+              { text: terms.payment_term3, margin: [0, 5], fontSize: '9', alignment: 'left' }
             ]
           ],
 
@@ -1923,15 +2004,15 @@ getTermsObject(files) {
         [
           [
             [
-              { text: test.inv_notes1, alignment: 'justify', margin: [0, 10, 0, 0], bold: false, fontSize: '10' },
-              { text: test.inv_notes2, alignment: 'justify', margin: [0, 10, 0, 0], bold: false, fontSize: '10' },
-              { text: 'For '+test.company_name, margin: [0, 10, 0, 0], bold: true, fontSize: '10', alignment: 'left' },
-              { text: 'Authorised Signatory', margin: [0, 35, 0, 0], bold: true, italics: true, fontSize: '10', alignment: 'left' },]
+              { text: test.inv_notes1, alignment: 'justify', margin: [0, 10, 0, 0], bold: false, fontSize: '9' },
+              { text: test.inv_notes2, alignment: 'justify', margin: [0, 10, 0, 0], bold: false, fontSize: '9' },
+              { text: 'For ' +test.company_name, margin: [0, 10, 0, 0], bold: true, fontSize: '9', alignment: 'left' },
+              { text: 'Authorised Signatory', margin: [0, 35, 0, 0], bold: true, italics: true, fontSize: '9', alignment: 'left' },]
           ],
           [
             [
-              { text: 'Terms & Conditions of sale:', bold: true, italics: true, fontSize: '10', alignment: 'left' },
-              { text: test.terms_conditions, margin: [0, 10], italics: true, fontSize: '10', alignment: 'left' },
+              { text: 'Terms & Conditions of sale:', bold: true, italics: true, fontSize: '9', alignment: 'left' },
+              { text: test.terms_conditions, margin: [0, 10], italics: true, fontSize: '9', alignment: 'left' },
             ]
           ],
         ],
@@ -2254,19 +2335,33 @@ async onSubmit(bill_data)
   }
 
 
-  e_bill()
+async  e_bill()
   {
-    this.new_category_id = this.modalService.open(this.ewayBill, { size: 'md' });
-
-    this.api.get('get_data.php?table=invoice&find=invoice_id&value='+this.invoice_id+'&authToken=' + environment.authToken).then((data: any) => {
+    this.e_way_bill_status = true;
+   await this.api.get('get_data.php?table=invoice&find=invoice_id&value='+this.invoice_id+'&authToken=' + environment.authToken).then((data: any) => {
 
        this.e_way_bill.controls['bill_no'].setValue(data[0].e_way_bill);
        this.e_way_bill.controls['vehicle_no'].setValue(data[0].vehicle_number);
        this.e_way_bill.controls['shipment_mode'].setValue(data[0].transport_mode);
        this.e_way_bill.controls['amount'].setValue(data[0].transport_charge);
-
+        if(data[0].e_way_bill == null && data[0].vehicle_number == null&& data[0].transport_mode == null && data[0].transport_charge == null)
+        {
+          this.e_way_bill_status = false;
+        }
     }).catch(error => { this.toastrService.error('Something went wrong'); });
+
+    this.new_category_id = this.modalService.open(this.ewayBill, { size: 'md' });
   }
+
+ewayEdit()
+{
+  this.e_way_bill_status = false;
+}
+
+editclose()
+{
+  this.e_way_bill_status = true;
+}
 
   async billSubmit(value)
   {
@@ -2490,5 +2585,37 @@ async onSubmit(bill_data)
   else{
     this.toastrService.error('No select the payament');
     }
+  }
+
+  insert_index : any
+  Item_popUp(i)
+  {
+    this.insert_index = i
+    console.log(i)
+    this.new_category_id = this.modalService.open(this.ItemListModel, { size: 'xl' });
+  }
+
+    selected_item: any
+
+  ItemSelect(event)
+  {
+    if(event.type == "click")
+    {
+         console.log("",event.row)
+         this.selected_item  = event.row
+    }
+
+  }
+
+ async ItemInsert()
+  {
+    console.log("selected_item", this.selected_item)
+    console.log("selected_item", this.insert_index)
+    const confirmed = confirm("Are you sure you want to Update this item?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
+      await this.edit_specItem(this.selected_item.item_id,this.insert_index)
   }
 }

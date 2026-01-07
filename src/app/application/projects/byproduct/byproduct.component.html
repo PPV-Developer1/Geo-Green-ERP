@@ -297,21 +297,27 @@
   </div>
   <div class="modal-body">
     <form [formGroup]="AddFromStr" (ngSubmit)="AddStoreItem(AddFromStr.value)" class="row">
-      <div class="form-group col-md-10">
+      <div class="form-group col-md-12">
         <!-- <select formControlName ="store_id" class="form-control">
           <option *ngFor= "let item of store_list" value={{item.id}}>{{item.product_name}} | {{item.batch}} | {{item.notes}}</option>
         </select> -->
-
-        <ng-select formControlName="store_id"  class=" form-control custom-select"   [clearable]="false" >
+        <label for="store_id">Product</label>
+        <ng-select formControlName="store_id"  class=" form-control custom-select" (change)="select($event)"  [clearable]="true" >
           <ng-option *ngFor= "let item of store_list" value="{{item.id}}" class="form-control">
-            {{item.product_name}} | {{item.batch}} | {{item.notes}}
+            {{item.product_name}} | {{item.batch}} | {{item.notes}} | Stock: {{item.stock_percentage}}%
           </ng-option>
         </ng-select>
 
         <span class="help-block text-danger" *ngIf="AddFromStr.get('store_id').touched && AddFromStr.get('store_id').hasError('required')">Selection Required!</span>
       </div>
-      <div class="form-group col-md-2">
-        <button [disabled]="loading" type="submit" class="btn btn-info pull-right">Add  <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+
+      <div class="form-group col-md-12">
+        <label for="value">Quantity (%)</label>
+        <input type="number" formControlName="value" class="form-control"  placeholder="Enter Quantity in percentage"/>
+        <span class="help-block text-danger" *ngIf="AddFromStr.get('value').touched && AddFromStr.get('value').hasError('required')">Required !</span>
+      </div>
+      <div class=" col-md-12 form-group text-center">
+        <button [disabled]="loading" type="submit" class="btn btn-info">Add  <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
       </div>
     </form>
   </div>

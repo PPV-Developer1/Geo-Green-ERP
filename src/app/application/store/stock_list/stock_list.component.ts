@@ -6,6 +6,7 @@ import { FormGroup, FormBuilder,  Validators,  FormControl } from '@angular/form
 import { ApiService } from "../../../service/api.service";
 import { environment } from "../../../../environments/environment";
 import { ToastrService } from 'ngx-toastr';
+import { group } from 'console';
 
 @Component({
   selector   : 'az-stock_list',
@@ -45,7 +46,7 @@ export class Stock_listComponent implements OnInit {
       quantity      : new FormControl(null, [Validators.required]),
       description   : new FormControl(null),
       item          : new FormControl(null, [Validators.required]),
-      'type'        : new FormControl('store'),
+      'type'        : new FormControl('Store'),
       project_id    : new FormControl(null)
     })
   constructor
@@ -106,12 +107,15 @@ export class Stock_listComponent implements OnInit {
     this.toastrService.error('Fill the Details');
   }
   }
+
+  total_stocklist : any
   async getProductList()
   {
     await this.api.get('mp_stock_list.php?format=status&authToken='+environment.authToken).then((data: any) =>
     {
       if(data != null)
       {
+        this.total_stocklist = data;
         this.stock_list  = data;
         this.filter_data = [...data];
       }
@@ -146,6 +150,19 @@ export class Stock_listComponent implements OnInit {
     }
   }
 
+  GroupStockDetails : any
+
+  onActivate2(event)
+  {
+    if(event.type === "click")
+    {
+      this.detail_view = null
+      console.log("on click : ",event.row);
+      this.GroupStockDetails  = this.total_stocklist.filter(i => i.item_id == event.row.item_list_id)
+      console.log("group stock : ",this.GroupStockDetails)
+    }
+  }
+
   updateFilter(event)
   {
     const val = event.target.value.toLowerCase();
@@ -174,6 +191,8 @@ export class Stock_listComponent implements OnInit {
   set_zero()
   {
     this.selected =[];
+    this.GroupStockDetails = null
+    this.detail_view = null
   }
 
   create_pur_request()
@@ -236,11 +255,17 @@ export class Stock_listComponent implements OnInit {
   Order_by_Item()
   {
     this.Type = false
+    this.detail_view = null
     this.getProductList()
   }
 
  async Order_by_Group()
   {
+     const confirmed = confirm("Are you sure you want to change stock grouping type?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
    await  this.api.get('stock_list_by_grouping.php?authToken='+environment.authToken).then((data: any) =>
     {
       console.log(data)

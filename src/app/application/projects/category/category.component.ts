@@ -54,6 +54,7 @@ async  ngOnInit()
 
    await this.api.get('get_data.php?table=project_level_category&authToken='+environment.authToken).then((data: any) =>
     {
+        console.log(data)
         for(let i=0;i< data.length;i++)
         {
            console.log(data[i]['id'])
@@ -123,9 +124,11 @@ async  ngOnInit()
       });
     if(this.CategoryForm.valid)
     {
+       this.CategoryForm.controls['created_by'].setValue(this.uid);
       this.loading = true;
-      await this.api.post('post_insert_data.php?table=project_level_category&authToken=' + environment.authToken, FormData).then((data_rt: any) =>
+      await this.api.post('post_insert_data.php?table=project_level_category&authToken=' + environment.authToken, this.CategoryForm.value).then((data_rt: any) =>
       {
+        console.log(data_rt)
         if (data_rt.status == "success")
         {
           this.loading = false;
@@ -166,6 +169,7 @@ async  ngOnInit()
     this.loading = true;
     this.api.post('post_update_data.php?authToken=' + environment.authToken + '&table=project_level_category&field=id&value=' + this.detail_view['id'], FormData).then((data: any) =>
     {
+      console.log(data)
       if (data.status == "success")
       {
         this.loading = false;

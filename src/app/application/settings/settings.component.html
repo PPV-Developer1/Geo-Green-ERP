@@ -47,7 +47,8 @@
                               </div>
                              <div class="col-sm-3 col-md-6 col-xl-6" >
                                 <a href="javascript:void(0);" class="list-group-item" (click)="payment_term_view()">Payment Terms</a>
-                                <a href="javascript:void(0);" (click)="payrole()" class="list-group-item">Pay Role Setting</a>
+                             
+                                <!-- <a href="javascript:void(0);" (click)="payrole()" class="list-group-item">Pay Role Setting</a> -->
                                  <!-- <a href="javascript:void(0);" class="list-group-item">Payment Receipt</a>
                                 <a href="javascript:void(0);" class="list-group-item">Bill</a>-->
                               </div>
@@ -1147,17 +1148,13 @@
 
 
 <div *ngIf="unit_view">
-  <div class="">
-    <button type="submit" class="btn btn-info fa fa-arrow-left " (click)="set_zero($event)"> Back</button>
-  </div>
-
   <div class="col-md-12">
     <table>
       <tr>
         <td style="width: 10px;">
-          <h1><small></small></h1>
+           <button type="submit" class="btn btn-info fa fa-arrow-left " (click)="set_zero($event)"> Back</button>
         </td>
-        <td style="width: 200px;">
+        <td style="width: 350px;text-align: center;">
           <h5>UNIT LIST</h5>
         </td>
         <!-- <td style="width: 1150px;">
@@ -1168,16 +1165,10 @@
              <input class="form-control" type="text" placeholder="Search Category by Key words - Category Name " (keyup)="updateFilter($event)" />
           </div>
         </td> -->
-        <td style="width: 100px;"> </td>
-        <td style="width: 100px; text-align: center; vertical-align: center;">
-        </td>
-        <td style="width: 200px; text-align: center; vertical-align: center;">
-          <div class="btn-group" role="group" aria-label="Basic example">
 
-          </div>
-        </td>
-        <td  style="width: 1000px">
-          <div class=" col-12 ">
+
+        <td  style="width:800">
+          <div class=" col-3 ">
             <button type="button" class="btn btn-success fa fa-plus pull-right"  (click)="Addunit()"> Add Unit</button>
           </div>
         </td>
@@ -1187,7 +1178,8 @@
 
   &nbsp;
   <div class="row">
-    <div class="col">
+     <div class="col-1"></div>
+    <div class="col-2">
       <ngx-datatable
       #table
       class="custom_table"

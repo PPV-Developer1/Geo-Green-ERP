@@ -20,6 +20,101 @@
         <td style="width: 100px; text-align: center; vertical-align: center;">
         </td>
         <td style="width: 200px; text-align: center; vertical-align: center;">
+          <!-- <div class="btn-group" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-success fa fa-plus" (click)="addNew()"> Add New</button>
+          </div> -->
+        </td>
+      </tr>
+    </table>
+  </div>
+  <ngx-datatable
+    #table
+    class="custom_table"
+    [headerHeight]="50"
+    [limit]="10"
+    [columnMode]="'flex'"
+    [footerHeight]="50"
+    [rowHeight]="'auto'"
+    [rows]="product_details"
+    [selected]="selected"
+    [selectionType]="'single'"
+    (activate)="onActivate($event)">
+
+    <ngx-datatable-column     [resizeable]="false" prop="id" name="ID" [flexGrow]="0.7" >
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.id}}
+        </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column     [resizeable]="false" prop="date_time" name="CREATED AT" [flexGrow]="1">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.date_time| date: 'dd-MM-yyyy HH:mm:ss'}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column     [resizeable]="false" prop="creater_name" name="CREATED BY" [flexGrow]="1">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.creater_name}}
+      </ng-template>
+    </ngx-datatable-column>
+
+        <ngx-datatable-column     [resizeable]="false" prop="by_product_no" name="PRODUCT NO" [flexGrow]="1">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.by_product_no}}
+      </ng-template>
+    </ngx-datatable-column>
+
+     <ngx-datatable-column     [resizeable]="false" prop="notes" [flexGrow]="1" name="PRODUCT NOTE">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.notes}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column     [resizeable]="false" prop="type" name="PROJECT NAME" [flexGrow]="2">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        <span *ngIf="row.type == 1">{{row.project_name}}</span>
+        <span *ngIf="row.type == 2"> <strong>For Store</strong></span>
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column     [resizeable]="false" prop="product_name" name="PRODUCT NAME" [flexGrow]="2">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.product_name}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column     [resizeable]="false" prop="level" name="LEVEL" [flexGrow]="1">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        <span *ngIf="row.level === 1">Created</span>
+        <span *ngIf="row.level === 2">Waiting For Approval</span>
+        <span *ngIf="row.level === 3">Move to Production</span>
+        <span *ngIf="row.level === 4">Completed</span>
+      </ng-template>
+    </ngx-datatable-column>
+  </ngx-datatable>
+  &nbsp;
+
+  <div class="col-md-12">
+    <table>
+      <tr>
+        <td style="width: 10px;">
+          <h1><small></small></h1>
+        </td>
+        <td style="width: 250px;">
+          <h5>STORE PLANNING</h5>
+        </td>
+        <td style="width: 1100px;">
+          <div class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input class="form-control" type="text" placeholder="Search Product Name or Product Number..." (keyup)="updateFilter_store($event)"/>
+          </div>
+        </td>
+        <td style="width: 100px;"> </td>
+        <td style="width: 100px; text-align: center; vertical-align: center;">
+        </td>
+        <td style="width: 200px; text-align: center; vertical-align: center;">
           <div class="btn-group" role="group" aria-label="Basic example">
             <button type="button" class="btn btn-success fa fa-plus" (click)="addNew()"> Add New</button>
           </div>
@@ -35,7 +130,7 @@
     [columnMode]="'flex'"
     [footerHeight]="50"
     [rowHeight]="'auto'"
-    [rows]="product_details"
+    [rows]="Store_production"
     [selected]="selected"
     [selectionType]="'single'"
     (activate)="onActivate($event)">
@@ -64,16 +159,16 @@
       </ng-template>
     </ngx-datatable-column>
 
-    <ngx-datatable-column     [resizeable]="false" prop="type" name="PROJECT NAME" [flexGrow]="2">
-      <ng-template ngx-datatable-cell-template let-row="row">
-        <span *ngIf="row.type == 1">{{row.project_name}}</span>
-        <span *ngIf="row.type == 2"> <strong>For Store</strong></span>
-      </ng-template>
-    </ngx-datatable-column>
-
     <ngx-datatable-column     [resizeable]="false" prop="product_name" name="PRODUCT NAME" [flexGrow]="2">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.product_name}}
+      </ng-template>
+    </ngx-datatable-column>
+
+
+      <ngx-datatable-column     [resizeable]="false" prop="notes" [flexGrow]="1" name="PRODUCT NOTE">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.notes}}
       </ng-template>
     </ngx-datatable-column>
 
@@ -87,6 +182,7 @@
     </ngx-datatable-column>
   </ngx-datatable>
 </div>
+
 <div *ngIf="selected.length > 0">
   <div class="modal-header">
     <button type="submit" class="btn btn-info fa fa-arrow-left" (click)="set_zero($event)"> Back</button>
@@ -248,7 +344,7 @@
         Notes
       </div>
       <div class="form-group col-md-8">
-        <input formControlName="notes" type="account" class="form-control" placeholder="Production Notes">
+        <textarea formControlName="notes" type="account" class="form-control" placeholder="Production Notes"></textarea>
         <span class="help-block text-danger" *ngIf="CategoryForm.get('notes').touched && CategoryForm.get('notes').hasError('required')">Notes Required !</span>
         <span class="help-block text-danger" *ngIf="CategoryForm.get('notes').touched && CategoryForm.get('notes').hasError('minlength')">Minimum 3 Letters</span>
       </div>

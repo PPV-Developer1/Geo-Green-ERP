@@ -6,7 +6,7 @@
           <h1><small></small></h1>
         </td>
         <td style="width: 300px;">
-          <h5>OUTWARD</h5>
+          <h5>OUTWARD FOR PROJECT</h5>
         </td>
         <td style="width: 900px;">
           <div class="input-group input-group-sm my-3">
@@ -32,7 +32,7 @@
     #table
     class="custom_table"
     [headerHeight]="50"
-    [limit]="20"
+    [limit]="10"
     [columnMode]="'flex'"
     [footerHeight]="50"
     [rowHeight]="'auto'"
@@ -73,6 +73,12 @@
       </ng-template>
     </ngx-datatable-column>
 
+     <ngx-datatable-column     [resizeable]="false" prop="notes" [flexGrow]="1" name="PRO NOTE">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.notes}}
+      </ng-template>
+    </ngx-datatable-column>
+
   <ngx-datatable-column     [resizeable]="false" prop="by_product_description" [flexGrow]="2" name="DESCRIPTION">
       <ng-template ngx-datatable-cell-template let-row="row">
           {{row.by_product_description}}
@@ -80,7 +86,98 @@
     </ngx-datatable-column>
     <ngx-datatable-column     [resizeable]="false" prop="product_name" [flexGrow]="2" name="PRODUCT NAME">
       <ng-template ngx-datatable-cell-template let-row="row">
-          {{row.product_name}}by_product_description
+          {{row.product_name}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column     [resizeable]="false" prop="level" [flexGrow]="1" name="LEVEL">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        <span *ngIf="row.level === 1">Created</span>
+        <span *ngIf="row.level === 2">Waiting For Approval</span>
+        <span *ngIf="row.level === 3">Move to Production</span>
+        <span *ngIf="row.level === 4">Completed</span>
+      </ng-template>
+    </ngx-datatable-column>
+  </ngx-datatable>
+
+  &nbsp;
+  <div class="col-md-12">
+    <table>
+      <tr>
+        <td style="width: 10px;">
+          <h1><small></small></h1>
+        </td>
+        <td style="width: 300px;">
+          <h5>OUTWARD FOR STORE</h5>
+        </td>
+        <td style="width: 900px;">
+          <div class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input class="form-control" type="text" placeholder="Search Product Name or Product Number or Assign Name..." (keyup)="updateFilter_store($event)"/>
+          </div>
+        </td>
+        <td style="width: 100px;"> </td>
+        <td style="width: 100px; text-align: center; vertical-align: center;">
+        </td>
+        <td style="width: 200px; text-align: center; vertical-align: center;">
+          <div class="btn-group" role="group" aria-label="Basic example">
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+
+  <ngx-datatable
+    #table
+    class="custom_table"
+    [headerHeight]="50"
+    [limit]="10"
+    [columnMode]="'flex'"
+    [footerHeight]="50"
+    [rowHeight]="'auto'"
+    [rows]="store_details"
+    [selected]="selected"
+    [selectionType]="'single'"
+    (activate)="onActivate($event)">
+
+    <!-- <ngx-datatable-column     [resizeable]="false"  name="ID" >
+        <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.id}}
+        </ng-template>
+    </ngx-datatable-column> -->
+
+    <ngx-datatable-column     [resizeable]="false" prop="start_datetime" [flexGrow]="1"   name="STARTED AT">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.start_datetime | date: 'dd-MM-yyyy HH:mm:ss'}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column     [resizeable]="false" prop="assign_name" [flexGrow]="1" name="ASSIGN TO">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.assign_name}}
+      </ng-template>
+    </ngx-datatable-column>
+
+
+    <ngx-datatable-column     [resizeable]="false" prop="by_product_no" [flexGrow]="1" name="PRODUCT NO">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.by_product_no}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column     [resizeable]="false" prop="product_name" [flexGrow]="2" name="PRODUCT NAME">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.product_name}}
+      </ng-template>
+    </ngx-datatable-column>
+
+
+     <ngx-datatable-column     [resizeable]="false" prop="notes" [flexGrow]="1" name="PRO NOTE">
+      <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.notes}}
       </ng-template>
     </ngx-datatable-column>
 
@@ -239,7 +336,7 @@
           <label for="input-15">Notes</label>
         </div>
         <div class="form-group col-6" *ngIf="batchQty != null && batchList != null">
-          <input formControlName ="notes" type="text" class="form-control" id="input-10" placeholder=" Enter Outward Notes">
+          <textarea formControlName ="notes" type="text" class="form-control" id="input-10" placeholder=" Enter Outward Notes"></textarea>
         </div>
 
         <div class="col-12" *ngIf="batchQty != null && batchList != null">

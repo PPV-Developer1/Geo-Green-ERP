@@ -35,6 +35,7 @@ export class Bank_listComponent implements OnInit
   editing                   = {};
   rows                      = [];
   temp                      = [];
+  expenseData_temp          = [];
   selected                  = [];
   detail_view               = [];
   price                     = '1000000';
@@ -99,6 +100,28 @@ export class Bank_listComponent implements OnInit
     this.loadData();
   }
 
+   updateFilter(event) {
+    const val = event.target.value.toLowerCase();
+    const temp = this.temp.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.bankData = temp;
+    this.table.offset = 0;
+  }
+
+  updateFilter_expense(event) {
+    const val = event.target.value.toLowerCase();
+    const temp = this.expenseData_temp.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.expenseData = temp;
+    this.table.offset = 0;
+  }
+
   AccountAddButton()
   {
     this.modalRef =  this.modalService.open(this.add_account, { size: 'xl'});
@@ -124,6 +147,7 @@ export class Bank_listComponent implements OnInit
       this.api.get('get_data.php?table=bank&find=type&value=1&authToken=' + environment.authToken).then((data: any) =>
       {
         this.bankData = data;
+        this.temp=[...data];
       }).catch(error => {
         this.toastrService.error('API Faild : loadData  bank list');
       });
@@ -133,6 +157,7 @@ export class Bank_listComponent implements OnInit
       this.api.get('get_data.php?table=bank&find=bank_id&value='+this.user_bank_id+'&authToken=' + environment.authToken).then((data: any) =>
       {
         this.bankData = data;
+         this.temp=[...data];
       }).catch(error => {
         this.toastrService.error('API Faild : loadData bank list');
       });
@@ -141,6 +166,7 @@ export class Bank_listComponent implements OnInit
     this.api.get('get_data.php?table=expense_account&authToken=' + environment.authToken).then((data: any) =>
     {
       this.expenseData = data;
+      this.expenseData_temp=[...data];
     }).catch(error => {
       this.toastrService.error('API Faild : loadData expence');
     });

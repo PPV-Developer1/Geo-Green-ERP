@@ -585,14 +585,14 @@
         <span class="help-block text-danger"
           *ngIf="payroll_days.get('no_of_days').touched && payroll_days.get('no_of_days').hasError('required')">Enter No of Days !</span>
       </div>
-
-      <div class="form-group col-xl-2" style="text-align: center;padding: center;">
-                 <label  *ngIf="total_days*8 - total_workeddays <= 32 && pl_status == null" for="name"> Add PL  </label>
+       <div class="form-group col-xl-5" style="text-align: center;padding: center;" *ngIf="employee_type > 4"></div>
+      <div class="form-group col-xl-2" style="text-align: center;padding: center;" *ngIf="employee_type < 4">
+                 <label  *ngIf="total_days*8 - total_workeddays <= 32 && pl_status == null " for="name"> Add PL  </label>
           <div   *ngIf="total_days*8 - total_workeddays <= 32 && pl_status == null" >
                 <button  size="sm" class="btn btn-success rounded-circle btn-sm" type="button" (click)="onAddLeave()" title="Add PL"><i class="fa fa-plus"></i></button>
         </div>
       </div>
-        <div class="form-group col-xl-3" style="text-align: center;padding: center;">
+        <div class="form-group col-xl-3" style="text-align: center;padding: center;" *ngIf="employee_type < 4">
 
             <small *ngIf="total_days*8 - total_workeddays <= 32 && pl_status == null" style="color: #e0a225;" > * Not eligible for PL leave,if more than 4 working days absent.</small>
               <small *ngIf="total_days*8 - total_workeddays > 32 && pl_status == null" style="color:red;">* Not eligible for PL leave due to insufficient worked days!</small>
@@ -801,7 +801,7 @@
                 <div class="col-md-6">
                   <div class="row">
                     <div class="col-md-6 mt-2">
-                      <b>Salary Amount </b>
+                      <b>Salary Amount <span *ngIf="Employee_type == 5"> (per day)</span> </b>
                       <span class="help-block text-danger" *ngIf="payroll_amount.get('salary_amount').touched && payroll_amount.get('salary_amount').hasError('required')">Salary Amount Required !</span>
                         <span class="help-block text-danger" *ngIf="payroll_amount.get('salary_amount').touched && payroll_amount.get('salary_amount').hasError('minlength')">Salary Amount </span>
                     </div>

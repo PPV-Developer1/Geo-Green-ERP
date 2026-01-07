@@ -145,7 +145,14 @@ export class BillsComponent implements OnInit {
   customer_list            : any
   project_list             : any
   originalTableHeight      : any
-
+  selected_item            : any;
+  insert_index             : any;
+  popup                    : any;
+  ItemList_temp            : any;
+  alldata                  : any;
+  alldata1                 : any;
+  item_id                  : any;
+  item_name                : any;
   tableWidth :any= 100 ;
   @ViewChild(DatatableComponent) table: DatatableComponent;
   @ViewChild("customer_name", { static: true }) customer_name: ElementRef;  // For MODEL Open
@@ -153,7 +160,8 @@ export class BillsComponent implements OnInit {
   @ViewChild("bill_list", { static: true }) bill_list : ElementRef;
   @ViewChild('tableResponsive', { static: false }) tableResponsive: ElementRef;
   @ViewChild('dropdownPanel', { static: false }) dropdownPanel: ElementRef;
-
+  @ViewChild("ItemListModel", { static: true }) ItemListModel   : ElementRef;
+   @ViewChild('Itemstable', { static: false }) Itemstable: DatatableComponent;
   constructor
   (
     public  fb            : FormBuilder,
@@ -192,22 +200,25 @@ export class BillsComponent implements OnInit {
         total     : [0],
         tds_percentage:[0],
         tcs_percentage:[0],
-        tax_type  : [null],
-        project_id : [null],
-        size    : [null],
-        product: this.fb.array([]),
-        type   : [null]
+        tax_type    : [null],
+        project_id  : [null],
+        size        : [null],
+        product     : this.fb.array([]),
+        type        : [null],
+
       })
 
 
   }
-
+initial_loading: boolean = false;
  async ngOnInit()
   {
+   this.initial_loading = true;
    await this.LoadVendorDetails();
    await this.LoadVendorBills();
    await this.initProduct();
    await this.LoadItemDetails();
+   this.initial_loading = false;
 
   }
 
@@ -329,13 +340,22 @@ export class BillsComponent implements OnInit {
 
   async LoadItemDetails()
   {
-    await this.api.get('get_data.php?table=item&find=purchase&value=1&authToken=' + environment.authToken).then((data: any) =>
+     await this.api.get('mp_item_list.php?&authToken=' + environment.authToken).then((data: any) =>
     {
-      console.log(data)
-      this.ItemList = data;
+      console.log("item : ",data)
+      this.ItemList = data.filter(i => i.purchase ==1);
+      this.ItemList_temp = [...data.filter(i => i.purchase ==1)]
+      console.log("Filter : ",this.ItemList)
     }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
   }
 
+  // In your component.ts
+trackByFn(index: number, row: any): any {
+  // Use a unique ID from your data (Bill No. or internal ID)
+  console.log(row.billNo)
+  console.log(index)
+  return row.billNo;
+}
   ReturnToList()
   {
     this.isDropdownAppendedToBody = true;
@@ -467,6 +487,7 @@ if(id)
     else{
       this.GSTCalculation()
     }
+    this.vendor_address(id)
   }
   async LoadGST(mode)
   {
@@ -594,6 +615,7 @@ if(id)
     product.push(this.fb.group({
       items       : new FormControl('', Validators.required),
       descriptions: new FormControl(''),
+      item_name   : new FormControl(''),
       taxes       : new FormControl('', Validators.required),
       price       : new FormControl('', Validators.required),
       quantity    : new FormControl('', Validators.required),
@@ -617,6 +639,8 @@ if(id)
       descriptions : this.descriptions,
       discount_1   : 0,
       discount_2   : 0,
+      items       : this.item_id,
+      item_name    : this.item_name
     });
   }
 
@@ -642,7 +666,8 @@ if(id)
         this.uom      = data[0].uom;
         this.amount   = data[0].price;
         this.descriptions = data[0].description;
-
+        this.item_id     = data[0].item_id;
+        this.item_name   = data[0].name;
         this.api.get('get_data.php?table=item_category&find=cat_id&value=' + data[0].item_cat + '&authToken=' + environment.authToken).then((data: any) => {
 
            this.category =  data[0].have_serial_number
@@ -657,6 +682,9 @@ if(id)
     this.SubTotalChange();
     this.GSTCalculation();
     this.resetTableHeight();
+    this.popup.close();
+    this.selected_item = null;
+    this.LoadItemDetails();
   }
 
   SubTotalChange()
@@ -825,9 +853,8 @@ if(id)
       });
     }
   }
+
   updateFilter(event) {
-
-
     const val = event.target.value.toLowerCase();
     const temp = this.temp.filter((d) => {
       return Object.values(d).some(field =>
@@ -873,6 +900,11 @@ if(id)
 
   setzero()
   {
+    const confirmed = confirm(" Are you sure you want to go back to this?");
+       console.log(confirmed)
+      if (!confirmed) {
+        return;
+      }
     this.show_new_bill = false;
     this.selected      = [];
     this.LoadVendorBills();
@@ -942,5 +974,102 @@ if(id)
       {
         this.project_list = data
       }).catch(error => { this.toastrService.error('Something went wrong'); });
+  }
+
+    ReloadBillAddr(id)
+  {
+    console.log("ReloadBillAddr id : ",id)
+    this.api.get('get_data.php?table=vendor_address&find=vendor_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
+      this.bill_addr = data[0];
+
+      this.billFrom = this.bill_addr.vendor_addr_id;
+      this.billAttention = this.bill_addr.attention;
+      this.billAddress_line_1 = this.bill_addr.address_line_1;
+      this.billAddress_line_2 = this.bill_addr.address_line_2;
+      this.billCity = this.bill_addr.city;
+      this.billState = this.bill_addr.state;
+      this.billZipcode = this.bill_addr.zip_code;
+      this.bill.controls['billFrom'].setValue(this.billFrom);
+    }).catch(error => { this.toastrService.error('Something went wrong'); });
+  }
+
+  ReloadShippAddr(id) {
+
+    this.api.get('get_data.php?table=vendor_address&find=vendor_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
+      this.shipp_addr = data[0];
+
+      this.shipFrom = this.shipp_addr.vendor_addr_id;
+      this.shipAttention = this.shipp_addr.attention;
+      this.shipAddress_line_1 = this.shipp_addr.address_line_1;
+      this.shipAddress_line_2 = this.shipp_addr.address_line_2;
+      this.shipCity = this.shipp_addr.city;
+      this.shipState = this.shipp_addr.state;
+      this.shipZipcode = this.shipp_addr.zip_code;
+      this.bill.controls['shipFrom'].setValue(this.shipFrom);
+
+    }).catch(error => { this.toastrService.error('Something went wrong'); });
+  }
+
+
+
+   vendor_address(id)
+  {
+    this.api.get('get_data.php?table=vendor_address&find=vendor_id&value=' + id + '&find1=type&value1=1&authToken=' + environment.authToken).then((data: any) => {
+
+        this.alldata = data;
+    }).catch(error => { this.toastrService.error('Something went wrong 1'); });
+
+    this.api.get('get_data.php?table=vendor_address&find=vendor_id&value=' + id + '&find1=type&value1=2&authToken=' + environment.authToken).then((data: any) => {
+
+      this.alldata1 = data;
+  }).catch(error => { this.toastrService.error('Something went wrong 2'); });
+
+  }
+
+
+  ItemSelect(event)
+  {
+    if(event.type == "click")
+    {
+         console.log("",event.row)
+         this.selected_item  = event.row
+    }
+
+  }
+
+ async ItemInsert()
+  {
+    console.log("selected_item", this.selected_item)
+    console.log("selected_item", this.insert_index)
+    const confirmed = confirm("Are you sure you want to add this item?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
+      await this.specItem(this.selected_item.item_id,this.insert_index)
+  }
+
+  Item_popUp(i)
+  {
+    this.insert_index = i
+    console.log(i)
+    console.log("item list : ",this.ItemList)
+    this.popup = this.modalService.open(this.ItemListModel, { size: 'xl' });
+  }
+
+  updateFilter_item(event)
+  {
+    const val = event.target.value.toLowerCase();
+    const temp = this.ItemList_temp.filter((d) => {
+      return Object.values(d).some(field =>
+        field != null && field.toString().toLowerCase().indexOf(val) !== -1
+      );
+    });
+    this.ItemList = temp;
+
+    if (this.Itemstable) {
+      this.Itemstable.offset = 0;
+    }
+
   }
 }

@@ -45,6 +45,7 @@ export class InwardComponent implements OnInit {
       batch           : new FormControl(null, [Validators.required]),
       inward_at       : new FormControl(null, [Validators.required]),
       inward_qty      : new FormControl(null, [Validators.required]),
+      inward_stock_qty: new FormControl(null),
       notes           : new FormControl(null),
       seriel_no       : this.fb.array([])
     })
@@ -59,13 +60,13 @@ export class InwardComponent implements OnInit {
       note            : new FormControl(null, [Validators.required]),
       terms_condition : new FormControl(null, [Validators.required]),
       item_id         : new FormControl(null, [Validators.required]),
-      item_description: new FormControl(null, [Validators.required]),
+      item_description: new FormControl(null),
       qty             : new FormControl(null, [Validators.required]),
       amount          : new FormControl(null, [Validators.required]),
       hsn             : new FormControl(null, [Validators.required]),
       uom             : new FormControl(null, [Validators.required]),
       tax_percent     : new FormControl(null, [Validators.required]),
-      inward_id       : new FormControl(null, [Validators.required]),
+      inward_id       : new FormControl(null ),
       total           : new FormControl(null, [Validators.required]),
       type            : new FormControl('vendor'),
     })
@@ -105,6 +106,8 @@ export class InwardComponent implements OnInit {
     }).catch(error => {this.toastrService.error('Something went wrong');});
   }
 
+  remaining_qty : any
+
   async onActivate(event)
   {
     if(event.type === "click")
@@ -112,7 +115,8 @@ export class InwardComponent implements OnInit {
       console.log(event.row)
       this.detail_view = event.row;
       this.has_serial  = event.row.have_seriel_number;
-      this.qty         = event.row.qty;
+      this.qty         = event.row.qty-event.row.inward_qty;
+      this.remaining_qty = event.row.qty-event.row.inward_qty;
       const billDate = this.detail_view['bill_date'];
       const formattedDate = billDate.substring(8, 10) + billDate.substring(5, 7) + billDate.substring(2, 4);
       this.batchCode   = formattedDate+'/'+this.detail_view['item_list_id'];
@@ -128,7 +132,8 @@ export class InwardComponent implements OnInit {
         setTimeout(() => {
           this.InwardEntry.controls['batch'].setValue(this.batchCode);
           this.InwardEntry.controls['inward_at'].setValue(this.todays_Date);
-          this.InwardEntry.controls['inward_qty'].setValue(this.detail_view['qty']);
+          this.InwardEntry.controls['inward_qty'].setValue(this.qty);
+          this.InwardEntry.controls['inward_stock_qty'].setValue(event.row.inward_qty);
           this.seriel_box();
         }, 500);
     }
@@ -147,6 +152,13 @@ export class InwardComponent implements OnInit {
 
   async InwardSubmit(value)
   {
+    console.log(value)
+    console.log(this.remaining_qty)
+    if(this.remaining_qty < value.inward_qty)
+    {
+      this.toastrService.warning( "Inward item value is greater than bill item value","Warning")
+      return
+    }
     Object.keys(this.InwardEntry.controls).forEach(field =>
       {
         const control = this.InwardEntry.get(field);
@@ -177,14 +189,14 @@ export class InwardComponent implements OnInit {
                   console.log(Number(this.InwardEntry.value['inward_qty']));
                   var qty = Number(this.detail_view['qty']) - Number(this.InwardEntry.value['inward_qty']);
                   console.log(qty);
-                   if (qty > 0) {
-                      await this.DebitNote(qty);
-                    }
-                    else if (qty < 0) {
-                        qty = qty * -1;
-                        console.log("credit note",qty);
-                     await   this.CreaditNote(qty)
-                    }
+                  //  if (qty > 0) {
+                  //     await this.DebitNote(qty);
+                  //   }
+                  //   else if (qty < 0) {
+                  //       qty = qty * -1;
+                  //       console.log("credit note",qty);
+                  //    await   this.CreaditNote(qty)
+                  //   }
                   this.loading = false;
                   this.toastrService.success('Inward Added Succesfully');
                   this.InwardEntry.controls['batch'].reset();
@@ -255,7 +267,7 @@ export class InwardComponent implements OnInit {
     }
   }
 
- async DebitNote(qty)
+ async DebitNote()
   {
       // var serial_no:any
       //  await this.api.get('get_data.php?table=prefix&authToken='+environment.authToken).then((data: any) =>
@@ -272,6 +284,30 @@ export class InwardComponent implements OnInit {
       //       }
       //       else{serial_no=`${this.prefix}${1}`}
       //   }).catch(error => {this.toastrService.error('Something went wrong');});
+
+        Object.keys(this.InwardEntry.controls).forEach(field =>
+      {
+        const control = this.InwardEntry.get(field);
+        control.markAsTouched({ onlySelf: true });
+      });
+      if(this.InwardEntry.valid)
+      {
+        const qty = this.InwardEntry.value.inward_qty
+       if(qty==0 || qty == null)
+       {
+          this.toastrService.error("Inward value missing","Warning")
+          return
+       }
+       if(qty> this.remaining_qty)
+       {
+          this.toastrService.warning( "Inward item value is greater than bill item value","Warning")
+          return
+       }
+        const confirmed = confirm("Are you sure you want to create the debi note?");
+              console.log(confirmed)
+              if (!confirmed) {
+                return;
+              }
 
        const amount = (this.detail_view['total']/this.detail_view['qty']).toFixed(2)
         const total  = (Number(amount)*qty).toFixed(2)
@@ -292,17 +328,43 @@ export class InwardComponent implements OnInit {
         this.DebitNoteForm.controls['tax_percent'].setValue(this.detail_view['tax_percent'])
         this.DebitNoteForm.controls['total'].setValue(total)
         console.log("form : ",this.DebitNoteForm.value)
+        let id = this.detail_view['bill_item_id'];
         if(this.DebitNoteForm.valid)
         {
-          await this.api.post('debit_note_create.php?&authToken='+environment.authToken, this.DebitNoteForm.value).then((data: any) =>
+          await this.api.post('debit_note_create.php?bill_item_id='+id+'&authToken='+environment.authToken, this.DebitNoteForm.value).then((data: any) =>
               {
                 console.log(data)
                 if(data.status =="success")
                 {
                   console.log(data.status =="success")
+                   this.loading = false;
+                  this.toastrService.success('Debit note created succesfully');
+                  this.InwardEntry.controls['batch'].reset();
+                  this.InwardEntry.controls['inward_at'].reset();
+                  this.InwardEntry.controls['inward_qty'].reset();
+                  this.InwardEntry.controls['notes'].reset();
+
+                  const formArray         = this.InwardEntry.get('seriel_no') as FormArray;
+                  const formArrayLength   = formArray.length;
+                  const formArrayControls = formArray.controls;
+                  for (let i = formArrayControls.length-1; i >0; i--)
+                  {
+                    const control = formArrayControls[i];
+                    formArray.removeAt(i);
+                  }
+                  this.has_serial = 0;
+                  this.selected = [];
+                  this.ngOnInit();
+                  setTimeout(() => {}, 500);
                 }
+                else { this.toastrService.error('Something went wrong');
+                this.loading = false;}
+
+                return true;
+
               }).catch(error => {this.toastrService.error('Something went wrong');});
         }
+      }
   }
 
   async CreaditNote(qty)

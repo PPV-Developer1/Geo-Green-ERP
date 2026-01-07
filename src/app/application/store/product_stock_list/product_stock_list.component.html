@@ -1,10 +1,28 @@
 
 <div class="row">
-  <div class="col-12" *ngIf="list_show">
+  <!-- <div class="col-12" *ngIf="list_show">
    <button  type="submit" class="btn btn-info fa fa-arrow-left mb-3" (click)="set_zero()"> Back</button>
    &nbsp;
-  </div>
-  <div *ngIf="!list_show" class="col-6">
+  </div> -->
+
+  <div class="col-12 d-flex  align-items-center">
+    <div class="col-2">
+      <h4>Product Stock List</h4>
+    </div>
+
+
+  <div class="col-8">
+       <div class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input class="form-control" type="text" placeholder="Search Project Name or Product Name..." (keyup)="updateFilter($event)"/>
+          </div>
+    </div>
+</div>
+
+  <div  class="col-3">
+
     <ngx-datatable
       #table class="custom_table"
       [headerHeight]="50"
@@ -28,10 +46,13 @@
       </ng-template>
     </ngx-datatable-column>
 
-
     </ngx-datatable>
 </div>
-  <div *ngIf="list_show" class="col-12">
+
+
+  <div  class="col-9 " >
+
+
         <ngx-datatable
           #table class="custom_table"
           [headerHeight]="50"
@@ -61,12 +82,12 @@
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column     [resizeable]="false" prop="type" [flexGrow]="2" name="PROJECT NAME">
+        <!-- <ngx-datatable-column     [resizeable]="false" prop="type" [flexGrow]="2" name="PROJECT NAME">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.type == 1">{{row.project_name}}</span>
             <span *ngIf="row.type == 2"> <strong>For Store</strong></span>
           </ng-template>
-        </ngx-datatable-column>
+        </ngx-datatable-column> -->
 
         <ngx-datatable-column     [resizeable]="false" prop="product_name" [flexGrow]="2" name="PRODUCT NAME">
           <ng-template ngx-datatable-cell-template let-row="row">
@@ -74,7 +95,13 @@
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column     [resizeable]="false" prop="product_name" [flexGrow]="2" name="NOTES">
+      <ngx-datatable-column     [resizeable]="false" prop="stock_percentage" [flexGrow]="2" name="STOCK PERCENTAGE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+              {{row.stock_percentage}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column     [resizeable]="false" prop="notes" [flexGrow]="2" name="NOTES">
           <ng-template ngx-datatable-cell-template let-row="row">
               {{row.notes}}
           </ng-template>

@@ -151,7 +151,7 @@
               </div>
 
               <div class="col">
-                <div class="row mb-1"  *ngIf="type =='vendor'">
+                <div class="row mb-1"  *ngIf="type =='vendor' && customer_id != null">
                   <label style="color: red" class="col-sm-2 mt-2 col-form-label col-form-label-sm">Bill *</label>
                   <div class="col-sm-7 mb-5">
 
@@ -167,7 +167,7 @@
                   </div>
                 </div>
 
-                <div class="row mb-1" *ngIf="type =='customer'" >
+                <div class="row mb-1" *ngIf="type =='customer' && customer_id != null" >
                   <label style="color: red" class="col-sm-2 mt-2 col-form-label col-form-label-sm">Invoice *</label>
                   <div class="col-sm-7 mb-5">
 
@@ -249,6 +249,14 @@
                           <input type="number" formControlName="note_no" [(ngModel)]="note_no" class="form-control form-control-sm" />
                       <span class="help-block text-danger" *ngIf="DebitNoteForm.get('note_no').touched && DebitNoteForm.get('note_no').hasError('required')">Enter Credit Note Number !</span>
                     </div>
+                  </div>
+
+                   <div class="row mb-3">
+                    <label style="color: #e54643"  class="col-sm-2 col-form-label col-form-label-sm">Credit Note Date *</label>
+                        <div class="col-sm-4">
+                          <input type="date" formControlName="note_date"  class="form-control form-control-sm" />
+                          <span class="help-block text-danger" *ngIf="DebitNoteForm.get('note_date').touched && DebitNoteForm.get('note_date').hasError('required')">Enter Credit Note Date !</span>
+                      </div>
                   </div>
 
 

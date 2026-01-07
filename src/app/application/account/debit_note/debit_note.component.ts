@@ -93,10 +93,10 @@ public notes               : any;
     this.DebitNoteForm = new FormGroup
   ({
       created_by      : new FormControl(this.uid),
+      note_date       : new FormControl(null, [Validators.required]),
       note_no         : new FormControl(null, [Validators.required]),
       bill_to         : new FormControl(null, [Validators.required]),
       vendor_id       : new FormControl(null, [Validators.required]),
-      payment_term    : new FormControl(null, [Validators.required]),
       bill_number     : new FormControl(null, [Validators.required]),
       notes           : new FormControl(null, [Validators.required]),
       terms_condition : new FormControl(null, [Validators.required]),
@@ -250,6 +250,11 @@ public notes               : any;
 
   back()
   {
+    const confirmed = confirm(" Are you sure you want to go back to this?");
+       console.log(confirmed)
+      if (!confirmed) {
+        return;
+      }
     this.show=false
      this._state.notifyDataChanged('menu.isCollapsed', false);
   }
@@ -374,7 +379,8 @@ ReturnToList()
 
 Confirm_back()
 {
-           this.show_new_note = false
+        this.customer_id= null
+        this.show_new_note = false
         this.formShow = true;
         this.DebitNoteForm.reset();
         this.billFrom           = null;
@@ -392,6 +398,15 @@ Confirm_back()
 async specItem(item,i)
   {
     console.log(item)
+     const items = this.DebitNoteForm.controls['product'].value
+      console.log("items ",items)
+      if(items.filter((it,index) => it.items == item && index != i).length > 0)
+      {
+        this.toastrService.error("Item already selected")
+          let product = this.DebitNoteForm.get('product') as FormArray;
+         product.removeAt(i);
+        return;
+      }
       const data = this.ItemList.find(i=> i.item_list_id == item)
         console.log("item bind ",data)
        if(this.taxmode == 1)
@@ -620,6 +635,7 @@ async specItem(item,i)
     this.DebitNoteForm.controls['type'].setValue(this.type);
     this.DebitNoteForm.controls['created_by'].setValue(this.uid);
     this.DebitNoteForm.controls['subTotal'].setValue(0);
+     this.DebitNoteForm.controls['note_date'].setValue(date)
  if(id != undefined)
     {
       if(this.type == "vendor")
@@ -631,7 +647,6 @@ async specItem(item,i)
         this.Bill_vendor_name = customer
         //  this.DebitNoteForm.controls['vendor_id'].setValue(this.customer_id);
         this.DebitNoteForm.controls['terms_condition'].setValue(customer.terms_condition)
-        this.DebitNoteForm.controls['payment_term'].setValue(customer.payment_term)
         this.DebitNoteForm.controls['bill_number'].setValue(customer.bill_number);
 
             await this.api.get('get_data.php?table=vendor&find=vendor_id&value='+this.customer_id+'&authToken=' + environment.authToken).then((data: any) => {
@@ -699,7 +714,6 @@ async specItem(item,i)
 
         //  this.DebitNoteForm.controls['vendor_id'].setValue(this.customer_id);
         this.DebitNoteForm.controls['terms_condition'].setValue(customer.terms_condition)
-        this.DebitNoteForm.controls['payment_term'].setValue(customer.payment_term)
         this.DebitNoteForm.controls['bill_number'].setValue(customer.invoice_number);
         console.log("customer : ",customer)
 
@@ -731,8 +745,6 @@ async specItem(item,i)
                 this.notes           = data[0].notes;
                 this.terms_condition = data[0].terms_condition;
                 this.stateCode       = data[0].place_from_supply_code;
-                this.payment_terms   = data[0].payment_terms;
-                let MyPaymentTerm    = data[0].my_payment_terms;
                 this.taxmode         = data[0].tax_mode;
                 this.Prefix          = data[0].debit_prefix
 

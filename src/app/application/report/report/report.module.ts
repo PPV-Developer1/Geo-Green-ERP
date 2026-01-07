@@ -22,7 +22,8 @@ export const routes = [
     NgxDatatableModule,
     INRModule,
     DirectivesModule,
-    NgSelectModule
+    NgSelectModule,
+  
   ],
   declarations: [ReportComponent]
 })

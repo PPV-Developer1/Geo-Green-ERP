@@ -102,7 +102,7 @@
             <div class="tab-pane active" id="overview">
               <div class="row">
 
-                <div class="col-lg-3 col-md-5">
+                <!-- <div class="col-lg-3 col-md-5">
                   <div class="card border-0 box-shadow mb-4">
                     <img [src]="img_path" class="img-thumbnail img-fluid" style="height: 260px;" alt="...">
                     <div class="mt-2" style="display:flex; align-items:center; justify-content:center;">
@@ -119,8 +119,8 @@
                       <div class="dropdown-divider w-100"></div>
                     </div>
                   </div>
-                </div>
-                <div class="col-lg-9 col-md-8">
+                </div> -->
+                <div class="col-lg-12 col-md-8">
                   <div class="card">
                     <form [formGroup]="editCustDetail">
                       <div class="card-body">
@@ -153,14 +153,7 @@
                                   </select>
                                 </td>
                               </tr>
-                              <tr>
-                                <th>Tax Exemption</th>
-                                <td>
-                                  <input type="text" style="border: none;" class="form-control col-md-5"
-                                    [readonly]="change" [(ngModel)]="tax_empty" formControlName="tax_empty"
-                                    placeholder="Enter Tax ">
-                                </td>
-                              </tr>
+
                               <tr>
                                 <th>Tax Mode</th>
                                 <td>
@@ -182,8 +175,15 @@
                                   </select>
                                 </td>
                               </tr>
-
-                              <tr>
+                              <tr *ngIf="tax_mode == '0'">
+                                <th>Tax Exemption</th>
+                                <td>
+                                  <input type="text" style="border: none;" class="form-control col-md-5"
+                                    [readonly]="change" [(ngModel)]="tax_empty" formControlName="tax_empty"
+                                    placeholder="Enter Tax ">
+                                </td>
+                              </tr>
+                              <tr *ngIf="tax_mode == '1'">
                                 <th>GST</th>
                                 <td>
                                   <input type="text" class="form-control col-md-5" style="border: none;"
@@ -225,7 +225,7 @@
                            </tr>
 
                            <tr>
-                            <tr>
+                            <tr *ngIf="udyam_registeration == 1">
                               <th>UDYAM Number</th>
                               <td>
                                 <input type="text" style="border: none;" class="form-control"
@@ -332,9 +332,9 @@
                                 <th>Opening Balance</th>
                                 <td>
 
-                                  <input type="number" class="form-control col-md-5" style="border: none;"
+                                  <textarea type="number" class="form-control col-md-5" style="border: none;"
                                     [readonly]="change" [(ngModel)]="opening_balance" formControlName="opening_balance"
-                                    placeholder="Enter Opening Balance">
+                                    placeholder="Enter Opening Balance"></textarea>
 
                                   <span class="help-block text-danger"
                                     *ngIf="editCustDetail.get('opening_balance').touched && editCustDetail.get('opening_balance').hasError('required')">
@@ -369,9 +369,9 @@
                               <tr>
                                 <th>Terms & Conditions</th>
                                 <td>
-                                  <input type="text" class="form-control " style="border: none;"
+                                  <textarea type="text" class="form-control " style="border: none;"
                                     [readonly]="change" [(ngModel)]="terms_condition" formControlName="terms_condition"
-                                    placeholder="Enter terms & conditions">
+                                    placeholder="Enter terms & conditions"></textarea>
                                   <span class="help-block text-danger"
                                     *ngIf="editCustDetail.get('terms_condition').touched && editCustDetail.get('terms_condition').hasError('required')">
                                     Terms & Conditions Required !</span>
@@ -380,9 +380,9 @@
                               <tr>
                                 <th>Remarks</th>
                                 <td>
-                                  <input type="text" class="form-control col-md-5" style="border: none;"
+                                  <textarea type="text" class="form-control " style="border: none;"
                                     formControlName="remarks" [readonly]="change" [(ngModel)]="remarks"
-                                    placeholder="Enter remarks">
+                                    placeholder="Enter remarks"></textarea>
                                   <span class="help-block text-danger"
                                     *ngIf="editCustDetail.get('remarks').touched && editCustDetail.get('remarks').hasError('required')">
                                     Remarks Required !</span>
@@ -392,9 +392,9 @@
                                 <th>Notes</th>
                                 <td>
 
-                                  <input type="text" class="form-control col-md-5" style="border: none;"
+                                  <textarea type="text" class="form-control " style="border: none;"
                                     formControlName="notes" [readonly]="change" [(ngModel)]="notes"
-                                    placeholder="Enter notes">
+                                    placeholder="Enter notes"></textarea>
                                   <span class="help-block text-danger"
                                     *ngIf="editCustDetail.get('notes').touched && editCustDetail.get('notes').hasError('required')">
                                     Notes Required !</span>
@@ -403,18 +403,19 @@
                             </tbody>
                           </table>
 
-                          <div class="col-4"></div>
-                          <div style="display:flex; align-items:center; justify-content:center;">
-                            <button *ngIf="user_type =='super_admin'" type="button" class="btn btn-danger btn-sm" (click)="editCust()" [hidden]="!stateShow">
-                              Edit
-                            </button>
-                            <button [hidden]="stateShow" (click)="updateEmp(editCustDetail.value)"
-                              class="btn btn-warning btn-sm">Update
-                            </button>
-                            &nbsp;
-                            <button [hidden]="stateShow" (click)="cancel()"
-                              class="btn btn-warning btn-sm">Cancel
-                            </button>
+                          <div class="col-12">
+                              <div style="display:flex; align-items:center; justify-content:center;">
+                                <button *ngIf="user_type =='super_admin'" type="button" class="btn btn-danger btn-sm" (click)="editCust()" [hidden]="!stateShow">
+                                  Edit
+                                </button>
+                                <button [hidden]="stateShow" (click)="updateEmp(editCustDetail.value)"
+                                  class="btn btn-warning btn-sm">Update
+                                </button>
+                                &nbsp;
+                                <button [hidden]="stateShow" (click)="cancel()"
+                                  class="btn btn-warning btn-sm">Cancel
+                                </button>
+                              </div>
                           </div>
                         </div>
                       </div>

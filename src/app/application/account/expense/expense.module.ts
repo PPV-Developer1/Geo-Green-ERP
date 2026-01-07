@@ -23,7 +23,8 @@ export const routes = [
     ReactiveFormsModule,
     FormsModule,
     INRModule,
-    NgSelectModule,NgxDatatableModule
+    NgSelectModule,NgxDatatableModule,
+    ReactiveFormsModule
   ],
   declarations: [ExpenseComponent]
 })

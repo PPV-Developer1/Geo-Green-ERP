@@ -1,3 +1,4 @@
+import { PdfGeneratorService } from './../../../service/pdf.service';
 import { Component, OnInit,ViewChild ,ElementRef, Type} from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
@@ -9,6 +10,20 @@ import { DatatableComponent } from '@swimlane/ngx-datatable';
 import * as XLSX from "xlsx";
 import {formatDate } from '@angular/common';
 import { ChangeDetectorRef } from '@angular/core';
+import { jsPDF } from 'jspdf';
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
+pdfMake.fonts = {
+  'Roboto': {
+    //normal: 'https://fonts.googleapis.com/css?family=Roboto',
+    normal:'Roboto-Regular.ttf',
+    bold: 'Roboto-Medium.ttf',
+    italics: 'Roboto-Italic.ttf',
+    bolditalics: 'Roboto-Italic.ttf'
+  }
+};
 
 @Component({
   selector: 'az-report',
@@ -94,15 +109,20 @@ export class ReportComponent implements OnInit {
   tax_show         : Boolean = false;
   loading          : boolean = false;
   opening_balance  : any
-  lastRow: any = null;
-  id     : any = null;
-  title     : any;
-  item_list : any;
+  lastRow          : any = null;
+  id               : any = null;
+  title            : any;
+  item_list        : any;
+  select_data      : any;
+  company_datails  : any;
+  vendor_details   : any;
+
 
   public user_type = localStorage.getItem('type');
   public uid       = localStorage.getItem('type_id');
 
-  constructor(private modalService: NgbModal, public router: Router, public api: ApiService, public toastrService: ToastrService, private fb: FormBuilder,private cdr: ChangeDetectorRef)
+  constructor(private modalService: NgbModal, public router: Router, public api: ApiService, public toastrService: ToastrService,
+     private fb: FormBuilder,private cdr: ChangeDetectorRef,public pdfservice : PdfGeneratorService)
   {
     this.date = fb.group({
       fromdate: [null],
@@ -1229,7 +1249,7 @@ purchase_list_view:boolean=false
 
   onSubmit_customer(value)
   {
-
+      console.log("onclick",value)
        this.customer_payment = true;
         if(this.customer.valid)
         {
@@ -1259,7 +1279,8 @@ purchase_list_view:boolean=false
                             this.cust_tran_data   =  data['report'];
                             this.print_tran_data  =  data['download_report'];
                             let due_balance       =  data['balance_due'];
-
+                            this.company_datails  =  data['company_details'];
+                            this.vendor_details   =  data['customer_details'];
                             const totalRow = {
                             Date:'',
                             Transaction:'',
@@ -1308,6 +1329,8 @@ purchase_list_view:boolean=false
                               this.cust_tran_data   =  data['report'];
                               this.print_tran_data  =  data['download_report'];
                               let due_balance       =  data['balance_due'];
+                              this.company_datails  =  data['company_details'];
+                              this.vendor_details   =  data['vendor_details'];
 
                               const totalRow = {
                               Date:'',
@@ -1518,7 +1541,7 @@ purchase_list_view:boolean=false
       {
         this.name= data.Customer_Name;
         this.customer_payment = true;
-
+        this.select_data = data.Customer_Name;
         this.api.get('mp_customer_payment_received.php?from_date='+this.tran_from_date+'&to_date='+this.tran_to_date+'&value=' + data.Customer_id + '&authToken=' + environment.authToken).then((data: any) =>
         {
           if(data != null)
@@ -1535,6 +1558,7 @@ purchase_list_view:boolean=false
           {
 
             this.name= data.Customer_Name;
+            this.select_data = data.Customer_Name;
             this.customer_payment = true;
             this.totalBalance = 0;
           this.api.get('mp_customer_balance_received_report.php?from_date='+this.tran_from_date+'&to_date='+this.tran_to_date+'&value=' + data.Customer_id + '&authToken=' + environment.authToken).then((data: any) =>
@@ -1576,7 +1600,8 @@ purchase_list_view:boolean=false
 
             if(this.id == "vendor_balances" && data.Vendor_Name  != "Total")
             {
-              this.name= data.Vendor_Name;
+              this.name = data.Vendor_Name;
+              this.select_data = data.Vendor_Name
               this.customer_payment = true;
               this.api.get('mp_vendor_payment_made_report.php?from_date='+this.tran_from_date+'&to_date='+this.tran_to_date+'&value=' + data.Vendor_id + '&authToken=' + environment.authToken).then((data: any) =>
               {
@@ -1620,6 +1645,7 @@ purchase_list_view:boolean=false
           if(event.row.Stock_on_Hand)
           {
             this.name= data.Item_Name;
+            this.select_data = data.Item_Name
             this.customer_payment = true;
             this.api.get('mp_each_item_summary.php?value=' + data.Item_id + '&authToken=' + environment.authToken).then((data: any) =>
             {
@@ -1729,6 +1755,82 @@ purchase_list_view:boolean=false
     }
   }
 
+
+
+  pdf()
+  {
+    const data = this.print_tran_data
+    console.log(this.print_tran_data)
+    if( this.print_tran_data == null || this.print_tran_data == undefined )
+    { this.toastrService.warning("List Empty")
+      return }
+
+    for(let i=0;i< this.print_tran_data.length;i++)
+    {
+      console.log(i)
+      if((i>0 ||i<this.print_tran_data.length-1) && !(i==0 ||i == this.print_tran_data.length-1))
+      {
+            this.print_tran_data[i]['Amount'] = '₹' + Number(this.print_tran_data[i]['Amount']).toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,')
+            this.print_tran_data[i]['Payments'] = '₹' + Number(this.print_tran_data[i]['Payments']).toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,')
+            this.print_tran_data[i]['Balance'] = '₹' + Number(this.print_tran_data[i]['Balance']).toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,')
+            console.log("first", this.print_tran_data[i])
+      }
+
+        if(i==0 ||i == this.print_tran_data.length-1)
+        {
+          this.print_tran_data[i]['Balance'] = '₹' + Number(this.print_tran_data[i]['Balance']).toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,')
+          console.log("second", this.print_tran_data[i])
+        }
+    }
+
+    console.log(this.print_tran_data)
+    var ClientName :any;
+    var ClientAddress : any;
+    var CompanyAddress : any = `${this.company_datails.address_1}, ${this.company_datails.address_2}, ${this.company_datails.city} - ${this.company_datails.pincode}`
+    var NumericField : any
+    if(this.id == "individual_vendor_balance")
+    {
+        ClientName = this.vendor_details.company_name;
+        ClientAddress = `${this.vendor_details.address_line_1}, ${this.vendor_details.address_line_2}, ${this.vendor_details.city} - ${this.vendor_details.zip_code}`;
+        NumericField =['Amount', 'Balance','Payments']
+    }
+
+    if(this.id == "individual_customer_balance")
+    {
+        ClientName = this.vendor_details.company_name;
+        ClientAddress = `${this.vendor_details.address_line_1}, ${this.vendor_details.address_line_2}, ${this.vendor_details.city} - ${this.vendor_details.zip_code}`;
+        NumericField =['Amount', 'Balance','Payments']
+    }
+    console.log(CompanyAddress)
+        setTimeout(() => {
+          this.pdfservice.generateDynamicPdf(
+          'Ledger Statement ',                                         // Title
+          this.company_datails.company_name,                            // Company Name
+          CompanyAddress,                                               // Address
+          ClientName,
+          ClientAddress,
+          data,                                                           // Your table data (any JSON)
+          NumericField,                                                   // Numeric columns
+          'open'                                                          // or 'download'
+        );
+     }, 500);
+
+  }
+
+  // convertToCSV(data: any[]): string
+  // {
+  //   const csvArray = [];
+  //   const headers = Object.keys(data[0]);
+  //   csvArray.push(headers.join(','));
+
+  //   data.forEach(item => {
+  //     const row = headers.map(key => item[key]);
+  //     csvArray.push(row.join(','));
+  //   });
+
+  //   return csvArray.join('\n');
+  // }
+
   // convertToCSV(data: any[]): string
   // {
   //   const csvArray = [];
@@ -1781,6 +1883,25 @@ purchase_list_view:boolean=false
     URL.revokeObjectURL(url);
   }
 
+   downloadPDF(data: any[], filename: string) {
+    console.log("pdf",data)
+    const doc = new jsPDF();
+    let yPos = 10;
+
+    // Generate headers
+    const headers = Object.keys(data[0]).join(' | ');
+    doc.text(headers, 10, yPos);
+    yPos += 10;
+
+    // Add each row
+    data.forEach((row: any) => {
+      const rowData = Object.values(row).join(' | ');
+      doc.text(rowData, 10, yPos);
+      yPos += 10;
+    });
+
+    doc.save(filename);
+  }
 
   set_zero()
   {
@@ -2045,6 +2166,7 @@ purchase_list_view:boolean=false
 
           this.api.get('mp_tax_report_list.php?find='+this.tax_field+'&value='+this.feild_value+'&authToken='+environment.authToken).then((data: any) =>
           {
+            console.log("vandor data :",data)
             if(data != null)
             {
             this.cust_tran_data   =  data;

@@ -472,7 +472,7 @@
                     <div class="row">
                       <h5 class="ml-2" style="color:gray;">BILL FROM ADDRESS</h5>
                       <i class="fa fa-pencil ml-2 mt-1" data-toggle="modal1" data-target="#nofooter-modal"
-                        style="cursor:pointer;" aria-hidden="true" data-toggle="modal" data-target="#lg-modal"></i>
+                        style="cursor:pointer;" aria-hidden="true" data-toggle="modal" data-target="#Bill_add_edit"></i>
                     </div>
                     <div>
                       <input type="hidden">
@@ -499,7 +499,7 @@
                       <h5 class="ml-2" style="color:gray;">SHIP FROM ADDRESS</h5>
                       <i class="fa fa-pencil ml-2 mt-1" data-toggle="modal2" data-target="#nofooter-modal"
                       style="cursor:pointer;" aria-hidden="true" data-toggle="modal"
-                      data-target="#ship-address"></i>
+                      data-target="#ship-address_edit"></i>
                     </div>
 
                     <div>
@@ -565,18 +565,14 @@
               <div class="row mb-3">
                 <label style="color:#d64830" class="col-sm-2 col-form-label col-form-label-sm">PO Date*</label>
                 <div class="col-sm-4">
-                  <input type="date" #BillDate (change)="Billdate(BillDate.value)" formControlName="billDate"
+                  <input type="date" #BillDate  formControlName="billDate"
                     class="form-control form-control-sm" />
                 </div>
 
-                <div class="row col-sm-3">
+                <!-- <div class="row col-sm-3">
                   <label class="col-sm-5 col-form-label col-form-label-sm">Terms</label>
                   <div class="col-sm-7">
-                    <!-- <select formControlName="paymentTerms" class="form-control"
-                      (change)="dueDates($event.target.value , BillDate.value)" placeholder="Due on Receipt">
-                      <option *ngFor="let term of payment_terms " value="{{term.terms_value}}">{{term.terms}}
-                      </option>
-                    </select> -->
+
 
                        <ng-select formControlName="paymentTerms"  class=" form-control custom-select"  (change)="dueDates($event , BillDate.value)"
                           [clearable]="false" >
@@ -593,7 +589,8 @@
                     <input type="date" [(ngModel)]="fullDate" (change)="dueDateChange()" formControlName="dueDate"
                       class="form-control form-control-sm">
                   </div>
-                </div>
+                </div> -->
+
               </div>
               &nbsp;
               <div class="row" >
@@ -628,12 +625,15 @@
                       <tbody formArrayName="product">
                         <tr *ngFor="let product of Edit_po.get('product')['controls']; let i = index;" [formGroupName]="i">
                           <td style="width: 350px;" class="dropdown-wrapper">
-                            <ng-select formControlName="items" class="form-control custom-select " style=" text-align: left;"
+                            <!-- <ng-select formControlName="items" class="form-control custom-select " style=" text-align: left;"
                             (click)="adjustTableHeight()" (change)="edit_specItem($event, i)" [clearable]="false">
                               <ng-option *ngFor="let item of ItemList" [value]="item.item_id" class="form-control">
                                 {{item.name}}
                               </ng-option>
-                            </ng-select>
+                            </ng-select> -->
+
+                                      <input type="text" readonly (click)="Item_popUp(i)" (input)="Item_popUp(i)" class="form-control form-control-sm"
+                                         placeholder="Click to select an item" formControlName="item_name">
                           </td>
                           <td style="width: 350px;">
                             <textarea type="text" class="form-control form-control-sm" formControlName="descriptions"></textarea>
@@ -855,7 +855,8 @@
                     <div class="col-md-3">
                       <div class="row">
                         <h5 class="ml-2" style="color:gray;">BILL FROM ADDRESS</h5>
-
+                        <i class="fa fa-pencil ml-2 mt-1" data-toggle="modal1" data-target="#nofooter-modal"
+                        style="cursor:pointer;" aria-hidden="true" data-toggle="modal" data-target="#Bill_add_edit"></i>
                       </div>
                       <div>
                         <input type="hidden">
@@ -880,7 +881,9 @@
                     <div class="col-md-5">
                       <div class="row">
                         <h5 class="ml-2" style="color:gray;">SHIP FROM ADDRESS</h5>
-
+                        <i class="fa fa-pencil ml-2 mt-1" data-toggle="modal2" data-target="#nofooter-modal"
+                          style="cursor:pointer;" aria-hidden="true" data-toggle="modal"
+                          data-target="#ship-address_edit"></i>
                       </div>
 
                       <div>
@@ -947,18 +950,13 @@
                 <div class="row mb-3">
                   <label style="color:#d64830" class="col-sm-2 col-form-label col-form-label-sm">PO Date*</label>
                   <div class="col-sm-4">
-                    <input type="date" #BillDate (change)="Billdate(BillDate.value)" formControlName="billDate"
+                    <input type="date" #BillDate  formControlName="billDate"
                       class="form-control form-control-sm" />
                   </div>
 
-                  <div class="row col-sm-3">
+                  <!-- <div class="row col-sm-3">
                     <label class="col-sm-5 col-form-label col-form-label-sm">Terms</label>
                     <div class="col-sm-7">
-                      <!-- <select formControlName="paymentTerms" class="form-control"
-                        (change)="dueDates($event.target.value , BillDate.value)" placeholder="Due on Receipt">
-                        <option *ngFor="let term of payment_terms " value="{{term.terms_value}}">{{term.terms}}
-                        </option>
-                      </select> -->
 
                       <ng-select formControlName="paymentTerms"  class=" form-control custom-select"  (change)="dueDates($event , BillDate.value)"
                         [clearable]="false" >
@@ -976,7 +974,7 @@
                       <input type="date" [(ngModel)]="fullDate" (change)="dueDateChange()" formControlName="dueDate"
                         class="form-control form-control-sm">
                     </div>
-                  </div>
+                  </div> -->
                 </div>
                 &nbsp;
 
@@ -1012,12 +1010,15 @@
                         <tbody formArrayName="product">
                           <tr *ngFor="let product of Edit_po.get('product')['controls']; let i = index;" [formGroupName]="i">
                             <td style="width: 350px;" class="dropdown-wrapper">
-                              <ng-select formControlName="items" class="form-control custom-select " style=" text-align: left;" (click)="adjustTableHeight()"
+                              <!-- <ng-select formControlName="items" class="form-control custom-select " style=" text-align: left;" (click)="adjustTableHeight()"
                               (change)="edit_specItem($event, i)" [clearable]="false">
                                 <ng-option *ngFor="let item of ItemList" [value]="item.item_id" class="form-control">
                                   {{item.name}}
                                 </ng-option>
-                              </ng-select>
+                              </ng-select> -->
+
+                               <input type="text" readonly (click)="Item_popUp(i)" (input)="Item_popUp(i)" class="form-control form-control-sm"
+                                         placeholder="Click to select an item" formControlName="item_name">
                             </td>
                             <td style="width: 350px;">
                               <textarea type="text" class="form-control form-control-sm" formControlName="descriptions"></textarea>
@@ -1242,7 +1243,8 @@
                     <div class="col-md-3">
                       <div class="row">
                         <h5 class="ml-2" style="color:gray;">BILL FROM ADDRESS</h5>
-
+                         <i class="fa fa-pencil ml-2 mt-1" data-toggle="modal1" data-target="#nofooter-modal"
+                          style="cursor:pointer;" aria-hidden="true" data-toggle="modal" data-target="#Bill_add_edit"></i>
                       </div>
                       <div>
                         <input type="hidden">
@@ -1267,7 +1269,9 @@
                     <div class="col-md-5">
                       <div class="row">
                         <h5 class="ml-2" style="color:gray;">SHIP FROM ADDRESS</h5>
-
+                        <i class="fa fa-pencil ml-2 mt-1" data-toggle="modal2" data-target="#nofooter-modal"
+                          style="cursor:pointer;" aria-hidden="true" data-toggle="modal"
+                          data-target="#ship-address_edit"></i>
                       </div>
 
                       <div>
@@ -1326,6 +1330,8 @@
                             </ng-option>
                         </ng-select>
 
+                         <span class="help-block text-danger" *ngIf="Edit_po.get('paymentTerms').touched && Edit_po.get('paymentTerms').hasError('required')">Required !</span>
+
                     </div>
                   </div>
 
@@ -1334,7 +1340,11 @@
                     <div class="col-sm-7">
                       <input type="date" [(ngModel)]="fullDate" (change)="dueDateChange()" formControlName="dueDate"
                         class="form-control form-control-sm">
+
+                         <span class="help-block text-danger" *ngIf="Edit_po.get('dueDate').touched && Edit_po.get('dueDate').hasError('required')">Required !</span>
                     </div>
+
+
                   </div>
                 </div>
                 &nbsp;
@@ -1370,12 +1380,15 @@
                         <tbody formArrayName="product">
                           <tr *ngFor="let product of Edit_po.get('product')['controls']; let i = index;" [formGroupName]="i">
                             <td style="width: 350px;" class="dropdown-wrapper">
-                              <ng-select formControlName="items" class="form-control custom-select " (click)="adjustTableHeight()"
+                              <!-- <ng-select formControlName="items" class="form-control custom-select " (click)="adjustTableHeight()"
                                style=" text-align: left;" (change)="edit_specItem($event, i)" [clearable]="false">
                                 <ng-option *ngFor="let item of ItemList" [value]="item.item_id" class="form-control">
                                   {{item.name}}
                                 </ng-option>
-                              </ng-select>
+                              </ng-select> -->
+
+                               <input type="text" readonly (click)="Item_popUp(i)" (input)="Item_popUp(i)" class="form-control form-control-sm"
+                                         placeholder="Click to select an item" formControlName="item_name">
                             </td>
                             <td style="width: 350px;">
                               <textarea type="text" class="form-control form-control-sm" formControlName="descriptions"></textarea>
@@ -1561,6 +1574,10 @@
       (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
   </div>
   <div class="modal-body">
+      <div style="text-align: right;" >
+      <span (click)="ewayEdit()" *ngIf="e_way_bill_status" style="color:#055f6bc2 ;"><i class="fa fa-pencil-square-o" ></i> Edit</span>
+        <span *ngIf="!e_way_bill_status" style="color: brown;" (click)="editclose()"> × cancel</span>
+    </div>
     <form [formGroup]="e_way_bill" (ngSubmit)="billSubmit(e_way_bill.value)">
       <div class="row">
 
@@ -1568,9 +1585,9 @@
         <label>Scope</label>
       </div>
       <div class="form-group col-md-9">
-       <select formControlName="scope"  class=" form-control custom-select">
-                  <option value="Customer">Customer</option>
-                  <option value="vendor">Vendor</option>
+       <select formControlName="scope"  [disabled]="e_way_bill_status" class=" form-control custom-select">
+                  <option value="Customer" [disabled]="e_way_bill_status">Customer</option>
+                  <option value="vendor" [disabled]="e_way_bill_status">Vendor</option>
 
             </select>
         <span class="help-block text-danger" *ngIf="e_way_bill.get('scope').touched && e_way_bill.get('scope').hasError('required')"> Required !</span>
@@ -1580,15 +1597,15 @@
         <label>Shipment Mode</label>
       </div>
       <div class="form-group col-md-9">
-        <select formControlName="shipment_mode"  class=" form-control custom-select">
-                  <option value="Road">Road</option>
-                  <option value="Rail">Rail</option>
-                  <option value="Rail">Air</option>
-                  <option value="Rail">Ship</option>
+        <select formControlName="shipment_mode" [disabled]="e_way_bill_status"  class=" form-control custom-select">
+                  <option value="Road" [disabled]="e_way_bill_status">Road</option>
+                  <option value="Rail" [disabled]="e_way_bill_status">Rail</option>
+                  <option value="Rail" [disabled]="e_way_bill_status">Air</option>
+                  <option value="Rail" [disabled]="e_way_bill_status">Ship</option>
             </select>
         <span class="help-block text-danger" *ngIf="e_way_bill.get('shipment_mode').touched && e_way_bill.get('shipment_mode').hasError('required')">Shipment Mode Required !</span>
       </div>
-      <div class="col-md-12">
+      <div class="col-md-12" *ngIf="!e_way_bill_status">
         <div class="row justify-content-center">
           <button  [disabled]="loading" class="btn btn-success" type="submit">Submit<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
         </div>
@@ -1614,7 +1631,7 @@
 </ng-template>
 
 
-<div class="modal fade" id="lg-modal" tabindex="-1" role="dialog" aria-labelledby="modal-large-label"
+<div class="modal fade" id="Bill_add_edit" tabindex="-1" role="dialog" aria-labelledby="modal-large-label"
   style="display: none;">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
@@ -1637,7 +1654,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="ship-address" tabindex="-1" role="dialog"
+<div class="modal fade" id="ship-address_edit" tabindex="-1" role="dialog"
 aria-labelledby="modal-large-label" style="display: none;">
 <div class="modal-dialog modal-lg" role="document">
   <div class="modal-content">
@@ -1754,6 +1771,113 @@ aria-labelledby="modal-large-label" style="display: none;">
   </form>
   </div>
  </ng-template>
+
+
+ <ng-template #ItemListModel let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Item List</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+            <div class="row" *ngIf="selected_item">
+
+              <!-- Left column -->
+              <div class="col-md-6">
+                <div class="row mb-2">
+                  <div class="col-4 ">Item Name</div>
+                  <div class="col-8">{{ selected_item.name }}</div>
+                </div>
+
+                <div class="row mb-2">
+                  <div class="col-4 ">HSN</div>
+                  <div class="col-8">{{ selected_item.hsnsac }}</div>
+                </div>
+              </div>
+
+              <!-- Right column -->
+              <div class="col-md-6">
+                <div class="row mb-2">
+                  <div class="col-4 fw-bold">Category</div>
+                  <div class="col-8">{{ selected_item.item_cat }}</div>
+                </div>
+
+                <div class="row mb-2">
+                  <div class="col-4 fw-bold">Stock on Hand</div>
+                  <div class="col-8"><span  [ngStyle]="{'color': selected_item.stock_status == 0 ? 'red' : 'green'}"> {{ selected_item.stock_status }} </span> {{ selected_item.uom ?? "" }}</div>
+                </div>
+              </div>
+
+              <!-- Description (full width) -->
+              <div class="col-12 mt-2">
+                <div class="row">
+                  <div class="col-2 fw-bold">Description</div>
+                  <div class="col-10">{{ selected_item.description }}</div>
+                </div>
+              </div>
+
+              <!-- Button -->
+              <div class="col-12 text-center mt-3">
+                <button [disabled]="loading" type="submit" class="btn btn-info" (click)="ItemInsert()">
+                  Insert
+                  <i class="fa fa-spinner fa-spin" *ngIf="loading"></i>
+                </button>
+              </div>
+
+            </div>
+
+        <div>
+      <div  class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input class="form-control" type="text" placeholder="Search Items by Key words - Item Name (or) HSN/SAC (or) Description" (keyup)="updateFilter_item($event)" />
+          </div>
+    </div>
+
+ <div class="row">
+    <div class="col-md-12">
+      <ngx-datatable
+      #Itemstable
+      class="custom_table"
+      [headerHeight]="50"
+      [limit]="10"
+      [columnMode]="'flex'"
+      [footerHeight]="50"
+      [rowHeight]="'auto'"
+      [rows]="ItemList"
+      [selected]="selected"
+      (activate)="ItemSelect($event)">
+
+        <ngx-datatable-column     [resizeable]="false" prop="name" [flexGrow]="2" name="NAME" >
+          <ng-template ngx-datatable-cell-template let-row="row" >
+            {{row.name}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column     [resizeable]="false" prop="hsnsac" name="HSN/SAC" [flexGrow]="1" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.hsnsac}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column     [resizeable]="false" prop="price" name="RATE" [flexGrow]="1" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.price|indianCurrency}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column     [resizeable]="false" prop="description" name="DESCRIPTION"  [flexGrow]="2">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.description}}
+          </ng-template>
+        </ngx-datatable-column>
+
+      </ngx-datatable>
+    </div>
+  </div>
+  </div>
+</ng-template>
 
 
  <ng-template #delete_item let-modal>

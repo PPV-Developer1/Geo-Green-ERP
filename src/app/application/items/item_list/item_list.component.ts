@@ -26,7 +26,7 @@ export class Item_listComponent implements OnInit
 
   selected_item     : any;
   selected          = [];
-  detail_view       = [];
+  detail_view       : any;
   uom_list          = [];
   tax_list          = [];
   loading           : boolean = false;
@@ -56,7 +56,9 @@ export class Item_listComponent implements OnInit
     sale           : new FormControl(null),
     price          : new FormControl('', [Validators.required]),
     description    : new FormControl(null),
-    status         : new FormControl('')
+    status         : new FormControl(''),
+    minimum_stock  : new FormControl(null),
+    minimum_stock_status  : new FormControl(null)
   });
 
   NewItem = new FormGroup
@@ -71,7 +73,10 @@ export class Item_listComponent implements OnInit
     price           : new FormControl('', [Validators.required]),
     tax_percent     : new FormControl('18', [Validators.required]),
     description     : new FormControl(null),
-    status          : new FormControl(1)
+    status          : new FormControl(1),
+    minimum_stock  : new FormControl(null),
+    minimum_stock_status  : new FormControl(null)
+
   });
 
 
@@ -112,6 +117,12 @@ export class Item_listComponent implements OnInit
     if(event.type === "click")
     {
       this.detail_view = event.row;
+      console.log(this.detail_view);
+    }
+  }
+
+  Edit()
+  {
       this.EditItem.controls['name'].setValue(this.detail_view['item_name']);
       this.EditItem.controls['item_cat'].setValue(this.detail_view['item_cat_id']);
       this.EditItem.controls['hsnsac'].setValue(this.detail_view['hsnsac']);
@@ -122,9 +133,48 @@ export class Item_listComponent implements OnInit
       this.EditItem.controls['tax'].setValue(this.detail_view['tax_percent']);
       this.EditItem.controls['description'].setValue(this.detail_view['description']);
       this.EditItem.controls['status'].setValue(this.detail_view['status']);
+      this.EditItem.controls['minimum_stock'].setValue(this.detail_view['minimum_stock']);
+      this.EditItem.controls['minimum_stock_status'].setValue(this.detail_view['minimum_stock_status']);
+       this.minimum_stock_edit_status = this.detail_view['minimum_stock_status'] == 1 ? true : false;
       this.OpenItemEdit();
-    }
   }
+
+  set_zero()
+  {
+
+    this.detail_view = null;
+
+  }
+  minimum_stock_status: boolean = false;
+  minimum_stock_edit_status: boolean = false;
+  select(event: any)
+  {
+    console.log("event ",event.target.checked);
+    this.minimum_stock_status = event.target.checked;
+    const minStockControl = this.NewItem.get('minimum_stock');
+    if (this.minimum_stock_status) {
+      minStockControl?.setValidators([Validators.required]);
+    } else {
+      minStockControl?.clearValidators();
+    }
+
+    minStockControl?.updateValueAndValidity();
+  }
+
+  Edit_minimum(event: any)
+  {
+    console.log("event ",event.target.checked);
+    this.minimum_stock_edit_status = event.target.checked;
+    const minStockControl = this.EditItem.get('minimum_stock');
+    if (this.minimum_stock_edit_status) {
+      minStockControl?.setValidators([Validators.required]);
+    } else {
+      minStockControl?.clearValidators();
+    }
+
+    minStockControl?.updateValueAndValidity();
+  }
+
 
   async EditSubmit(data)
   {
@@ -134,7 +184,7 @@ export class Item_listComponent implements OnInit
             return;
           }
     this.loading=true;
-    await this.api.post('post_update_data.php?table=item&field=item_id&value=' + this.detail_view['item_id'] + '&authToken=' + environment.authToken, data).then((data_rt: any) =>
+    await this.api.post('post_update_data.php?table=item&field=item_id&value=' + this.detail_view['item_id'] + '&authToken=' + environment.authToken, data).then(async (data_rt: any) =>
     {
       if (data_rt.status == "success")
       {
@@ -144,7 +194,10 @@ export class Item_listComponent implements OnInit
       else { this.toastrService.error(data_rt.status);
         this.loading = false; }
         this.update_item_id.close();
-        this.load_item();
+       await this.load_item();
+        var update_data = await this.item_list.find((item) => item.item_id === this.detail_view['item_id']);
+        this.detail_view = update_data;
+        console.log(this.detail_view);
       return true;
     }).catch(error => {this.toastrService.error('API Faild : Item Updated');
     this.loading = false;});

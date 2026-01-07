@@ -47,62 +47,62 @@
         (activate)="onActivate($event)"
         (select)='onSelect($event)'>
 
-        <ngx-datatable-column prop="invoice_date" name="DATE" [flexGrow]="1" >
+        <ngx-datatable-column       [resizeable]="false" prop="invoice_date" name="DATE" [flexGrow]="1" >
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.invoice_date  | date: 'dd-MM-yyyy'}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="invoice_number" name="INVOICE NO" [flexGrow]="1">
+        <ngx-datatable-column       [resizeable]="false" prop="invoice_number" name="INVOICE NO" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span style="font-weight:bold;">{{row.invoice_number}}</span>
           </ng-template>
         </ngx-datatable-column>
-        <ngx-datatable-column prop="reference_number" name="REFF NUMBER" [flexGrow]="1">
-          <ng-template ngx-datatable-cell-template let-row="row">
-            <span *ngIf="row.reference_number != ''"> {{row.reference_number}}</span>
-            <span *ngIf="row.reference_number == ''"> Nill</span>
-          </ng-template>
-        </ngx-datatable-column>
 
-        <ngx-datatable-column prop="customer_name" name="CUSTOMER NAME" [flexGrow]="2">
+
+        <ngx-datatable-column       [resizeable]="false" prop="customer_name" name="CUSTOMER NAME" [flexGrow]="2">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span style="font-weight:bold;">{{row.customer_name}}</span>
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="description" name="DESCRIPTION" [flexGrow]="2">
-          <ng-template ngx-datatable-cell-template let-row="row">
-            {{row.description}}
-          </ng-template>
-        </ngx-datatable-column>
 
-        <ngx-datatable-column prop="invoice_due_date" name="DUE DATE" [flexGrow]="1">
+
+        <ngx-datatable-column       [resizeable]="false" prop="invoice_due_date" name="DUE DATE" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.invoice_due_date  | date: 'dd-MM-yyyy'}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column prop="total"  name="BILL AMOUNT" [flexGrow]="1">
+        <ngx-datatable-column       [resizeable]="false" prop="total"  name="INV AMOUNT" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.total | indianCurrency}}
           </ng-template>
         </ngx-datatable-column>
 
 
-        <ngx-datatable-column prop=""  name="BALANCE" [flexGrow]="1">
+        <ngx-datatable-column       [resizeable]="false" prop=""  name="BALANCE" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.balance | indianCurrency}}
           </ng-template>
         </ngx-datatable-column>
 
 
-        <ngx-datatable-column prop=""  name="PAID AMOUNT" [flexGrow]="1">
+        <ngx-datatable-column       [resizeable]="false" prop=""  name="PAID AMOUNT" [flexGrow]="1">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.paid_amount | indianCurrency}}
           </ng-template>
         </ngx-datatable-column>
 
+
+         <ngx-datatable-column  [resizeable]="false" prop="invoice_status" [flexGrow]="1" name="DISPATCH">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span *ngIf="row.invoice_status == 'No Items'" style="color: red;"> {{row.invoice_status}} </span>
+             <span *ngIf="row.invoice_status == 'Moved to Dispatch'" style="color: green;"> {{row.invoice_status}} </span>
+              <span *ngIf="row.invoice_status == 'Partially Moved Dispatch'" style="color: rgb(138, 139, 25);"> {{row.invoice_status}} </span>
+               <span *ngIf="row.invoice_status == 'Not Dispatch'" style="color: red;"> {{row.invoice_status}} </span>
+          </ng-template>
+        </ngx-datatable-column>
       </ngx-datatable>
     </div>
 <!-- Starting -->
@@ -196,6 +196,8 @@
                       <div class="col-md-3">
                         <div class="row">
                           <h5 class="ml-2" style="color:gray;">BILL FROM ADDRESS</h5>
+                           <i class="fa fa-pencil ml-2 mt-1" data-toggle="modal1" data-target="#nofooter-modal"
+                            style="cursor:pointer;" aria-hidden="true" data-toggle="modal" data-target="#billAddr"></i>
                         </div>
                         <div>
                           <input type="hidden">
@@ -220,6 +222,9 @@
                       <div class="col-md-5">
                         <div class="row">
                           <h5 class="ml-2" style="color:gray;">SHIP FROM ADDRESS</h5>
+                           <i class="fa fa-pencil ml-2 mt-1" data-toggle="modal2" data-target="#nofooter-modal"
+                                  style="cursor:pointer;" aria-hidden="true" data-toggle="modal"
+                                  data-target="#shipAddress"></i>
                         </div>
 
                         <div>
@@ -413,12 +418,15 @@
                                 </option>
                                 </select> -->
 
-                                <ng-select formControlName="items"  style="text-align: left;font-size: 14px" class=" form-control custom-select" (change)="specItem($event, i)"
+                                <!-- <ng-select formControlName="items"  style="text-align: left;font-size: 14px" class=" form-control custom-select" (change)="specItem($event, i)"
                                 (click)="adjustTableHeight()"  [clearable]="false">
                                   <ng-option *ngFor="let item of ItemList"  [value]="item.item_id" class="form-control">
                                     {{item.name}}
                                   </ng-option>
-                                </ng-select>
+                                </ng-select> -->
+                                <input type="text" readonly (click)="Item_popUp(i)" (input)="Item_popUp(i)" class="form-control form-control-sm"
+                                  placeholder="Click to select an item" formControlName="item_name">
+
                               </td>
                               <td style="min-width: 350px;">
                                 <textarea type="text" class="form-control form-control-sm" formControlName="descriptions" ></textarea>
@@ -590,6 +598,155 @@
   </div>
 </div>
 
+
+<ng-template #ItemListModel let-modal>
+  <div class="modal-header state modal-info">
+    <h3 class="modal-title" id="modal-primary-label">Item List</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+      (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+       <div *ngIf="selected_item" class="row">
+              <table class="table col-md-6">
+                <tbody>
+                  <tr>
+                    <th>Item Name</th>
+                    <td>{{selected_item.item_name}}</td>
+                  </tr>
+                   <tr>
+                    <th>HSN</th>
+                    <td>{{selected_item.hsnsac}}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <table class="table col-md-6">
+                <tbody>
+                  <tr>
+                      <th>Category </th>
+                      <td>{{selected_item.item_cat}}</td>
+                  </tr>
+                   <tr>
+                    <th>Stock on Hand</th>
+                    <td>{{selected_item.stock_status}}{{selected_item.uom??""}}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <table class="table col-md-12">
+                <tbody>
+                  <tr>
+                    <th class="col-2">Description</th>
+                    <td class="col-10">{{selected_item.description}}</td>
+                  </tr>
+
+                </tbody>
+              </table>
+              <div class="col-12 " style="text-align: center;">
+                    <button [disabled]="loading"  type="submit" class="btn btn-info "
+                        (click)="ItemInsert()">Insert <i class="fa fa-spinner fa-spin" *ngIf="loading"></i> </button>
+              </div>
+        </div>
+    <div>
+      <div  class="input-group input-group-sm my-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input class="form-control" type="text" placeholder="Search Items by Key words - Item Name (or) HSN/SAC (or) Description" (keyup)="updateFilter_item($event)" />
+          </div>
+    </div>
+
+ <div class="row">
+    <div class="col-md-12">
+      <ngx-datatable
+      #Itemstable
+      class="custom_table"
+      [headerHeight]="50"
+      [limit]="10"
+      [columnMode]="'flex'"
+      [footerHeight]="50"
+      [rowHeight]="'auto'"
+      [rows]="ItemList"
+      [selected]="selected"
+      (activate)="ItemSelect($event)">
+
+        <ngx-datatable-column       [resizeable]="false"     [resizeable]="false" prop="name" [flexGrow]="2" name="NAME" >
+          <ng-template ngx-datatable-cell-template let-row="row" >
+            {{row.name}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column       [resizeable]="false"     [resizeable]="false" prop="hsnsac" name="HSN/SAC" [flexGrow]="1" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.hsnsac}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column       [resizeable]="false"     [resizeable]="false" prop="price" name="RATE" [flexGrow]="1" >
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.price|indianCurrency}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column       [resizeable]="false"     [resizeable]="false" prop="description" name="DESCRIPTION"  [flexGrow]="2">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.description}}
+          </ng-template>
+        </ngx-datatable-column>
+
+      </ngx-datatable>
+    </div>
+  </div>
+  </div>
+</ng-template>
+
+
+<div class="modal fade" id="billAddr" tabindex="-1" role="dialog" aria-labelledby="modal-large-label"
+  style="display: none;">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header state modal-primary">
+          <h4 class="modal-title" id="modal-large-label">Select Your Bill Address</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">×</span></button>
+        </div>
+        <div class="modal-body">
+          <select  class="form-control w-500 col-md-12" (click)="ReloadBillAddr($event.target.value)">
+            <option *ngFor=" let addr of alldata" [value]="addr.cust_addr_id">
+              {{addr.attention + " "+ addr.address_line_1 +" "+ addr.address_line_2 +" "+
+              addr.city +" "+ addr.state +" "+ addr.zip_code }}</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="modal fade" id="shipAddress" tabindex="-1" role="dialog"
+aria-labelledby="modal-large-label" style="display: none;">
+<div class="modal-dialog modal-lg" role="document">
+  <div class="modal-content">
+    <div class="modal-header state modal-primary">
+      <h4 class="modal-title" id="modal-large-label">Select Your Ship Address</h4>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+          aria-hidden="true">×</span></button>
+    </div>
+    <div class="modal-body">
+      <select  class="form-control w-500 col-md-12" (click)="ReloadShippAddr($event.target.value)">
+        <option *ngFor=" let addr of alldata1" value="{{addr.cust_addr_id}}">
+          {{addr.attention + " "+ addr.address_line_1 +" "+ addr.address_line_2 +" "+
+          addr.city +" "+ addr.state +" "+ addr.zip_code }}</option>
+      </select>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+    </div>
+  </div>
+</div>
+</div>
 
 <div *ngIf="selected.length > 0">
   <div>
