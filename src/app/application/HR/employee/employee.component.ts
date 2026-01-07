@@ -199,7 +199,7 @@ export class EmployeeComponent implements OnInit
       branch          : new FormControl(null),
       doj             : new FormControl(null),
       esiNo           : new FormControl(null),
-      pfNo            : new FormControl(null,Validators.compose([Validators.pattern(/^[A-Z]{2}\/[A-Z]{3}\/\d{7}\/\d{3}\/\d{7}$/)])),
+      pfNo            : new FormControl(null),
       uan             : new FormControl(null),
       salary          : new FormControl(null),
       ot              : new FormControl(null),
@@ -312,7 +312,7 @@ export class EmployeeComponent implements OnInit
         emp_empRole             : [null],
         emp_empType             : [null],
         emp_esiNo               : [null],
-        emp_pfNo                : [null, Validators.compose([Validators.pattern(/^[A-Z]{2}\/[A-Z]{3}\/\d{7}\/\d{3}\/\d{7}$/)])],
+        emp_pfNo                : [null],
         emp_bank_access         : [null],
         emp_permenantAddress    : [null],
         emp_AddressForCommunication:[null],
@@ -687,7 +687,15 @@ export class EmployeeComponent implements OnInit
       const control = this.editEmpDetails.get(field);
       control.markAsTouched({ onlySelf: true });
     });
-
+    console.log(this.editEmpDetails.valid)
+     console.log(this.editEmpDetails.value)
+     Object.keys(this.editEmpDetails.controls).forEach(key => {
+    const control = this.editEmpDetails.get(key);
+    if (control?.invalid) {
+      console.log(`❌ Invalid field: ${key}`);
+      console.log('Errors:', control.errors);
+    }
+  });
     if(this.editEmpDetails.valid)
       {
     const confirmed = confirm("Are you sure you want to update this employee details?");
@@ -730,6 +738,9 @@ export class EmployeeComponent implements OnInit
             this.toastrService.error('API Faild : Update Employee');
             this.loading=false;
           });
+        }
+        else{
+          this.toastrService.error('Please Fill All Details');
         }
   }
 
@@ -931,8 +942,59 @@ export class EmployeeComponent implements OnInit
     }
   }
 
+
+  dataempty()
+  {
+     this.employee_details  =null;
+
+      this.emp_name                             = null
+      this.emp_doj                              = null
+      this.emp_id                               = null
+      this.emp_designation                      = null
+      this.emp_pan                              = null
+      this.emp_aadhar                           = null
+      this.emp_status                           = null
+      this.emp_bank_account_no                  = null
+      this.emp_bank_name                        = null
+      this.emp_ifsc                             = null
+      this.emp_branch                           = null
+      this.emp_basic_salary                     = null
+      this.emp_portal_access                    = null
+      this.emp_image                            = null
+      this.emp_father_guardianName              = null
+      this.emp_maritalStatus                    = null
+      this.emp_mobileNo                         = null
+      this.emp_dob                              = null
+      this.emp_emailId                          = null
+      this.emp_password                         = null
+      this.emp_empRole_id                       = null
+      this.emp_empRole                          = null
+      this.emp_empType_name                     = null
+      this.emp_empType                          = null
+      this.emp_esiNo                            = null
+      this.emp_pfNo                             = null
+      this.emp_salary                           = null
+      this.emp_bank_access                      = null
+      this.emp_userStatus                       = null
+      this.emp_permenantAddress                 = null
+      this.emp_AddressForCommunication          = null
+      this.emp_jobLocation                      = null
+      this.emp_lastWorkingDay                   = null
+      this.emp_emergency_Con_Person             = null
+      this.emp_emergency_Con_PersonNo           = null
+      this.emp_emergency_Con_PersonRelationship = null
+      this.img_path                             = null
+      this.emp_salaryGroup_name                 = null
+      this.emp_salaryGroup                      = null
+      this.emp_ot                               = null
+      this.emp_qualification                    = null
+      this.emp_bloodgroup                       = null
+      this.emp_pl                               = null
+      this.emp_cl                               = null
+  }
   async employeeLoad(emp_id)
   {
+   await this.dataempty();
     await this.api.get('mp_employee_view.php?id='+ emp_id +'&authToken=' + environment.authToken).then((data: any) =>
      {
       if(data != null)

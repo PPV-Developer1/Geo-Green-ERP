@@ -74,7 +74,15 @@
             {{row.total | indianCurrency}}
           </ng-template>
         </ngx-datatable-column>
-      </ngx-datatable>
+
+
+        <ngx-datatable-column     [resizeable]="false" prop="total" [flexGrow]="1" name="PO STATUS">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <span *ngIf="row.status == 2" style="color: green;"> Converted to Bill</span>
+            <span *ngIf="row.status == 1" style="color: rgb(128, 128, 43);"> Yet to Bill</span>
+          </ng-template>
+        </ngx-datatable-column>
+     </ngx-datatable>
     </div>
 <!-- Starting -->
 <!-- Ending-->
