@@ -226,6 +226,31 @@ export class EmployeeComponent implements OnInit
       nominee_name    : new FormControl('', [Validators.required]),
       nominee_contact_no : new FormControl('', [Validators.required]),
     })
+  account_balance: any;
+  advance_date: string;
+  salary_Amount: any;
+  salary_advance: any;
+  salary_paid_amount: any;
+  ot_hours: any;
+  ot_per_hours: any;
+  ot_paid_amount: any;
+  total_amount: any;
+  fixed_salary: any;
+  fixed_payable_salary: any;
+  basic_da: any;
+  hra: any;
+  allowance: any;
+  epf_deduction: any;
+  esi_deduction: any;
+  petrol_food_expenses: any;
+  incentive_others: any;
+  total_deduction: any;
+  net_salary: any;
+  salary_paid: any;
+  gross_salary: any;
+  epf_employer_contribution: any;
+  esi_employer_contribution: any;
+  company_total_expence: any;
   constructor(private modalService: NgbModal, public api: ApiService, public toastrService: ToastrService, fb: FormBuilder,private http: HttpClient)
   {
     this.sal_edit = fb.group
@@ -1135,13 +1160,16 @@ export class EmployeeComponent implements OnInit
     this.dropdown  = false;
   }
 
-
+  final_data:any
+  salary_details_view  = false
  async viewSlip(event)
   {
     if (event.type === "click") {
 
     let id = event.row.payroll_id;
-    console.log(event.row);
+    this.final_data = event.row
+    this.ot_hours = event.row.no_of_ot
+    console.log(this.final_data);
    await  this.api.get('get_data.php?table=salary_payment&find=payroll_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) =>
     {
       if(data != null)
@@ -1151,6 +1179,40 @@ export class EmployeeComponent implements OnInit
        this.show = false;
       }
     }).catch(error => { this.toastrService.error('API Faild : salary transactions'); });
+
+    await  this.api.get('salary_details.php?value=' + event.row.id + '&authToken=' + environment.authToken).then((data: any) =>
+    {
+        console.log(data);
+        this.detail_view =  data
+      if(data != null)
+      {
+        this.salary_details_view = true
+
+      this.salary_Amount             = data[0].salary_amount.toFixed(2);
+      this.salary_advance            = data[0].salary_advance.toFixed(2);
+      this.salary_paid_amount        = data[0].salary_amount_paid.toFixed(2);
+      this.ot_per_hours              = data[0].ot_per_hours;
+      this.ot_paid_amount            = data[0].ot_amount_paid.toFixed(2);
+      this.total_amount              = data[0].total_amount.toFixed(2);
+      this.fixed_salary              = data[0].fixed_salary.toFixed(2);
+      this.fixed_payable_salary      = data[0].payable_salary.toFixed(2);
+      this.basic_da                  = data[0].basic_da.toFixed(2);
+      this.hra                       = data[0].hra.toFixed(2);
+      this.allowance                 = data[0].allowance.toFixed(2);
+      this.epf_deduction             = data[0].epf_deduction.toFixed(2);
+      this.esi_deduction             = data[0].esi_deduction.toFixed(2);
+      this.petrol_food_expenses      = data[0].petrol_food_expenses.toFixed(2);
+      this.incentive_others          = data[0].incentive_others.toFixed(2);
+      this.total_deduction           = data[0].total_deduction.toFixed(2);
+      this.net_salary                = data[0].net_salary_credit.toFixed(2);
+      this.salary_paid               = data[0].salary_paid.toFixed(2);
+      this.gross_salary              = data[0].gross_salary.toFixed(2);
+      this.epf_employer_contribution = data[0].epf_employer.toFixed(2);
+      this.esi_employer_contribution = data[0].esi_employer.toFixed(2);
+      this.company_total_expence     = data[0].company_total_expense.toFixed(2);
+      }
+    }).catch(error => { this.toastrService.error('API Faild : salary transactions'); });
+
     }
   }
 

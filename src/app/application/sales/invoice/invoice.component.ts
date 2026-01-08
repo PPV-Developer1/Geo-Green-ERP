@@ -549,8 +549,6 @@ alldata1:any
 
   }
 
-
-
   async  Items_DctoInvoice(event)
   {
 
@@ -607,20 +605,24 @@ alldata1:any
             if (product1.length === 1 && !product1.at(0).get('items')?.value) {
               product1.clear();
             }
+
             // if (this.type == "project") {
             //   product1.clear();
             // }
+
             data.forEach(async(item: any) => {
               // Avoid duplicates by item_list_id
               const isDuplicate = product1.controls.some(ctrl =>
                 ctrl.get('items')?.value === item.item_list_id
               );
               // if (isDuplicate) return;
+
               var item_name :any = null
-          await this.api.get('get_data.php?table=item&find=item_id&value='+ item.item_list_id+'&authToken=' + environment.authToken).then((data: any) =>
+            await this.api.get('get_data.php?table=item&find=item_id&value='+ item.item_list_id+'&authToken=' + environment.authToken).then((data: any) =>
             {
-                    item_name = data[0].name
+                item_name = data[0].name
             }).catch(error => { this.toastrService.error('Something went wrong in ItemDetails'); });
+
               // Push new product row
               product1.push(this.fb.group({
                 dc_id       : [event.dc_id],
@@ -638,7 +640,7 @@ alldata1:any
             const newIndex = product1.length - 1;
             this.priceChange(item.qty, item.amount, newIndex);
           });
-          console.log(product1.value )
+          console.log(product1.value)
         }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
   }
 

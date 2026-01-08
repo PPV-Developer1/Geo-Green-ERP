@@ -952,9 +952,9 @@
                                                     <span style="font-weight:bold;"> {{row.salary_paid | indianCurrency}} </span>
                                                   </ng-template>
                                                 </ngx-datatable-column>
-                                                <ngx-datatable-column     [resizeable]="false" [flexGrow]="1" prop="status" name="STATUS">
+                                                <ngx-datatable-column     [resizeable]="false" [flexGrow]="1" prop="Paymentstatus" name="STATUS">
                                                   <ng-template ngx-datatable-cell-template let-row="row">
-                                                    <span style="font-weight:bold;"> {{row.status}} </span>
+                                                    <span style="font-weight:bold;"> {{row.Paymentstatus}} </span>
                                                   </ng-template>
                                                 </ngx-datatable-column>
                                               </ngx-datatable>
@@ -1013,8 +1013,315 @@
                                         </div>
                                   </div>
                             </div>
+                  <div >
+
+                    &nbsp;
+
+
+   <div widget class="card" *ngIf="salary_details_view">
+    <div class="card-header">
+        <span>Salary Period</span>
+        <!-- <div class="widget-controls">
+            <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+            <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+            <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+            <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+            <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+        </div> -->
+    </div>
+    <div class="card-body" >
+      <div class="row">
+        <table class="table col-md-6">
+          <thead>
+              <tr>
+                  <th>Total Hours</th>
+                  <td>{{final_data.no_of_days}}</td>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                  <th>Total Worked Hours</th>
+                  <td>{{final_data.no_working_days}}</td>
+              </tr>
+              <tr>
+                <th>Personal Leave Hours</th>
+                <td>{{final_data.no_of_pl}}</td>
+            </tr>
+
+              <tr>
+                  <th>Casual Leave Hours</th>
+                  <td>{{final_data.no_of_cl}}</td>
+              </tr>
+          </tbody>
+        </table>
+        <table class="table col-md-6">
+          <thead>
+
+              <tr>
+                  <th>Sick Leave Hours</th>
+                  <td>{{final_data.no_of_sl}}</td>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <th>Com Off Use Hours</th>
+                <td>{{final_data.c_off_use}}</td>
+            </tr>
+              <tr>
+                  <th>LOP Hours</th>
+                  <td>{{final_data.lop}}</td>
+              </tr>
+              <tr>
+                  <th>Salary Paid Hours</th>
+                  <td>{{final_data.salary_paid_days}}</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <div class="row" *ngIf="salary_details_view">
+      <div class="col-lg-12 col-md-7  ">
+          <div class="card card-outline-info box-shadow">
+            <div class="card-header">
+              <span>Salary</span>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="row mt-3">
+                  <div class="col-md-6 mt-2">
+                    <b>Salary Advance </b><spna></spna>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="input-group">
+                      <input type="number" class="form-control" readonly [(ngModel)]="salary_advance"  placeholder=" Enter Salary Advance">
+                    </div>
+                  </div>
+                 </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Paid Amount </b>
+
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" [(ngModel)]="salary_paid_amount" readonly class="form-control" placeholder="Enter Paid Amount"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>OT Hours </b>
+
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number"  [(ngModel)]="ot_hours" readonly (input)="ot_amount_calculation()" class="form-control" placeholder="Enter OT Hours"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>OT Per Hour </b>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number"  [(ngModel)]="ot_per_hours" readonly (input)="ot_amount_calculation()" class="form-control" placeholder="Enter OT Per Hour"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>OT Paid Amount</b>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number"  [(ngModel)]="ot_paid_amount" readonly class="form-control" placeholder="Enter OT Paid Amount"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Total Amount </b>
+
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number"  [(ngModel)]="total_amount" readonly class="form-control" placeholder="Enter Total Amount"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Fixed Salary</b>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number"  [(ngModel)]="fixed_salary" readonly class="form-control" placeholder="Enter DoB"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Fixed Payable Amount </b>
+                      </div>
+                    <div class="col-md-6">
+                      <input type="number"  readonly [(ngModel)]="fixed_payable_salary" class="form-control" placeholder="Enter Fixed Payable Amount"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Basic + DA </b>
+                      </div>
+                    <div class="col-md-6">
+                      <input type="number"  [(ngModel)]="basic_da" readonly class="form-control" placeholder="Enter Fixed Payable Amount"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b> HRA </b>
+
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number"  [(ngModel)]="hra" readonly class="form-control" placeholder=" Enter HRA"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b> Allowance </b>
+
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number"  [(ngModel)]="allowance" readonly class="form-control" placeholder=" Enter Email Id"/>
+                    </div>
+                  </div>
+
+                </div>
+
+
+
+
+                <div class="col-md-6">
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>EPF Employee </b>
+
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number"  [(ngModel)]="epf_deduction" readonly class="form-control" placeholder="Enter EPF"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>ESI Employee </b>
+
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number"  [(ngModel)]="esi_deduction" readonly class="form-control" placeholder="Enter ESI"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Total Deduction </b>
+
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number"  [(ngModel)]="total_deduction" readonly class="form-control" placeholder="Enter Total Deduction"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Pentrol/Food  Expenses </b>
+
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" readonly [(ngModel)]="petrol_food_expenses"   class="form-control" placeholder=" Enter Address">
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Incentive and Others</b>
+
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number"  readonly  [(ngModel)]="incentive_others"   class="form-control" placeholder="Enter Address For Communication">
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Net Salary</b>
+
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" [(ngModel)]="net_salary" class="form-control" readonly placeholder="Enter Bank Name"/>
+                    </div>
+                    </div>
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Salary Paid</b>
+
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number"  [(ngModel)]="salary_paid" class="form-control" readonly placeholder="Enter Bank Name"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>Gross Salary</b>
+
+
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number"  [(ngModel)]="gross_salary" class="form-control" readonly placeholder="Enter Bank IFSC"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>EPF Employer Contribution</b>
+
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number"  [(ngModel)]="epf_employer_contribution" readonly class="form-control" placeholder="Enter EPF Employer"/>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-6 mt-2">
+                      <b>ESI Employer Contribution</b>
+
+                    </div>
+                    <div class="col-md-6">
+                      <input type="text"   [(ngModel)]="esi_employer_contribution" readonly class="form-control" placeholder="Enter ESI Employer"/>
+                    </div>
+                  </div>
+
+                          <div class="row mt-3">
+                            <div class="col-md-6 mt-2">
+                              <b>Company Total Expence </b>
+
+                            </div>
+                            <div class="col-md-6">
+                              <input type="number"  [(ngModel)]="company_total_expence" readonly class="form-control"/>
+                            </div>
+                          </div>
+                        </div>
                         </div>
 
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </div>
 
                         <div class="tab-pane" id="bank">
 
@@ -2123,5 +2430,6 @@
     </form>
   </div>
 </ng-template>
+
 
 
