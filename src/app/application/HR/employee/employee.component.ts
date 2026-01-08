@@ -712,6 +712,7 @@ export class EmployeeComponent implements OnInit
       const control = this.editEmpDetails.get(field);
       control.markAsTouched({ onlySelf: true });
     });
+
     console.log(this.editEmpDetails.valid)
      console.log(this.editEmpDetails.value)
      Object.keys(this.editEmpDetails.controls).forEach(key => {
@@ -721,6 +722,7 @@ export class EmployeeComponent implements OnInit
       console.log('Errors:', control.errors);
     }
   });
+
     if(this.editEmpDetails.valid)
       {
     const confirmed = confirm("Are you sure you want to update this employee details?");
@@ -764,9 +766,11 @@ export class EmployeeComponent implements OnInit
             this.loading=false;
           });
         }
+
         else{
           this.toastrService.error('Please Fill All Details');
         }
+
   }
 
   async onInsert(data)

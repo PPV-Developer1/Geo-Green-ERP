@@ -618,11 +618,10 @@ alldata1:any
               // if (isDuplicate) return;
 
               var item_name :any = null
-            await this.api.get('get_data.php?table=item&find=item_id&value='+ item.item_list_id+'&authToken=' + environment.authToken).then((data: any) =>
+          await this.api.get('get_data.php?table=item&find=item_id&value='+ item.item_list_id+'&authToken=' + environment.authToken).then((data: any) =>
             {
-                item_name = data[0].name
+                    item_name = data[0].name
             }).catch(error => { this.toastrService.error('Something went wrong in ItemDetails'); });
-
               // Push new product row
               product1.push(this.fb.group({
                 dc_id       : [event.dc_id],

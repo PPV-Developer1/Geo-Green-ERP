@@ -670,25 +670,31 @@
       [selected]="selected"
       (activate)="ItemSelect($event)">
 
-        <ngx-datatable-column       [resizeable]="false"     [resizeable]="false" prop="name" [flexGrow]="2" name="NAME" >
+
+        <ngx-datatable-column     [resizeable]="false" prop="name" [flexGrow]="2" name="NAME" >
+
           <ng-template ngx-datatable-cell-template let-row="row" >
             {{row.name}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column       [resizeable]="false"     [resizeable]="false" prop="hsnsac" name="HSN/SAC" [flexGrow]="1" >
+
+        <ngx-datatable-column     [resizeable]="false" prop="hsnsac" name="HSN/SAC" [flexGrow]="1" >
+
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.hsnsac}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column       [resizeable]="false"     [resizeable]="false" prop="price" name="RATE" [flexGrow]="1" >
+<
+        <ngx-datatable-column     [resizeable]="false" prop="price" name="RATE" [flexGrow]="1" >
+
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.price|indianCurrency}}
           </ng-template>
         </ngx-datatable-column>
 
-        <ngx-datatable-column       [resizeable]="false"     [resizeable]="false" prop="description" name="DESCRIPTION"  [flexGrow]="2">
+        <ngx-datatable-column     [resizeable]="false" prop="description" name="DESCRIPTION"  [flexGrow]="2">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.description}}
           </ng-template>
