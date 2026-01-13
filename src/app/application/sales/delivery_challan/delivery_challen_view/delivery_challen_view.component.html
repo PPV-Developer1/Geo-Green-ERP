@@ -41,12 +41,12 @@
             </td> -->
             <td style="border: none;width: 34%;">
                <div class="btn-group mb-3 col-md-7" role="group" aria-label="Basic example">
-                  <button type="button" class="btn btn-outline-info fa fa-pencil btn-sm" [disabled]="status == 2|| return_status == 2" (click)="editbill()"> Edit</button>
+                  <button type="button" class="btn btn-outline-info fa fa-pencil btn-sm" [disabled]="status == 2|| return_status == 2 || dispatch_count > 0" (click)="editbill()"> Edit</button>
                     <button type="button" class="btn btn-outline-info fa fa-print btn-sm" (click)="download()"> Print</button>
                     <button type="button" class="btn btn-outline-info fa fa-pencil-square-o btn-sm" (click)="e_bill()"> Transport Vehicle Details</button>
                     <button type="button" class="btn btn-outline-info fa fa-copy btn-sm" (click)="clone()"> Clone</button>
-                    <button type="button" class="btn btn-outline-danger fa fa-trash-o btn-sm"  [disabled]="status == 2 || return_status == 2" (click)="remove()"> Delete</button>
-                    <button type="button" class="btn btn-outline-info fa fa-undo btn-sm" *ngIf="this.dc_type == 'return dc' && return_status == 1" (click)="return()"> Return Status</button>
+                    <button type="button" class="btn btn-outline-danger fa fa-trash-o btn-sm"  [disabled]="status == 2 || return_status == 2 || dispatch_count > 0" (click)="remove()"> Delete</button>
+                    <button type="button" class="btn btn-outline-info fa fa-undo btn-sm" *ngIf="this.dc_type == 'return dc' && return_status == 1 " (click)="return()"> Return Status</button>
                 </div>
             </td>
           </tr>
@@ -56,7 +56,7 @@
   <div class="card-group col-md-12">
     <div class="col-md-4">
       <ngx-datatable #table class="custom_table vh-100" [headerHeight]="0" [limit]="5" [columnMode]="'force'"
-        [footerHeight]="50" [rowHeight]="70" [rows]="CustomerBillList" [selected]="selected"
+        [footerHeight]="50" [rowHeight]="80" [rows]="CustomerBillList" [selected]="selected"
         [selectionType]="SelectionType.single" [scrollbarV]="true" (activate)="onActivate($event)"
         (select)='onSelect($event)'>
 
@@ -77,6 +77,10 @@
               <div class="col-md-12 "> {{row.reference_number}}</div>
 
             </div>
+             <div class="row" *ngIf="row.invoice_number">
+              <div class="col-md-12 ">INV No : {{row.invoice_number}}</div>
+
+            </div>
             </div>
           </ng-template>
         </ngx-datatable-column>
@@ -84,8 +88,16 @@
     </div>
     <div class="card col-md-8 vh-100" style="overflow-y: scroll;">
       <div class="page-content container">
-        <div *ngIf="return_status == 1" class="ribbon ribbon-create" ><span>Return Create</span></div>
-         <div *ngIf="return_status == 2" class="ribbon ribbon-close"><span>Return Close</span></div>
+        <!-- <div *ngIf="return_status == 1" class="ribbon ribbon-create" ><span>Return Create</span></div>
+         <div *ngIf="return_status == 2" class="ribbon ribbon-close"><span>Return Close</span></div> -->
+
+         <div>
+        <div *ngIf="dc_type == 'return dc' && return_status == 1" style="text-align: right;padding-top: 1%;color: red;" ><span> <b>Return Create</b></span></div>
+
+
+          <div *ngIf="dc_type == 'return dc' && return_status == 2" style="text-align: right;padding-top: 1%;color: green;" ><span> <b>Return Completed</b></span></div>
+         </div>
+
         <div class="container px-0">
           <div class="row mt-4">
             <div class="col-md-12 col-lg-10 offset-lg-1" *ngFor="let invoice of invoicePdf">
@@ -564,8 +576,8 @@
                       <tr *ngFor="let product of Edit_dc.get('product')['controls']; let j = index;" [formGroupName]="j">
                         <td style="min-width: 350px;">
                           <ng-select  formControlName="items"  style="text-align: left;"
-                               class=" form-control custom-select" (change)="specProject($event, j)" [clearable]="false" (click)="adjustTableHeight()">
-                                <ng-option *ngFor="let item of edit_ItemList" [value]="item.id" class="form-control">
+                               class=" form-control custom-select" (change)="specProject($event, j)" [clearable]="false" (click)="adjustTableHeight()" [disabled]="product.get('edit_status')?.value === false">
+                                <ng-option *ngFor="let item of edit_ItemList" [value]="item.id" class="form-control" >
                                   {{item.name}}
                                 </ng-option>
                              </ng-select>
@@ -574,13 +586,13 @@
                           <textarea type="text" class="form-control form-control-sm" formControlName="descriptions" ></textarea>
                         </td>
                         <td>
-                          <input type="number" #qtys (change)="edit_qty(qtys.value, price.value, j)" class="form-control form-control-sm" formControlName="quantity" />
+                          <input type="number" #qtys (change)="edit_qty(qtys.value, price.value, j)" [readonly]="product.get('edit_status')?.value === false" class="form-control form-control-sm" formControlName="quantity" />
                         </td>
                         <td>
                           <input type="text" class="form-control form-control-sm" readonly formControlName="uom"/>
                         </td>
                         <td>
-                          <input type="number" #price (change)="edit_priceChange(qtys.value, price.value, j)" class="form-control form-control-sm" formControlName="price" />
+                          <input type="number" #price (change)="edit_priceChange(qtys.value, price.value, j)" [readonly]="product.get('edit_status')?.value === false" class="form-control form-control-sm" formControlName="price" />
                         </td>
 
                         <td>
@@ -616,13 +628,13 @@
                           <textarea type="text" class="form-control form-control-sm" formControlName="descriptions" ></textarea>
                         </td>
                         <td>
-                          <input type="number" #qtys (change)="edit_qty(qtys.value, price.value, j)" class="form-control form-control-sm" formControlName="quantity" />
+                          <input type="number" #qtys (change)="edit_qty(qtys.value, price.value, j)" [readonly]="product.get('edit_status')?.value === false"  class="form-control form-control-sm" formControlName="quantity" />
                         </td>
                         <td>
                           <input type="text" class="form-control form-control-sm" readonly formControlName="uom"/>
                         </td>
                         <td>
-                          <input type="number" #price (change)="edit_priceChange(qtys.value, price.value, j)" class="form-control form-control-sm" formControlName="price" />
+                          <input type="number" #price (change)="edit_priceChange(qtys.value, price.value, j)" [readonly]="product.get('edit_status')?.value === false"  class="form-control form-control-sm" formControlName="price" />
                         </td>
                         <td>
                           <input type="number" class="form-control form-control-sm" readonly formControlName="taxes"/>
@@ -630,7 +642,7 @@
                         <td style="min-width: 200px;">
                           <input type="number" class="form-control form-control-sm" readonly formControlName="amount">
                         </td>
-                        <td class="col-sm-1 mt-2 " (click)="edit_onDeleteRow(j)" [disabled]="Edit_dc.controls.product.controls.length === 1">
+                        <td class="col-sm-1 mt-2 " *ngIf="product.get('edit_status')?.value === true" (click)="edit_onDeleteRow(j)" [disabled]="Edit_dc.controls.product.controls.length === 1">
                              <i style="color: red;" class="far fa-times-circle"></i>
                           </td>
                       </tr>
@@ -1414,6 +1426,7 @@
                           <th>ITEM NAME <div class="resizer"></div></th>
                           <th>DESCRIPTION  <div class="resizer"></div></th>
                           <th>QUANTITY <div class="resizer"></div></th>
+                          <th>HSN <div class="resizer"></div></th>
                           <th>UOM <div class="resizer"></div></th>
                           <th>RATE <div class="resizer"></div></th>
                           <th>TAX <div class="resizer"></div></th>
@@ -1431,7 +1444,7 @@
                            <textarea type="text" class="form-control form-control-sm" formControlName="descriptions" ></textarea>
                         </td>
                         <td>
-                          <input type="number" #qtys (change)="edit_qty(qtys.value, price.value, i)" class="form-control form-control-sm" formControlName="quantity" />
+                          <input type="number" #qtys (change)="edit_qty(qtys.value, price.value, i)" [readonly]="product.get('edit_status')?.value === false" class="form-control form-control-sm" formControlName="quantity" />
                         </td>
                         <td>
                           <input type="text" class="form-control form-control-sm"   formControlName="hsn" />
@@ -1439,6 +1452,7 @@
                         <td>
                           <input type="text" class="form-control form-control-sm"   formControlName="uom" />
                         </td>
+
                         <td>
                           <input type="number" #price (change)="edit_priceChange(qtys.value, price.value, i)" class="form-control form-control-sm" formControlName="price" />
                         </td>
@@ -1771,7 +1785,7 @@
                            <textarea type="text" class="form-control form-control-sm" formControlName="descriptions" ></textarea>
                         </td>
                         <td>
-                          <input type="number" #qtys (change)="edit_qty(qtys.value, price.value, i)" class="form-control form-control-sm" formControlName="quantity" />
+                          <input type="number" #qtys (change)="edit_qty(qtys.value, price.value, i)"  class="form-control form-control-sm" formControlName="quantity" />
                         </td>
                         <td>
                           <input type="text" class="form-control form-control-sm"   formControlName="hsn" />

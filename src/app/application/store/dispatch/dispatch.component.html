@@ -77,7 +77,7 @@
     <ngx-datatable-column     [resizeable]="false" prop="status" name="STATUS" [flexGrow]="1">
       <ng-template ngx-datatable-cell-template let-row="row">
         <label *ngIf="row.status == 1" style="color:blue"><strong>Created</strong></label>
-        <label *ngIf="row.status == 2 && row.type =='project'" style="color:rgb(235, 155, 8)"><strong>Approved</strong></label>
+        <label *ngIf="row.status == 2 && (row.type =='project'||row.type =='return dc')" style="color:rgb(235, 155, 8)"><strong>Approved</strong></label>
         <label *ngIf="row.status == 2 && row.type =='items'" style="color:rgb(235, 155, 8)"><strong>Move to Approve</strong></label>
         <label *ngIf="row.status == 3" style="color:rgb(235, 155, 8)"><strong>Approved</strong></label>
       </ng-template>
@@ -93,7 +93,7 @@
     <div class="dropdown-menu">
       <a class="dropdown-item" href="javascript:void(0);" (click)="Edit_Button($event)" *ngIf="detail_view.status == 1">Edit Dispatch</a>
       <a class="dropdown-item" href="javascript:void(0);" (click)="Update_tran($event)" *ngIf="detail_view.status == 1">Update Transport</a>
-      <a class="dropdown-item" href="javascript:void(0);" (click)="approval_button($event)" *ngIf="user_type == 'super_admin' && detail_view.status == 1 && edit_type =='project'" >Approve</a>
+      <a class="dropdown-item" href="javascript:void(0);" (click)="approval_button($event)" *ngIf="user_type == 'super_admin' && detail_view.status == 1 && (edit_type =='project'||edit_type =='return dc')" >Approve</a>
       <a class="dropdown-item" href="javascript:void(0);" (click)="approval_button($event)" *ngIf="user_type == 'super_admin' && detail_view.status == 1 && edit_type =='items'" >Move to outward</a>
       <a class="dropdown-item" href="javascript:void(0);" (click)="packing_list()" *ngIf="detail_view.status == 2 ||detail_view.status == 3" >Print Packing List</a>
     </div>
@@ -333,7 +333,7 @@
       </div>
   </div>
 
-  <div  *ngIf="edit_type =='items'" widget class="card">
+  <div  *ngIf="edit_type =='items' || edit_type == 'return dc'" widget class="card">
     <div class="card-header">
       <span class="text-uppercase">Item List</span>
     </div>
@@ -797,7 +797,7 @@
                   </ngx-datatable>
                 </div>
 
-                <div *ngIf="invoice_type ==='items'" class="card card-outline-info">
+                <div *ngIf="invoice_type ==='items' || invoice_type === 'return dc'" class="card card-outline-info">
                   <div class="input-group input-group-sm my-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fa fa-search"></i></span>
@@ -1276,7 +1276,7 @@
                   </ngx-datatable>
                 </div>
 
-                <div *ngIf="edit_type == 'items'" class="card card-outline-info">
+                <div *ngIf="edit_type == 'items' || edit_type == 'return dc'" class="card card-outline-info">
 
                   <div class="input-group input-group-sm my-3">
                     <div class="input-group-prepend">

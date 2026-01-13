@@ -69,7 +69,7 @@
           </ng-template>
         </ngx-datatable-column> -->
 
-        <ngx-datatable-column     [resizeable]="false" prop="total" [flexGrow]="1" name="BILL AMOUNT">
+        <ngx-datatable-column     [resizeable]="false" prop="total" [flexGrow]="1" name="PO AMOUNT">
           <ng-template ngx-datatable-cell-template let-row="row">
             {{row.total | indianCurrency}}
           </ng-template>

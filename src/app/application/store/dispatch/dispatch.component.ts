@@ -615,7 +615,7 @@ async  update(Batch)
     if(this.LoadType == 1)
     {
       this.openModel.close();
-     await   this.api.get('get_data.php?table=invoice&find=status&value=1&authToken='+environment.authToken).then((data: any) =>
+     await   this.api.get('get_data.php?table=invoice&find=status&value=1&asign_field=invoice_id&asign_value=DESC&authToken='+environment.authToken).then((data: any) =>
       {
         this.invoice_data = data;
       }).catch(error => {this.toastrService.error('Something went wrong');});
@@ -624,7 +624,7 @@ async  update(Batch)
     else if(this.LoadType == 2)
     {
       this.openModel.close();
-     await this.api.get('get_data.php?table=dc&find=status&value=1&authToken='+environment.authToken).then((data: any) =>
+     await this.api.get('get_data.php?table=dc&find=status&value=1&asign_field=dc_id&asign_value=DESC&authToken='+environment.authToken).then((data: any) =>
       {
         this.dc_list = data;
       }).catch(error => {this.toastrService.error('Something went wrong');});
@@ -678,6 +678,7 @@ async  update(Batch)
           var data = this.dc_list.find(t=>t.dc_id == this.LoadBy);
           this.DispatchForm.controls['dc_id'].setValue(data['dc_id']);
           this.invoice_id=data.dc_id;
+
           await this.api.get('mp_dispatch_item_list.php?type=DC&find=dc_id&value='+this.invoice_id+'&authToken='+environment.authToken).then((data: any) =>
           {
 
@@ -704,6 +705,12 @@ async  update(Batch)
                 this.LoadItems();
                 this.DispatchForm.controls['projectname'].setValue('item');
               }
+              if(this.invoice_type =='return dc')
+              {
+                this.DispatchForm.controls['project_id'].setValue(0);
+                this.LoadItems();
+                this.DispatchForm.controls['projectname'].setValue('return dc');
+              }
           }).catch(error => {this.toastrService.error('Something went wrong');});
         }
     this.openModel.close();
@@ -729,7 +736,9 @@ async  update(Batch)
       this.loading = false;
       this.addnew_form = true;
       this.DispatchBy.controls['dispatch_by'].reset();
-      this.project_id = this.invoiceitem_list[0].item_list_id;
+
+        this.project_id = this.invoiceitem_list[0].item_list_id;
+
     }
     else{
       this.toastrService.warning('Select the list');
@@ -806,7 +815,7 @@ async  update(Batch)
           }
           if (data.status == 'no data'||data== null)
           {
-            this.toastrService.warning('No Data');
+            this.toastrService.warning('No association data found');
           }
         }
     }).catch(error => {this.toastrService.error('Something went wrong  ');});
@@ -858,7 +867,7 @@ async  update(Batch)
 
       }).catch(error => {this.toastrService.error('Something went wrong');});
      }
-     if(this.edit_type =='items')
+     if(this.edit_type =='items'||this.edit_type =='return dc')
      {
         if(this.inv_OR_dc =='Invoice')
         {
@@ -872,6 +881,7 @@ async  update(Batch)
         {
           await this.api.get('mp_dispatch_item_list.php?type='+this.inv_OR_dc+'&find=dc_id&value='+dc_id+'&authToken='+environment.authToken).then((data: any) =>
           {
+            console.log("data list dc ",data)
             this.data_list=data;
           }).catch(error => {this.toastrService.error('Something went wrong');});
         }
@@ -980,7 +990,8 @@ async  update(Batch)
     let type      = this.detail_view['type'];
     let delivery_against = this.detail_view['delivery_against'];
     let project_id = this.detail_view['project_id'];
-
+    console.log("type ",type)
+     console.log("EditAssoList ",this.EditAssoList)
     if(type == 'items')
     {
       var id = this.EditAssoList.item_list_id;
@@ -988,6 +999,10 @@ async  update(Batch)
     if(type == 'project')
     {
       var id = this.EditAssoList.id;
+    }
+    if(type =='return dc')
+    {
+        var id = this.EditAssoList.dc_item_id;
     }
 
     if(delivery_against == 'Invoice')
@@ -1114,10 +1129,11 @@ async  update(Batch)
       }).catch(error => {this.toastrService.error('Something went wrong ');});
 
       }
-    else if(this.edit_type == 'items')
+    else if(this.edit_type == 'items'|| this.edit_type == 'return dc')
       {
-       await this.api.get('mp_dispatch_item_list.php?type='+this.inv_OR_dc+'&find=dispatch_id&value='+dispatch_id+'&authToken='+environment.authToken).then((data: any) =>
+       await this.api.get('mp_dispatch_item_list.php?type='+this.inv_OR_dc+'&find=dispatch_id&value='+dispatch_id+'&id='+this.detail_view['dc_id']+'&authToken='+environment.authToken).then((data: any) =>
         {
+          console.log("data list ",data)
           if(data != null)
           {
           this.project_asso_list = data ;
@@ -1177,6 +1193,11 @@ updateFilter_item (event)
         {
         var project       = this.detail_view['dc_number'];
         }
+      }
+      if(mode =="return dc")
+      {
+          mode = "return_dc";
+          var project       = this.detail_view['dc_number'];
       }
     await this.api.get('mp_print_dispatchList.php?type='+mode+'&value='+id+'&delivery_type='+delivery_type+'&authToken='+environment.authToken).then((data: any) =>
     {

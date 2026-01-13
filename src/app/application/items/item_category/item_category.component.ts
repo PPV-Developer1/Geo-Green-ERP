@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment.prod';
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
+import { format } from 'path';
 
 @Component({
   selector   : 'az-item_category',
@@ -38,7 +39,8 @@ export class Item_categoryComponent implements OnInit {
     type              : new FormControl('', [Validators.required]),
     HaveSerialNumber  : new FormControl(null),
     JobworkMaterial   : new FormControl(null),
-    status            : new FormControl(null)
+    status            : new FormControl(null),
+    format            : new FormControl(null),
   });
 
   AddCategory = new FormGroup
@@ -48,7 +50,8 @@ export class Item_categoryComponent implements OnInit {
     type              : new FormControl('', [Validators.required]),
     HaveSerialNumber  : new FormControl(0),
     JobworkMaterial   : new FormControl(null),
-    status            : new FormControl(1)
+    status            : new FormControl(1),
+    format            : new FormControl(null),
   });
 
   constructor(public api: ApiService, public toastrService: ToastrService, private modalService: NgbModal)
@@ -108,6 +111,7 @@ export class Item_categoryComponent implements OnInit {
       this.EditCategory.controls['HaveSerialNumber'].setValue(this.detail_view['have_seriel_number']);
       this.EditCategory.controls['JobworkMaterial'].setValue(this.detail_view['jobworkmaterial']);
       this.EditCategory.controls['status'].setValue(this.detail_view['status']);
+      this.EditCategory.controls['format'].setValue(this.detail_view['format']);
       this.OpenCatEdit();
   }
 
@@ -127,14 +131,15 @@ export class Item_categoryComponent implements OnInit {
             return;
           }
       this.loading = true;
-      await this.api.post('post_update_data.php?table=item_category&field=cat_id&value='+this.detail_view['cat_id']+'&authToken=' + environment.authToken, this.EditCategory.value).then((data: any) =>
+      await this.api.post('post_update_data.php?table=item_category&field=cat_id&value='+this.detail_view['cat_id']+'&authToken=' + environment.authToken, this.EditCategory.value).then(async (data: any) =>
         {
           if(data.status == "success")
             {
               this.loading = false;
               this.toastrService.success('Item Category Updated Succesfully');
-              this.load_item();
+              await this.load_item();
               this.update_categogy_id.close();
+              this.detail_view = this.category_list.find(i => i.cat_id == this.detail_view['cat_id'])
             }
           else
           { this.toastrService.error(data.status);
@@ -186,6 +191,7 @@ export class Item_categoryComponent implements OnInit {
                       this.AddCategory.controls['type'].reset();
                       this.AddCategory.controls['status'].setValue(1);
                       this.AddCategory.controls['HaveSerialNumber'].setValue(0);
+                      this.AddCategory.controls['format'].reset();
                       this.load_item();
                       this.new_category_id.close();
                     }

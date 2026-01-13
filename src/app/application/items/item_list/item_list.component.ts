@@ -1,3 +1,4 @@
+import { format } from 'path';
 import { Component, ViewChild, OnInit, ElementRef} from '@angular/core';
 import { DatatableComponent } from '@swimlane/ngx-datatable';
 import { ApiService } from 'src/app/service/api.service';
@@ -50,6 +51,7 @@ export class Item_listComponent implements OnInit
     name           : new FormControl(null, [Validators.required, Validators.minLength(3)]),
     hsnsac         : new FormControl(null, [Validators.required, Validators.minLength(3)]),
     item_cat       : new FormControl(null, [Validators.required]),
+
     uom            : new FormControl(null, [Validators.required]),
     tax            : new FormControl(null, [Validators.required]),
     purchase       : new FormControl(null),
@@ -64,6 +66,7 @@ export class Item_listComponent implements OnInit
   NewItem = new FormGroup
   ({
     created_by      : new FormControl(this.uid),
+     cat_format     : new FormControl(null),
     name            : new FormControl(null, [Validators.required, Validators.minLength(3)]),
     item_cat        : new FormControl(null, [Validators.required]),
     hsnsac          : new FormControl(null, [Validators.required, Validators.minLength(4)]),
@@ -139,6 +142,18 @@ export class Item_listComponent implements OnInit
       this.OpenItemEdit();
   }
 
+  cat_category(event)
+  {
+    console.log(event)
+    if(event == undefined)
+    {
+      this.NewItem.controls["cat_format"].reset()
+      return
+    }
+    const value = this.category.find(i => i.cat_id == event)
+    console.log(value.format)
+    this.NewItem.controls["cat_format"].setValue(value.format)
+  }
   set_zero()
   {
 

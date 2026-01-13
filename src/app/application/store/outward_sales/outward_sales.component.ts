@@ -257,6 +257,8 @@ export class Outward_salesComponent implements OnInit {
                           }
                       }).catch(error => {this.toastrService.error('Something went wrong');});
                     }
+
+                    console.log("batch list : ",this.batchList)
                   }
             }
       }).catch(error => {this.toastrService.error('Something went wrong 1');});

@@ -37,7 +37,6 @@
         [selectionType]="'single'"
         (activate)="onActivate($event)"
          [loadingIndicator]="initial_loading"
-
         (select)='onSelect($event)'>
 
         <ngx-datatable-column   [resizeable]="false" prop="bill_date" [flexGrow]="1" name="DATE">
@@ -51,12 +50,13 @@
             <span style="font-weight:bold;"> {{row.bill_number}}</span>
           </ng-template>
         </ngx-datatable-column>
-        <ngx-datatable-column  [resizeable]="false" prop="reference_number" [flexGrow]="1" name="REFF NUMBER">
+
+        <!-- <ngx-datatable-column  [resizeable]="false" prop="reference_number" [flexGrow]="1" name="REFF NUMBER">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.reference_number != ''"> {{row.reference_number}}</span>
             <span *ngIf="row.reference_number == ''"> Nill</span>
           </ng-template>
-        </ngx-datatable-column>
+        </ngx-datatable-column> -->
 
         <ngx-datatable-column  [resizeable]="false" prop="vendor_name" [flexGrow]="2" name="VENDOR NAME">
           <ng-template ngx-datatable-cell-template let-row="row">
@@ -89,7 +89,8 @@
           </ng-template>
         </ngx-datatable-column>
 
-         <ngx-datatable-column  [resizeable]="false" prop="paid_amount" [flexGrow]="1" name="INWARD STATUS">
+
+         <ngx-datatable-column  [resizeable]="false" prop="edit_status" [flexGrow]="1" name="INWARD STATUS">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.edit_status == 'No Items'" style="color: red;"> {{row.edit_status}} </span>
              <span *ngIf="row.edit_status == 'Inward Complete'" style="color: green;"> {{row.edit_status}} </span>

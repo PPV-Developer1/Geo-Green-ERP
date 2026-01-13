@@ -642,7 +642,7 @@
                           </select> -->
 
 
-                          <ng-select  formControlName="items"  style="text-align: left;"
+                          <ng-select  formControlName="items"   style="text-align: left;"
                            class=" form-control custom-select" (change)="specProject($event, j)" [clearable]="false" (click)="adjustTableHeight()">
                             <ng-option *ngFor="let item of edit_ItemList" [value]="item.id" class="form-control">
                               {{item.name}}
@@ -656,11 +656,11 @@
 
                         <td style="min-width: 350px;">
 
-                          <textarea type="text" class="form-control form-control-sm"  formControlName="descriptions" ></textarea>
+                          <textarea type="text" class="form-control form-control-sm" [readOnly]="product.edit_status"  formControlName="descriptions" ></textarea>
                         </td>
 
                         <td>
-                          <input type="number" #qtys (change)="edit_qty(qtys.value, price.value, j)" class="form-control form-control-sm" formControlName="quantity" />
+                          <input type="number" #qtys (change)="edit_qty(qtys.value, price.value, j)"  [readonly]="product.get('edit_status')?.value === false" class="form-control form-control-sm" formControlName="quantity" />
                         </td>
 
                         <td>
@@ -704,7 +704,7 @@
                             </ng-option>
                           </ng-select> -->
 
-                             <input type="text" readonly (click)="Item_popUp(j)" (input)="Item_popUp(j)" class="form-control form-control-sm"
+                             <input type="text" readonly (click)="Item_popUp(j)" (input)="Item_popUp(j)"  class="form-control form-control-sm"
                                   placeholder="Click to select an item" formControlName="item_name">
                         </td>
 
@@ -712,13 +712,13 @@
                           <textarea type="text" class="form-control form-control-sm" formControlName="descriptions" ></textarea>
                         </td>
                         <td>
-                          <input type="number" #qtys (change)="edit_qty(qtys.value, price.value, j)" class="form-control form-control-sm" formControlName="quantity" />
+                          <input type="number" #qtys (change)="edit_qty(qtys.value, price.value, j)" [readonly]="product.get('edit_status')?.value === false" class="form-control form-control-sm" formControlName="quantity" />
                         </td>
                         <td>
                           <input type="text" class="form-control form-control-sm" readonly formControlName="uom"/>
                         </td>
                         <td>
-                          <input type="number" #price (change)="edit_priceChange(qtys.value, price.value, j)" class="form-control form-control-sm" formControlName="price" />
+                          <input type="number" #price (change)="edit_priceChange(qtys.value, price.value, j)" [readonly]="product.get('edit_status')?.value === false" class="form-control form-control-sm" formControlName="price" />
                         </td>
                         <td>
                           <input type="number" class="form-control form-control-sm" readonly formControlName="taxes"/>
@@ -726,7 +726,7 @@
                         <td style="min-width: 200px;">
                           <input type="number" class="form-control form-control-sm" readonly formControlName="amount">
                         </td>
-                        <td *ngIf="product.get('dc_id')?.value == 0" class="col-sm-1 mt-2 " (click)="edit_onDeleteRow(j)" [disabled]="Edit_invoice.controls.product.controls.length === 1">
+                        <td *ngIf="product.get('dc_id')?.value == 0 && product.get('edit_status')?.value === true" class="col-sm-1 mt-2 "  (click)="edit_onDeleteRow(j)" [disabled]="Edit_invoice.controls.product.controls.length === 1">
                             <i style="color: red;" class="far fa-times-circle"></i>
                           </td>
                       </tr>

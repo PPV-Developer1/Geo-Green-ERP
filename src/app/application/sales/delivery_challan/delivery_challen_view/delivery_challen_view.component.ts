@@ -333,6 +333,8 @@ export class Delivery_challen_viewComponent implements OnInit {
     }
   }
 
+  dispatch_count : any
+  used_invoice : any
   async loadonce()
   {
     await this.api.get('mp_customer_dc_pdf.php?value=' + this.view_dc + '&authToken=' + environment.authToken).then(async (data: any) => {
@@ -342,6 +344,7 @@ export class Delivery_challen_viewComponent implements OnInit {
       this.dc_type = data[0].dc_type;
       this.return_status = data[0].return_dc_status;
       this.status = data[0].status;
+      this.dispatch_count = data[0].dipatch_count;
       this.dc_id = data[0].dc_id;
       this.company_pdf_logo = this.invoicePdf[0].company_details[0].logo;
       this.company_pdf_logo = environment.baseURL + "download_file.php?path=upload/company/" +  this.company_pdf_logo + "&authToken=" + environment.authToken
@@ -405,7 +408,7 @@ export class Delivery_challen_viewComponent implements OnInit {
       if(data.length > 0)
         this.temp=[...data]
       var selectedId  = this.view_dc;
-      let selectedRow = this.CustomerBillList.find(item => item.serial_no == selectedId);
+      let selectedRow = this.CustomerBillList.find(item => item.dc_id == selectedId);
       if (selectedRow)
       {
         this.selected = [selectedRow];
@@ -433,7 +436,7 @@ export class Delivery_challen_viewComponent implements OnInit {
       this.dc_list = event.row;
       this.name = event.row.customer_name;
       this.selectEdit_data();
-      this.view_dc=event.row.serial_no;
+      this.view_dc=event.row.dc_id;
       this.e_way_bill.controls['bill_no'].setValue(this.dc_list.e_way_bill);
       this.e_way_bill.controls['vehicle_no'].setValue(this.dc_list.vehicle_number);
       this.e_way_bill.controls['shipment_mode'].setValue(this.dc_list.transport_mode);
@@ -454,6 +457,7 @@ export class Delivery_challen_viewComponent implements OnInit {
           console.log("dc view data ",data)
           this.dc_type        = data[0].dc_type;
           this.return_status  = data[0].return_dc_status;
+          this.dispatch_count = data[0].dipatch_count;
           this.invoiceItems   = this.invoicePdf[0].invoiceItems;
           this.taxempty       = data[0].tax_mode;
           this.stateCode      = data[0].place_from_supply_code;
@@ -676,6 +680,7 @@ async FetchAddress(data)
       amount      : new FormControl('', Validators.required),
       uom         : new FormControl('', Validators.required),
       hsn         : new FormControl(''),
+      edit_status : [true]
     }))
   }
 
@@ -737,7 +742,8 @@ load_editpage()
                 quantity    : [item.qty],
                 amount      : [item.total],
                 uom         : [item.uom],
-                item_name   : [item.item_name]
+                item_name   : [item.item_name],
+                edit_status : [item.edit_status]
               }));
 
           let qty   = item.qty;
@@ -760,7 +766,8 @@ load_editpage()
               quantity    : [item.qty],
               amount      : [item.total],
               uom         : [item.uom],
-              hsn         : [item.hsn]
+              hsn         : [item.hsn],
+              edit_status : [item.edit_status]
             }));
 
         let qty   = item.qty;
@@ -1063,7 +1070,7 @@ async edit_specItem(item,j)
               this.toastrService.success('DC Updated Succesfully');
               this.Return();
               this.returnable_dc_show = false
-              this.view_dc = serial_no;
+              this.view_dc = dc_id;
               this.loadonce();
             }
             else { this.toastrService.error('Something went wrong');
@@ -1639,7 +1646,7 @@ prefix_data:any
           let dc_id             = data[0].serial_no + 1;
           this.prefix_data      = data[0].prefix ;
           this.inv_no           = dc_id;
-          this.view_dc          = dc_id;
+          this.view_dc          = data[0].dc_id;
           this.invoice_type     = this.details.dc_type
           if(this.clone_dc_show == true)
           {
@@ -1732,7 +1739,7 @@ async onSubmit(bill_data)
         }
    }).catch(error => { this.toastrService.error('Something went wrong 1'); });
   }
-  
+
 ewayEdit()
 {
   this.e_way_bill_status = false;
@@ -1751,7 +1758,7 @@ editclose()
                 return;
               }
   let dc_id =this.invoicePdf[0].dc_id;
-  this.view_dc =this.dc_list.serial_no;
+  this.view_dc =this.dc_list.dc_id;
       await this.api.post('mp_dc_create.php?dc_id='+dc_id+'&type=e_way&authToken=' + environment.authToken, value).then((data: any) =>
       {
           if (data.status == "success")
@@ -1899,8 +1906,15 @@ editclose()
   Item_popUp(i)
   {
     this.insert_index = i
+     let y = (<FormArray>this.Edit_dc.controls['product']).at(i);
+     const status = y.value.edit_status
+    console.log("y",y.value.edit_status)
     console.log(i)
-    this.new_category_id = this.modalService.open(this.ItemListModel, { size: 'xl' });
+    if(status)
+    {
+      this.new_category_id = this.modalService.open(this.ItemListModel, { size: 'xl' });
+    }
+    else{ this.toastrService.error('Item dispatched')}
   }
 
   updateFilter_item(event)

@@ -457,9 +457,23 @@ fontload()
       this.invoicePdf   = data;
       this.status   = data[0].status
         console.log("invoicePdf ",this.invoicePdf)
-      if(this.invoicePdf[0].dc_data != null)
-      this.invoicePdf[0]['dc_no'] =this.invoicePdf[0].dc_data.map(item => item.dc_number).join(", ");
-        console.log(this.invoicePdf[0]);
+       if(this.invoicePdf[0].dc_data != null)
+         {
+            const dcNumbers = this.invoicePdf[0].dc_data.map(item => item.dc_number);
+
+                  if (dcNumbers.length > 0) {
+                    const parts = dcNumbers[0].split('/');
+                    const prefix = parts.slice(0, -1).join('/') + '/';
+
+                    const formattedDcNo =
+                      prefix +
+                      dcNumbers.map(dc => dc.split('/').pop()).join(', ');
+
+                    this.invoicePdf[0]['dc_no'] = `${formattedDcNo}`;
+                    console.log("Formatted DC No:", formattedDcNo);
+                  }
+          }
+
       this.company_pdf_logo = this.invoicePdf[0].company_details[0].logo;
       this.company_pdf_logo = environment.baseURL + "download_file.php?path=upload/company/" +  this.company_pdf_logo + "&authToken=" + environment.authToken
 
@@ -511,7 +525,7 @@ fontload()
       this.CustomerBillList = data;
       this.temp   = data;
       var selectedId  = this.view_invoice;
-      let selectedRow = this.CustomerBillList.find(item => item.serial_no == selectedId);
+      let selectedRow = this.CustomerBillList.find(item => item.invoice_id == selectedId);
       if (selectedRow)
       {
         this.selected = [selectedRow];
@@ -535,7 +549,7 @@ fontload()
     if (event.type === "click")
     {
       console.log(event.row.serial_number)
-      this.view_invoice = event.row.serial_number;
+      this.view_invoice = event.row.invoice_id;
       this.invoice_id   = event.row.invoice_id;
       this.invoice_list = event.row;
       this.name = event.row.customer_name;
@@ -557,15 +571,31 @@ fontload()
 
  async  selectEdit_data()
     {
-        var serial_no =  this.invoice_list['serial_no'];
+        var serial_no =  this.invoice_list['invoice_id'];
 
       this.api.get('mp_customer_invoice_pdf.php?value=' + serial_no  + '&authToken=' + environment.authToken).then((data: any) => {
 
         this.invoicePdf = data;
         console.log("invoicePdf ",this.invoicePdf)
         this.status   = data[0].status
-        if(this.invoicePdf[0].dc_data != null)
-        this.invoicePdf[0]['dc_no'] =this.invoicePdf[0].dc_data.map(item => item.dc_number).join(", ");
+        // if(this.invoicePdf[0].dc_data != null)
+        // this.invoicePdf[0]['dc_no'] =this.invoicePdf[0].dc_data.map(item => item.dc_number).join(", ");
+         if(this.invoicePdf[0].dc_data != null)
+         {
+            const dcNumbers = this.invoicePdf[0].dc_data.map(item => item.dc_number);
+
+                  if (dcNumbers.length > 0) {
+                    const parts = dcNumbers[0].split('/');
+                    const prefix = parts.slice(0, -1).join('/') + '/';
+
+                    const formattedDcNo =
+                      prefix +
+                      dcNumbers.map(dc => dc.split('/').pop()).join(', ');
+
+                    this.invoicePdf[0]['dc_no'] = `${formattedDcNo}`;
+                    console.log("Formatted DC No:", formattedDcNo);
+                  }
+          }
         console.log(this.invoicePdf[0]);
         this.invoiceItems     = this.invoicePdf[0].invoiceItems;
         this.taxempty         = this.invoicePdf[0].tax_mode;
@@ -627,7 +657,7 @@ async edit_dataload()
          this.customer_id      = data[0].customer_id;
          this.taxempty         = data[0].tax_mode;
        }
-     }).catch(error => { this.toastrService.error('Something went wrong'); });
+     }).catch(error => { this.toastrService.error('Something went wrong 1'); });
 
      this.Edit_invoice.controls['customerId'].setValue(this.invoice_list.customer_id);
      this.Edit_invoice.controls['inv_type'].setValue(this.invoice_type);
@@ -796,7 +826,8 @@ async FetchAddress(data)
       price       : new FormControl('', Validators.required),
       quantity    : new FormControl('', Validators.required),
       amount      : new FormControl('', Validators.required),
-      uom         : new FormControl('', Validators.required)
+      uom         : new FormControl('', Validators.required),
+      edit_status : [true]
     }))
   }
 
@@ -863,9 +894,10 @@ async FetchAddress(data)
       price       : [item.amount],
       quantity    : [item.qty],
       amount      : [item.total],
-      uom         : [item.uom]
+      uom         : [item.uom],
+      edit_status : [item.edit_status]
     }));
-
+    console.log(product1.value)
      let qty   = item.qty;
      let price = item.amount;
      this.edit_priceChange(qty, price, j);
@@ -973,7 +1005,8 @@ async FetchAddress(data)
                 quantity    : [item.qty],
                 amount      : [item.total],
                 uom         : [item.uom],
-                item_name   : [item_name]
+                item_name   : [item_name],
+                edit_status : [true]
               }));
 
             // Call priceChange with latest index
@@ -1448,7 +1481,7 @@ async edit_specItem(item,j)
               this.loading=false;
               this.toastrService.success('Invoice Updated Succesfully');
               this.Return();
-              this.view_invoice = serial_no;
+              this.view_invoice = invoice_id;
               this.loadonce();
             }
             else { this.toastrService.error('Something went wrong');
@@ -1602,11 +1635,24 @@ getInvoiceObject(files) {
   var test = files[0]
   console.log(test)
   var order_numbers : any
-  if(files[0].length>0)
-  {
-   order_numbers = files[0].dc_data.map(item => item.dc_number.split('/').pop()).join(", ");
-  }
- console.log(order_numbers)
+          if (test?.dc_data && test.dc_data.length > 0) {
+
+          const dcNumbers = test.dc_data
+            .map(item => item.dc_number)
+            .filter(Boolean);
+
+          if (dcNumbers.length > 0) {
+            const parts = dcNumbers[0].split('/');
+            const prefix = parts.slice(0, -1).join('/') + '/';
+
+            order_numbers =
+              prefix + dcNumbers.map(dc => dc.split('/').pop()).join(', ');
+
+            console.log("Formatted DC No:", order_numbers);
+          }
+        }
+
+    console.log(order_numbers);
   return {
 
     table: {
@@ -2221,7 +2267,7 @@ feedData(data)
         this.Edit_invoice.controls['billDate'].setValue(this.todaysDate);
         this.Edit_invoice.controls['inv_type'].setValue(this.details.inv_type);
       }
-   }).catch(error => { this.toastrService.error('Something went wrong') });
+   }).catch(error => { this.toastrService.error('Something went wrong ') });
 }
 
 async onSubmit(bill_data)
@@ -2233,8 +2279,9 @@ async onSubmit(bill_data)
     });
     if (this.Edit_invoice.valid)
     {
-      this.view_invoice = this.inv_no
+
       const billNoValue =this.prefix_data+ this.inv_no;
+      // this.view_invoice = billNoValue
       function normalizeString(str : any) {
         return str.replace(/\s+/g, '').toLowerCase();
       }
@@ -2267,11 +2314,14 @@ async onSubmit(bill_data)
                 {
                   this.toastrService.success('Invoice Added Succesfully');
                   this.loading = false;
+                  this.view_invoice   = data.last_id
                   this.Return();
                   this.show_invoice_edit = false;
                   this.show = true;
                   this.loadonce()
                   this.clone_invoice_show = false;
+
+
                 }
                 else { this.toastrService.error('Something went wrong');
                 this.loading = false;}
@@ -2336,7 +2386,7 @@ editclose()
 
 
     let invoice_id =this.invoicePdf[0].invoice_id;
-    this.view_invoice =this.invoice_list.serial_no;
+    this.view_invoice =this.invoice_list.invoice_id;
 
     await this.api.post('mp_invoice_create.php?invoice_id='+invoice_id+'&type=e_way&authToken=' + environment.authToken, value).then((data: any) =>
     {
@@ -2388,12 +2438,17 @@ editclose()
   async ReqDelete()
   {
     let invoice_id =this.invoicePdf[0].invoice_id;
-
+    if(this.invoicePdf[0].dc_data !=  null)
+    {
+      this.toastrService.error('This invoice linked in dc')
+      return;
+    }
     await this.api.post('mp_delete_invoice.php?table=invoice&field=invoice_id&delete_id='+invoice_id+'&authToken=' + environment.authToken,invoice_id).then((data: any) =>
     {
-
+      console.log("data : ",data)
       if (data.status == "success")
       {
+
                this.view_invoice = data.id;
                this.toastrService.success('Deleted Succesfully');
                this.loading = false;
@@ -2404,12 +2459,12 @@ editclose()
                this.clone_invoice_show = false;
                this.openMd.close();
       }
-      else { this.toastrService.error('Something went wrong 13');
+      else { this.toastrService.error('Something went wrong');
       this.loading = false;}
       return true;
     }).catch(error =>
       {
-      this.toastrService.error('Something went wrong 14');
+      this.toastrService.error('Something went wrong');
       this.loading = false;
     });
   }
@@ -2550,7 +2605,16 @@ editclose()
   {
     this.insert_index = i
     console.log(i)
-    this.new_category_id = this.modalService.open(this.ItemListModel, { size: 'xl' });
+       let y = (<FormArray>this.Edit_invoice.controls['product']).at(i);
+     const status = y.value.edit_status
+    console.log("y",y.value.edit_status)
+    console.log(i)
+    if(status)
+    {
+      this.new_category_id = this.modalService.open(this.ItemListModel, { size: 'xl' });
+    }
+    else{ this.toastrService.error('Item dispatched')}
+
   }
 
     selected_item: any

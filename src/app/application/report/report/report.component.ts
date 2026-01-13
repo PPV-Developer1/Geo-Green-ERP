@@ -1639,7 +1639,7 @@ purchase_list_view:boolean=false
          }
 
 
-         if(this.id == 'inventory_summary')
+         if(this.id == 'stock_summary_report')
          {
 
           if(event.row.Stock_on_Hand)
@@ -1647,7 +1647,7 @@ purchase_list_view:boolean=false
             this.name= data.Item_Name;
             this.select_data = data.Item_Name
             this.customer_payment = true;
-            this.api.get('mp_each_item_summary.php?value=' + data.Item_id + '&authToken=' + environment.authToken).then((data: any) =>
+            this.api.get('mp_each_item_summary.php?value=' + data.Item_id + '&from_date='+this.tran_from_date+'&to_date='+this.tran_to_date+'&authToken=' + environment.authToken).then((data: any) =>
             {
               if(data != null)
               {

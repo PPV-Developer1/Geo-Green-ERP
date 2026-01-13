@@ -243,25 +243,34 @@
   </div>
   <div class="modal-body">
     <form [formGroup]="NewItem" (ngSubmit)="NewSubmit(NewItem.value)" class="row">
+
+      <div class="form-group col-md-12">
+          <label for="name">Item Category</label>
+
+          <ng-select formControlName="item_cat" class=" form-control custom-select" [clearable]="true" (change)="cat_category($event)" >
+            <ng-option *ngFor="let item of category" value="{{item.cat_id}}" class="form-control">
+              {{ item.title}}
+            </ng-option>
+          </ng-select>
+
+          <span class="help-block text-danger" *ngIf="NewItem.get('item_cat').touched && NewItem.get('item_cat').hasError('required')">Required !</span>
+      </div>
+
+       <div class="form-group col-md-12">
+          <label for="name" >Format</label>
+          <input formControlName="cat_format" placeholder="Item name format" readonly type="text" class="form-control">
+
+      </div>
+
+
       <div class="form-group col-md-12">
         <label for="name">Name</label>
-        <input formControlName="name" placeholder="Enter Name" type="text" class="form-control">
-        <span class="help-block text-danger" *ngIf="NewItem.get('name').touched && NewItem.get('name').hasError('required')">Required !</span>
-        <span class="help-block text-danger" *ngIf="NewItem.get('name').touched && NewItem.get('name').hasError('minlength')">Minimum 3 Letters</span>
+          <input formControlName="name" placeholder="Enter Name" type="text" class="form-control">
+          <span class="help-block text-danger" *ngIf="NewItem.get('name').touched && NewItem.get('name').hasError('required')">Required !</span>
+          <span class="help-block text-danger" *ngIf="NewItem.get('name').touched && NewItem.get('name').hasError('minlength')">Minimum 3 Letters</span>
       </div>
 
-      <div class="form-group col-md-12">
-        <label for="name">Item Category</label>
 
-        <ng-select formControlName="item_cat" class=" form-control custom-select" [clearable]="true">
-          <ng-option *ngFor="let item of category" value="{{item.cat_id}}" class="form-control">
-            {{ item.title}}
-          </ng-option>
-        </ng-select>
-
-
-        <span class="help-block text-danger" *ngIf="NewItem.get('item_cat').touched && NewItem.get('item_cat').hasError('required')">Required !</span>
-      </div>
 
       <div class="form-group col-md-12">
         <label for="name">HSN / SAC</label>

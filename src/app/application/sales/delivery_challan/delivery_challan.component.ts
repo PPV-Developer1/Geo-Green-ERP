@@ -421,7 +421,7 @@ export class Delivery_challanComponent implements OnInit {
             let dc_id            = data[0].serial_no + 1;
             this.prefix_data     = data[0].prefix ;
             this.inv_no          = dc_id;
-           
+
 
             if(this.stateCode == 33)
             {
@@ -939,9 +939,9 @@ export class Delivery_challanComponent implements OnInit {
   {
     if (event.type === "click")
     {
-      localStorage.setItem('view_bill', event.row.serial_no);
+      localStorage.setItem('view_bill', event.row.dc_id);
 
-      this.api.get('mp_customer_dc_pdf.php?value=' + event.row.serial_no + '&authToken=' + environment.authToken).then((data: any) => {
+      this.api.get('mp_customer_dc_pdf.php?value=' + event.row.id + '&authToken=' + environment.authToken).then((data: any) => {
         this.invoicePdf = data;
         this.img_path = environment.baseURL + "download_file.php?path=upload/company/" + this.invoicePdf[0].pdf_logo + "&authToken=" + environment.authToken
         this.invoiceItems   = this.invoicePdf[0].invoice_items;

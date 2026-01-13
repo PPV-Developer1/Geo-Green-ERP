@@ -348,62 +348,6 @@
 
 
             <ngx-datatable style="cursor: pointer;" #table class="custom_table"
-            [headerHeight]="50"
-            [limit]="20"
-            [columnMode]="'flex'"
-            [footerHeight]="50"
-            [rowHeight]="'auto'"
-            [rows]="sale_by_cust"
-            [sortable]="true"
-            [selectionType]="'single'"
-            (activate)="onActivate($event)" >
-
-
-       <ngx-datatable-column     [resizeable]="false" prop="Item_Name" [flexGrow]="2" name="ITEM NAME">
-        <ng-template ngx-datatable-cell-template let-row="row">
-          {{row.Item_Name}}
-        </ng-template>
-      </ngx-datatable-column>
-
-      <ngx-datatable-column     [resizeable]="false" prop="Batch_Number" [flexGrow]="1" name="BATCH">
-        <ng-template ngx-datatable-cell-template let-row="row">
-          {{row.Batch_Number}}
-        </ng-template>
-      </ngx-datatable-column>
-
-
-        <ngx-datatable-column     [resizeable]="false" prop="Quantity_Ordered" [flexGrow]="1" name="QUANTITY OREDERED">
-          <ng-template ngx-datatable-cell-template let-row="row">
-           {{row.Quantity_Ordered}}
-          </ng-template>
-        </ngx-datatable-column>
-
-        <ngx-datatable-column     [resizeable]="false"  prop="Quantity_In" [flexGrow]="1" name="QUANTITY IN">
-          <ng-template ngx-datatable-cell-template let-row="row">
-            {{row.Quantity_In}}
-          </ng-template>
-        </ngx-datatable-column>
-
-        <ngx-datatable-column     [resizeable]="false" prop="Quantity_Out" [flexGrow]="1" name="QUANTITY OUT">
-          <ng-template ngx-datatable-cell-template let-row="row">
-           {{row.Quantity_Out}}
-          </ng-template>
-        </ngx-datatable-column>
-
-        <ngx-datatable-column     [resizeable]="false"  prop="Stock_on_Hand" [flexGrow]="1" name="STOCK ON HAND">
-          <ng-template ngx-datatable-cell-template let-row="row">
-            {{row.Stock_on_Hand}}
-          </ng-template>
-        </ngx-datatable-column>
-
-
-        </ngx-datatable>
-          </div>
-
-
-    <div *ngIf="id =='stock_summary_report'">
-
-                    <ngx-datatable style="cursor: pointer;" #table class="custom_table"
                     [headerHeight]="50"
                     [limit]="20"
                     [columnMode]="'flex'"
@@ -428,6 +372,12 @@
                     </ngx-datatable-column>
 
 
+                     <ngx-datatable-column     [resizeable]="false" prop="Quantity_Ordered" [flexGrow]="1" name="QUANTITY OREDERED">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                    {{row.Quantity_Ordered}}
+                    </ng-template>
+                    </ngx-datatable-column>
+
                     <ngx-datatable-column     [resizeable]="false"  prop="Quantity_in" [flexGrow]="1" name="QUANTITY IN">
                     <ng-template ngx-datatable-cell-template let-row="row">
                     {{row.Quantity_in}}
@@ -446,6 +396,52 @@
                     </ng-template>
                     </ngx-datatable-column>
                     </ngx-datatable>
+
+          </div>
+
+
+
+
+    <div *ngIf="id =='stock_summary_report'">
+
+                  <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+            [headerHeight]="50"
+            [limit]="20"
+            [columnMode]="'flex'"
+            [footerHeight]="50"
+            [rowHeight]="'auto'"
+            [rows]="sale_by_cust"
+            [sortable]="true"
+            [selectionType]="'single'"
+            (activate)="onActivate($event)" >
+
+
+       <ngx-datatable-column     [resizeable]="false" prop="Item_Name" [flexGrow]="2" name="ITEM NAME">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.Item_Name}}
+        </ng-template>
+      </ngx-datatable-column>
+
+        <ngx-datatable-column     [resizeable]="false"  prop="Quantity_In" [flexGrow]="1" name="QUANTITY IN">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.Quantity_In}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column     [resizeable]="false" prop="Quantity_Out" [flexGrow]="1" name="QUANTITY OUT">
+          <ng-template ngx-datatable-cell-template let-row="row">
+           {{row.Quantity_Out}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column     [resizeable]="false"  prop="Stock_on_Hand" [flexGrow]="1" name="STOCK ON HAND">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.Stock_on_Hand}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        </ngx-datatable>
 
           </div>
 
@@ -743,15 +739,6 @@
                 </ng-template>
               </ngx-datatable-column>
 
-<<<<<<< HEAD
-               <!-- <ngx-datatable-column     [resizeable]="false" prop="Customer_Name" [flexGrow]="2" name="CUSTOMER NAME">
-=======
-               <ngx-datatable-column     [resizeable]="false" prop="Customer_Name" [flexGrow]="2" name="CUSTOMER NAME">
->>>>>>> 0e84583114bc683395bd0b0d0a7b5c024a8ad281
-                <ng-template ngx-datatable-cell-template let-row="row">
-                  {{row.Customer_Name}}
-                </ng-template>
-              </ngx-datatable-column> -->
 
               <ngx-datatable-column     [resizeable]="false" prop="Reference_Number" [flexGrow]="2" name="REFERENCE NUMBER">
                 <ng-template ngx-datatable-cell-template let-row="row">
@@ -1163,7 +1150,7 @@
 </div>
 
 
- <div *ngIf="customer_payment && id =='inventory_summary' && view">
+ <div *ngIf="customer_payment && id =='stock_summary_report' && view">
     <div class="row">
           <div class="col-md-10" style="text-align: center;">
                 <h5 style="color: rgb(77, 77, 145);">{{select_data}}</h5>
