@@ -22,21 +22,21 @@ export class Payment_transferComponent implements OnInit
   today               = new Date();
   todaysDate          = '';
 
-  bankData            = [];
+  bankData            : any[] = [];
   bankData_length     : any;
-  all_account         = [];
-  user_account        = [];
-  company_account     = [];
-  cash_account        = [];
-  gst_account         = [];
-  employee_account    = [];
+  all_account         : any[]= [];
+  user_account        : any[]= [];
+  company_account     : any[]= [];
+  cash_account        : any[]= [];
+  gst_account         : any[]= [];
+  employee_account    : any[]= [];
   employee_list       : any;
   balance             : any;
   addTrans            : FormGroup;
   loading             : boolean=false;
    pipe                 = new DatePipe('en-US');
   public now            = Date.now();
-  public Date           = this.pipe.transform(this.now, 'yyyy-MM-dd');
+  public Date           = this.pipe.transform(this.now, 'yyyy-MM-dd') || '';
 
 
   constructor
@@ -78,7 +78,7 @@ export class Payment_transferComponent implements OnInit
     }).catch(error => { });
   }
 
- async feedData(data)
+ async feedData(data: any)
   {
     console.log("bank data api : ",data)
     this.bankData = [];
@@ -88,7 +88,7 @@ export class Payment_transferComponent implements OnInit
          if (data[i].type == 1 && data[i].mode == 3)
         {
 
-          if (data[i].employee_status ==1 &&  data[i].doj <= this.Date && (data[i].last_working_day >= this.Date || data[i].last_working_day == null || data[i].last_working_day === '') )
+          if (data[i] && data[i].employee_status ==1 &&  data[i].doj <= this.Date && (data[i].last_working_day >= this.Date || data[i].last_working_day == null || data[i].last_working_day === '') )
             {
               this.bankData.push(data[i]);
             }
@@ -100,12 +100,12 @@ export class Payment_transferComponent implements OnInit
     };
 
      console.log("bank data : ",this.bankData)
-   
+
     // this.bankData        = data;
     this.bankData_length = this.bankData.length;
 
     let j = 0 ; let k = 0; let l = 0; let m = 0; let n=0; let p=0
-    for (let i = 0; i<=this.bankData.length; i++)
+    for (let i = 0; i < this.bankData.length; i++)
       {
 
         if (this.bankData[i].type == 1 && this.bankData[i].mode == 1 && this.bankData[i].status == 1 )
@@ -144,13 +144,13 @@ export class Payment_transferComponent implements OnInit
       }
   }
 
-  async AddNewTrans(data)
+  async AddNewTrans(data:any)
   {
 
     Object.keys(this.addTrans.controls).forEach(field =>
       {
         const control = this.addTrans.get(field);
-        control.markAsTouched({ onlySelf: true });
+        control?.markAsTouched({ onlySelf: true });
       });
 
     if (this.addTrans.valid)
@@ -212,7 +212,7 @@ export class Payment_transferComponent implements OnInit
   }
 
 
-  selecct(value)
+  selecct(value:any)
   {
   }
 }

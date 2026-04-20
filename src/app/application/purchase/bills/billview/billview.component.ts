@@ -954,7 +954,7 @@ edit_GSTCalculation() {
   {
 
      let subtotal = Number(this.subtotal)
-     let tds =  ((subtotal + this.total_tax)*(this.tds_percent/100)).toFixed(2);
+     let tds =  ((subtotal)*(this.tds_percent/100)).toFixed(2);
      this.Edit_bill.controls['TDS'].setValue(tds);
      this.edit_FinalTotalCalculation();
   }

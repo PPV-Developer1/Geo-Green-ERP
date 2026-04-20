@@ -163,6 +163,104 @@
     </div>
 
     &nbsp;
+ <h5 style="text-align: center;" *ngIf="project_dc" > <b>Project DC List</b></h5>
+        <ngx-datatable *ngIf="project_dc"
+          #table
+          class="custom_table"
+          [headerHeight]="50"
+          [limit]="8"
+          [columnMode]="'flex'"
+          [footerHeight]="50"
+          [rowHeight]="'auto'"
+          [rows]="project_dc"
+          [selected]="selected"
+          [selectionType]="'single'">
+
+        <ngx-datatable-column     [resizeable]="false" prop="dc_date" [flexGrow]="1" name="DC DATE">
+            <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.dc_date}}
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column     [resizeable]="false" prop="dc_number" [flexGrow]="1" name="DC NUMBER">
+            <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.dc_number}}
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column     [resizeable]="false" prop="association_date_time" [flexGrow]="2" name="CUSTOMER NAME">
+            <ng-template ngx-datatable-cell-template let-row="row">
+                {{ row.customer_name }}
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column     [resizeable]="false"  prop="total" [flexGrow]="1" alig name="TOTAL">
+          <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.total| indianCurrency}}
+          </ng-template>
+      </ngx-datatable-column>
+
+          <ngx-datatable-column     [resizeable]="false" prop="use_invoice" [flexGrow]="1" name="DC STATUS">
+            <ng-template ngx-datatable-cell-template let-row="row">
+               <span *ngIf="row.use_invoice == 1">Invoiced</span>
+                <span *ngIf="row.use_invoice == 0">Not Invoiced</span>
+            </ng-template>
+        </ngx-datatable-column>
+
+         <ngx-datatable-column     [resizeable]="false" prop="association_date_time" [flexGrow]="1" name="INVOICE NO">
+            <ng-template ngx-datatable-cell-template let-row="row">
+               {{row.invoice_number}}
+            </ng-template>
+        </ngx-datatable-column>
+
+      </ngx-datatable>
+       &nbsp;
+
+  <h5 style="text-align: center;" *ngIf="project_invoice" > <b>Project Invoice List</b></h5>
+        <ngx-datatable *ngIf="project_invoice"
+          #table
+          class="custom_table"
+          [headerHeight]="50"
+          [limit]="8"
+          [columnMode]="'flex'"
+          [footerHeight]="50"
+          [rowHeight]="'auto'"
+          [rows]="project_invoice"
+          [selected]="selected"
+          [selectionType]="'single'">
+
+        <ngx-datatable-column     [resizeable]="false" prop="invoice_date" [flexGrow]="1" name="INVOICE DATE">
+            <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.invoice_date}}
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column     [resizeable]="false" prop="invoice_number" [flexGrow]="1" name="INVOICE NUMBER">
+            <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.invoice_number}}
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column     [resizeable]="false" prop="company_name" [flexGrow]="2" name="COMPANY NAME">
+            <ng-template ngx-datatable-cell-template let-row="row">
+                {{ row.customer_name}}
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column     [resizeable]="false"  prop="total" [flexGrow]="1" alig name="TOTAL">
+          <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.total| indianCurrency}}
+          </ng-template>
+      </ngx-datatable-column>
+
+        <ngx-datatable-column     [resizeable]="false"  prop="balance" [flexGrow]="1" alig name="BALANCE">
+          <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.balance| indianCurrency}}
+          </ng-template>
+      </ngx-datatable-column>
+
+      </ngx-datatable>
+       &nbsp;
 
     <h5 style="text-align: center;" *ngIf="association_list " > <b>Association List</b></h5>
         <ngx-datatable *ngIf="association_list"

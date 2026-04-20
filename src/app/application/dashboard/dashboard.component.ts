@@ -28,47 +28,47 @@ export class DashboardComponent implements OnInit  {
     public lineChartData: ChartConfiguration<'line'>['data'] = {
       datasets: []
     };
-    public lineChartOptions: ChartOptions<'line'>;
+    public lineChartOptions       !: ChartOptions<'line'>;
 
-    public invoice_count          :number;
-    public total_invoice_value    :number;
-    public bill_count             :number;
-    public total_bill_value       :number;
-    public total_balance_value    :number;
-    public project_count          :number;
-    public yet_to_dispatch_count  :number;
-    public vendor_count           :number;
-    public customer_count         :number;
-    public total_receivables      :number;
-    public total_payables         :number;
-    public total_store_worth      :number;
-    public total_bank_worth       :number;
+    public invoice_count          !:number;
+    public total_invoice_value    !:number;
+    public bill_count             !:number;
+    public total_bill_value       !:number;
+    public total_balance_value    !:number;
+    public project_count          !:number;
+    public yet_to_dispatch_count  !:number;
+    public vendor_count           !:number;
+    public customer_count         !:number;
+    public total_receivables      !:number;
+    public total_payables         !:number;
+    public total_store_worth      !:number;
+    public total_bank_worth       !:number;
 
-    public chart_apl  :number;
-    public chart_may  :number;
-    public chart_jun  :number;
-    public chart_jul  :number;
-    public chart_aug  :number;
-    public chart_sep  :number;
-    public chart_oct  :number;
-    public chart_nov  :number;
-    public chart_dec  :number;
-    public chart_jan  :number;
-    public chart_feb  :number;
-    public chart_mar  :number;
+    public chart_apl  !:number;
+    public chart_may  !:number;
+    public chart_jun  !:number;
+    public chart_jul  !:number;
+    public chart_aug  !:number;
+    public chart_sep  !:number;
+    public chart_oct  !:number;
+    public chart_nov  !:number;
+    public chart_dec  !:number;
+    public chart_jan  !:number;
+    public chart_feb  !:number;
+    public chart_mar  !:number;
 
-    public chart1_apl :number;
-    public chart1_may :number;
-    public chart1_jun :number;
-    public chart1_jul :number;
-    public chart1_aug :number;
-    public chart1_sep :number;
-    public chart1_oct :number;
-    public chart1_nov :number;
-    public chart1_dec :number;
-    public chart1_jan :number;
-    public chart1_feb :number;
-    public chart1_mar :number;
+    public chart1_apl !:number;
+    public chart1_may !:number;
+    public chart1_jun !:number;
+    public chart1_jul !:number;
+    public chart1_aug !:number;
+    public chart1_sep !:number;
+    public chart1_oct !:number;
+    public chart1_nov !:number;
+    public chart1_dec !:number;
+    public chart1_jan !:number;
+    public chart1_feb !:number;
+    public chart1_mar !:number;
 
     constructor(router:Router, private _appConfig:AppConfig, private _dashboardService:DashboardService , private api : ApiService)
     {
@@ -299,7 +299,7 @@ export class DashboardComponent implements OnInit  {
 
    }
 
-   page_routing(page)
+   page_routing(page:any)
    {
     console.log(page);
        this.router.navigate([`/${page}`]);

@@ -19,7 +19,7 @@ export class SalaryComponent implements OnInit
   selected            = [];
   detail_view         = [];
   employee            = [];
-  salary_details      = [];
+  salary_details       = [];
 
   ip_sal_show         : boolean = true;
   loading             : boolean = false;
@@ -42,8 +42,8 @@ export class SalaryComponent implements OnInit
   public ip_reff      : AbstractControl;
   public ip_tran_mode : AbstractControl;
   public ip_tran_date : AbstractControl;
-  public from_date    : AbstractControl;
-  public to_date      : AbstractControl;
+  public from_date    !: AbstractControl;
+  public to_date      !: AbstractControl;
   public category     : AbstractControl;
   public total_hr     : AbstractControl;
 
@@ -114,24 +114,24 @@ export class SalaryComponent implements OnInit
   epf_employer_contribution : any;
   esi_employer_contribution : any;
 
-months = [];
+months :any[] = [];
 
 
 selectedMonth:any; // default to current month
 startDate: Date | null = null;
 endDate: Date | null = null;
 month: any;
-  @ViewChild(DatatableComponent) table: DatatableComponent;
+  @ViewChild(DatatableComponent) table !: DatatableComponent;
 
-  @ViewChild("content",{static:true}) content:ElementRef;
+  @ViewChild("content",{static:true}) content !:ElementRef;
 
-  @ViewChild("employee_salary",{static:true}) employee_salary:ElementRef;
+  @ViewChild("employee_salary",{static:true}) employee_salary !:ElementRef;
 
-  @ViewChild("employee_advance",{static:true}) employee_advance:ElementRef;
+  @ViewChild("employee_advance",{static:true}) employee_advance !:ElementRef;
 
-  @ViewChild("employee_salary_days",{static:true}) employee_salary_days:ElementRef;
+  @ViewChild("employee_salary_days",{static:true}) employee_salary_days !:ElementRef;
 
-   @ViewChild("Confirmation",{static:true}) Confirmation:ElementRef;
+   @ViewChild("Confirmation",{static:true}) Confirmation !:ElementRef;
 
   constructor(private modalService: NgbModal, public api: ApiService, public toastrService: ToastrService, fb:FormBuilder)
   {
@@ -291,7 +291,7 @@ month: any;
     this.loadData();
   }
 
-  PageAction(action)
+  PageAction(action : string)
   {
     if(action == "show")
     {
@@ -317,7 +317,7 @@ month: any;
 
       if(data != null)
         {
-          function levelFilter(value) {
+          function levelFilter(value: any) {
             if (!value) { return false; }
             return value.mode != 3; }
           let get_data = data.filter(levelFilter);
@@ -342,7 +342,7 @@ month: any;
       {
           for(let i=0;i<data.length;i++)
           {
-            var name = this.employee.find(t=>t.emp_id == this.SalaryList[i]['emp_id']);
+            var name = this.employee.find((t:any) => t.emp_id == this.SalaryList[i]['emp_id']);
             data[i]['employee_name'] = name.name
             data[i]['emp_type']  = name.emp_type
             this.temp =[...data];
@@ -362,7 +362,7 @@ month: any;
     this.advance = false;
   }
   Employee_type : any
-  async onActivate(event)
+  async onActivate(event:any)
   {
     if(event.type === "click" || event.type === "dblclick")
     {
@@ -384,7 +384,7 @@ month: any;
     }
   }
 
-  async load_salary(id)
+  async load_salary(id:any)
   {
     await  this.api.get('mp_payroll_salary_amount.php?value='+id+'&authToken='+ environment.authToken).then((data: any) =>
     {
@@ -421,7 +421,7 @@ month: any;
     }).catch(error => { this.toastrService.error('API Faild : loadData employee details'); });
   }
 
-  payment_data(id)
+  payment_data(id:any)
   {
     this.api.get('get_data.php?table=pay_roll&find=attendance_id&value='+id+'&find1=status&value1=1&authToken=' + environment.authToken).then((data: any) =>
     {
@@ -460,7 +460,7 @@ salaryCalculate()
 }
 
 
- async onAction(event)
+ async onAction(event:any)
   {
     if(event.type === "click")
     {
@@ -586,7 +586,7 @@ salaryCalculate()
     Object.keys(this.salary_load.controls).forEach(field =>
       {
         const control = this.salary_load.get(field);
-        control.markAsTouched({ onlySelf: true });
+        control?.markAsTouched({ onlySelf: true });
       });
     if(this.salary_load.valid)
     {
@@ -651,7 +651,7 @@ salaryCalculate()
    }
   }
 
-  load_transaction(id)
+  load_transaction(id:any)
   {
     this.api.get('get_data.php?table=salary_payment&find=payroll_id&value='+id+'&authToken=' + environment.authToken).then((data: any) =>
       {
@@ -668,12 +668,12 @@ salaryCalculate()
       }).catch(error => { this.toastrService.error('API Faild : Salary Generated Failed'); });
   }
 
-  async salaryUpdate(data)
+  async salaryUpdate(data:any)
   {
     Object.keys(this.form_salary.controls).forEach(field =>
       {
         const control = this.form_salary.get(field);
-        control.markAsTouched({ onlySelf: true });
+        control?.markAsTouched({ onlySelf: true });
       });
       if(this.form_salary.valid)
       {
@@ -733,7 +733,7 @@ salaryCalculate()
    }
   }
 
-  updateFilter(event)
+  updateFilter(event:any)
   {
     const val = event.target.value.toLowerCase();
     const temp = this.temp.filter((d) => {
@@ -879,13 +879,13 @@ salaryCalculate()
       this.payroll_days.controls['salary_paid_day'].setValue(salaryPaidHours);
     }
 
- async submit_payroll_days(value)
+ async submit_payroll_days(value:any)
   {
 
     Object.keys(this.payroll_days.controls).forEach(field =>
       {
         const control = this.payroll_days.get(field);
-        control.markAsTouched({ onlySelf: true });
+        control?.markAsTouched({ onlySelf: true });
       });
     if(this.payroll_days.valid && value.salary_paid_day > 0 && this.payroll_days.value.no_of_days>0)
       {
@@ -928,7 +928,7 @@ salaryCalculate()
   }
 
 
-  onsalary(event)
+  onsalary(event:any)
   {
     if(event.type == "click")
     {
@@ -987,7 +987,7 @@ salary_amount_calculation()
   }
 }
 
-onSubmit(value)
+onSubmit(value:any)
  {
 
   let today = new Date();
@@ -1021,7 +1021,7 @@ onSubmit(value)
         }).catch(error => { this.toastrService.error('API Faild : Salary Generated Failed');  this.loading = false;});
  }
 
- make_transaction(value)
+ make_transaction(value:any)
   {
     this.salary_dtails = value
 
@@ -1063,7 +1063,7 @@ onSubmit(value)
     this.SalaryAck = this.modalService.open(this.employee_advance, { size: 'sm'});
   }
 
-  employee_advan(value)
+  employee_advan(value:any)
   {
     const today = new Date();
     let date = today.toISOString().split('T')[0];
@@ -1085,7 +1085,7 @@ onSubmit(value)
   }
 
 
-  salaryadvance(data)
+  salaryadvance(data : any)
   {
     data.emp_acc_id = this.emp_acc_id;
     data.emp_id     = this.emp_id;
@@ -1093,7 +1093,7 @@ onSubmit(value)
     Object.keys(this.advance_salary.controls).forEach(field =>
       {
         const control = this.advance_salary.get(field);
-        control.markAsTouched({ onlySelf: true });
+        control?.markAsTouched({ onlySelf: true });
       });
       if(this.advance_salary.valid)
       {

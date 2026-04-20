@@ -16,17 +16,17 @@ import { WizardValidationService } from 'src/app/pages/form-elements/wizard/wiza
   })
 export class CustomerComponent implements OnInit {
 
-  @ViewChild(DatatableComponent) table: DatatableComponent;
-  @ViewChild("content", { static: true }) content: ElementRef
-  @ViewChild("edit_address", { static: true }) edit_address: ElementRef
-  @ViewChild("edit_contact", { static: true }) edit_contact: ElementRef
-  @ViewChild("upload_cust_img", { static: true }) upload_cust_img: ElementRef;
-  @ViewChild("add_address", { static: true }) add_address: ElementRef
-  @ViewChild("add_contact", { static: true }) add_contact: ElementRef
+  @ViewChild(DatatableComponent) table !: DatatableComponent;
+  @ViewChild("content", { static: true }) content!: ElementRef
+  @ViewChild("edit_address", { static: true }) edit_address !: ElementRef
+  @ViewChild("edit_contact", { static: true }) edit_contact!: ElementRef
+  @ViewChild("upload_cust_img", { static: true }) upload_cust_img!: ElementRef;
+  @ViewChild("add_address", { static: true }) add_address!: ElementRef
+  @ViewChild("add_contact", { static: true }) add_contact!: ElementRef
 
   public uid = localStorage.getItem('uid');
   public customer        : FormGroup;
-  public address         : FormGroup;
+  public address         !: FormGroup;
   public updateAddress   : FormGroup;
   public customer_data   : FormGroup;
   public gst_details     : FormGroup;
@@ -104,6 +104,7 @@ export class CustomerComponent implements OnInit {
   email            : any;
   workphone        : any;
   edit_name        : any;
+  edit_contact_name: any;
   paymentterm      : any;
   payment_term_name: any;
   contact_no       : any;
@@ -129,15 +130,15 @@ export class CustomerComponent implements OnInit {
   stateShow        : boolean = true;
   udyamhide        : boolean = false;
 
-  public showConfirm:boolean;
+  public showConfirm !:boolean;
   taxRate          = false;
   taxRate1         = false;
   taxfills         = false;
   taxfills1        = false;
   emptyTax         = false;
   show             = true;
-  gstDetails       : [];
-  temp             = [];
+  gstDetails       : [] = [];
+  temp             :any[] = [];
   rows             = [];
   selected         = [];
   public details   : any = {contacts: []};
@@ -253,6 +254,7 @@ export class CustomerComponent implements OnInit {
         web_site     : [],
         place_of_supply: [],
         place_of_supply_code:[],
+        contact_name : [],
         contact_no   : [],
         mobile_no    : [],
         udyam_register : [],
@@ -313,14 +315,14 @@ export class CustomerComponent implements OnInit {
 
   myForm = new FormGroup(
     {
-      type: new FormControl(''),
-      name: new FormControl('', [Validators.required, Validators.minLength(3)]),
-      file: new FormControl('', [Validators.required]),
-      fileSource: new FormControl('', [Validators.required])
+      type: new FormControl(null),
+      name: new FormControl(null, [Validators.required, Validators.minLength(3)]),
+      file: new FormControl(null, [Validators.required]),
+      fileSource: new FormControl(null, [Validators.required])
     }
   );
 
-  fileChange(input) {
+  fileChange(input: any) {
     const reader = new FileReader();
     if (input.files.length) {
       this.file = input.files[0].name;
@@ -336,50 +338,55 @@ export class CustomerComponent implements OnInit {
     }
   }
 
-  customerContact(detail_view)
+  customerContact(detail_view :any)
   {
     this.api.get('get_data.php?table=customer_contact&find=customer_id&value=' + detail_view + '&authToken=' + environment.authToken).then((data: any) => {
       this.customer_contact = data;
     }).catch(error => { this.toastrService.error('Something went wrong'); });
   }
 
-  submitImg(data) {
-    if(data.file == null||data.file == "")
-    {
-      this.toastrService.warning('Image required !');
-      return
-    }
-    const formData = new FormData();
-    formData.append('file', this.myForm.get('fileSource')?.value);
-     const confirmed = confirm("Are you sure you want to confirm update image?");
-              console.log(confirmed)
-              if (!confirmed) {
-                return;
-              }
-    this.loading = true;
-    this.api.post('upload_customer_file.php?mode=update&user_id=' + this.customer_id + '&location=upload/customer_images/&table=customers&authToken=' + environment.authToken, formData).then((data: any) => {
-      if(data.status == "success")
-      {
-      this.toastrService.success('Image Updated Succesfully');
-      this.loading=false;
-      this.Upl_cust_img.close();
-      this.myForm.reset();
-      this.employeeLoad(this.customer_id);
-      }
-      else { this.toastrService.error(data.status);
-             this.loading=false; }
-      return true;
-    }).catch(error => {
-      this.toastrService.error('Image Updated Failed');
-      this.loading=false;
-    });
-  }
+  // submitImg(data :any) {
+  //   if(data.file == null||data.file == "")
+  //   {
+  //     this.toastrService.warning('Image required !');
+  //     return
+  //   }
+  //   const formData = new FormData();
+  //   const fileSource = this.myForm.get('fileSource')?.value as File;
+  //   if (!fileSource) {
+  //     this.toastrService.warning('Image required !');
+  //     return;
+  //   }
+  //   formData.append('file', fileSource);
+  //    const confirmed = confirm("Are you sure you want to confirm update image?");
+  //             console.log(confirmed)
+  //             if (!confirmed) {
+  //               return;
+  //             }
+  //   this.loading = true;
+  //   this.api.post('upload_customer_file.php?mode=update&user_id=' + this.customer_id + '&location=upload/customer_images/&table=customers&authToken=' + environment.authToken, formData).then((data: any) => {
+  //     if(data.status == "success")
+  //     {
+  //     this.toastrService.success('Image Updated Succesfully');
+  //     this.loading=false;
+  //     this.Upl_cust_img.close();
+  //     this.myForm.reset();
+  //     this.employeeLoad(this.customer_id);
+  //     }
+  //     else { this.toastrService.error(data.status);
+  //            this.loading=false; }
+  //     return true;
+  //   }).catch(error => {
+  //     this.toastrService.error('Image Updated Failed');
+  //     this.loading=false;
+  //   });
+  // }
 
   removeFile(): void {
     this.file = '';
   }
 
-  async employeeLoad(customer_id) {
+  async employeeLoad(customer_id:any) {
     await this.api.get('get_data.php?table=customers&find=customer_id&value=' + customer_id + '&authToken=' + environment.authToken).then((data: any) => {
       this.customer_details = data[0];
 
@@ -389,16 +396,16 @@ export class CustomerComponent implements OnInit {
   }
 
 
-  async updateEmp(editCustDetail)
+  async updateEmp(editCustDetail :any)
   {
 
       let id         = editCustDetail.customer_id;
 
-      var data = this.stateName.find(t=>t.state_name == this.place_of_supply);
+      var data = this.stateName.find( (t:any) => t.state_name == this.place_of_supply );
       editCustDetail.place_of_supply_code= data.state_code;
 
       const billNoValue = this.edit_name;
-      let value = this.customers.find(item => item.company_name === billNoValue);
+      let value = this.customers.find((item: any) => item.company_name === billNoValue);
 
         if( value != undefined)
         {
@@ -416,7 +423,7 @@ export class CustomerComponent implements OnInit {
         }
 
       const gstvalue = this.gst_number;
-      let value_1 = this.customers.find(item => item.gst_number   === gstvalue);
+      let value_1 = this.customers.find((item: any) => item.gst_number   === gstvalue);
 
       if(value_1 != undefined)
         {
@@ -434,7 +441,7 @@ export class CustomerComponent implements OnInit {
           }
 
           const panvalue = this.pan_number;
-          let value_2 = this.customers.find(item => item.pan_number   === panvalue);
+          let value_2 = this.customers.find((item: any) => item.pan_number   === panvalue);
 
       if(value_2 != undefined)
         {
@@ -508,7 +515,7 @@ export class CustomerComponent implements OnInit {
         // }
   }
 
- updateCust(updateCust) {
+ updateCust(updateCust: any) {
     this.updateCustomer = updateCust;
     this.cust_id        = updateCust.customer_id
     this.api.post('post_update_data.php?authToken=' + environment.authToken + '&table=customers&field=customer_id&value=' + this.cust_id, this.updateCustomer).then((data: any) => {
@@ -525,7 +532,7 @@ export class CustomerComponent implements OnInit {
     }).catch(error => { this.toastrService.error('Customer Update Failed');});
   }
 
-  editCustomerAddress(addressId)
+  editCustomerAddress(addressId :any)
   {
     this.status        = false;
     this.editAddressId = addressId
@@ -546,7 +553,7 @@ export class CustomerComponent implements OnInit {
     this.editAddress = this.modalService.open(this.edit_address, { size: 'md' });
   }
 
- editCustomerContact(contactId)
+ editCustomerContact(contactId :any)
   {
     this.editContactId = contactId
     this.api.get('get_data.php?table=customer_contact&find=cust_cont_id&value=' + contactId + '&authToken=' + environment.authToken).then((data: any) => {
@@ -609,7 +616,7 @@ export class CustomerComponent implements OnInit {
     }).catch(error => { this.toastrService.error('Something went wrong'); });
   }
 
-  gstTreat(gst)
+  gstTreat(gst :any)
   {
     if (gst == 1)
     {
@@ -622,7 +629,7 @@ export class CustomerComponent implements OnInit {
     }
   }
 
-  copyAddress(customerAddress)
+  copyAddress(customerAddress :any)
   {
     this.shipAttention = customerAddress.billAttention;
     this.shipAddress1  = customerAddress.billAddress1;
@@ -669,19 +676,19 @@ export class CustomerComponent implements OnInit {
     this.addPerson_wizard();
   }
 
-  removePerson(i)
+  removePerson(i :any)
   {
     let con = this.customer.get('contacts') as FormArray;
     con.removeAt(i);
   }
 
-  removePerson_wizard(i)
+  removePerson_wizard(i :any)
   {
     let con = this.contact_details.get('contacts') as FormArray;
     con.removeAt(i);
   }
 
-  async submit(updateAddress)
+  async submit(updateAddress :any)
   {
       const confirmed = confirm(" Are you sure you want to update these changes?");
           console.log(confirmed)
@@ -705,7 +712,7 @@ export class CustomerComponent implements OnInit {
 
 
 
-  onActivate(event) {
+  onActivate(event :any) {
     if (event.type === "click") {
       this.edit_show= false;
       this.detail_view = event.row.customer_id;
@@ -721,12 +728,13 @@ export class CustomerComponent implements OnInit {
   }
 
 
-  loaddata(id)
+  loaddata(id :any)
   {
     this.api.get('get_data.php?table=customers&find=customer_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
       this.detail_view     = data[0]
       setTimeout(() => {
       this.edit_name       = this.detail_view.company_name
+      this.edit_contact_name   = this.detail_view.name
       this.customer_id     = this.detail_view.customer_id
       this.customerType    = this.detail_view.customer_type
       this.tax_exemption   = this.detail_view.tax_exemption
@@ -758,20 +766,20 @@ export class CustomerComponent implements OnInit {
   }
 
 
-  nameload(value)
+  nameload( value:any)
   {
-        var name =this.paymentTerm.find(x => x.id === value);
+        var name =this.paymentTerm.find((x: any) => x.id === value);
         this.payment_term_name = name.terms;
   }
 
-  custAddr(detail_view)
+  custAddr(detail_view :any)
   {
     this.api.get('get_data.php?table=customer_address&find=customer_id&value=' + detail_view + '&authToken=' + environment.authToken).then((data: any) => {
       this.customer_address = data;
     }).catch(error => { this.toastrService.error('Something went wrong'); });
   }
 
-  updateFilter(event)
+  updateFilter(event: any)
   {
               const val = event.target.value.toLowerCase();
                 const temp = this.temp.filter((d) => {
@@ -838,7 +846,7 @@ export class CustomerComponent implements OnInit {
     this.Upl_cust_img = this.modalService.open(this.upload_cust_img, { size: 'md' });
   }
 
-  getGstNo(gstNo)
+  getGstNo(gstNo :any)
   {
     this.placeOfSupply = gstNo.slice(0, 2);
     this.placeOfSupply = this.placeOfSupply;
@@ -873,7 +881,7 @@ cancel()
     this.imgStatus = true;
  }
 
-contact_submit(data)
+contact_submit(data :any)
 {
 
   const confirmed = confirm(" Are you sure you want to update these changes?");
@@ -908,7 +916,7 @@ public next(){
   const con =this.contact_details.controls.contacts.value;
   if(this.steps[this.steps.length-1].active)
       return false;
-    this.steps.some(function (step, index, steps) {
+    this.steps.some(function (step: any, index: number, steps: any[]) {
 
       if(index < steps.length-1){
 
@@ -918,7 +926,7 @@ public next(){
                 Object.keys(customer_data.controls).forEach(field =>
                   {
                   const control = customer_data.get(field);
-                  control.markAsTouched({ onlySelf: true });
+                  control?.markAsTouched({ onlySelf: true });
                   });
 
                   if (customer_data.valid) {
@@ -936,7 +944,7 @@ public next(){
                 Object.keys(gst_details.controls).forEach(field =>
                   {
                   const control = gst_details.get(field);
-                  control.markAsTouched({ onlySelf: true });
+                  control?.markAsTouched({ onlySelf: true });
                   });
                   if (gst_details.valid) {
                       step.active = false;
@@ -953,7 +961,7 @@ public next(){
                 Object.keys(address_details.controls).forEach(field =>
                   {
                   const control = address_details.get(field);
-                  control.markAsTouched({ onlySelf: true });
+                  control?.markAsTouched({ onlySelf: true });
                   });
 
                   if (address_details.valid) {
@@ -1050,7 +1058,7 @@ public next(){
  public prev(){
   if(this.steps[0].active)
       return false;
-  this.steps.some(function (step, index, steps) {
+  this.steps.some(function (step: any, index: number, steps: any[]) {
       if(index != 0){
           if(step.active){
               step.active = false;
@@ -1063,7 +1071,7 @@ public next(){
 
 async confirm()
 {
-  this.steps.forEach(step => step.valid = true);
+  this.steps.forEach((step: any) => step.valid = true);
   this.dataload();
   const billNoValue = this.cus_name;
 
@@ -1084,15 +1092,23 @@ async confirm()
     await this.api.get('get_data.php?table=customers&authToken=' + environment.authToken).then((data: any) =>
 
       {
-        checking = data.some((item: { company_name: any; }) =>  normalizeString(item.company_name) ===  normalizeString(billNoValue) );
-        if(gstvalue != null)
+        if(data.length != 0)
         {
-          checking_gst = data.some((item: { gst_number: any; }) =>  normalizeString(item.gst_number) ===  normalizeString(gstvalue) );
-        }
-        if(gstvalue != null)
+          checking = data.some((item: { company_name: any; }) =>  normalizeString(item.company_name) ===  normalizeString(billNoValue) );
+          if(gstvalue != null)
           {
-            checking_pan = data.some((item: { pan_number: any; }) =>  normalizeString(item.pan_number) ===  normalizeString(panvalue) );
+            checking_gst = data.some((item: { gst_number: any; }) =>  normalizeString(item.gst_number) ===  normalizeString(gstvalue) );
           }
+          if(gstvalue != null)
+            {
+              checking_pan = data.some((item: { pan_number: any; }) =>  normalizeString(item.pan_number) ===  normalizeString(panvalue) );
+            }
+        }
+        else{
+          checking = false;
+          checking_gst = false;
+          checking_pan = false;
+        }
       }).catch(error =>
           {
                 this.toastrService.error('API Faild : vendor details checking failed');
@@ -1159,7 +1175,7 @@ async confirm()
                     this.customerType1 = true;
                     this.emptyTax  = false;
                     this.show = true;
-                    this.steps.some(function (step, index, steps) {
+                    this.steps.some(function (step: any, index: number, steps: any[]) {
                       if(index != 0){
                           if(step.active)
                           {
@@ -1195,13 +1211,13 @@ async confirm()
   this.addAddress = this.modalService.open(this.add_address, { size: 'md' });
  }
 
- new_submit(value)
+ new_submit(value: any)
  {
 
   Object.keys(this.newaddress.controls).forEach(field =>
     {
       const control = this.newaddress.get(field);
-      control.markAsTouched({ onlySelf: true });
+      control?.markAsTouched({ onlySelf: true });
     });
     if(this.newaddress.valid)
     {
@@ -1235,13 +1251,13 @@ async confirm()
   this.addcontact_popup = this.modalService.open(this.add_contact, { size: 'md' });
  }
 
- newcontact_submit(data)
+ newcontact_submit(data: any)
  {
 
   Object.keys(this.addcontact.controls).forEach(field =>
     {
       const control = this.addcontact.get(field);
-      control.markAsTouched({ onlySelf: true });
+      control?.markAsTouched({ onlySelf: true });
     });
   if (this.addcontact.valid)
   {
@@ -1273,7 +1289,7 @@ async confirm()
  onInputChange()
  {
    const billNoValue = this.cus_name;
-   let value   = this.customers.find(item => item.company_name === billNoValue);
+   let value   = this.customers.find((item: any) => item.company_name === billNoValue);
 
       if(value != undefined)
       {
@@ -1288,7 +1304,7 @@ async confirm()
  onInput()
  {
   const gstvalue = this.gstin_number;
-  let value_1 = this.customers.find(item => item.gst_number   === gstvalue);
+  let value_1 = this.customers.find((item: any) => item.gst_number   === gstvalue);
   if(value_1 != undefined)
   {
     this.toastrService.error(' GST NUmber has already been entered')
@@ -1298,7 +1314,7 @@ async confirm()
  onInput_pan()
  {
   const panvalue = this.pan;
-  let value = this.customers.find(item => item.pan_number   === panvalue);
+  let value = this.customers.find((item: any) => item.pan_number   === panvalue);
   if(value != undefined)
   {
     this.toastrService.error(' PAN Number has already been entered')
@@ -1307,7 +1323,7 @@ async confirm()
  edit_gst()
  {
   const gstvalue = this.gst_number;
-  let value_1 = this.customers.find(item => item.gst_number   === gstvalue);
+  let value_1 = this.customers.find((item: any) => item.gst_number   === gstvalue);
 
   // if(value_1 != undefined)
   //   {
@@ -1323,7 +1339,7 @@ async confirm()
  {
 
    const panvalue = this.pan_number;
-  let value_2 = this.customers.find(item => item.pan_number   === panvalue);
+  let value_2 = this.customers.find((item: any) => item.pan_number   === panvalue);
 
   // if(value_2 != undefined)
   //   {
@@ -1339,7 +1355,7 @@ async confirm()
  {
 
   const billNoValue = this.edit_name;
-  let value = this.customers.find(item => item.company_name === billNoValue);
+  let value = this.customers.find((item: any) => item.company_name === billNoValue);
 
   // console.log(this.edit_id)
   // console.log(value)
@@ -1353,7 +1369,7 @@ async confirm()
 
  }
 
- udyam_register(value)
+ udyam_register(value: any)
  {
 
    if(value == 1)

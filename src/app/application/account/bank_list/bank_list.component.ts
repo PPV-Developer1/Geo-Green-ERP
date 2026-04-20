@@ -1,3 +1,4 @@
+import { AnyARecord } from 'dns';
 import { Component, ViewChild, OnInit, ElementRef } from '@angular/core';
 import { DatatableComponent } from '@swimlane/ngx-datatable';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -14,30 +15,30 @@ import * as XLSX from "xlsx";
 })
 export class Bank_listComponent implements OnInit
 {
-  @ViewChild(DatatableComponent) table: DatatableComponent;
-  @ViewChild("add_account",{static:true})  add_account:ElementRef;
-  @ViewChild("add_expense",{static:true})  add_expense:ElementRef;
-  @ViewChild("edit_expense",{static:true}) edit_expense:ElementRef;
-  @ViewChild("edit_account",{static:true}) edit_account:ElementRef;
-  @ViewChild("content", { static: true })  content: ElementRef;
+  @ViewChild(DatatableComponent) table                  !: DatatableComponent;
+  @ViewChild("add_account",{static:true})  add_account  !:ElementRef;
+  @ViewChild("add_expense",{static:true})  add_expense  !:ElementRef;
+  @ViewChild("edit_expense",{static:true}) edit_expense !:ElementRef;
+  @ViewChild("edit_account",{static:true}) edit_account !:ElementRef;
+  @ViewChild("content", { static: true })  content      !: ElementRef;
 
   public uid                = localStorage.getItem('uid');
   public user_type          = localStorage.getItem('type');
   public user_bank_id       = localStorage.getItem('bank_id');
 
-  public account_name       : AbstractControl;
-  public mode               : AbstractControl;
-  public opening_balance    : AbstractControl;
-  public level              : AbstractControl;
-  public status             : AbstractControl;
-  public bank_id            : AbstractControl;
+  public account_name       !: AbstractControl;
+  public mode               !: AbstractControl;
+  public opening_balance    !: AbstractControl;
+  public level              !: AbstractControl;
+  public status             !: AbstractControl;
+  public bank_id            !: AbstractControl;
 
   editing                   = {};
   rows                      = [];
-  temp                      = [];
-  expenseData_temp          = [];
+  temp                      :any = [];
+  expenseData_temp          :any= [];
   selected                  = [];
-  detail_view               = [];
+  detail_view               : any = {};
   price                     = '1000000';
   statement                 = [];
 
@@ -100,9 +101,9 @@ export class Bank_listComponent implements OnInit
     this.loadData();
   }
 
-   updateFilter(event) {
+   updateFilter(event:any) {
     const val = event.target.value.toLowerCase();
-    const temp = this.temp.filter((d) => {
+    const temp = this.temp.filter((d:any) => {
       return Object.values(d).some(field =>
         field != null && field.toString().toLowerCase().indexOf(val) !== -1
       );
@@ -111,9 +112,9 @@ export class Bank_listComponent implements OnInit
     this.table.offset = 0;
   }
 
-  updateFilter_expense(event) {
+  updateFilter_expense(event:any) {
     const val = event.target.value.toLowerCase();
-    const temp = this.expenseData_temp.filter((d) => {
+    const temp = this.expenseData_temp.filter((d:any) => {
       return Object.values(d).some(field =>
         field != null && field.toString().toLowerCase().indexOf(val) !== -1
       );
@@ -165,8 +166,13 @@ export class Bank_listComponent implements OnInit
 
     this.api.get('get_data.php?table=expense_account&authToken=' + environment.authToken).then((data: any) =>
     {
-      this.expenseData = data;
-      this.expenseData_temp=[...data];
+      console.log("expense account data : ",data);
+
+         this.expenseData = data;
+      if(data!= null)
+      {
+        this.expenseData_temp=[...data];
+      }
     }).catch(error => {
       this.toastrService.error('API Faild : loadData expence');
     });
@@ -177,12 +183,14 @@ export class Bank_listComponent implements OnInit
     }).catch(error => { this.toastrService.error('API Faild : loadData bank transaction details'); });
   }
 
-  async newAccount(addAccount)
+  async newAccount(addAccount : any)
   {
     Object.keys(this.addAccount.controls).forEach(field =>
       {
         const control = this.addAccount.get(field);
-        control.markAsTouched({ onlySelf: true });
+        if (control) {
+          control.markAsTouched({ onlySelf: true });
+        }
       });
     if (this.addAccount.valid)
     {
@@ -237,7 +245,7 @@ export class Bank_listComponent implements OnInit
     }
   }
 
-  async editAccount(editAccount)
+  async editAccount(editAccount : any)
   {
     if (this.addAccount.valid)
     {
@@ -299,7 +307,7 @@ export class Bank_listComponent implements OnInit
     else{ this.toastrService.error('Please make sure all fields are filled in correctly');}
   }
 
-  async submitAccount_expense(editExpense)
+  async submitAccount_expense(editExpense : any)
   {
     if (this.addExpense.valid)
     {
@@ -470,7 +478,7 @@ export class Bank_listComponent implements OnInit
       });
   }
 
-  onActivate(event)
+  onActivate(event : any)
   {
     if (event.type === "click")
     {
@@ -481,7 +489,7 @@ export class Bank_listComponent implements OnInit
     }
   }
 
-  onActivate_expense(event)
+  onActivate_expense(event : any)
   {
     if (event.type === "click")
     {
@@ -494,7 +502,7 @@ export class Bank_listComponent implements OnInit
     }
   }
 
-  loadTranseaction(data)
+  loadTranseaction(data : any)
   {
     this.api.get('bank_transaction_list.php?value='+data+'&authToken=' + environment.authToken).then((data: any) =>
     {
@@ -502,7 +510,7 @@ export class Bank_listComponent implements OnInit
     }).catch(error => {this.toastrService.error('API Faild : loadTranseaction');});
   }
 
-  ExpenceloadTranseaction(data)
+  ExpenceloadTranseaction(data : any)
   {
     this.api.get('get_data.php?table=expense&find=exp_account&value='+data+'&asign_field=exp_id&asign_value=DESC&authToken=' + environment.authToken).then((data: any) =>
     {
@@ -511,13 +519,15 @@ export class Bank_listComponent implements OnInit
     }).catch(error => {this.toastrService.error('API Faild : loadTranseaction');});
   }
 
-  async newExpense(addExpense)
+  async newExpense(addExpense:any)
   {
 
     Object.keys(this.addExpense.controls).forEach(field =>
       {
         const control = this.addExpense.get(field);
-        control.markAsTouched({ onlySelf: true });
+        if (control) {
+          control.markAsTouched({ onlySelf: true });
+        }
       });
     if (this.addExpense.valid)
     {
@@ -550,7 +560,7 @@ export class Bank_listComponent implements OnInit
   }
 
 
-  download(value,data)
+  download(value :any , data: any)
   {
     let today = new Date();
     let year  = today.getFullYear();

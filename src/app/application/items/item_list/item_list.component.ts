@@ -32,18 +32,18 @@ export class Item_listComponent implements OnInit
   tax_list          = [];
   loading           : boolean = false;
   add_item          : boolean = false;
-  SerialStatus      : boolean;
+  SerialStatus      !: boolean;
 
   searchText = '';
   isDropdownOpen = false;
   items = ['Item 1', 'Item 2', 'Item 3'];
   filteredItems: string[] = [];
   selectedValue = '';
-  @ViewChild(DatatableComponent) table: DatatableComponent;
+  @ViewChild(DatatableComponent) table !: DatatableComponent;
 
-  @ViewChild("update_item", { static: true }) update_item   : ElementRef;
+  @ViewChild("update_item", { static: true }) update_item   !: ElementRef;
 
-  @ViewChild("AddNew_item", { static: true }) AddNew_item   : ElementRef;
+  @ViewChild("AddNew_item", { static: true }) AddNew_item   !: ElementRef;
 
 
   EditItem = new FormGroup
@@ -77,8 +77,8 @@ export class Item_listComponent implements OnInit
     tax_percent     : new FormControl('18', [Validators.required]),
     description     : new FormControl(null),
     status          : new FormControl(1),
-    minimum_stock  : new FormControl(null),
-    minimum_stock_status  : new FormControl(null)
+    minimum_stock   : new FormControl(null),
+    minimum_stock_status  : new FormControl(0)
 
   });
 
@@ -103,10 +103,10 @@ export class Item_listComponent implements OnInit
     this.new_item_id = this.modalService.open(this.AddNew_item, { size: 'md' });
   }
 
-  updateFilter(event)
+  updateFilter(event:any)
   {
       const val = event.target.value.toLowerCase();
-      const temp = this.item_filter.filter((d) => {
+      const temp = this.item_filter.filter((d:any) => {
         return Object.values(d).some(field =>
           field != null && field.toString().toLowerCase().indexOf(val) !== -1
         );
@@ -115,7 +115,7 @@ export class Item_listComponent implements OnInit
       this.table.offset = 0;
 
   }
-  onActivate(event)
+  onActivate(event:any)
   {
     if(event.type === "click")
     {
@@ -142,7 +142,7 @@ export class Item_listComponent implements OnInit
       this.OpenItemEdit();
   }
 
-  cat_category(event)
+  cat_category(event:any)
   {
     console.log(event)
     if(event == undefined)
@@ -150,7 +150,7 @@ export class Item_listComponent implements OnInit
       this.NewItem.controls["cat_format"].reset()
       return
     }
-    const value = this.category.find(i => i.cat_id == event)
+    const value = this.category.find((i:any) => i.cat_id == event)
     console.log(value.format)
     this.NewItem.controls["cat_format"].setValue(value.format)
   }
@@ -191,7 +191,7 @@ export class Item_listComponent implements OnInit
   }
 
 
-  async EditSubmit(data)
+  async EditSubmit(data : any)
   {
     const confirmed = confirm(" Are you sure you want to update these changes?");
           console.log(confirmed)
@@ -210,7 +210,7 @@ export class Item_listComponent implements OnInit
         this.loading = false; }
         this.update_item_id.close();
        await this.load_item();
-        var update_data = await this.item_list.find((item) => item.item_id === this.detail_view['item_id']);
+        var update_data = await this.item_list.find((item:any) => item.item_id === this.detail_view['item_id']);
         this.detail_view = update_data;
         console.log(this.detail_view);
       return true;
@@ -224,13 +224,13 @@ export class Item_listComponent implements OnInit
     this.OpenItemNew();
   }
 
-  async NewSubmit(data)
+  async NewSubmit(data : any)
   {
     this.NewItem.controls['created_by'].setValue(this.uid);
     Object.keys(this.NewItem.controls).forEach(field =>
       {
         const control = this.NewItem.get(field);
-        control.markAsTouched({ onlySelf: true });
+        control?.markAsTouched({ onlySelf: true });
       });
 
     if (this.NewItem.valid)
@@ -243,7 +243,9 @@ export class Item_listComponent implements OnInit
       await this.api.get('get_data.php?table=item&authToken=' + environment.authToken).then((data: any) =>
 
         {
+          if(data != null)
           checking = data.some((item: { name: any; }) =>  normalizeString(item.name) ===  normalizeString(this.NewItem.value.name) );
+          else{checking = false;}
         }).catch(error =>
           {
               this.toastrService.error('API Faild : item checking failed');
@@ -316,7 +318,7 @@ export class Item_listComponent implements OnInit
     }).catch(error => {this.toastrService.error('API Faild : load item category');});
   }
 
-  load_list(data)
+  load_list(data:any)
   {
 
   }
@@ -336,7 +338,7 @@ export class Item_listComponent implements OnInit
 
     let formattedDate = `${year}-${month}-${day}`;
 
-  const exportData = this.item_list.map(item => ({
+  const exportData = this.item_list.map((item:any) => ({
     Item_id     : item.item_id,
     Item_name   : item.item_name,
     Category    : item.item_cat,

@@ -21,11 +21,12 @@ export class Product_stock_listComponent implements OnInit {
         this.loadItem();
   }
 
-  loadItem()
+ async loadItem()
   {
-   this.api.get('mp_production_stock.php?authToken='+environment.authToken).then((data: any) =>
+  await this.api.get('mp_production_stock.php?authToken='+environment.authToken).then((data: any) =>
     {
       this.stock_list = data;
+      if(data != null)
       this.filter_data = [...data];
     }).catch(error => {this.toastrService.error('Something went wrong');});
   }

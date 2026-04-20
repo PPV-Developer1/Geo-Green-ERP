@@ -189,7 +189,7 @@ export class EmployeeComponent implements OnInit
       nationality     : new FormControl('Indian'),
       qualification   : new FormControl(null),
       emailId         : new FormControl('',Validators.compose([ Validators.pattern("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$")])),
-      login_id        : new FormControl(null),
+      login_id        : new FormControl('',Validators.compose([ Validators.pattern("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$")])),
       password        : new FormControl(''),
       empRole         : new FormControl('0', [Validators.required]),
       empType         : new FormControl('', [Validators.required]),

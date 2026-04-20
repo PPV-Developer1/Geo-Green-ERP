@@ -283,7 +283,7 @@ export class Delivery_challanComponent implements OnInit {
   {
     await this.api.get('mp_customer_dc.php?&authToken=' + environment.authToken).then((data: any) =>
     {
-
+        console.log("Customer Bill List : ",data)
       this.CustomerBillList = data;
       if(data != null)
       {
@@ -809,7 +809,7 @@ export class Delivery_challanComponent implements OnInit {
 
   tdsCalculation()
   {
-      let subtotal = Number(this.subtotal) + this.total_tax
+      let subtotal = Number(this.subtotal) 
       let tds =  ((subtotal )*(this.tds_percent/100)).toFixed(2);
       this.dc.controls['TDS'].setValue(tds);
       this.FinalTotalCalculation();

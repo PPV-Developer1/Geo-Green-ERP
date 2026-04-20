@@ -1,15 +1,15 @@
 {
   "name": "accounts_erp",
-  "version": "6.1.1",
-  "scripts": {
-    "ng": "ng",
-    "start": "ng serve -o",
-    "build": "ng build",
-    "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e",
-    "install": "napa"
-  },
+  "version": "6.1.2",
+"scripts": {
+  "ng": "ng",
+  "start": "ng serve -o",
+  "build": "ng build --configuration production",
+  "build:secure": "ng build --configuration production --source-map=false",
+  "test": "ng test",
+  "lint": "ng lint",
+  "e2e": "ng e2e"
+},
   "private": true,
   "dependencies": {
     "@angular-slider/ngx-slider": "^18.0.0",

@@ -18,8 +18,8 @@ export class Item_categoryComponent implements OnInit {
   temp               = [];
   detail_view        : any;
   selected           = [];
-  category_list      = [];
-  category_filter    = [];
+  category_list      : any[] = [];
+  category_filter     : any[] = [];
 
   update_categogy_id : any;
   new_category_id    : any;
@@ -27,11 +27,11 @@ export class Item_categoryComponent implements OnInit {
   loading :  boolean = false;
   public uid         = localStorage.getItem('uid');
 
-  @ViewChild(DatatableComponent) table: DatatableComponent;
+  @ViewChild(DatatableComponent) table !: DatatableComponent;
 
-  @ViewChild("new_category", { static: true }) new_category   : ElementRef;
+  @ViewChild("new_category", { static: true }) new_category   !: ElementRef;
 
-  @ViewChild("update_categogy", { static: true }) update_categogy   : ElementRef;
+  @ViewChild("update_categogy", { static: true }) update_categogy   !: ElementRef;
 
   EditCategory = new FormGroup
   ({
@@ -49,7 +49,7 @@ export class Item_categoryComponent implements OnInit {
     name              : new FormControl('', [Validators.required, Validators.minLength(3)]),
     type              : new FormControl('', [Validators.required]),
     HaveSerialNumber  : new FormControl(0),
-    JobworkMaterial   : new FormControl(null),
+    JobworkMaterial   : new FormControl(0),
     status            : new FormControl(1),
     format            : new FormControl(null),
   });
@@ -79,7 +79,7 @@ export class Item_categoryComponent implements OnInit {
     this.new_category_id = this.modalService.open(this.new_category, { size: 'md' });
   }
 
-  updateFilter(event)
+  updateFilter(event:any)
   {
     const val = event.target.value.toLowerCase();
     const temp = this.category_filter.filter((d) => {
@@ -90,7 +90,7 @@ export class Item_categoryComponent implements OnInit {
     this.category_list = temp;
     this.table.offset = 0;
   }
-  onActivate(event)
+  onActivate(event:any)
   {
     if(event.type === "click")
     {
@@ -115,13 +115,13 @@ export class Item_categoryComponent implements OnInit {
       this.OpenCatEdit();
   }
 
-  async EditSubmit(data)
+  async EditSubmit(data:any)
   {
 
       Object.keys(this.EditCategory.controls).forEach(field =>
       {
         const control = this.EditCategory.get(field);
-        control.markAsTouched({ onlySelf: true });
+        control?.markAsTouched({ onlySelf: true });
       });
     if(this.EditCategory.valid)
     {
@@ -155,12 +155,12 @@ export class Item_categoryComponent implements OnInit {
     else{}
   }
 
-  async AddSubmit(data)
+  async AddSubmit(data:any)
   {
     Object.keys(this.AddCategory.controls).forEach(field =>
       {
         const control = this.AddCategory.get(field);
-        control.markAsTouched({ onlySelf: true });
+        control?.markAsTouched({ onlySelf: true });
       });
     if(this.AddCategory.valid)
     {
@@ -171,7 +171,9 @@ export class Item_categoryComponent implements OnInit {
       await this.api.get('get_data.php?table=item_category&authToken=' + environment.authToken).then((data: any) =>
 
         {
+          if(data!= null)
           checking = data.some((item: { title: any; }) =>  normalizeString(item.title) ===  normalizeString(this.AddCategory.value.name) );
+          else{checking = false;}
         }).catch(error =>
           {
               this.toastrService.error('API Faild : item checking failed');

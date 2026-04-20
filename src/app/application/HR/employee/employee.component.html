@@ -381,7 +381,8 @@
                                                             <input type="text" formControlName="emp_login_id" style="border: none;" [readonly]="status"
                                                               [(ngModel)]="emp_login_id" placeholder="Enter Login ID">
                                                             <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_login_id').touched && editEmpDetails.get('emp_login_id').hasError('required')">Required !</span>
-                                                            </td>
+                                                            <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_login_id').touched && editEmpDetails.get('emp_login_id').hasError('pattern')">Incorrect Email</span>
+                                                          </td>
                                                     </tr>
                                                   </table>
                                             </div>
@@ -430,7 +431,7 @@
                                                         <label for="" *ngIf="status">{{emp_pfNo}}</label>
                                                         <input type="text" *ngIf="!status" name="" id="" style="border: none;" [readonly]="status"
                                                           formControlName="emp_pfNo" [(ngModel)]="emp_pfNo"
-                                                          placeholder="Enter your PF No" (input)=" formatInput_edit($event)" > </td>
+                                                          placeholder="Enter your PF No" > </td>
                                                     </tr>
 
                                                   </table>
@@ -590,7 +591,7 @@
 
                                                                  <tr>
                                                                      <th>Nominee Contact</th>
-                                                                      <td><input type="text" formControlName="emp_nominee_contact_no" style="border: none;" [readonly]="status"
+                                                                      <td><input type="number" formControlName="emp_nominee_contact_no" style="border: none;" [readonly]="status"
                                                                       [(ngModel)]="emp_nominee_contact_no" placeholder="Enter Nominee Contact">
 
                                                                        <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_nominee_contact_no').touched && editEmpDetails.get('emp_nominee_contact_no').hasError('required')">Required !</span>
@@ -604,7 +605,7 @@
                                                         <table class="table ">
                                                            <tr>
                                                               <th>Aadhar</th>
-                                                              <td><input type="text" formControlName="emp_aadhar" style="border: none;" [readonly]="status"
+                                                              <td><input type="number" formControlName="emp_aadhar" style="border: none;" [readonly]="status"
                                                                   [(ngModel)]="emp_aadhar" placeholder="Enter your Aadhar number">
                                                                     <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_aadhar').touched && editEmpDetails.get('emp_aadhar').hasError('required')">Required !</span>
                                                                 </td>
@@ -1718,10 +1719,11 @@
                                       <div class="col-md-6 mt-2">
                                           <b> Login ID </b>
                                             <span class="help-block text-danger" *ngIf="addEmployee.get('login_id').touched && addEmployee.get('login_id').hasError('required')">Required !</span>
-                                        </div>
+                                            <span class="help-block text-danger" *ngIf="addEmployee.get('login_id').touched && addEmployee.get('login_id').hasError('pattern')">Incorrect Email</span>
+                                          </div>
 
                                     <div class="col-md-6">
-                                      <input type="number" formControlName="login_id" class="form-control" placeholder="Enter Login ID"/>
+                                      <input type="text" formControlName="login_id" class="form-control" placeholder="Enter Login ID"/>
                                     </div>
                                 </div>
                           </div>
@@ -1838,7 +1840,7 @@
                                 <span class="help-block text-danger" *ngIf="addEmployee.get('pfNo').touched && addEmployee.get('pfNo').hasError('required')">Required !</span>
                               </div>
                               <div class="col-md-6">
-                                <input type="text" formControlName="pfNo" class="form-control" placeholder="Enter EPF Number" (input)="formatInput($event)" [(ngModel)]="formattedInput"
+                                <input type="text" formControlName="pfNo" class="form-control" placeholder="Enter EPF Number"  [(ngModel)]="formattedInput"
                                   maxlength="26"/>
 
                               </div>
@@ -1995,7 +1997,7 @@
                                   <span class="help-block text-danger" *ngIf="addEmployee.get('aadharNo').touched && addEmployee.get('aadharNo').hasError('required')">Required !</span>
                                 </div>
                                 <div class="col-md-6">
-                                  <input type="text" formControlName="aadharNo" onKeyPress="if(this.value.length==12) return false;" class="form-control" placeholder="Enter Aadhar Number"/>
+                                  <input type="number" formControlName="aadharNo" onKeyPress="if(this.value.length==12) return false;" class="form-control" placeholder="Enter Aadhar Number"/>
                                 </div>
                               </div>
 
@@ -2055,7 +2057,7 @@
                                       <span class="help-block text-danger" *ngIf="addEmployee.get('nominee_contact_no').touched && addEmployee.get('nominee_contact_no').hasError('required')"> Required !</span>
                                     </div>
                                     <div class="col-md-6">
-                                      <input type="text" formControlName="nominee_contact_no" class="form-control" placeholder=" Enter Nominee Contact Number"/>
+                                      <input type="number" formControlName="nominee_contact_no" class="form-control" placeholder=" Enter Nominee Contact Number"/>
                                     </div>
                                   </div>
 

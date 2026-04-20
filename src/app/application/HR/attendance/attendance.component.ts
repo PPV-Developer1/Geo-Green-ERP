@@ -18,15 +18,15 @@ import { Router } from '@angular/router';
 
 export class AttendanceComponent implements OnInit
 {
-  @Input() list:any[];
+  @Input() list !:any[];
 
   @Output() shareCheckedList = new EventEmitter();
   @Output() shareIndividualCheckedList = new EventEmitter();
 
   pipe                   = new DatePipe('en-US');
   public now             = Date.now();
-  public myFormattedDate = this.pipe.transform(this.now, 'dd/MM/yyyy HH:mm:ss');
-  public Date           =   this.pipe.transform(this.now, 'yyyy-MM-dd');
+  public myFormattedDate = this.pipe.transform(this.now, 'dd/MM/yyyy HH:mm:ss') as string;
+  public Date: string    = this.pipe.transform(this.now, 'yyyy-MM-dd') as string;
 
   employee               : any;
   modaladdatt            : any;
@@ -44,10 +44,10 @@ export class AttendanceComponent implements OnInit
   emp_type_list          : any;
   employee_type          : any;
   checkedList            : any[];
-  currentSelected : {};
+  currentSelected !: {};
   selected               = [];
   add_options            = [];
-  att_list               = [];
+  att_list              :any [] = [];
   att_post               = [];
   att_window             = 0;
   designation            :any
@@ -57,9 +57,9 @@ export class AttendanceComponent implements OnInit
   public form_date       : FormGroup;
   public form_att        : FormGroup;
   public form_att_edit   : FormGroup;
-  public date_form       : FormGroup;
+  public date_form       !: FormGroup;
   public com_off         : FormGroup;
-  public emp_id          : number;
+  public emp_id          !: number;
   public date_val        : AbstractControl;
 
   public att_val_hr      : AbstractControl;
@@ -76,13 +76,13 @@ export class AttendanceComponent implements OnInit
   public att_edit_val_cl : AbstractControl;
   public att_edit_notes  : AbstractControl;
   public loading         : boolean=false;
-  temp: any [];
-  @ViewChild(DatatableComponent) table: DatatableComponent;
+  temp  : any [] = [];
+  @ViewChild(DatatableComponent) table!: DatatableComponent;
 
-  @ViewChild("add_att",{static:true})  add_att :ElementRef;
-  @ViewChild("edit_att",{static:true}) edit_att:ElementRef;
-  @ViewChild("addcom_off",{static:true}) addcom_off:ElementRef;
-  @ViewChild("addpaid_laeve",{static:true}) addpaid_laeve:ElementRef;
+  @ViewChild("add_att",{static:true})  add_att !:ElementRef;
+  @ViewChild("edit_att",{static:true}) edit_att!:ElementRef;
+  @ViewChild("addcom_off",{static:true}) addcom_off!:ElementRef;
+  @ViewChild("addpaid_laeve",{static:true}) addpaid_laeve!:ElementRef;
 
   constructor(private modalService: NgbModal, public api: ApiService, private datePipe: DatePipe, public toastrService: ToastrService, fb:FormBuilder, router:Router)
   {
@@ -151,11 +151,12 @@ export class AttendanceComponent implements OnInit
 
   ngOnInit(): void
   {
+     this.Date = this.pipe.transform(this.now, 'yyyy-MM-dd') as string;
     this.api.get('get_data.php?table=employee&authToken='+environment.authToken).then((data: any) =>
     {
       this.employee_list = data;
       this.temp = [...data];
-      this.Admin_employee_list = this.employee_list.filter(emp => emp.emp_type == 2&& emp.doj <= this.Date && (emp.last_working_day >= this.Date || emp.last_working_day == null || emp.last_working_day == '')&& emp.status ==1)
+      this.Admin_employee_list = this.employee_list.filter((emp:any) => emp.emp_type == 2&& emp.doj <= this.Date && (emp.last_working_day >= this.Date || emp.last_working_day == null || emp.last_working_day == '')&& emp.status ==1)
       console.log(this.Admin_employee_list)
     }).catch(error => {this.toastrService.error('Something went wrong');
     this.loading=false;});
@@ -170,16 +171,16 @@ export class AttendanceComponent implements OnInit
     }).catch(error => { this.toastrService.error('API Faild : loadData Employee type'); });
   }
 
-  onActivate(event)
+  onActivate(event:any)
   {
     if(event.type === "click")
     {
       console.log("on click : ",event.row)
       this.employee = event.row.emp_id;
-      this.employee_data = this.employee_list.find(e => e.emp_id == event.row.emp_id);
+      this.employee_data = this.employee_list.find((e:any) => e.emp_id == event.row.emp_id);
       console.log(" employee_data",this.employee_data)
        console.log("emp_type_list",this.emp_type_list)
-      const employee_type = this.emp_type_list.find(e => e.id == this.employee_data.emp_type);
+      const employee_type = this.emp_type_list.find((e:any) => e.id == this.employee_data.emp_type);
       this.employee_type = employee_type.type;
       console.log(" employee_type",employee_type.type)
         this.form_att.controls['att_val_ot'].setValue(0)
@@ -246,12 +247,13 @@ export class AttendanceComponent implements OnInit
     this.modaleditatt = this.modalService.open(this.edit_att, { size: 'md'});
   }
 
-  onSubmit_date(data)
+  onSubmit_date(data:any)
   {
 
     this.select_date_value = data.date_val;
     if(this.form_date.valid)
     {
+
       if(this.Today_Date < this.select_date_value)
       {
         this.toastrService.error('Future date cannot be called !');
@@ -274,7 +276,7 @@ export class AttendanceComponent implements OnInit
     this.loading=false;};
   }
 
-    updateFilter(event) {
+    updateFilter(event:any) {
     const val = event.target.value.toLowerCase();
     const temp = this.temp.filter((d) => {
       return Object.values(d).some(field =>
@@ -286,7 +288,7 @@ export class AttendanceComponent implements OnInit
   }
 
 
-  async onSubmit(data)
+  async onSubmit(data:any)
   {
     data.created_by = this.uid;
     data.emp_id     = this.employee;
@@ -295,11 +297,16 @@ export class AttendanceComponent implements OnInit
     Object.keys(this.form_att.controls).forEach(field =>
       {
         const control = this.form_att.get(field);
-        control.markAsTouched({ onlySelf: true });
+        control?.markAsTouched({ onlySelf: true });
       });
 
     if(this.form_att.valid)
     {
+        const confirmed = confirm(" Confirm to submit ?");
+       console.log(confirmed)
+      if (!confirmed) {
+        return;
+      }
         const hours   = Number(this.form_att.controls['att_val_hr'].value) || 0;
         const ot      = Number(this.form_att.controls['att_val_ot'].value) || 0;
         const leave   = Number(this.form_att.controls['att_val_pl'].value) || 0;
@@ -346,7 +353,7 @@ export class AttendanceComponent implements OnInit
     }
  }
 
-  async onUpdate(data)
+  async onUpdate(data:any)
   {
     data.created_by = this.uid;
     data.emp_id     = this.employee;
@@ -1035,7 +1042,7 @@ export class AttendanceComponent implements OnInit
  }
 
  clearCheckboxes() {
-  this.employee_list.forEach(employee => {
+  this.employee_list.forEach((employee:any) => {
     employee.checked = false;
   });
 

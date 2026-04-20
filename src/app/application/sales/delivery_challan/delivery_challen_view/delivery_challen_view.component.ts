@@ -819,7 +819,7 @@ async edit_specItem(item,j)
 
   async specProject(item,i)
   {
-    // this.item_id = item
+     this.item_id = item
    await this.api.get('get_data.php?table=projects&find=project_id&value=' + item + '&authToken=' + environment.authToken).then((data: any) => {
         this.type_id      = data[0].type;
         this.price        = data[0].project_value;
@@ -968,7 +968,7 @@ async edit_specItem(item,j)
 
   tdsCalculation()
   {
-     let subtotal = Number(this.subtotal) + this.total_tax
+     let subtotal = Number(this.subtotal)
      let tds =  ((subtotal )*(this.tds_percent/100)).toFixed(2);
      this.Edit_dc.controls['TDS'].setValue(tds);
      this.edit_FinalTotalCalculation();

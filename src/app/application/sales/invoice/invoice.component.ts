@@ -7,6 +7,8 @@ import { environment } from "../../../../environments/environment";
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppState } from 'src/app/app.state';
+import { dispatch } from 'd3';
+import { DecimationAlgorithm } from 'chart.js';
 
 @Component({
   selector: 'az-invoice',
@@ -49,18 +51,18 @@ export class InvoiceComponent implements OnInit {
   GST_Length               : any;
   type_id                  : any;
   taxmode                  : any;
-  addForm                  : FormGroup;
-  product                  : FormGroup;
+  addForm                  !: FormGroup;
+  product                  !: FormGroup;
   invoice                  : FormGroup;
   myControl                 = new FormControl();
 
-  imageToShow              : string | ArrayBuffer;
-  billPerfix               : string;
+  imageToShow              !: string | ArrayBuffer | null;
+  billPerfix               !: string;
   imgUrl                   : string = '../../../../assets/img/logo/geogreen.png';
 
   rows                     = [];
-  temp                     = [];
-  selected                 = [];
+  temp                     :any []= [];
+  selected                 :any = [];
   options                  : string[] = ['One', 'Two', 'Three'];
   SelectionType            = SelectionType;
 
@@ -132,7 +134,7 @@ export class InvoiceComponent implements OnInit {
   tds_percent              : any=0;
   tcs_percent              : any=0;
   lastindex                : any=0;
-  total_tax                : number;
+  total_tax                !: number;
   loading                  : boolean = false;
   show_new_bill            : boolean = false;
   public formShow          : boolean = true;
@@ -144,19 +146,26 @@ export class InvoiceComponent implements OnInit {
   tableWidth :any= 100 ;
   originalTableHeight      : any
   private dropdownOpen = false;
+  public dc_apply : any;
+
+  selectedDCs: any[] = [];  // instead of null
+
+
+
+dropdownSettings = {};
 //   dc_list:any=[]
 //   dc_list = [
 //   { item_id: 1, item_text: 'DC001' },
 //   { item_id: 2, item_text: 'DC002' },
 //   { item_id: 3, item_text: 'DC003' }
 // ];
-  @ViewChild(DatatableComponent) table: DatatableComponent;
+  @ViewChild(DatatableComponent) table !: DatatableComponent;
   //  @ViewChild(DatatableComponent) Itemstable: DatatableComponent;
-  @ViewChild('Itemstable', { static: false }) Itemstable: DatatableComponent;
-  @ViewChild("customer_name", { static: true }) customer_name: ElementRef;  // For MODEL Open
-  @ViewChild("new_category", { static: true }) new_category   : ElementRef;
-  @ViewChild('tableResponsive', { static: false }) tableResponsive: ElementRef;
-  @ViewChild("ItemListModel", { static: true }) ItemListModel   : ElementRef;
+  @ViewChild('Itemstable', { static: false }) Itemstable!: DatatableComponent;
+  @ViewChild("customer_name", { static: true }) customer_name!: ElementRef;  // For MODEL Open
+  @ViewChild("new_category", { static: true }) new_category   !: ElementRef;
+  @ViewChild('tableResponsive', { static: false }) tableResponsive!: ElementRef;
+  @ViewChild("ItemListModel", { static: true }) ItemListModel   !: ElementRef;
   constructor
   (
     private modalService : NgbModal,
@@ -174,6 +183,7 @@ export class InvoiceComponent implements OnInit {
         customerId: [null, Validators.compose([Validators.required])],
         billFrom: [null],
         shipFrom: [null],
+        use_dc : [0],
         invoiceNo: [null, Validators.compose([Validators.required])],
         reference_number: [null],
         billDate: [(new Date()).toISOString().substring(0, 10)],
@@ -203,13 +213,23 @@ export class InvoiceComponent implements OnInit {
       invoicetype:[null, Validators.compose([Validators.required])],
      })
   }
-  ngOnInit()
+ async ngOnInit()
   {
     this.LoadCustomerDetails();
     this.LoadCustomerBills();
     this.initProduct();
   //  this.LoadItemDetails();
-  }
+    this.dropdownSettings  = {
+            singleSelection: false,
+            idField: 'dc_id',
+            textField: 'dc_number',
+            selectAllText: 'Select All',
+            unSelectAllText: 'UnSelect All',
+            itemsShowLimit: 10,
+            allowSearchFilter: true,
+            enableCheckAll: false
+          };
+        }
 
   @HostListener('mousedown', ['$event'])
   onMouseDown(event: MouseEvent) {
@@ -242,9 +262,6 @@ export class InvoiceComponent implements OnInit {
   changeTableWidth() {
     document.documentElement.style.setProperty('--table-width', this.tableWidth+'%');
   }
-
-
-
 
 
   @HostListener('document:click', ['$event'])
@@ -281,6 +298,7 @@ adjustTableHeight() {
       }, 100);
  }
 
+
   resetTableHeight() {
         if (this.tableResponsive) {
 
@@ -288,18 +306,7 @@ adjustTableHeight() {
         }
   }
 
-selectedDCs: any[] = [];  // instead of null
 
-dropdownSettings = {
-  singleSelection: false,
-  idField: 'dc_id',
-  textField: 'dc_number',
-  selectAllText: 'Select All',
-  unSelectAllText: 'UnSelect All',
-  itemsShowLimit: 10,
-  allowSearchFilter: true,
-  enableCheckAll: false
-};
 
   async LoadCustomerBills()
   {
@@ -310,6 +317,8 @@ dropdownSettings = {
       this.temp   =[...data]
     }).catch(error => { this.toastrService.error('Something went wrong in LoadCustomerInvoice'); });
   }
+
+
   async LoadCustomerDetails()
   {
     await this.api.get('get_data.php?table=customers&authToken=' + environment.authToken).then((data: any) =>
@@ -317,19 +326,22 @@ dropdownSettings = {
       this.vendorDetails = data;
     }).catch(error => { this.toastrService.error('Something went wrong in LoadCustomerDetails'); });
   }
+
+
  async LoadItemDetails()
   {
-    await this.api.get('mp_item_list.php?&authToken=' + environment.authToken).then((data: any) =>
+   await this.api.get('mp_item_list.php?&authToken=' + environment.authToken).then((data: any) =>
     {
       console.log("item : ",data)
-      this.ItemList = data.filter(i => i.sales ==1);
-      this.ItemList_temp = [...data.filter(i => i.sales ==1)]
+      this.ItemList = data.filter((i: any) => i.sales ==1);
+      this.ItemList_temp = [...data.filter((i: any) => i.sales ==1)]
       console.log("Filter : ",this.ItemList)
     }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
   }
 
   ReturnToList()
   {
+    this.dc_apply   = 0;
     this.isDropdownAppendedToBody = true;
     this.LoadCustomerBills();
     this.show_new_bill = !this.show_new_bill;
@@ -341,10 +353,12 @@ dropdownSettings = {
     this.invoice.controls['TCS'].setValue(0);
     this.invoice.controls['TDS'].setValue(0);
     this.invoice.controls['roundOff'].setValue(0);
+    this.invoice.controls['use_dc'].setValue(0);
     this.invoice.controls['tax_type'].setValue(null);
     this.invoice.controls['status'].setValue(1);
     this.tds_percent = 0;
     this.tcs_percent = 0;
+
     this.loading=false;
     this.LoadCustomerBills();
     const formArray         = this.invoice.get('product') as FormArray;
@@ -359,9 +373,10 @@ dropdownSettings = {
 
   prefix_data : any
   selected_project : any
-  async VendorSelection(id)
-  {
 
+  async VendorSelection(id: any)
+  {
+      this.dc_apply = 0
       this.isDropdownAppendedToBody = false;
       this.formShow = false;
       this.customer_id = id;
@@ -369,6 +384,8 @@ dropdownSettings = {
       const today = new Date();
       let date = today.toISOString().split('T')[0];
       this.invoice.reset();
+      this.selectedDCs=[]
+      this.invoice.controls['use_dc'].setValue(0);
       this.invoice.controls['inv_type'].setValue(this.type);
       this.invoice.controls['customerId'].setValue(id);
       this.invoice.controls['created_by'].setValue(this.uid);
@@ -383,7 +400,10 @@ dropdownSettings = {
       this.invoice.controls['tds_percentage'].setValue(0);
       this.invoice.controls['tcs_percentage'].setValue(0);
       this.invoice.controls['project_list'].setValue(null);
+      this.invoice.controls['dc_data'].setValue(null);
+
       this.customer_address(id);
+
     const formArray         = this.invoice.get('product') as FormArray;
     const formArrayLength   = formArray.length;
     const formArrayControls = formArray.controls;
@@ -467,12 +487,14 @@ dropdownSettings = {
                 }).catch(error => { this.toastrService.error('Something went wrong in Project Load'); });
               }
 
-              this.selectedDCs=[]
+
               if(this.type == "items")
               {
-                 this.Items_DctoInvoice(this.customer_id)
-                if(this.dc_list == null)
+                await this.Items_DctoInvoice(this.customer_id)
+                console.log("dc list",this.dc_list)
+                if(this.dc_list == null || this.dc_list.length == 0)
                 {
+                  confirm
                     this.LoadItemDetails()
                     return
                 }
@@ -489,9 +511,11 @@ dropdownSettings = {
         this.isDropdownAppendedToBody = true;
     }
   }
+
 alldata :any
 alldata1:any
-  customer_address(id)
+
+  customer_address(id: any)
   {
     this.api.get('get_data.php?table=customer_address&find=customer_id&value=' + id + '&find1=type&value1=1&authToken=' + environment.authToken).then((data: any) => {
 
@@ -504,7 +528,7 @@ alldata1:any
   }).catch(error => { this.toastrService.error('Something went wrong'); });
   }
 
-  ReloadBillAddr(id)
+  ReloadBillAddr(id: any)
   {
 
     this.api.get('get_data.php?table=customer_address&find=cust_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
@@ -521,7 +545,7 @@ alldata1:any
     }).catch(error => { this.toastrService.error('Something went wrong'); });
   }
 
-  ReloadShippAddr(id) {
+  ReloadShippAddr(id: any) {
 
     this.api.get('get_data.php?table=customer_address&find=cust_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
       this.shipp_addr = data[0];
@@ -538,7 +562,7 @@ alldata1:any
     }).catch(error => { this.toastrService.error('Something went wrong'); });
   }
 
-  async  Project_DctoInvoice(event)
+  async  Project_DctoInvoice(event :any)
   {
 
       await  this.api.get('project_dc_list.php?project_id='+event+'&authToken=' + environment.authToken).then((data: any) =>
@@ -549,24 +573,22 @@ alldata1:any
 
   }
 
-  async  Items_DctoInvoice(event)
+  async  Items_DctoInvoice(event  :any)
   {
-
       await  this.api.get('customer_item_dclist.php?customer_id='+event+'&authToken=' + environment.authToken).then((data: any) =>
         {
           this.dc_list = data;
-          console.log("Dc List : ", data)
+          console.log("Dc List : ", this.dc_list)
         }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
-
   }
 
   dc_item_List:any
 
-  async  Dcitems(event)
+  async  Dcitems(event :any)
     {
       console.log("multiple event",event)
         console.log("dc list before ",this.selectedDCs)
-         var dc_no = this.dc_list.find(i => i.dc_id == event.dc_id)
+         var dc_no = this.dc_list.find((i: any) => i.dc_id == event.dc_id)
         //  this.selectedDCs.push(event)
             console.log("dc list after",this.selectedDCs)
          console.log(dc_no.dc_number)
@@ -632,7 +654,8 @@ alldata1:any
                 quantity    : [item.qty],
                 amount      : [item.total],
                 uom         : [item.uom],
-                item_name   : [item_name]
+                item_name   : [item_name],
+                dispatch    : [item.dispatch_id]
               }));
 
             // Call priceChange with latest index
@@ -644,12 +667,12 @@ alldata1:any
   }
 
 
-  SlecetAllDcitems(event)
+  SlecetAllDcitems(event :any)
   {
       console.log(event)
       var data =event
 
-      data.forEach(async element => {
+      data.forEach(async (element: { dc_id: string; }) => {
           console.log("element : ",element)
         await this.api.get('get_data.php?table=dc_item&find=dc_id&value='+element.dc_id+'&authToken=' + environment.authToken).then((data: any) =>
         {
@@ -677,7 +700,8 @@ alldata1:any
                 price       : [item.amount],
                 quantity    : [item.qty],
                 amount      : [item.total],
-                uom         : [item.uom]
+                uom         : [item.uom],
+                dispatch    : [item.dispatch_id]
               }));
 
             // Call priceChange with latest index
@@ -694,7 +718,7 @@ alldata1:any
   }
 
 
-    RemoveDcitems(event) {
+    RemoveDcitems(event: any) {
       console.log(event)
 
       console.log("Updated list: ", this.selectedDCs);
@@ -715,7 +739,7 @@ alldata1:any
     }
 
 
-async  UnSlecetAllDcitems(event) {
+async  UnSlecetAllDcitems(event: any) {
           let product = this.invoice.get('product') as FormArray;
 
           if (product.length > 1) {
@@ -732,7 +756,7 @@ async  UnSlecetAllDcitems(event) {
        await this.SubTotalChange();
 }
 
-  async LoadGST(mode)
+  async LoadGST(mode: any)
   {
     await this.api.get('get_data.php?table=tax&find=type&value=' + mode + '&authToken=' + environment.authToken).then((data: any) =>
     {
@@ -747,7 +771,7 @@ async  UnSlecetAllDcitems(event) {
       }
   }
 
-  async FetchAddress(data)
+  async FetchAddress(data: any)
   {
     for (let i = 0; i < data.bill_address.length; i++)
     {
@@ -789,7 +813,7 @@ async  UnSlecetAllDcitems(event) {
     this.new_category_id = this.modalService.open(this.new_category, { size: 'md' });
   }
 
-  Billdate(a)
+  Billdate(a: any)
   {
     this.dueDateChange();
     this.invoiceDate  = a;
@@ -797,7 +821,7 @@ async  UnSlecetAllDcitems(event) {
     this.followingDay = new Date(current.getTime() + (this.dueValues * 24 * 60 * 60 * 1000));
     this.fullDate     = this.followingDay.toISOString().substring(0, 10);
   }
-  dueDates(s, BillDate)
+  dueDates(s: any, BillDate: any)
   {
     this.dueValues    = s;
     var current       = new Date(this.invoiceDate || BillDate);
@@ -811,11 +835,11 @@ async  UnSlecetAllDcitems(event) {
   }
 
 
-  async onSubmit(bill_data)
+  async onSubmit(bill_data: any)
   {
     Object.keys(this.invoice.controls).forEach(field => {
       const control = this.invoice.get(field);
-      control.markAsTouched({ onlySelf: true });
+      control?.markAsTouched({ onlySelf: true });
     });
     console.log("dc list ",this.selectedDCs)
        console.log("Invoice data : ",bill_data)
@@ -882,13 +906,16 @@ async  UnSlecetAllDcitems(event) {
       price       : new FormControl('', Validators.required),
       quantity    : new FormControl('', Validators.required),
       amount      : new FormControl('', Validators.required),
-      uom         : new FormControl('', Validators.required)
+      uom         : new FormControl('', Validators.required),
+      dispatch    : new FormControl(''),
     }))
   }
 
   item_id: any
   item_name : any
-  patchValues(i)
+  item_dispatch: any
+
+  patchValues(i: number)
   {
     console.log()
     let x = (<FormArray>this.invoice.controls['product']).at(i);
@@ -901,11 +928,12 @@ async  UnSlecetAllDcitems(event) {
       descriptions : this.descriptions,
       uom      : this.uom,
       items    : this.item_id,
-      item_name: this.item_name
+      item_name: this.item_name,
+      dispatch : this.item_dispatch
     });
   }
 
-  async specItem(item,i)
+  async specItem(item : any,i : number)
   {
     this.item_id = item
 
@@ -924,7 +952,9 @@ async  UnSlecetAllDcitems(event) {
         this.amount       = data[0].price;
         this.descriptions = data[0].description;
         this.uom          = data[0].uom;
-        this.item_name    = data[0].name
+        this.item_name    = data[0].name;
+        this.item_dispatch= 0;
+
    }).catch(error => { this.toastrService.error('Something went wrong'); });
 
     const formData = {
@@ -942,7 +972,7 @@ async  UnSlecetAllDcitems(event) {
   }
 
 
-  async specProject(item,i)
+  async specProject(item : any,i : number)
   {
     this.item_id = item
    await this.api.get('get_data.php?table=projects&find=project_id&value=' + item + '&authToken=' + environment.authToken).then((data: any) => {
@@ -952,6 +982,7 @@ async  UnSlecetAllDcitems(event) {
         this.amount       = data[0].project_value;
         this.descriptions = data[0].description;
         this.uom          = "Nos";
+        this.item_dispatch= 0;
    }).catch(error => { this.toastrService.error('Something went wrong'); });
 
    await this.api.get('get_data.php?table=product_type&find=id&value=' + this.type_id + '&authToken=' + environment.authToken).then((data: any) => {
@@ -985,8 +1016,8 @@ async  UnSlecetAllDcitems(event) {
           return;
         }
 
-        let sum = arr .map(a => Number(a.amount) || 0) // ensure `amount` is a number or 0
-          .reduce((a, b) => a + b, 0);     // provide initial value 0
+        let sum = arr .map((a: { amount: any }) => Number(a.amount) || 0) // ensure `amount` is a number or 0
+          .reduce((a: any, b: any) => a + b, 0);     // provide initial value 0
 
         this.subtotal = sum;
         this.invoice.controls['subTotal'].setValue(sum.toFixed(2));
@@ -1001,7 +1032,7 @@ async  UnSlecetAllDcitems(event) {
 
   tdsCalculation()
   {
-     let tds =  ((this.subtotal+this.total_tax)*(this.tds_percent/100)).toFixed(2);
+     let tds =  ((this.subtotal)*(this.tds_percent/100)).toFixed(2);
      this.invoice.controls['TDS'].setValue(tds);
      this.FinalTotalCalculation();
   }
@@ -1021,7 +1052,7 @@ async  UnSlecetAllDcitems(event) {
     let Shipping_Value  = this.invoice.controls['shippingCharge'].value;
     let Roundof_Value   = this.invoice.controls['roundOff'].value;
 
-    let TotalGST: number = this.GST_Data.map(a => a.amount).reduce(function(a, b)
+    let TotalGST: number = this.GST_Data.map((a: { amount: any }) => a.amount).reduce(function(a: any, b: any)
     {
       return a + b;
     });
@@ -1033,19 +1064,19 @@ async  UnSlecetAllDcitems(event) {
 
   GSTCalculation() {
 
-    this.GST_Data.forEach(data => {
+    this.GST_Data.forEach((data:any) => {
       data.amount = 0;
     });
 
     this.total_tax = 0;
     let products = (<FormArray>this.invoice.controls['product']).value;
-    products.forEach(product => {
+    products.forEach((product: any) => {
 
       let taxValue = (product.amount / 100) * product.taxes;
       let taxAmount = parseFloat(taxValue.toFixed(2));
       this.total_tax  += (product.amount / 100) * product.taxes;
 
-      this.GST_Data.forEach(data => {
+      this.GST_Data.forEach((data: any) => {
         if (data.rate === product.taxes)
         {
           data.amount += taxAmount;
@@ -1058,7 +1089,7 @@ async  UnSlecetAllDcitems(event) {
     this.FinalTotalCalculation();
   }
 
-  GSTCalculation_tax(value,j)
+  GSTCalculation_tax(value:any,j:number)
   {
     this.taxes        = parseInt(value);
 
@@ -1072,7 +1103,7 @@ async  UnSlecetAllDcitems(event) {
     this.FinalTotalCalculation();
   }
 
-  qty(qty, price, i)
+  qty(qty: any, price: any, i: number)
   {
     this.amount = qty * price;
     let x = (<FormArray>this.invoice.controls['product']).at(i);
@@ -1082,7 +1113,7 @@ async  UnSlecetAllDcitems(event) {
     this.SubTotalChange();
   }
 
-  priceChange(qty, price, i)
+  priceChange(qty: any, price: any, i: number)
   {
     this.amount = qty * price;
     let x       = (<FormArray>this.invoice.controls['product']).at(i);
@@ -1091,7 +1122,7 @@ async  UnSlecetAllDcitems(event) {
     });
     this.SubTotalChange();
   }
-  onDeleteRow(rowIndex)
+  onDeleteRow(rowIndex: number)
   {
     let product = this.invoice.get('product') as FormArray;
     if (product.length > 1) {
@@ -1131,12 +1162,12 @@ async  UnSlecetAllDcitems(event) {
     return this.options.filter(option => option.toLowerCase().includes(filterValue));
   }
 
-  onSelect({ selected }) {
+  onSelect({ selected }: { selected: any[] }) {
     this.selected.splice(0, this.selected.length);
     this.selected.push(...selected);
   }
 
-  onActivate(event)
+  onActivate(event: any)
   {
     if (event.type === "click")
     {
@@ -1159,7 +1190,7 @@ async  UnSlecetAllDcitems(event) {
     }
   }
 
-  updateFilter(event) {
+  updateFilter(event: any) {
     // const val = event.target.value.toLowerCase();
     // const temp = this.temp.filter(function (d) {
     //  return d.customer_name.toLowerCase().indexOf(val) !== -1 || !val || d.invoice_number.toLowerCase().indexOf(val) !== -1 || !val;
@@ -1177,10 +1208,10 @@ async  UnSlecetAllDcitems(event) {
     this.table.offset = 0;
   }
 
-  updateFilter_item(event)
+  updateFilter_item(event: any)
   {
     const val = event.target.value.toLowerCase();
-    const temp = this.ItemList_temp.filter((d) => {
+    const temp = this.ItemList_temp.filter((d: any) => {
       return Object.values(d).some(field =>
         field != null && field.toString().toLowerCase().indexOf(val) !== -1
       );
@@ -1195,7 +1226,7 @@ async  UnSlecetAllDcitems(event) {
 
   selected_item: any
   insert_index : any
-  ItemSelect(event)
+  ItemSelect(event:any)
   {
     if(event.type == "click")
     {
@@ -1262,7 +1293,7 @@ async  UnSlecetAllDcitems(event) {
     this.selected      = [];
     this.LoadCustomerBills();
   }
-async  AddSubmit(data)
+async  AddSubmit(data:any)
   {
 
     this.type=data;
@@ -1281,12 +1312,13 @@ async  AddSubmit(data)
 
      if(this.type === "items")
      {
-      await  this.api.get('mp_item_list_load.php?authToken=' + environment.authToken).then((data: any) =>
-        {
-
-          this.ItemList = data;
-          console.log("item",data)
-        }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
+        await this.api.get('mp_item_list.php?&authToken=' + environment.authToken).then((data: any) =>
+          {
+            console.log("item : ",data)
+            this.ItemList = data.filter((i: any) => i.sales ==1);
+            this.ItemList_temp = [...data.filter((i: any) => i.sales ==1)]
+            console.log("Filter : ",this.ItemList)
+          }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
      }
 
     }
@@ -1299,11 +1331,43 @@ async  AddSubmit(data)
   }
 
 
-  Item_popUp(i)
+  Item_popUp(i: any)
   {
-    this.insert_index = i
-    console.log(i)
-    this.new_category_id = this.modalService.open(this.ItemListModel, { size: 'xl' });
+    if(this.dc_apply == 0)
+    {
+      this.insert_index = i
+      console.log(i)
+      this.new_category_id = this.modalService.open(this.ItemListModel, { size: 'xl' });
+    }
+  }
+
+  async DcPermission($event: any)
+  {
+
+    console.log("dc apply ",this.dc_apply)
+    const formArray         = this.invoice.get('product') as FormArray;
+    const formArrayLength   = formArray.length;
+    const formArrayControls = formArray.controls;
+    for (let i = formArrayControls.length-1; i >= 0; i--)
+    {
+      const control = formArrayControls[i];
+      formArray.removeAt(i);
+    }
+
+    this.invoice.controls['subTotal'].setValue(0);
+    this.invoice.controls['shippingCharge'].setValue(0);
+    this.invoice.controls['TCS'].setValue(0);
+    this.invoice.controls['TDS'].setValue(0);
+    this.invoice.controls['roundOff'].setValue(0);
+
+    this.tds_percent = 0;
+    this.tcs_percent = 0;
+
+      this.GSTCalculation();
+    this.initProduct();
+ await this.Items_DctoInvoice(this.customer_id)
+    this.loading=false;
+
   }
 }
 

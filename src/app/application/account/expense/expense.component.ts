@@ -16,8 +16,8 @@ import { DatatableComponent } from '@swimlane/ngx-datatable';
 })
 export class ExpenseComponent implements OnInit
 {
-  @ViewChild("delete", { static: true }) delete   : ElementRef;
-  @ViewChild(DatatableComponent) table: DatatableComponent;
+  @ViewChild("delete", { static: true }) delete   !: ElementRef;
+  @ViewChild(DatatableComponent) table !: DatatableComponent;
   public user_bank_id = localStorage.getItem('bank_id');
   public user_type    = localStorage.getItem('type');
   public uid          = localStorage.getItem('uid');
@@ -29,11 +29,11 @@ export class ExpenseComponent implements OnInit
 
   invoice_list        : any;
   bill_list           : any;
-  all_account         = [];
-  user_account        = [];
-  company_account     = [];
-  cash_account        = [];
-  gst_account         = [];
+  all_account         :any []= [];
+  user_account        :any []= [];
+  company_account     :any []= [];
+  cash_account        :any []= [];
+  gst_account         :any []= [];
   addExpen            : FormGroup;
   balance             : any;
   bankData            : any;
@@ -109,9 +109,11 @@ export class ExpenseComponent implements OnInit
   {
     this.api.get('mp_expense_list.php?authToken=' + environment.authToken).then((data: any) =>
       {
-
-        this.expense_list = data;
-        this.temp = [...data];
+        if(data != null)
+        {
+          this.expense_list = data;
+          this.temp = [...data];
+        }
 
       }).catch(error => {this.toastrService.error('API Faild : loadData tax'); });
   }
@@ -138,8 +140,11 @@ export class ExpenseComponent implements OnInit
 
     await this.api.get('get_data.php?table=expense_account&find=status&value=1&authToken=' + environment.authToken).then((exp_acc: any) =>
     {
-      this.exp_acc_info = exp_acc;
-      this.feedData_exp(exp_acc);
+      if(exp_acc != null)
+      {
+        this.exp_acc_info = exp_acc;
+        this.feedData_exp(exp_acc);
+      }
     }).catch(error => {this.toastrService.error('API Faild : loadData expense '); });
 
     await this.api.get('get_data.php?table=tax&authToken=' + environment.authToken).then((gst_per: any) =>
@@ -187,7 +192,7 @@ export class ExpenseComponent implements OnInit
     this.addExpen.controls['tax_rate'].setValue(this.cal_tax);
   }
 
-  feedData(data)
+  feedData(data:any)
   {
     console.log("bank data api : ",data)
     this.bankData = [];

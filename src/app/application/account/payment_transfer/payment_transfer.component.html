@@ -1,6 +1,6 @@
-<div class="row">
-  <div class="col-xl-6 col-lg-6 col-12 bottom-30">
-    <div widget class="card">
+<div class="row" style="max-height: 600px;">
+  <div class="col-xl-6 col-lg-6 col-12 ">
+    <div widget class="card"  >
         <div class="card-header">
             <span>ADD NEW TRANSACTION</span>
             <div class="widget-controls">
@@ -147,7 +147,46 @@
         </div>
         <div class="card-body widget-body">
 
-            <table class="table table-hover">
+
+        <div style="max-height: 590px;  overflow-y: auto;">
+        <table class="table table-hover">
+          <thead style="position: sticky; top: 0; z-index: 1; background-color: #fff;">
+            <tr>
+              <th>Bank ID</th>
+              <th>Bank</th>
+              <th>Balance</th>
+            </tr>
+          </thead>
+          <tbody *ngIf="this.user_type === 'super_admin' || this.user_type === 'admin' || this.user_type === 'Admin_Purchase'">
+
+            <tr *ngFor="let data of company_account">
+              <td *ngIf="this.user_type === 'super_admin'" scope="row">{{data.bank_id}}</td>
+              <td *ngIf="this.user_type === 'super_admin'">{{data.account_name}}</td>
+              <th *ngIf="this.user_type === 'super_admin'">{{data.balance | indianCurrency}}</th>
+            </tr>
+
+            <tr *ngFor="let data of cash_account">
+              <td scope="row">{{data.bank_id}}</td>
+              <td>{{data.account_name}}</td>
+              <th>{{data.balance | indianCurrency}}</th>
+            </tr>
+
+            <tr *ngFor="let data of all_account">
+              <td scope="row">{{data.bank_id}}</td>
+              <td>{{data.account_name}}</td>
+              <th>{{data.balance | indianCurrency}}</th>
+            </tr>
+
+            <tr *ngFor="let data of gst_account">
+              <td scope="row">{{data.bank_id}}</td>
+              <td>{{data.account_name}}</td>
+              <th>{{data.balance | indianCurrency}}</th>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+            <!-- <table class="table table-hover">
                 <thead>
                     <tr>
                         <th>Bank ID</th>
@@ -181,7 +220,7 @@
                     <td>{{data.account_name}}</td>
                     <th>{{data.balance | indianCurrency}}</th>
                   </tr>
-                </tbody>
+                </tbody> -->
                 <!-- <tbody *ngIf="this.user_type != 'super_admin'">
                   <tr *ngFor= "let data of user_account">
                     <td scope="row">{{data.bank_id}}</td>
@@ -189,7 +228,7 @@
                     <th>{{data.balance | indianCurrency}}</th>
                   </tr>
                 </tbody> -->
-            </table>
+
 
         </div>
     </div>

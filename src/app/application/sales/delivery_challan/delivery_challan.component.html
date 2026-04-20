@@ -33,75 +33,83 @@
       </div>
 
     </div>
-    <div class="col-md-12">
-      <ngx-datatable style="cursor: pointer;" #table class="custom_table"
-        [headerHeight]="50"
-        [limit]="16"
-        [columnMode]="'flex'"
-        [columns]="columns"
-        [footerHeight]="50"
-        [rowHeight]="'auto'"
-        [rows]="CustomerBillList"
-        [selected]="selected"
-        [selectionType]="'single'"
-        (activate)="onActivate($event)"
-        (select)='onSelect($event)'>
 
-        <ngx-datatable-column       [resizeable]="false" prop="dc_date" [flexGrow]="1" name="DATE">
-          <ng-template ngx-datatable-cell-template let-row="row">
-            {{row.dc_date  | date: 'dd-MM-yyyy'}}
-          </ng-template>
-        </ngx-datatable-column>
+    &nbsp;
+     <div class="row">
+        <div class="col-md-12">
+          <div widget class="card">
+              <div class="card-body widget-body">
+          <ngx-datatable style="cursor: pointer;" #table class="custom_table"
+            [headerHeight]="50"
+            [limit]="16"
+            [columnMode]="'flex'"
+            [columns]="columns"
+            [footerHeight]="50"
+            [rowHeight]="'auto'"
+            [rows]="CustomerBillList"
+            [selected]="selected"
+            [selectionType]="'single'"
+            (activate)="onActivate($event)"
+            (select)='onSelect($event)'>
 
-        <ngx-datatable-column       [resizeable]="false" prop="dc_number" [flexGrow]="1" name="DC NO">
-          <ng-template ngx-datatable-cell-template let-row="row">
-            <span style="font-weight:bold;">{{row.dc_number}}</span>
-          </ng-template>
-        </ngx-datatable-column>
-        <ngx-datatable-column       [resizeable]="false" prop="reference_number" [flexGrow]="1" name="REFF NUMBER">
-          <ng-template ngx-datatable-cell-template let-row="row">
-            <span *ngIf="row.reference_number != ''"> {{row.reference_number}}</span>
-            <span *ngIf="row.reference_number == ''"> Nill</span>
-          </ng-template>
-        </ngx-datatable-column>
-
-        <ngx-datatable-column       [resizeable]="false" prop="customer_name" [flexGrow]="2" name="VENDOR NAME">
-          <ng-template ngx-datatable-cell-template let-row="row">
-            <span style="font-weight:bold;">{{row.customer_name}}</span>
-          </ng-template>
-        </ngx-datatable-column>
-
-        <ngx-datatable-column       [resizeable]="false" prop="total" [flexGrow]="1" name="BILL AMOUNT">
-          <ng-template ngx-datatable-cell-template let-row="row">
-            {{row.total | indianCurrency}}
-          </ng-template>
-        </ngx-datatable-column>
-
-
-       <ngx-datatable-column  name="INV STATUS" prop="use_invoice"  [resizeable]="false" [flexGrow]="1">
-
+            <ngx-datatable-column       [resizeable]="false" prop="dc_date" [flexGrow]="1" name="DATE">
               <ng-template ngx-datatable-cell-template let-row="row">
-                <ng-container [ngSwitch]="row.use_invoice">
-                <span *ngIf="row.use_invoice === 1" style="color:#2e7d32;">Invoiced</span>
-                <span *ngIf="row.use_invoice === 0" style="color:#c26100;">Not Invoice</span>
-
-
-                </ng-container>
+                {{row.dc_date  | date: 'dd-MM-yyyy'}}
               </ng-template>
-
             </ngx-datatable-column>
 
-        <ngx-datatable-column  [resizeable]="false" prop="dc_status" [flexGrow]="1" name="DISPATCH ">
-                <ng-template ngx-datatable-cell-template let-row="row">
-                  <span *ngIf="row.dc_status == 'No Items'" style="color: red;"> {{row.dc_status}} </span>
-                  <span *ngIf="row.dc_status == 'Moved to Dispatch'" style="color: green;"> {{row.dc_status}} </span>
-                    <span *ngIf="row.dc_status == 'Partially Moved Dispatch'" style="color: rgb(138, 139, 25);"> {{row.dc_status}} </span>
-                    <span *ngIf="row.dc_status == 'Not Dispatch'" style="color: red;"> {{row.dc_status}} </span>
-                </ng-template>
-              </ngx-datatable-column>
+            <ngx-datatable-column       [resizeable]="false" prop="dc_number" [flexGrow]="1" name="DC NO">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                <span style="font-weight:bold;">{{row.dc_number}}</span>
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column       [resizeable]="false" prop="reference_number" [flexGrow]="1" name="REFF NUMBER">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                <span *ngIf="row.reference_number != ''"> {{row.reference_number}}</span>
+                <span *ngIf="row.reference_number == ''"> Nill</span>
+              </ng-template>
+            </ngx-datatable-column>
 
-      </ngx-datatable>
-    </div>
+            <ngx-datatable-column       [resizeable]="false" prop="customer_name" [flexGrow]="2" name="VENDOR NAME">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                <span style="font-weight:bold;">{{row.customer_name}}</span>
+              </ng-template>
+            </ngx-datatable-column>
+
+            <ngx-datatable-column       [resizeable]="false" prop="total" [flexGrow]="1" name="BILL AMOUNT">
+              <ng-template ngx-datatable-cell-template let-row="row">
+                {{row.total | indianCurrency}}
+              </ng-template>
+            </ngx-datatable-column>
+
+
+          <ngx-datatable-column  name="INV STATUS" prop="use_invoice"  [resizeable]="false" [flexGrow]="1">
+
+                  <ng-template ngx-datatable-cell-template let-row="row">
+                    <ng-container [ngSwitch]="row.use_invoice">
+                    <span *ngIf="row.use_invoice === 1" style="color:#2e7d32;">Invoiced</span>
+                    <span *ngIf="row.use_invoice === 0" style="color:#c26100;">Not Invoice</span>
+
+
+                    </ng-container>
+                  </ng-template>
+
+                </ngx-datatable-column>
+
+            <ngx-datatable-column  [resizeable]="false" prop="dc_status" [flexGrow]="1" name="DISPATCH ">
+                    <ng-template ngx-datatable-cell-template let-row="row">
+                      <span *ngIf="row.dc_status == 'No Items'" style="color: red;"> {{row.dc_status}} </span>
+                      <span *ngIf="row.dc_status == 'Moved to Dispatch'" style="color: green;"> {{row.dc_status}} </span>
+                        <span *ngIf="row.dc_status == 'Partially Moved Dispatch'" style="color: rgb(138, 139, 25);"> {{row.dc_status}} </span>
+                        <span *ngIf="row.dc_status == 'Not Dispatch'" style="color: red;"> {{row.dc_status}} </span>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+          </ngx-datatable>
+            </div>
+          </div>
+        </div>
+      </div>
   </div>
 </div>
 

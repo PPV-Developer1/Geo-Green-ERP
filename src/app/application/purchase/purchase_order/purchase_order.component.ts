@@ -54,19 +54,18 @@ export class Purchase_orderComponent implements OnInit {
   GST_Length               : any;
   show:boolean=false;
 
-  addForm                  : FormGroup;
-  product                  : FormGroup;
-  po                       : FormGroup;
+  addForm                  !: FormGroup;
+  po                       !: FormGroup;
   myControl                = new FormControl();
 
-  imageToShow              : string | ArrayBuffer;
-  billPerfix               : string;
+  imageToShow              !: string | ArrayBuffer;
+  billPerfix               !: string;
 
   imgUrl                   : string = '../../../../assets/img/logo/geogreen.png';
 
   rows                     = [];
-  temp                     = [];
-  selected                 = [];
+  temp                     : any[] =        [];
+  selected                 : any[] = [];
   options                  : string[] = ['One', 'Two', 'Three'];
   SelectionType            = SelectionType;
 
@@ -149,13 +148,14 @@ export class Purchase_orderComponent implements OnInit {
   private resizing = false;
   tableWidth:any = 100
 
-  @ViewChild(DatatableComponent) table: DatatableComponent;
+  @ViewChild(DatatableComponent) table !: DatatableComponent;
 
-  @ViewChild("customer_name", { static: true }) customer_name: ElementRef;
-  @ViewChild('tableResponsive', { static: false }) tableResponsive: ElementRef;
-  @ViewChild('dropdownPanel', { static: false }) dropdownPanel: ElementRef;
-   @ViewChild("ItemListModel", { static: true }) ItemListModel   : ElementRef;
-   @ViewChild('Itemstable', { static: false }) Itemstable: DatatableComponent;
+  @ViewChild("customer_name", { static: true }) customer_name !: ElementRef;
+  @ViewChild('tableResponsive', { static: false }) tableResponsive !: ElementRef;
+  @ViewChild('dropdownPanel', { static: false }) dropdownPanel !: ElementRef;
+  @ViewChild("ItemListModel", { static: true }) ItemListModel   !: ElementRef;
+  @ViewChild('Itemstable', { static: false }) Itemstable !: DatatableComponent;
+
   constructor
   (
     public  fb           : FormBuilder,
@@ -316,8 +316,8 @@ export class Purchase_orderComponent implements OnInit {
      await this.api.get('mp_item_list.php?&authToken=' + environment.authToken).then((data: any) =>
     {
       console.log("item : ",data)
-      this.ItemList = data.filter(i => i.purchase ==1);
-      this.ItemList_temp = [...data.filter(i => i.purchase ==1)]
+      this.ItemList = data.filter( (i :any) => i.purchase ==1);
+      this.ItemList_temp = [...data.filter((i :any) => i.purchase ==1)]
       console.log("Filter : ",this.ItemList)
     }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
   }
@@ -350,7 +350,7 @@ export class Purchase_orderComponent implements OnInit {
   }
 
 
-  async VendorSelection(id)
+  async VendorSelection(id: number)
   {
     this.formShow  = false;
     this.vendor_id = id;
@@ -446,7 +446,7 @@ export class Purchase_orderComponent implements OnInit {
     this.vendor_address(this.vendor_id);
   }
 
-  async LoadGST(mode)
+  async LoadGST(mode: any)
   {
     await this.api.get('get_data.php?table=tax&find=type&value=' + mode + '&authToken=' + environment.authToken).then((data: any) =>
     {
@@ -460,7 +460,7 @@ export class Purchase_orderComponent implements OnInit {
       }
   }
 
-  async FetchAddress(data)
+  async FetchAddress(data: any)
   {
     for (let i = 0; i < data.bill_address.length; i++)
     {
@@ -497,7 +497,7 @@ export class Purchase_orderComponent implements OnInit {
     }
   }
 
-  Billdate(a)
+  Billdate(a : any)
   {
     // this.dueDateChange();
     this.invoiceDate  = a;
@@ -506,7 +506,7 @@ export class Purchase_orderComponent implements OnInit {
     this.fullDate     = this.followingDay.toISOString().substring(0, 10);
   }
 
-  dueDates(s, BillDate)
+  dueDates(s : number, BillDate: any)
   {
     this.dueValues = s;
     var current       = new Date(this.invoiceDate || BillDate);
@@ -518,11 +518,13 @@ export class Purchase_orderComponent implements OnInit {
     this.po.controls["paymentTerms"].setValue(this.payment_terms);
   }
 
-  async onSubmit(bill_data)
+  async onSubmit(bill_data:any)
   {
     Object.keys(this.po.controls).forEach(field => {
       const control = this.po.get(field);
-      control.markAsTouched({ onlySelf: true });
+      if (control) {
+        control.markAsTouched({ onlySelf: true });
+      }
     });
     if (this.po.valid)
     {
@@ -591,7 +593,7 @@ export class Purchase_orderComponent implements OnInit {
     }))
     this.adjustTableHeight()
   }
-  patchValues(id,i)
+  patchValues(id : any,i : number)
   {
     let x = (<FormArray>this.po.controls['product']).at(i);
     x.patchValue({
@@ -607,7 +609,7 @@ export class Purchase_orderComponent implements OnInit {
       item_name : this.item_name
     });
   }
-  async specItem(item,i)
+  async specItem( item : any,i : number)
   {
     await this.api.get('get_data.php?table=item&find=item_id&value=' + item + '&authToken=' + environment.authToken).then((data: any) => {
 
@@ -642,7 +644,7 @@ export class Purchase_orderComponent implements OnInit {
   SubTotalChange()
   {
     let arr = this.po.controls['product'].value;
-    let sum: number = arr.map(a => parseFloat(a.amount)).reduce(function(a, b)
+    let sum: number = arr.map((a: any) => parseFloat(a.amount)).reduce(function(a: number, b: number)
     {
       return a + b;
     });
@@ -657,7 +659,7 @@ export class Purchase_orderComponent implements OnInit {
   tdsCalculation()
   {
     let subtotal = Number(this.subtotal)
-     let tds =  ((subtotal+this.total_tax)*(this.tds_percent/100)).toFixed(2);
+     let tds =  ((subtotal)*(this.tds_percent/100)).toFixed(2);
      this.po.controls['TDS'].setValue(tds);
      this.FinalTotalCalculation();
   }
@@ -678,8 +680,7 @@ export class Purchase_orderComponent implements OnInit {
     let Shipping_Value  = this.po.controls['shippingCharge'].value;
     let Roundof_Value   = this.po.controls['roundOff'].value;
 
-    let TotalGST: number = this.GST_Data.map(a => parseFloat (a.amount)).reduce(function(a, b)
-    {
+    let TotalGST: number = this.GST_Data.map((a: any) => parseFloat(a.amount)).reduce(function(a: number, b: number) {
       return a + b;
     });
 
@@ -689,17 +690,17 @@ export class Purchase_orderComponent implements OnInit {
 
   GSTCalculation() {
 
-    this.GST_Data.forEach(data => {
+    this.GST_Data.forEach((data: any) => {
       data.amount = 0;
     });
 
     this.total_tax = 0
     let products = (<FormArray>this.po.controls['product']).value;
-    products.forEach(product => {
+    products.forEach((product: any) => {
       let taxValue = (product.amount / 100) * product.taxes;
       let taxAmount = parseFloat(taxValue.toFixed(2));
       this.total_tax += taxAmount
-      this.GST_Data.forEach(data => {
+      this.GST_Data.forEach((data: any) => {
         if (data.rate === product.taxes)
         {
           data.amount += taxAmount;
@@ -710,7 +711,7 @@ export class Purchase_orderComponent implements OnInit {
     this.FinalTotalCalculation();
   }
 
-  qty(qty, price,discount_1,discount_2, i)
+  qty(qty: any, price: any, discount_1: any, discount_2: any, i: any)
   {
     let dis_1=  price - (discount_1/100)*price;
     let dis_2= dis_1 - (discount_2/100)*dis_1;
@@ -723,7 +724,7 @@ export class Purchase_orderComponent implements OnInit {
 
   }
 
-  discount_Change(qty, price,discount_1,discount_2, i)
+  discount_Change(qty: any, price: any, discount_1: any, discount_2: any, i: any)
   {
 
     let dis_1=  price - (discount_1/100)*price;
@@ -736,7 +737,7 @@ export class Purchase_orderComponent implements OnInit {
     this.SubTotalChange();
   }
 
-  priceChange(qty, price,discount_1,discount_2, i)
+  priceChange(  qty: any, price: any,discount_1: any,discount_2: any, i: any)
   {
     let dis_1=  price - (discount_1/100)*price;
     let dis_2= dis_1 - (discount_2/100)*dis_1;
@@ -749,7 +750,7 @@ export class Purchase_orderComponent implements OnInit {
     this.SubTotalChange();
   }
 
- async onDeleteRow(rowIndex)
+ async onDeleteRow(rowIndex: number)
   {
     let product = this.po.get('product') as FormArray;
     if (product.length > 1) {
@@ -763,7 +764,9 @@ export class Purchase_orderComponent implements OnInit {
   createImageFromBlob(image: Blob) {
     let reader = new FileReader();
     reader.addEventListener("load", () => {
-      this.imageToShow = reader.result;
+      if (reader.result) {
+        this.imageToShow = reader.result;
+      }
     }, false);
     if (image) {
       reader.readAsDataURL(image);
@@ -783,12 +786,12 @@ export class Purchase_orderComponent implements OnInit {
     const filterValue = value.toLowerCase();
     return this.options.filter(option => option.toLowerCase().includes(filterValue));
   }
-  onSelect({ selected }) {
+  onSelect({ selected }: { selected: any[] }) {
     this.selected.splice(0, this.selected.length);
     this.selected.push(...selected);
   }
 
-  onActivate(event)
+  onActivate(event:any)
   {
     if (event.type === "click")
     {
@@ -796,7 +799,7 @@ export class Purchase_orderComponent implements OnInit {
       this.show=true;
     }
   }
-  updateFilter(event) {
+  updateFilter(event: any) {
 
         const val = event.target.value.toLowerCase();
         const temp = this.temp.filter((d) => {
@@ -857,7 +860,7 @@ export class Purchase_orderComponent implements OnInit {
 
     if(this.VendorPOList != null)
     {
-      let value = this.VendorPOList.find(item => item.po_number === billNoValue);
+      let value = this.VendorPOList.find((item: any) => item.po_number === billNoValue);
         if(value != undefined)
         {
           this.toastrService.error('PO number has already been entered')
@@ -870,7 +873,7 @@ export class Purchase_orderComponent implements OnInit {
 
 
 
-   vendor_address(id)
+   vendor_address(id :number)
   {
     this.api.get('get_data.php?table=vendor_address&find=vendor_id&value=' + id + '&find1=type&value1=1&authToken=' + environment.authToken).then((data: any) => {
 
@@ -885,7 +888,7 @@ export class Purchase_orderComponent implements OnInit {
   }
 
 
-  ItemSelect(event)
+  ItemSelect(event:any)
   {
     if(event.type == "click")
     {
@@ -907,7 +910,7 @@ export class Purchase_orderComponent implements OnInit {
       await this.specItem(this.selected_item.item_id,this.insert_index)
   }
 
-  Item_popUp(i)
+  Item_popUp(i: number)
   {
     this.insert_index = i
     console.log(i)
@@ -915,7 +918,7 @@ export class Purchase_orderComponent implements OnInit {
     this.popup = this.modalService.open(this.ItemListModel, { size: 'xl' });
   }
 
-  updateFilter_item(event)
+  updateFilter_item(event: any)
   {
     const val = event.target.value.toLowerCase();
     const temp = this.ItemList_temp.filter((d) => {
@@ -931,7 +934,7 @@ export class Purchase_orderComponent implements OnInit {
 
   }
 
-  ReloadBillAddr(id)
+  ReloadBillAddr(id: number)
   {
     console.log("ReloadBillAddr id : ",id)
     this.api.get('get_data.php?table=vendor_address&find=vendor_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
@@ -948,7 +951,7 @@ export class Purchase_orderComponent implements OnInit {
     }).catch(error => { this.toastrService.error('Something went wrong'); });
   }
 
-  ReloadShippAddr(id) {
+  ReloadShippAddr(id: number) {
 
     this.api.get('get_data.php?table=vendor_address&find=vendor_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
       this.shipp_addr = data[0];

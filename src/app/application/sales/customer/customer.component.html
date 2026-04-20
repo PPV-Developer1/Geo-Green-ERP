@@ -139,6 +139,16 @@
                                     placeholder="Enter Name ">
                                 </td>
                               </tr>
+
+                              <tr>
+                                <th>Contact Name</th>
+                                <td>
+                                  <input type="text" style="border: none;" class="form-control "
+                                    [readonly]="change" [(ngModel)]="edit_contact_name" (ngModelChange)="edit_cus_name()" formControlName="contact_name"
+                                    placeholder="Enter Name ">
+                                </td>
+                              </tr>
+
                               <tr>
                                 <input type="hidden" [(ngModel)]="customer_id" formControlName="customer_id">
                                 <th>Customer type</th>

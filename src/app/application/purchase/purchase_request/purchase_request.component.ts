@@ -167,8 +167,7 @@ export class Purchase_requestComponent implements OnInit {
         poNo       : [null, Validators.compose([Validators.required])],
         reference_number: [null],
         billDate  : [(new Date()).toISOString().substring(0, 10)],
-        paymentTerms: ['', Validators.compose([Validators.required])],
-        dueDate    : [(new Date()).toISOString().substring(0, 10)],
+
         subTotal   : [0],
         shippingCharge: [0],
         TCS        : [0],
@@ -434,6 +433,7 @@ po_prefix : any
     {
         await this.api.get('mp_po.php?&value=' + this.vendor_id + '&authToken=' + environment.authToken).then((data: any) =>
         {
+          console.log("vendor details : ",data)
           this.FetchAddress(data[0]);
 
           this.company_name    = data[0].company_name;
@@ -443,7 +443,7 @@ po_prefix : any
           this.stateCode       = data[0].place_from_supply_code;
           this.payment_terms   = data[0].payment_terms;
 
-          let MyPaymentTerm    = data[0].my_payment_terms;
+          // let MyPaymentTerm    = data[0].my_payment_terms;
           let po_id            = data[0].serial_no + 1;
           this.po_prefix        = data[0].prefix ;
           this.po_no           =  po_id;
@@ -452,11 +452,11 @@ po_prefix : any
           const today = new Date();
           let date = today.toISOString().split('T')[0];
           this.po.controls['billDate'].setValue(date);
-          if(MyPaymentTerm != null)
-            {
-              this.dueDates(MyPaymentTerm, date);
-              this.po.controls['paymentTerms'].setValue(MyPaymentTerm)
-            }
+          // if(MyPaymentTerm != null)
+          //   {
+          //     this.dueDates(MyPaymentTerm, date);
+          //     this.po.controls['paymentTerms'].setValue(MyPaymentTerm)
+          //   }
           if(this.stateCode == 33)
           {
             this.LoadGST('GST');
@@ -467,7 +467,7 @@ po_prefix : any
             this.LoadGST('IGST');
             this.po.controls['tax_type'].setValue("IGST");
           }
-        }).catch(error => { this.toastrService.error('Something went wrong'); });
+        }).catch(error => { this.toastrService.error('Something went wrong 12'); });
       }
       else{
         this.GSTCalculation()
@@ -480,12 +480,12 @@ po_prefix : any
     this.api.get('get_data.php?table=vendor_address&find=vendor_id&value=' + id + '&find1=type&value1=1&authToken=' + environment.authToken).then((data: any) => {
 
         this.alldata = data;
-    }).catch(error => { this.toastrService.error('Something went wrong 1'); });
+    }).catch(error => { this.toastrService.error('Something went wrong'); });
 
     this.api.get('get_data.php?table=vendor_address&find=vendor_id&value=' + id + '&find1=type&value1=2&authToken=' + environment.authToken).then((data: any) => {
 
       this.alldata1 = data;
-  }).catch(error => { this.toastrService.error('Something went wrong 2'); });
+  }).catch(error => { this.toastrService.error('Something went wrong'); });
 
   }
 
@@ -650,7 +650,7 @@ po_prefix : any
   tdsCalculation()
   {
     let subtotal = Number(this.subtotal)
-    let tds =  ((subtotal + this.total_tax)*(this.tds_percent/100)).toFixed(2);
+    let tds =  ((subtotal )*(this.tds_percent/100)).toFixed(2);
     this.po.controls['TDS'].setValue(tds);
     this.FinalTotalCalculation();
   }
@@ -847,17 +847,23 @@ po_prefix : any
       const control = this.po.get(field);
       control.markAsTouched({ onlySelf: true });
     });
+    console.log("po value: ",this.po.value)
     if (this.po.valid)
     {
       const billNoValue = this.po_prefix + this.po_no;
       function normalizeString(str : any) {
         return str.replace(/\s+/g, '').toLowerCase();
       }
+      console.log("normalized bill no : ",billNoValue)
       let checking :any
       await this.api.get('get_data.php?table=po&authToken=' + environment.authToken).then((data: any) =>
 
         {
-          checking = data.some((item: { po_number: any; }) =>  normalizeString(item.po_number) ===  normalizeString(billNoValue) );
+          console.log("po list : ",data)
+          if(data != null)
+          {
+            checking = data.some((item: { po_number: any; }) =>  normalizeString(item.po_number) ===  normalizeString(billNoValue) );
+          }
         }).catch(error =>
           {
               this.toastrService.error('API Faild : PO number checking failed');

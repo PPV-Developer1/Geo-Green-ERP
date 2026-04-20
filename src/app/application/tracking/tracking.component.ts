@@ -101,14 +101,17 @@ export class TrackingComponent implements OnInit {
         }).catch(error => {this.toastrService.error('Something went wrong');});
   }
 
-  onActivate(event)
+  project_dc      :any
+  project_invoice :any
+
+ async onActivate(event)
   {
     if(event.type === "click")
     {
 
       this.detail_view = event.row;
       this.p_id = this.detail_view['id'];
-      this.api.get('mp_project_tracking.php?authToken='+environment.authToken+'&project_id='+this.p_id).then((data: any) =>
+     await this.api.get('mp_project_tracking.php?authToken='+environment.authToken+'&project_id='+this.p_id).then((data: any) =>
         {
               console.log(data)
               this.track_data = data[0];
@@ -124,6 +127,27 @@ export class TrackingComponent implements OnInit {
                 }
               this.value =((parseInt(data[0].project_asso_cost) + asso_cost + parseInt(data[0].expense_total_amount))/(parseInt(data[0].project_value)/100)).toFixed(2) ;
               return true;
+
+        }).catch(error =>
+        {
+            this.toastrService.error('Something went wrong');
+        });
+
+
+       await this.api.get('project_invoice_list.php?authToken='+environment.authToken+'&project_id='+this.p_id).then((data: any) =>
+        {
+              console.log("invoice",data)
+              this.project_invoice = data
+
+        }).catch(error =>
+        {
+            this.toastrService.error('Something went wrong');
+        });
+
+      await this.api.get('project_bills.php?authToken='+environment.authToken+'&project_id='+this.p_id).then((data: any) =>
+        {
+              console.log("dc",data)
+              this.project_dc = data
 
         }).catch(error =>
         {

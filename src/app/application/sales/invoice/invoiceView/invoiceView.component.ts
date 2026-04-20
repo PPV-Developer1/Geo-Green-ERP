@@ -13,7 +13,7 @@ import { InvoiceItem} from "../../class/invoiceItem";
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { formatDate } from '@angular/common';
 import { stringify } from 'querystring';
-import { json } from 'd3';
+import { dispatch, json } from 'd3';
 import { AppState } from 'src/app/app.state';
 declare let $: any;
 
@@ -35,17 +35,17 @@ pdfMake.fonts = {
   styleUrls  : ['./invoiceView.component.scss']
 })
 export class InvoiceViewComponent implements OnInit {
-  public router: Router;
+  public router !: Router;
 
   SelectionType     = SelectionType;
   selected          = [];
-  invoicePdf        = [];
-  all_account       = [];
-  user_account      = [];
-  company_account   = [];
-  cash_account      = [];
-  gst_account       = [];
-  invoiceItems      : [];
+  invoicePdf        : any []= [];
+  all_account       :any[]= [];
+  user_account      :any []= [];
+  company_account   :any[]= [];
+  cash_account      :any[]= [];
+  gst_account       :any[]= [];
+  invoiceItems      : any [] = [];
 
   show_new_bill             : boolean = false;
   loading                   : boolean = false;
@@ -176,7 +176,7 @@ export class InvoiceViewComponent implements OnInit {
   invoice_payment           : FormGroup;
   e_way_bill                : FormGroup;
   advance                   : FormGroup;
-  imageToShow               : string | ArrayBuffer;
+  imageToShow               !: string | ArrayBuffer | null;
   today                     = new Date();
   todaysDate                = '';
   item_index                : any;
@@ -189,7 +189,7 @@ export class InvoiceViewComponent implements OnInit {
   originalTableHeight       : any
   private dropdownOpen      = false;
   e_way_bill_status :boolean = false;
-
+  use_dc :any =0;
   imgUrl: string = '../../../../assets/img/logo/geogreen.png';
  // imgUrl: string =  'https://chart.googleapis.com/chart?chs=100x100&cht=qr&chl=http://ppvgroups.org/test.php?id=100001';
 
@@ -201,6 +201,7 @@ export class InvoiceViewComponent implements OnInit {
   selectedDCs             : any[]  = [];  // instead of null
   temp                    : any[]  = [];
   ItemList_temp           : any[]  = [];
+  dc_apply      : any = 0;
   dropdownSettings = {
     singleSelection: false,
     idField: 'dc_id',
@@ -212,12 +213,12 @@ export class InvoiceViewComponent implements OnInit {
     enableCheckAll: false
   };
 
-  @ViewChild("ItemListModel", { static: true }) ItemListModel   : ElementRef;
-  @ViewChild('Itemstable', { static: false }) Itemstable: DatatableComponent;
-  @ViewChild("delete",{static:true}) delete:ElementRef;
-  @ViewChild('tableResponsive', { static: false }) tableResponsive: ElementRef;
-  @ViewChild("delete_item",{static:true}) delete_item:ElementRef;
-  @ViewChild("delete_item_dc",{static:true}) delete_item_dc:ElementRef;
+  @ViewChild("ItemListModel", { static: true }) ItemListModel   !: ElementRef;
+  @ViewChild('Itemstable', { static: false }) Itemstable !: DatatableComponent;
+  @ViewChild("delete",{static:true}) delete !:ElementRef;
+  @ViewChild('tableResponsive', { static: false }) tableResponsive !: ElementRef;
+  @ViewChild("delete_item",{static:true}) delete_item !:ElementRef;
+  @ViewChild("delete_item_dc",{static:true}) delete_item_dc !:ElementRef;
   constructor(private api: ApiService, private modalService: NgbModal, private imgToBase64: ImgToBase64Service, public toastrService: ToastrService,
     router:Router, public fb: FormBuilder,private scriptService: ScriptService, private renderer: Renderer2,private _state : AppState)
     {
@@ -227,6 +228,7 @@ export class InvoiceViewComponent implements OnInit {
       created_by: [this.uid],
       customerId: ['', Validators.compose([Validators.required])],
       billFrom  : [''],
+      use_dc    : [0],
       shipFrom  : [null],
       invoiceNo : [null, Validators.compose([Validators.required])],
       reference_number: [null],
@@ -259,6 +261,7 @@ export class InvoiceViewComponent implements OnInit {
         created_by: [this.uid],
         customerId: ['', Validators.compose([Validators.required])],
         billFrom  : [],
+
         shipFrom  : [null],
         invoiceNo : [null, Validators.compose([Validators.required])],
         reference_number: [null],
@@ -315,10 +318,10 @@ export class InvoiceViewComponent implements OnInit {
   }
 
 
-  @ViewChild(DatatableComponent) table: DatatableComponent;
-  @ViewChild("addPayment", { static: true }) addPayment: ElementRef;
-  @ViewChild("ewayBill", { static: true }) ewayBill   : ElementRef;
-  @ViewChild("use_advancePayment", { static: true }) use_advancePayment: ElementRef;
+  @ViewChild(DatatableComponent) table !: DatatableComponent;
+  @ViewChild("addPayment", { static: true }) addPayment !: ElementRef;
+  @ViewChild("ewayBill", { static: true }) ewayBill   !: ElementRef;
+  @ViewChild("use_advancePayment", { static: true }) use_advancePayment !: ElementRef;
 
   async ngOnInit()
   {
@@ -437,7 +440,7 @@ fontload()
     }
   }
 
-   updateFilter(event) {
+   updateFilter(event : any) {
     const val = event.target.value.toLowerCase();
     const temp = this.temp.filter((d) => {
       return Object.values(d).some(field =>
@@ -456,10 +459,11 @@ fontload()
       this.invoice_id = data[0].invoice_id;
       this.invoicePdf   = data;
       this.status   = data[0].status
+      this.use_dc   = data[0].use_dc
         console.log("invoicePdf ",this.invoicePdf)
        if(this.invoicePdf[0].dc_data != null)
          {
-            const dcNumbers = this.invoicePdf[0].dc_data.map(item => item.dc_number);
+            const dcNumbers = this.invoicePdf[0].dc_data.map((item: any) => item.dc_number);
 
                   if (dcNumbers.length > 0) {
                     const parts = dcNumbers[0].split('/');
@@ -467,7 +471,7 @@ fontload()
 
                     const formattedDcNo =
                       prefix +
-                      dcNumbers.map(dc => dc.split('/').pop()).join(', ');
+                      dcNumbers.map((dc: string) => dc.split('/').pop()).join(', ');
 
                     this.invoicePdf[0]['dc_no'] = `${formattedDcNo}`;
                     console.log("Formatted DC No:", formattedDcNo);
@@ -525,7 +529,7 @@ fontload()
       this.CustomerBillList = data;
       this.temp   = data;
       var selectedId  = this.view_invoice;
-      let selectedRow = this.CustomerBillList.find(item => item.invoice_id == selectedId);
+      let selectedRow = this.CustomerBillList.find((item: any) => item.invoice_id == selectedId);
       if (selectedRow)
       {
         this.selected = [selectedRow];
@@ -535,7 +539,7 @@ fontload()
     }).catch(error => { this.toastrService.error('Something went wrong in LoadCustomerInvoice 3'); });
   }
 
-  scrollToSelectedRow(selectedId) {
+  scrollToSelectedRow(selectedId:any) {
     const uniqueId = `invoice-row-${selectedId}`;
     const selectedRow = document.getElementById(uniqueId);
     if (selectedRow) {
@@ -543,7 +547,7 @@ fontload()
     }
   }
 
-  onActivate(event)
+  onActivate(event :any)
   {
 
     if (event.type === "click")
@@ -582,7 +586,7 @@ fontload()
         // this.invoicePdf[0]['dc_no'] =this.invoicePdf[0].dc_data.map(item => item.dc_number).join(", ");
          if(this.invoicePdf[0].dc_data != null)
          {
-            const dcNumbers = this.invoicePdf[0].dc_data.map(item => item.dc_number);
+            const dcNumbers = this.invoicePdf[0].dc_data.map((item: any) => item.dc_number);
 
                   if (dcNumbers.length > 0) {
                     const parts = dcNumbers[0].split('/');
@@ -590,7 +594,7 @@ fontload()
 
                     const formattedDcNo =
                       prefix +
-                      dcNumbers.map(dc => dc.split('/').pop()).join(', ');
+                      dcNumbers.map((dc: any) => dc.split('/').pop()).join(', ');
 
                     this.invoicePdf[0]['dc_no'] = `${formattedDcNo}`;
                     console.log("Formatted DC No:", formattedDcNo);
@@ -608,7 +612,7 @@ fontload()
 
     }
 
-onSelect({ selected })
+onSelect({ selected  })
 {
   this.selected.splice(0, this.selected.length);
   this.selected.push(...selected);
@@ -637,8 +641,8 @@ async LoadItemDetails()
     await this.api.get('mp_item_list.php?&authToken=' + environment.authToken).then((data: any) =>
     {
       console.log("item : ",data)
-      this.ItemList = data.filter(i => i.sales ==1);
-      this.ItemList_temp = [...data.filter(i => i.sales ==1)]
+      this.ItemList = data.filter((i:any) => i.sales ==1);
+      this.ItemList_temp = [...data.filter((i:any) => i.sales ==1)]
       console.log("Filter : ",this.ItemList)
     }).catch(error => { this.toastrService.error('Something went wrong in LoadItemDetails'); });
   }
@@ -649,6 +653,7 @@ async edit_dataload()
   await this.api.get('mp_invoice_edit_data.php?value=' +  invoice_id  + '&authToken=' + environment.authToken).then((data: any) => {
      if(data != null)
        {
+        console.log("edit_data  : ",data)
          this.invoice_item     = data[0];
          this.invoiceitem_list = data[0].invoice_items;
          this.edit_ItemList    = data[0].items_list;
@@ -656,6 +661,7 @@ async edit_dataload()
          this.invoice_type     = data[0].inv_type;
          this.customer_id      = data[0].customer_id;
          this.taxempty         = data[0].tax_mode;
+         this.dc_apply        = data[0].use_dc;
        }
      }).catch(error => { this.toastrService.error('Something went wrong 1'); });
 
@@ -688,7 +694,7 @@ async edit_dataload()
 
 }
 
- updateFilter_item(event)
+ updateFilter_item(event:any)
   {
     const val = event.target.value.toLowerCase();
     const temp = this.ItemList_temp.filter((d) => {
@@ -705,7 +711,7 @@ async edit_dataload()
   }
 
 
-clone_address(id)
+clone_address(id :any)
 {
 
    this.api.get('get_data.php?table=customer_address&find=customer_id&value='+id+'&find1=status&value1=1&authToken=' + environment.authToken).then((data: any) =>
@@ -721,7 +727,7 @@ clone_address(id)
 }
 
 
-async FetchAddress(data)
+async FetchAddress(data:any)
   {
 
   if(this.clone_invoice_show == true && this.show_invoice_edit == false)
@@ -792,7 +798,7 @@ async FetchAddress(data)
 
   }
 
-  Billdate(a)
+  Billdate(a:any)
   {
     this.dueDateChange();
     this.invoiceDate  = a;
@@ -800,7 +806,7 @@ async FetchAddress(data)
     this.followingDay = new Date(current.getTime() + (this.dueValues * 24 * 60 * 60 * 1000));
     this.fullDate     = this.followingDay.toISOString().substring(0, 10);
   }
-  dueDates(s, BillDate)
+  dueDates(s:any, BillDate:any)
   {
     this.dueValues    = s;
     var current       = new Date(this.invoiceDate || BillDate);
@@ -827,11 +833,12 @@ async FetchAddress(data)
       quantity    : new FormControl('', Validators.required),
       amount      : new FormControl('', Validators.required),
       uom         : new FormControl('', Validators.required),
-      edit_status : [true]
+      edit_status : [true],
+      dispatch    : new FormControl(''),
     }))
   }
 
-  async edit_LoadGST(mode)
+  async edit_LoadGST(mode:any)
   {
       await this.api.get('get_data.php?table=tax&find=type&value=' + mode + '&authToken=' + environment.authToken).then((data: any) =>
       {
@@ -882,7 +889,7 @@ async FetchAddress(data)
   const product1 = this.Edit_invoice.get('product') as FormArray;
   product1.clear();
   console.log(this.invoiceitem_list)
-  this.invoiceitem_list.forEach((item,j) => {
+  this.invoiceitem_list.forEach((item:any,j:any) => {
     product1.push(this.fb.group({
       dc_id       : [item.dc_id],
       type        : "edit",
@@ -895,7 +902,8 @@ async FetchAddress(data)
       quantity    : [item.qty],
       amount      : [item.total],
       uom         : [item.uom],
-      edit_status : [item.edit_status]
+      edit_status : [item.edit_status],
+      dispatch    : [item.dispatch_id],
     }));
     console.log(product1.value)
      let qty   = item.qty;
@@ -914,7 +922,7 @@ async FetchAddress(data)
 
     if(dc_data != null)
     {
-        dc_data.forEach(async  element => {
+        dc_data.forEach(async  (element: { dc_id: string; }) => {
             await  this.api.get('get_data.php?table=dc&find=dc_id&value='+element.dc_id+'&authToken=' + environment.authToken).then((data: any) =>
                     {
                       console.log("Dc List : ", data)
@@ -945,7 +953,7 @@ async FetchAddress(data)
       dc_list:any[]=[]
       dc_item_List:any
 
-  async  Dcitems(event)
+  async  Dcitems(event: any)
     {
       console.log(event)
         console.log("List : ",this.dc_list)
@@ -1006,7 +1014,8 @@ async FetchAddress(data)
                 amount      : [item.total],
                 uom         : [item.uom],
                 item_name   : [item_name],
-                edit_status : [true]
+                edit_status : [true],
+                dispatch    : [item.dispatch_id],
               }));
 
             // Call priceChange with latest index
@@ -1019,7 +1028,7 @@ async FetchAddress(data)
 
 
 
-  async  Project_DctoInvoice(event)
+  async  Project_DctoInvoice(event:any)
   {
       await  this.api.get('project_dc_list.php?project_id='+event+'&authToken=' + environment.authToken).then((data: any) =>
         {
@@ -1032,7 +1041,7 @@ async FetchAddress(data)
 
 
 
-  async  Items_DctoInvoice(event)
+  async  Items_DctoInvoice(event:any)
   {
 
       await  this.api.get('customer_item_dclist.php?customer_id='+event+'&authToken=' + environment.authToken).then((data: any) =>
@@ -1049,12 +1058,12 @@ async FetchAddress(data)
   }
 
 
-  SlecetAllDcitems(event)
+  SlecetAllDcitems(event:any)
   {
       console.log(event)
       var data =event
 
-      data.forEach(async element => {
+      data.forEach(async (element: { dc_id: string; }) => {
           console.log("element : ",element)
         await this.api.get('get_data.php?table=dc_item&find=dc_id&value='+element.dc_id+'&authToken=' + environment.authToken).then((data: any) =>
         {
@@ -1106,7 +1115,7 @@ async FetchAddress(data)
 dc_id:any
 remove_data :any[]=[]
 
-    RemoveDcitems(event) {
+    RemoveDcitems(event:any) {
       console.log(event)
       this.remove_data = [...this.selectedDCs];
       console.log("Updated list: ", this.selectedDCs);
@@ -1148,6 +1157,7 @@ remove_data :any[]=[]
        this.loading=true
      await this.api.post('delete_invoice_dc_Items.php?authToken='+environment.authToken,fordata).then((data: any) =>
         {
+          console.log(data)
              this.new_category_id.close();
              this.loading = false
               for (let i = editproduct.length - 1; i >= 0; i--) {
@@ -1200,7 +1210,7 @@ remove_data :any[]=[]
       }
   }
 
-async  UnSlecetAllDcitems(event) {
+async  UnSlecetAllDcitems(event:any) {
           let product = this.Edit_invoice.get('product') as FormArray;
 
           if (product.length > 1) {
@@ -1219,7 +1229,7 @@ async  UnSlecetAllDcitems(event) {
 
 item_id: any
 item_name : any
-async edit_specItem(item,j)
+async edit_specItem(item:any,j:any)
   {
    await this.api.get('get_data.php?table=item&find=item_id&value=' + item + '&authToken=' + environment.authToken).then((data: any) => {
 
@@ -1253,7 +1263,7 @@ async edit_specItem(item,j)
   }
 
 
-  async specProject(item,i)
+  async specProject(item:any,i:any)
   {
     this.item_id = item
    await this.api.get('get_data.php?table=projects&find=project_id&value=' + item + '&authToken=' + environment.authToken).then((data: any) => {
@@ -1278,7 +1288,7 @@ async edit_specItem(item,j)
     this.edit_GSTCalculation()
   }
 
- async edit_patchValues(id,j)
+ async edit_patchValues(id:any,j:any)
   {
 
     let y = (<FormArray>this.Edit_invoice.controls['product']).at(j);
@@ -1294,7 +1304,7 @@ async edit_specItem(item,j)
     });
   }
 
-  edit_priceChange(qty, price, j)
+  edit_priceChange(qty:any, price:any, j:any)
   {
     this.amount = Number(qty * price).toFixed(2);
     let y       = (<FormArray>this.Edit_invoice.controls['product']).at(j);
@@ -1304,7 +1314,7 @@ async edit_specItem(item,j)
     this.edit_SubTotalChange();
   }
 
- edit_qty(qty, price, j)
+ edit_qty(qty:any, price:any, j:any)
   {
     this.amount = Number(qty * price).toFixed(2);
     let y       = (<FormArray>this.Edit_invoice.controls['product']).at(j);
@@ -1316,16 +1326,16 @@ async edit_specItem(item,j)
 
   edit_GSTCalculation()
   {
-    this.editGST_Data.forEach(data => {
+    this.editGST_Data.forEach((data:any) => {
       data.amount = 0;
     });
      this.total_tax =0;
     let products = (<FormArray>this.Edit_invoice.controls['product']).value;
-    products.forEach(product => {
+    products.forEach((product:any) => {
       let taxValue = (product.amount / 100) * product.taxes;
       let taxAmount = parseFloat(taxValue.toFixed(2));
        this.total_tax += taxAmount
-      this.editGST_Data.forEach(data => {
+      this.editGST_Data.forEach((data:any) => {
         if (data.rate === product.taxes)
         {
           data.amount += taxAmount;
@@ -1348,8 +1358,8 @@ async edit_specItem(item,j)
           this.Edit_invoice.controls['subTotal'].setValue('0.00');
           return;
         }
-     let sum1 = edit_arr .map(a => Number(a.amount) || 0) // ensure `amount` is a number or 0
-          .reduce((a, b) => a + b, 0);     // provide initial value 0
+     let sum1 = edit_arr .map((a:any) => Number(a.amount) || 0) // ensure `amount` is a number or 0
+          .reduce((a:any, b:any) => a + b, 0);     // provide initial value 0
 
     this.subtotal = sum1;
      console.log("subtotal: ",this.subtotal);
@@ -1364,7 +1374,7 @@ async edit_specItem(item,j)
   tdsCalculation()
   {
 
-     let tds = ((this.subtotal+this.total_tax)*(this.tds_percent/100)).toFixed(2);
+     let tds = ((this.subtotal)*(this.tds_percent/100)).toFixed(2);
      this.Edit_invoice.controls['TDS'].setValue(tds);
      this.edit_FinalTotalCalculation();
   }
@@ -1384,7 +1394,7 @@ async edit_specItem(item,j)
     let editShipping_Value  = this.Edit_invoice.controls['shippingCharge'].value;
     let editRoundof_Value   = this.Edit_invoice.controls['roundOff'].value;
 
-    let editTotalGST: number = this.editGST_Data.map(a => parseFloat (a.amount)).reduce(function(a, b)
+    let editTotalGST: number = this.editGST_Data.map((a:any) => parseFloat (a.amount)).reduce(function(a:any, b:any)
     {
       return a + b;
     });
@@ -1394,7 +1404,7 @@ async edit_specItem(item,j)
 
   item_DeleteId:any
 
- edit_onDeleteRow(rowIndex)
+ edit_onDeleteRow(rowIndex:any)
   {
     let editproduct = this.Edit_invoice.get('product') as FormArray;
      const delete_data = editproduct.at(rowIndex).value;
@@ -1418,7 +1428,7 @@ async edit_specItem(item,j)
   }
 
 
-   onDeleteRow(rowIndex)
+   onDeleteRow(rowIndex:any)
   {
     let editproduct=this.Edit_invoice.get('product') as FormArray;
     if (editproduct.length>0)
@@ -1456,13 +1466,13 @@ async edit_specItem(item,j)
     }).catch(error => { this.toastrService.error('Something went wrong'); });
   }
 
-  async edit_onSubmit(value)
+  async edit_onSubmit(value:any)
   {
     let invoice_id =  this.invoice_list['invoice_id'];
     let serial_no =  this.invoice_list['serial_no'];
        Object.keys(this.Edit_invoice.controls).forEach(field => {
        const control = this.Edit_invoice.get(field);
-       control.markAsTouched({ onlySelf: true });
+       control?.markAsTouched({ onlySelf: true });
        });
        if (this.Edit_invoice.valid)
          {
@@ -1514,7 +1524,7 @@ async edit_specItem(item,j)
  }
 
 
-async pdfDownload(files) {
+async pdfDownload(files:any) {
 
   const font = 'Roboto';
   let docDefinition = {
@@ -1540,7 +1550,7 @@ async pdfDownload(files) {
         },
         layout: {
           layout: 'lightHorizontalLines',
-          hLineWidth: function (i, node) {
+          hLineWidth: function (i:any, node:any) {
             return (i === 0 || i === node.table.body.length) ? 0 : 0;
           },
         },
@@ -1557,7 +1567,7 @@ async pdfDownload(files) {
       defaultStyle: {
         font: 'Roboto',
       },
-      footer: function(currentPage, pageCount) {
+      footer: function(currentPage:any, pageCount:any) {
               return {
                 columns: [
                   { text: 'For ' + files[0].company_name, alignment: 'right', margin: [0, 0, 40, 25],  fontSize: 8 },
@@ -1570,7 +1580,7 @@ async pdfDownload(files) {
 
 }
 
-getCompanyDetails(files) {
+getCompanyDetails(files:any) {
   var test = files[0].company_details[0];
 
   return {
@@ -1590,7 +1600,7 @@ getCompanyDetails(files) {
   };
 }
 
-getMobileDetails(files) {
+getMobileDetails(files:any) {
   var test = files[0].company_details[0]
   return {
     table: {
@@ -1604,14 +1614,14 @@ getMobileDetails(files) {
       ]
     },
     layout: {
-      hLineWidth: function (i, node) {
+      hLineWidth: function (i:any, node:any) {
         return (i === 0 || i === node.table.body.length) ? 0 : 0;
       },
     },
   }
 }
 
-getGstObject(files) {
+getGstObject(files:any) {
 
   var test = files[0]
   return {
@@ -1630,27 +1640,31 @@ getGstObject(files) {
 
 }
 
-getInvoiceObject(files) {
+getInvoiceObject(files:any) {
 
   var test = files[0]
   console.log(test)
   var order_numbers : any
-          if (test?.dc_data && test.dc_data.length > 0) {
+       if (test?.dc_data && test.dc_data.length > 0) {
 
-          const dcNumbers = test.dc_data
-            .map(item => item.dc_number)
-            .filter(Boolean);
+        const dcNumbers = test.dc_data
+          .map((item: any) => item.dc_number)
+          .filter(Boolean);
 
-          if (dcNumbers.length > 0) {
-            const parts = dcNumbers[0].split('/');
-            const prefix = parts.slice(0, -1).join('/') + '/';
+        if (dcNumbers.length > 0) {
 
-            order_numbers =
-              prefix + dcNumbers.map(dc => dc.split('/').pop()).join(', ');
+          // Take prefix from first DC number
+         const parts = dcNumbers[0].split('/');
+          const prefix = parts.slice(0, 2).join('/') + '/';
+          // GGEE/DC/
 
-            console.log("Formatted DC No:", order_numbers);
-          }
+          order_numbers = prefix + dcNumbers.map((dc: string) => dc.split('/').slice(2).join('/')).join(', ');
+
+
+          console.log("Formatted DC No:", order_numbers);
         }
+      }
+
 
     console.log(order_numbers);
   return {
@@ -1681,14 +1695,14 @@ getInvoiceObject(files) {
 
     layout: {
       layout: 'lightHorizontalLines',
-      hLineWidth: function (i, node) {
+      hLineWidth: function (i:any, node:any) {
         return (i === 0 || i === node.table.body.length) ? 1 : 1;
       },
     },
   }
 }
 
-getBillObject(files) {
+getBillObject(files:any) {
 
   var test = files[0]
 
@@ -1724,14 +1738,14 @@ getBillObject(files) {
     },
     layout: {
       layout: 'lightHorizontalLines',
-      hLineWidth: function (i, node) {
+      hLineWidth: function (i:any, node:any) {
         return (i === 0 || i === node.table.body.length) ? 0 : 0;
       },
     },
   }
 }
 
-getItemsObject(files) {
+getItemsObject(files:any) {
   var test = files[0].invoiceItems;
   var serialNumber = 1;
   if(files[0].place_from_supply_code == 33)
@@ -1766,7 +1780,7 @@ getItemsObject(files) {
         { text: 'Amt',fillColor: '#CCCCCC', bold: true, fontSize: 10,alignment:'center' },
         { text: '',fillColor: '#CCCCCC', border: [true, false, true, false], bold:true},
       ],
-      ...test.map((ed, index) => {
+      ...test.map((ed: any, index: number) => {
           let cellBorder = [true, true, true, false];
           if (index > 0) {
             cellBorder = [true, true, true, true];
@@ -1823,7 +1837,7 @@ getItemsObject(files) {
 
           { text: '',fillColor: '#CCCCCC', border: [true, false, true, false], bold:true},
         ],
-        ...test.map((ed, index) => {
+        ...test.map((ed: any, index: number) => {
             let cellBorder = [true, true, true, false];
             if (index > 0) {
               cellBorder = [true, true, true, true];
@@ -1849,7 +1863,7 @@ getItemsObject(files) {
 }
 
 
-getItemstotalObject(files) {
+getItemstotalObject(files: any) {
 
   var test = files[0];
   var tax  = files[0].tax_amount_percentage;
@@ -1951,7 +1965,7 @@ getItemstotalObject(files) {
 
 
 
-getBankObject(files) {
+getBankObject(files: any) {
 
   var test = files[0].company_details[0]
   var terms =files[0];
@@ -1989,7 +2003,7 @@ getBankObject(files) {
     layout: {
 
       layout: 'headerLineOnly',
-      hLineWidth: function (i, node) {
+      hLineWidth: function (i: number, node: any) {
         return (i === 0 || i === node.table.body.length) ? 0 : 0;
       },
     },
@@ -1998,7 +2012,7 @@ getBankObject(files) {
 
 
 
-getTermsObject(files) {
+getTermsObject(files: any) {
   var test = files[0]
 
   return {
@@ -2027,7 +2041,7 @@ getTermsObject(files) {
 
       layout: 'lightHorizontalLines',
 
-      hLineWidth: function (i, node) {
+      hLineWidth: function (i: number, node: any) {
         return (i === 0 || i === node.table.body.length) ? 1 : 0;
       },
     },
@@ -2064,7 +2078,7 @@ async payment()
   this.invoice_payment.controls['receipt_no'].setValue(serial_no);
 }
 
-load_paymentTransactiond(id)
+load_paymentTransactiond(id: any)
 {
   this.payment_view =false;
    this.api.get('get_data.php?table=payment_transactions&find=invoice_id&value='+id+'&asign_field=tran_id&asign_value=DESC&authToken=' + environment.authToken).then((data) =>
@@ -2103,7 +2117,7 @@ async openpop()
   }
 
 
-feedData(data)
+feedData(data: any)
   {
     this.bankData        = data;
     this.bankData_length = data.length;
@@ -2150,7 +2164,7 @@ feedData(data)
   }
 
 
-  async AddNewTrans(data)
+  async AddNewTrans(data:any)
   {
     let invoice_id =this.invoice_list.invoice_id;
     let amount =this.invoice_list.total;
@@ -2167,7 +2181,7 @@ feedData(data)
        Object.keys(this.invoice_payment.controls).forEach(field =>
         {
           const control = this.invoice_payment.get(field);
-          control.markAsTouched({ onlySelf: true });
+          control?.markAsTouched({ onlySelf: true });
         });
     if (this.invoice_payment.valid)
     {
@@ -2248,7 +2262,7 @@ feedData(data)
 
   }
 
-  async load_invoicenumber(id)
+  async load_invoicenumber(id:any)
  {
     this.details =id
    await  this.api.get('mp_invoice.php?&value=' + this.details.customer_id+ '&authToken=' + environment.authToken).then((data: any) =>
@@ -2270,12 +2284,12 @@ feedData(data)
    }).catch(error => { this.toastrService.error('Something went wrong ') });
 }
 
-async onSubmit(bill_data)
+async onSubmit(bill_data:any)
   {
 
     Object.keys(this.Edit_invoice.controls).forEach(field => {
       const control = this.Edit_invoice.get(field);
-      control.markAsTouched({ onlySelf: true });
+      control?.markAsTouched({ onlySelf: true });
     });
     if (this.Edit_invoice.valid)
     {
@@ -2371,7 +2385,7 @@ editclose()
   this.e_way_bill_status = true;
 }
 
-  async billSubmit(value)
+  async billSubmit(value:any)
   {
     // Object.keys(this.e_way_bill.controls).forEach(field => {
     //   const control = this.e_way_bill.get(field);
@@ -2438,7 +2452,8 @@ editclose()
   async ReqDelete()
   {
     let invoice_id =this.invoicePdf[0].invoice_id;
-    if(this.invoicePdf[0].dc_data !=  null)
+    console.log("DC Data: ", this.invoicePdf[0].dc_data);
+    if(this.invoicePdf[0].dc_data != null && this.invoicePdf[0].dc_data.length !=  0)
     {
       this.toastrService.error('This invoice linked in dc')
       return;
@@ -2469,7 +2484,7 @@ editclose()
     });
   }
 
-  customer_address(id)
+  customer_address(id:any)
   {
     this.api.get('get_data.php?table=customer_address&find=customer_id&value=' + id + '&find1=type&value1=1&authToken=' + environment.authToken).then((data: any) => {
 
@@ -2482,7 +2497,7 @@ editclose()
   }).catch(error => { this.toastrService.error('Something went wrong'); });
   }
 
-  ReloadBillAddr(id)
+  ReloadBillAddr(id:any)
   {
 
     this.api.get('get_data.php?table=customer_address&find=cust_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
@@ -2499,7 +2514,7 @@ editclose()
     }).catch(error => { this.toastrService.error('Something went wrong'); });
   }
 
-  ReloadShippAddr(id) {
+  ReloadShippAddr(id:any) {
 
     this.api.get('get_data.php?table=customer_address&find=cust_addr_id&value=' + id + '&authToken=' + environment.authToken).then((data: any) => {
       this.shipp_addr = data[0];
@@ -2519,7 +2534,7 @@ editclose()
   onInputChange()
   {
     const billNoValue = this.inv_no;
-    let value = this.CustomerBillList.find(item => item.invoice_number === billNoValue);
+    let value = this.CustomerBillList.find((item: any) => item.invoice_number === billNoValue);
        if(value != undefined)
        {
         this.toastrService.error('Invoice number has already been entered')
@@ -2541,7 +2556,7 @@ editclose()
 
       if (data != null)
       {
-        function levelFilter(value) {
+        function levelFilter(value: any) {
           if (!value) { return false; }
            return value.invoice_id === null;
           }
@@ -2552,13 +2567,13 @@ editclose()
      this.add_payment = this.modalService.open(this.use_advancePayment, { size: 'md' });
   }
 
-  Add_advance(data)
+  Add_advance(data: any)
   {
-   let select = this.advance_list.find(u => u.id == data.advance_id)
+   let select = this.advance_list.find((u:any) => u.id == data.advance_id)
 
     Object.keys(this.advance.controls).forEach(field => {
       const control = this.advance.get(field);
-      control.markAsTouched({ onlySelf: true });
+      control?.markAsTouched({ onlySelf: true });
     });
 
     if(this.advance.valid)
@@ -2601,7 +2616,7 @@ editclose()
   }
 
   insert_index : any
-  Item_popUp(i)
+  Item_popUp(i:any)
   {
     this.insert_index = i
     console.log(i)
@@ -2619,7 +2634,7 @@ editclose()
 
     selected_item: any
 
-  ItemSelect(event)
+  ItemSelect(event: any)
   {
     if(event.type == "click")
     {
@@ -2640,4 +2655,6 @@ editclose()
               }
       await this.edit_specItem(this.selected_item.item_id,this.insert_index)
   }
+
+
 }

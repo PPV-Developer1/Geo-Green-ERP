@@ -58,7 +58,7 @@
                   <a  class="dropdown-item" href="javascript:void(0);" (click)="use_advance()">Use Advance</a>
               </div>
                 <button type="button" class="btn btn-outline-info fa fa-pencil-square-o btn-sm" (click)="e_bill()"> Transport Vehicle Details</button>
-                <button type="button" class="btn btn-outline-info fa fa-copy btn-sm" (click)="clone()"> Clone</button>
+                <button type="button" class="btn btn-outline-info fa fa-copy btn-sm" [disabled]="use_dc == 1" (click)="clone()"> Clone</button>
                 <button type="button" class="btn btn-outline-danger fa fa-trash-o btn-sm" (click)="remove()"> Delete</button>
 
               </div>
@@ -577,7 +577,7 @@
               </div>
               &nbsp;
 
-            <div class="row mb-3" style="border: 1px solid #c9c9c9 !important;padding-top: 5px;padding-bottom: 5px;">
+            <div  *ngIf="dc_apply == 1" class="row mb-3" style="border: 1px solid #c9c9c9 !important;padding-top: 5px;padding-bottom: 5px;">
                     <label *ngIf="invoice_type == 'project'" class="col-sm-2 col-form-label col-form-label-sm">Project <span style="font-size: smaller;color: rgb(39, 39, 143);"> ( for dc list ) </span></label>
                           <div class="col-sm-4" *ngIf="invoice_type == 'project'">
 
@@ -587,7 +587,6 @@
                                                         {{item.name}}
                                                       </ng-option>
                                               </ng-select>
-
                           </div>
 
                            <label class="col-sm-2 col-form-label col-form-label-sm">Use DC</label>
@@ -735,7 +734,7 @@
                 </div>
                  </div>
              </div>
-              <div *ngIf="invoice_type== 'items'" class="row">
+              <div *ngIf="invoice_type== 'items'&& dc_apply == 0" class="row">
                 <div  class="col-sm-12">
                   <Button type="button" (click)="edit_initProduct()" class="btn btn-primary">+</Button>
                 </div>

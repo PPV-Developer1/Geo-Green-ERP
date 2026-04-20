@@ -33,7 +33,12 @@
       </div>
 
     </div>
-    <div class="col-md-12">
+
+     &nbsp;
+     <div class="row">
+        <div class="col-md-12">
+          <div widget class="card">
+              <div class="card-body widget-body">
       <ngx-datatable style="cursor: pointer;" #table class="custom_table"
         [headerHeight]="50"
         [limit]="16"
@@ -104,6 +109,9 @@
         </ngx-datatable-column>
       </ngx-datatable>
     </div>
+    </div>
+    </div>
+    </div>
 <!-- Starting -->
 <!-- Ending-->
   </div>
@@ -165,14 +173,13 @@
           <div class="header" style="height: auto; ">
             <form class="mt-3" [formGroup]="invoice">
               <div class="col">
+
+
+
                 <div class="row mb-1">
                   <label style="color: red" class="col-sm-2 mt-2 col-form-label col-form-label-sm">Customer Name*</label>
                   <div class="col-sm-7 mb-5">
-                    <!-- <select formControlName="customerId" class="form-control" (change)="VendorSelection($event.target.value)"
-                      placeholder="Select Customer name" placeholder="Enter Customer name">
-                      <option *ngFor="let Customer of vendorDetails" value="{{Customer.customer_id}}">
-                        {{Customer.company_name}}</option>
-                    </select> -->
+
 
 
                     <ng-select formControlName="customerId"  class=" form-control" (change)="VendorSelection($event)"
@@ -304,8 +311,28 @@
                     </div>
                   </div>
 
+                       <div class="row mb-1">
+                  <label style="color: red" class="col-sm-2 mt-2 col-form-label col-form-label-sm">Use DC</label>
+                  <div class="col-sm-4 mb-5">
+                    <!-- <select formControlName="customerId" class="form-control" (change)="VendorSelection($event.target.value)"
+                      placeholder="Select Customer name" placeholder="Enter Customer name">
+                      <option *ngFor="let Customer of vendorDetails" value="{{Customer.customer_id}}">
+                        {{Customer.company_name}}</option>
+                    </select> -->
+                      <select formControlName="use_dc" [(ngModel)]="dc_apply" (change)="DcPermission($event.target.value)" class="form-control custom-select">
 
-                   <div class="row mb-3" style="border: 1px solid #c9c9c9 !important;padding-top: 5px;padding-bottom: 5px;">
+                        <option value = 1 > Yes, Use Delivery Challan</option>
+                        <option value = 0 >No, Do Not Use Delivery Challan</option>
+                    </select>
+
+
+
+                    <span class="help-block text-danger"
+                      *ngIf="invoice.get('use_dc').touched && invoice.get('use_dc').hasError('required')">Required !</span>
+                  </div>
+                </div>
+
+                   <div *ngIf="dc_apply == 1" class="row mb-3" style="border: 1px solid #c9c9c9 !important;padding-top: 5px;padding-bottom: 5px;">
 
                     <label *ngIf="type == 'project'" class="col-sm-2 col-form-label col-form-label-sm">Project <span style="font-size: smaller;color: rgb(39, 39, 143);"> ( for dc list ) </span></label>
                           <div class="col-sm-4" *ngIf="type == 'project'">
@@ -320,18 +347,31 @@
 
                           </div>
 
-                           <label class="col-sm-2 col-form-label col-form-label-sm">Use DC</label>
+                           <label class="col-sm-2 col-form-label col-form-label-sm">DC List</label>
                           <div class="col-sm-3" >
                                       <ng-multiselect-dropdown
+                                     
                                           [placeholder]="'Select DCs'"
                                           [data]="dc_list"
-                                          [(ngModel)]="selectedDCs"
                                           [settings]="dropdownSettings"
                                           (onSelect)="Dcitems($event)"
                                           (onDeSelect)="RemoveDcitems($event)"
                                           (onSelectAll)="SlecetAllDcitems($event)"
                                           (onDeSelectAll)="UnSlecetAllDcitems($event)" formControlName="dc_data" >
                                         </ng-multiselect-dropdown>
+
+                                        <!-- <ng-select
+                                            class="form-control custom-select"
+                                            formControlName="project_list"
+                                            [items]="dc_list"
+                                            bindLabel="dc_number"
+                                            bindValue="dc_id"
+                                            [multiple]="true"
+                                            [clearable]="true"
+                                           >
+                                          </ng-select> -->
+
+
 
                           </div>
                   </div>
@@ -454,7 +494,7 @@
                       </div>
                     </div>
                   </div>
-                  <div  *ngIf="type =='items'" class="row">
+                  <div  *ngIf="type =='items' && dc_apply == 0" class="row">
                     <div class="col-sm-12">
                       <Button type="button" (click)="initProduct()" class="btn btn-primary">+</Button>
                     </div>

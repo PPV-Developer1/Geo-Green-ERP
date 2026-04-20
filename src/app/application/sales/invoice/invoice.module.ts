@@ -32,7 +32,8 @@ export const routes = [
     NgSelectModule,
     NTWModule,
     NgbModule,
-    ResizableModule,NgxSliderModule,NgMultiSelectDropDownModule
+    ResizableModule,NgxSliderModule,
+    NgMultiSelectDropDownModule.forRoot()
   ],
   declarations: [InvoiceComponent,InvoiceViewComponent]
 })

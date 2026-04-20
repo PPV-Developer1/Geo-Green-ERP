@@ -645,6 +645,7 @@ export class VendorComponent implements OnInit {
                 this.toastrService.error('Please Fill All Details');
               }
   }
+
  async onSubmit(vendor)
   {
               Object.keys(this.vendor.controls).forEach(field =>
@@ -1094,11 +1095,15 @@ async confirm()
             await this.api.get('get_data.php?table=vendor&authToken=' + environment.authToken).then((data: any) =>
 
               {
-                checking = data.some((item: { company_name: any; }) =>  normalizeString(item.company_name) ===  normalizeString(billNoValue) );
-                if(gstvalue != null)
+                if(data != null)
                 {
-                  checking_gst = data.some((item: { gst_number: any; }) =>  normalizeString(item.gst_number) ===  normalizeString(gstvalue) );
+                  checking = data.some((item: { company_name: any; }) =>  normalizeString(item.company_name) ===  normalizeString(billNoValue) );
+                  if(gstvalue != null)
+                  {
+                    checking_gst = data.some((item: { gst_number: any; }) =>  normalizeString(item.gst_number) ===  normalizeString(gstvalue) );
+                  }
                 }
+                else{checking = false; checking_gst = false;}
               }).catch(error =>
                 {
                     this.toastrService.error('API Faild : vendor details checking failed');

@@ -468,7 +468,7 @@ async  update(Batch)
         if(data.status == "success")
         {
           console.log("edit_project_id",this.edit_project_id)
-      await  this.api.get('mp_project_item_list.php?project_id='+ this.edit_project_id+'&authToken='+environment.authToken).then((data: any) =>
+      await  this.api.get('mp_project_item_list.php?dispatch_id='+ this.detail_view['id']+'&authToken='+environment.authToken).then((data: any) =>
             {
               console.log("After update item load",data)
               if(data != null)
@@ -736,7 +736,7 @@ async  update(Batch)
       this.loading = false;
       this.addnew_form = true;
       this.DispatchBy.controls['dispatch_by'].reset();
-
+        console.log("project id ",this.invoiceitem_list)
         this.project_id = this.invoiceitem_list[0].item_list_id;
 
     }
@@ -1108,11 +1108,11 @@ async  update(Batch)
         {
           this.project_asso_list  = null;
         }
-      }).catch(error => {this.toastrService.error('Something went wrong ');});
+      }).catch(error => {this.toastrService.error('Something went wrong');});
 
-      await this.api.get('mp_project_item_list.php?project_id='+ event.row.project_id+'&authToken='+environment.authToken).then((data: any) =>
+      await this.api.get('mp_project_item_list.php?dispatch_id='+ dispatch_id+'&authToken='+environment.authToken).then((data: any) =>
       {
-
+        console.log("Item data ",data)
          if(data != null)
          {
             var id  = this.detail_view['id'];
