@@ -1412,6 +1412,15 @@
                     <td>{{cgst_28|indianCurrency}}</td>
                     <td>{{igst_28|indianCurrency}}</td>
                   </tr>
+
+                  <tr>
+                    <td>Total</td>
+                    <td>{{(sgst_5 + sgst_12 + sgst_18 + sgst_28)|indianCurrency}}</td>
+                    <td>{{(op_igst_5 + op_igst_12 + op_igst_18 + op_igst_28)|indianCurrency}}</td>
+                    <td>{{(cgst_5 + cgst_12 + cgst_18 + cgst_28)|indianCurrency}}</td>
+                    <td>{{(igst_5 + igst_12 + igst_18 + igst_28)|indianCurrency}}</td>
+
+                  </tr>
               </tbody>
             </table>
           </div>
@@ -1589,7 +1598,7 @@
                       <span *ngIf="row.status ==2" style="color: green"><b>Paid</b></span>
                       </ng-template>
                     </ngx-datatable-column>
-                    
+
                     </ngx-datatable>
         </div>
   </div>
