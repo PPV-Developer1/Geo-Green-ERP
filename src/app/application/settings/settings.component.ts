@@ -193,7 +193,7 @@ export class SettingsComponent implements OnInit
 
   }
 
-  @ViewChild("edit_address", { static: true }) edit_address: ElementRef
+  @ViewChild("edit_address", { static: true }) edit_address : ElementRef
   @ViewChild("edit_prefix", { static: true }) edit_prefix: ElementRef
   @ViewChild("edit_product", { static: true }) edit_product: ElementRef
   @ViewChild("add_product", { static: true }) add_product: ElementRef
