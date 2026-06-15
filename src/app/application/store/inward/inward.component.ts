@@ -164,6 +164,13 @@ export class InwardComponent implements OnInit {
         const control = this.InwardEntry.get(field);
         control.markAsTouched({ onlySelf: true });
       });
+        if (this.InwardEntry.invalid) {
+          this.InwardEntry.markAllAsTouched();
+           this.toastrService.error('Please Fill all data!');
+        this.loading = false;
+          return;
+        }
+
       if(this.InwardEntry.valid)
       {
         const confirmed = confirm("Are you sure you want to inward?");
@@ -235,13 +242,10 @@ export class InwardComponent implements OnInit {
           }
         }).catch(error => {this.toastrService.error('Something went wrong');});
       }
-      else
-      {
-        this.toastrService.error('Please Fill all data!');
-        this.loading = false;
-      }
+
   }
 
+  
   updateFilter(event)
   {
     const val = event.target.value.toLowerCase();
@@ -262,7 +266,7 @@ export class InwardComponent implements OnInit {
     {
         let product = this.InwardEntry.get('seriel_no') as FormArray;
         product.push(this.fb.group({
-          seriel_number  : new FormControl(null,),
+          seriel_number  : new FormControl(null,Validators.required),
         }))
     }
   }

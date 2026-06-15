@@ -30,6 +30,8 @@ export class Serial_no_materialComponent implements OnInit {
           {
             this.ProductData = data;
             console.log(data)
+            if(data == null)
+            {this.toastrService.warning('No data found');}
           }).catch(error => {this.toastrService.error('Something went wrong');});
   }
 

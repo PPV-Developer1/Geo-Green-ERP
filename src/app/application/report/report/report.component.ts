@@ -116,7 +116,7 @@ export class ReportComponent implements OnInit {
   select_data      : any;
   company_datails  : any;
   vendor_details   : any;
-
+  salary_group     : any;
 
   public user_type = localStorage.getItem('type');
   public uid       = localStorage.getItem('type_id');
@@ -130,6 +130,7 @@ export class ReportComponent implements OnInit {
     });
 
     this.customer=fb.group({
+      salary_group_id : [null],
       customer_id :[null,Validators.compose([Validators.required])],
       from_date   :[null,Validators.compose([Validators.required])],
       to_date     :[null,Validators.compose([Validators.required])]
@@ -207,6 +208,16 @@ async  ngOnInit()
        }, 1000);
 
  }
+
+async onSalaryGroupSelect($event)
+ {
+  console.log($event)
+   await this.api.get('get_data.php?table=employee&find=status&value=1&find1=emp_type&value1='+$event+'&authToken='+environment.authToken).then((data: any) =>
+        {
+          console.log("employee_list",data)
+              this.employee_list = data;
+      }).catch(error => {this.toastrService.error('Something went wrong ');});
+}
 
 async itemLoad()
  {
@@ -316,6 +327,11 @@ async itemLoad()
     if(this.id ==  'attendance_report')
     {
       this.customer_payment = true;
+       this.api.get('get_data.php?table=employee_type&authToken=' + environment.authToken).then((data: any) =>
+      {
+        console.log("employee type ",data)
+        this.salary_group = data;
+      }).catch(error => { this.toastrService.error('API Faild : loadData salary group'); });
     }
 
   }
