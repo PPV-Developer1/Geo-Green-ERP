@@ -209,6 +209,7 @@ async  ngOnInit()
 
  }
 
+ 
 async onSalaryGroupSelect($event)
  {
   console.log($event)
@@ -216,6 +217,7 @@ async onSalaryGroupSelect($event)
         {
           console.log("employee_list",data)
               this.employee_list = data;
+              this.customer.get('customer_id')?.setValue("0");
       }).catch(error => {this.toastrService.error('Something went wrong ');});
 }
 
@@ -1469,7 +1471,8 @@ purchase_list_view:boolean=false
                           this.name = "Employee Attendance Report ";
                         }
 
-                       this.api.get('mp_attendance_report.php?emp_id='+value.customer_id+'&from_date=' + from_date + '&to_date=' + to_date + '&authToken=' + environment.authToken).then((data: any) => {
+                       this.api.get('mp_attendance_report.php?emp_id='+value.customer_id+'&from_date=' + from_date + '&to_date=' + to_date +
+                                     '&type=' +  value.salary_group_id  + '&authToken=' + environment.authToken).then((data: any) => {
                           if (data != null)
                             {
                               this.sale_by_cust    =  data['report'];
