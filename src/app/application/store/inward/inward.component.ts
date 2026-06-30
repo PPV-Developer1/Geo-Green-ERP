@@ -134,7 +134,8 @@ export class InwardComponent implements OnInit {
           this.InwardEntry.controls['inward_at'].setValue(this.todays_Date);
           this.InwardEntry.controls['inward_qty'].setValue(this.qty);
           this.InwardEntry.controls['inward_stock_qty'].setValue(event.row.inward_qty);
-          this.seriel_box();
+          if(this.has_serial == 1)
+          { this.seriel_box();}
         }, 500);
     }
   }
@@ -245,7 +246,7 @@ export class InwardComponent implements OnInit {
 
   }
 
-  
+
   updateFilter(event)
   {
     const val = event.target.value.toLowerCase();
