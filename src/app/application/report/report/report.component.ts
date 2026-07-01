@@ -90,7 +90,7 @@ export class ReportComponent implements OnInit {
   feild_value     :any;
   employee_list   :any;
   total_attedance :any;
-
+ Employee_total_attedance :any;
   public  group_id      : any;
   public  customer_list : any;
   public  vendor_list   : any;
@@ -209,7 +209,7 @@ async  ngOnInit()
 
  }
 
- 
+
 async onSalaryGroupSelect($event)
  {
   console.log($event)
@@ -1478,6 +1478,7 @@ purchase_list_view:boolean=false
                               this.sale_by_cust    =  data['report'];
                               this.print_tran_data =  data['download_report'];
                               this.total_attedance =  data['total'];
+                              this.Employee_total_attedance = data['load_list'];
                               //this.date.reset();
 
                               if(this.sale_by_cust == null)

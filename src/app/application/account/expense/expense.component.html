@@ -203,7 +203,8 @@
                     <label style="color:red">Paid Through *</label>
                   </div>
                   <div *ngIf="this.balance_disp == 0" class="col-8">
-                    <span *ngIf="this.user_type == 'super_admin'">
+                    <!-- <span *ngIf="this.user_type == 'super_admin'"> -->
+                     <span>
                       <ng-select formControlName="paid_through" [items]="bankData" bindLabel="account_name" bindValue="bank_id"   groupBy="mode"
                        class=" form-control custom-select" [clearable]="true" (ngModelChange)="balanceLoad()">
                           <ng-template ng-optgroup-tmp let-item="item" class="form-control">
@@ -216,7 +217,7 @@
                       <span class="help-block text-danger" *ngIf="addExpen.get('paid_through').touched && addExpen.get('paid_through').hasError('required')">Expense Account Required !</span>
                     </span>
 
-                    <span *ngIf="this.user_type != 'super_admin'">
+                    <!-- <span *ngIf="this.user_type != 'super_admin'">
 
 
                       <ng-select formControlName="paid_through"  class=" form-control custom-select" [clearable]="true" >
@@ -226,12 +227,12 @@
                       </ng-select>
 
                       <span class="help-block text-danger" *ngIf="addExpen.get('paid_through').touched && addExpen.get('paid_through').hasError('required')">Expense Account Required !</span>
-                    </span>
+                    </span> -->
                   </div>
                   <div *ngIf="this.balance_disp == 1" class="col-4">
-                    <span *ngIf="this.user_type == 'super_admin'">
+                    <!-- <span *ngIf="this.user_type == 'super_admin'"> -->
 
-
+                  <span>
                       <ng-select formControlName="paid_through" [items]="bankData" bindLabel="account_name" bindValue="bank_id"   groupBy="mode"
                         class=" form-control custom-select" [clearable]="true" (ngModelChange)="balanceLoad()">
                          <ng-template ng-optgroup-tmp let-item="item" class="form-control">
@@ -244,10 +245,8 @@
 
                       <span class="help-block text-danger" *ngIf="addExpen.get('paid_through').touched && addExpen.get('paid_through').hasError('required')">Expense Account Required !</span>
                     </span>
-                    <span *ngIf="this.user_type != 'super_admin'">
-                      <!-- <select formControlName="paid_through" class="form-control custom-select" (ngModelChange)="balanceLoad()">
-                          <option *ngFor= "let view of employee_account" value="{{view.bank_id}}" >{{view.account_name}}</option>
-                      </select> -->
+                    
+                    <!-- <span *ngIf="this.user_type != 'super_admin'">
 
                       <ng-select formControlName="paid_through"  class=" form-control custom-select" [clearable]="true" >
                         <ng-option  *ngFor= "let view of employee_account " [value]="view.bank_id" class="form-control">
@@ -256,7 +255,8 @@
                       </ng-select>
 
                       <span class="help-block text-danger" *ngIf="addExpen.get('paid_through').touched && addExpen.get('paid_through').hasError('required')">Expense Account Required !</span>
-                    </span>
+                    </span> -->
+
                   </div>
                   <div *ngIf="this.balance_disp == 1" class="col-4">
                     <span> <strong> <h6>Balance : {{onloadBalance | indianCurrency}}</h6></strong></span>

@@ -2000,18 +2000,29 @@
     </div>
     <div class="card-body widget-body">
 
-      <div class="row">
-        <table class="table col-md-12">
-          <tbody>
+      <div class="row" style="max-height: 400px; overflow-y: auto; overflow-x: hidden;">
+        <table class="table col-md-12 " >
+          <tbody class="sticky-header-table">
               <tr>
                 <th></th>
+                <th>Name</th>
                 <th>Total Worked Hours</th>
                 <th>Total OverTime</th>
                 <th>Total PL</th>
                 <th>Total SickLeave</th>
               </tr>
+              <tr *ngFor="let item of Employee_total_attedance">
+                <td></td>
+                <td>{{item.name}}</td>
+                <td>{{item.worked_hours}}hrs / {{item.worked_days}}days</td>
+                <td>{{item.ot_hours}}hrs / {{item.ot_days}}days</td>
+                <td>{{item.pl_hours}}hrs / {{item.pl_days}}days</td>
+                <td>{{item.cl_hours}}hrs / {{item.cl_days}}days</td>
+
+              </tr>
               <tr *ngIf="this.total_attedance != null">
                 <td></td>
+                <td><b>Total</b></td>
                 <td>{{this.total_attedance.worked_hours}}hrs / {{this.total_attedance.worked_days}}days</td>
                 <td>{{this.total_attedance.ot_hours}}hrs / {{this.total_attedance.ot_days}}days</td>
                 <td>{{this.total_attedance.pl_hours}}hrs / {{this.total_attedance.pl_days}}days</td>
@@ -2020,7 +2031,10 @@
           </tbody>
         </table>
       </div>
-
+  </div>
+</div>
+   <div widget class="card">
+   <div class="card-body widget-body">
   <div class="row">
     <div class="col-md-12">
 
