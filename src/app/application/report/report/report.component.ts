@@ -90,7 +90,7 @@ export class ReportComponent implements OnInit {
   feild_value     :any;
   employee_list   :any;
   total_attedance :any;
- Employee_total_attedance :any;
+
   public  group_id      : any;
   public  customer_list : any;
   public  vendor_list   : any;
@@ -209,7 +209,6 @@ async  ngOnInit()
 
  }
 
-
 async onSalaryGroupSelect($event)
  {
   console.log($event)
@@ -217,7 +216,6 @@ async onSalaryGroupSelect($event)
         {
           console.log("employee_list",data)
               this.employee_list = data;
-              this.customer.get('customer_id')?.setValue("0");
       }).catch(error => {this.toastrService.error('Something went wrong ');});
 }
 
@@ -336,6 +334,15 @@ async itemLoad()
       }).catch(error => { this.toastrService.error('API Faild : loadData salary group'); });
     }
 
+    if(this.id ==  'com_off_report')
+    {
+      this.customer_payment = true;
+      this.api.get('get_data.php?table=employee&find=emp_type&value=2&authToken=' + environment.authToken).then((data: any) =>
+      {
+        console.log("employee type ",data)
+        this.employee_list = data;
+      }).catch(error => { this.toastrService.error('API Faild : loadData salary group'); });
+    }
   }
 
   download(data)
@@ -1471,14 +1478,12 @@ purchase_list_view:boolean=false
                           this.name = "Employee Attendance Report ";
                         }
 
-                       this.api.get('mp_attendance_report.php?emp_id='+value.customer_id+'&from_date=' + from_date + '&to_date=' + to_date +
-                                     '&type=' +  value.salary_group_id  + '&authToken=' + environment.authToken).then((data: any) => {
+                       this.api.get('mp_attendance_report.php?emp_id='+value.customer_id+'&from_date=' + from_date + '&to_date=' + to_date + '&authToken=' + environment.authToken).then((data: any) => {
                           if (data != null)
                             {
                               this.sale_by_cust    =  data['report'];
                               this.print_tran_data =  data['download_report'];
                               this.total_attedance =  data['total'];
-                              this.Employee_total_attedance = data['load_list'];
                               //this.date.reset();
 
                               if(this.sale_by_cust == null)
@@ -1501,6 +1506,49 @@ purchase_list_view:boolean=false
                             this.loading= false;
                           });
                       }
+
+                      if(this.id == "com_off_report")
+                      {
+                        this.cust_tran_data=null;
+                        let employee = this.employee_list.find(employee => employee.emp_id ==  value.customer_id);
+                        if(employee != undefined)
+                        {
+                          this.name = employee.name+" com-off report "+from_date+" to " +to_date;
+                        }
+                        else{
+                          this.name = "Employee Com-Off Report ";
+                        }
+
+                       this.api.get('com_off_report.php?emp_id='+value.customer_id+'&from_date=' + from_date + '&to_date=' + to_date + '&authToken=' + environment.authToken).then((data: any) => {
+                          if (data != null)
+                            {
+                              console.log(data)
+                              this.sale_by_cust    =  data['report'];
+                              this.print_tran_data =  data['download_report'];
+
+
+
+                              if(this.sale_by_cust == null)
+                              {
+                                this.toastrService.warning('No Data');
+                              }
+                            }
+                            else
+                            {
+                              this.sale_by_cust = null;
+                              this.print_data   = null;
+                              this.total_attedance = null;
+                              this.toastrService.warning('No data');
+                              //this.date.reset();
+                            }
+                            this.loading= false;
+                          })
+                          .catch(error => {
+                            this.toastrService.error('API Failed: loadTransaction');
+                            this.loading= false;
+                          });
+                      }
+
                   }else{
                     this.toastrService.error('Choose the correct Date');
                   }
@@ -1973,7 +2021,7 @@ purchase_list_view:boolean=false
     this.customer_payment = false;
 
     if(this.id == "individual_customer_balance" || this.id =="individual_vendor_balance"|| this.id =="expense_report" ||
-       this.id =="employee_accounts_report" || this.id == "attendance_report" ||  this.id == "price_trend"  )
+       this.id =="employee_accounts_report" || this.id == "attendance_report" ||  this.id == "price_trend" || this.id == "com_off_report" || this.id == "stock_summary_report" || this.id == "tax_report" || this.id == "invoice_details" || this.id == "bills_details")
     {
        this.id = null;
        this.show = true

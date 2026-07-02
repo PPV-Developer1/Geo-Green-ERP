@@ -1021,7 +1021,8 @@ export class AttendanceComponent implements OnInit
   //   this.toastrService.warning('Enter the days and Select the Employee List');
 
 
-  await this.api.get('mp_employee_com_off_update.php?table=employee&field=emp_id&value='+this.employee+'&up_field=com_off&update='+this.days+'&authToken=' + environment.authToken).then((data: any) =>
+  await this.api.get('mp_employee_com_off_update.php?table=employee&field=emp_id&value='+this.employee+'&up_field=com_off&update='+this.days+
+              '&Update_Date='+this.form_date.value.date_val+'&authToken=' + environment.authToken).then((data: any) =>
 
         {
 

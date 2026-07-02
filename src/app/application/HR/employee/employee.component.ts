@@ -491,6 +491,15 @@ export class EmployeeComponent implements OnInit
     }).catch(error => { this.toastrService.error('API Faild : viewDocData'); });
   }
 
+  com_off_data:any
+
+  async Com_off_history(empid)
+  {
+    await this.api.get('com_off_report.php?emp_id=' +empid +'&authToken=' + environment.authToken).then((data: any) => {
+      this.com_off_data = data;
+    }).catch(error => { this.toastrService.error('API Faild : viewDocData'); });
+  }
+
   downloadMyFile(data : any)
   {
     this.fileURL = environment.baseURL+"download_file.php?path=upload/employee_files/"+data+"&authToken="+ environment.authToken;
@@ -968,6 +977,7 @@ export class EmployeeComponent implements OnInit
 
      await this.employeeLoad(emp_id);
      await this.loadTranseaction()
+     await this.Com_off_history(emp_id);
      this.salary_transaction= null
      this.view = false;
     }
