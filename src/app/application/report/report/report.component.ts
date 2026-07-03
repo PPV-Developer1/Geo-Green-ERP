@@ -90,7 +90,7 @@ export class ReportComponent implements OnInit {
   feild_value     :any;
   employee_list   :any;
   total_attedance :any;
-
+Employee_total_attedance :any;
   public  group_id      : any;
   public  customer_list : any;
   public  vendor_list   : any;
@@ -1478,14 +1478,14 @@ purchase_list_view:boolean=false
                           this.name = "Employee Attendance Report ";
                         }
 
-                       this.api.get('mp_attendance_report.php?emp_id='+value.customer_id+'&from_date=' + from_date + '&to_date=' + to_date + '&authToken=' + environment.authToken).then((data: any) => {
+                       this.api.get('mp_attendance_report.php?type='+this.customer.value.salary_group_id+'&emp_id='+value.customer_id+'&from_date=' + from_date + '&to_date=' + to_date + '&authToken=' + environment.authToken).then((data: any) => {
                           if (data != null)
                             {
                               this.sale_by_cust    =  data['report'];
                               this.print_tran_data =  data['download_report'];
                               this.total_attedance =  data['total'];
                               //this.date.reset();
-
+                               this.Employee_total_attedance = data['load_list'];
                               if(this.sale_by_cust == null)
                               {
                                 this.toastrService.warning('No Data');
