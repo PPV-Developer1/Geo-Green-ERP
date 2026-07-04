@@ -235,7 +235,7 @@
         </div>
         <div class="card-body widget-body">
           <div class="row">
-            <form [formGroup]="InwardEntry" (ngSubmit)="InwardSubmit(InwardEntry.value)" >
+            <form [formGroup]="InwardEntry" >
                   <table>
                       <tbody formArrayName="seriel_no">
                           <div class="row">
@@ -243,15 +243,16 @@
                                   <div class="col-12">
                                     <input type="text" style="width: 300px;" placeholder="Enter the Serial Number" class="form-control form-control-sm"  formControlName="seriel_number"/>
                                      <span class="help-block text-danger" *ngIf="seriel_no.get('seriel_number').touched && seriel_no.get('seriel_number').hasError('required')"> Required !</span>
-                                      
+
                                     </div>
 
 
                                    &nbsp;
                               </div>
                               <div class="col-12">
-                                <div *ngIf="has_serial == 1" class="row justify-content-center">
-                                  <button [disabled]="loading" type="submit" class="btn btn-success">Inward<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+                                <div *ngIf="has_serial == 1" class="row justify-content-center" style="gap: 10px">
+                                  <button [disabled]="loading" type="submit" class="btn btn-success" (click)="InwardSubmit(InwardEntry.value)">Inward<i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+                                  <button [disabled]="loading" type="submit" class="btn btn-success" (click)="DebitNote()">Debit Note <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
                                 </div>
                               </div>
                           </div>

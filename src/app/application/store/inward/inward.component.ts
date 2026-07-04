@@ -165,6 +165,10 @@ export class InwardComponent implements OnInit {
         const control = this.InwardEntry.get(field);
         control.markAsTouched({ onlySelf: true });
       });
+
+       if(this.has_serial == 1)
+          { this.seriel_box();}
+       
         if (this.InwardEntry.invalid) {
           this.InwardEntry.markAllAsTouched();
            this.toastrService.error('Please Fill all data!');
@@ -290,6 +294,15 @@ export class InwardComponent implements OnInit {
       //       else{serial_no=`${this.prefix}${1}`}
       //   }).catch(error => {this.toastrService.error('Something went wrong');});
 
+            let product = this.InwardEntry.get('seriel_no') as FormArray;
+          product.clear();
+          for(let i=1;i<=this.qty;i++)
+          {
+              let product = this.InwardEntry.get('seriel_no') as FormArray;
+              product.push(this.fb.group({
+                seriel_number  : new FormControl(null),
+              }))
+          }
         Object.keys(this.InwardEntry.controls).forEach(field =>
       {
         const control = this.InwardEntry.get(field);
@@ -297,6 +310,8 @@ export class InwardComponent implements OnInit {
       });
       if(this.InwardEntry.valid)
       {
+
+
         const qty = this.InwardEntry.value.inward_qty
        if(qty==0 || qty == null)
        {
