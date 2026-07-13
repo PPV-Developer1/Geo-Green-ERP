@@ -343,6 +343,15 @@ async itemLoad()
         this.employee_list = data;
       }).catch(error => { this.toastrService.error('API Faild : loadData salary group'); });
     }
+
+    if(this.id ==  'paid_leave_report')
+    {
+      this.customer_payment = true;
+      this.api.get('get_data.php?table=employee&authToken=' + environment.authToken).then((data: any) =>
+      {
+        this.employee_list = data;
+      }).catch(error => { this.toastrService.error('API Faild : loadData employee list'); });
+    }
   }
 
   download(data)
@@ -1549,6 +1558,43 @@ purchase_list_view:boolean=false
                           });
                       }
 
+                      if(this.id == "paid_leave_report")
+                      {
+                        this.cust_tran_data=null;
+                        let employee = this.employee_list.find(employee => employee.emp_id ==  value.customer_id);
+                        if(employee != undefined)
+                        {
+                          this.name = employee.name+" PL report "+from_date+" to " +to_date;
+                        }
+                        else{
+                          this.name = "Employee Primary Leave Report ";
+                        }
+
+                       this.api.get('paid_leave_report.php?emp_id='+value.customer_id+'&from_date=' + from_date + '&to_date=' + to_date + '&authToken=' + environment.authToken).then((data: any) => {
+                          if (data != null)
+                            {
+                              this.sale_by_cust    =  data['report'];
+                              this.print_tran_data =  data['download_report'];
+                              if(this.sale_by_cust == null)
+                              {
+                                this.toastrService.warning('No Data');
+                              }
+                            }
+                            else
+                            {
+                              this.sale_by_cust = null;
+                              this.print_data   = null;
+                              this.total_attedance = null;
+                              this.toastrService.warning('No data');
+                            }
+                            this.loading= false;
+                          })
+                          .catch(error => {
+                            this.toastrService.error('API Failed: paid_leave_report');
+                            this.loading= false;
+                          });
+                      }
+
                   }else{
                     this.toastrService.error('Choose the correct Date');
                   }
@@ -2019,9 +2065,9 @@ purchase_list_view:boolean=false
     this.tax_show = false;
     this.tax_type2=false;
     this.customer_payment = false;
-
+    this.sale_by_cust = null
     if(this.id == "individual_customer_balance" || this.id =="individual_vendor_balance"|| this.id =="expense_report" ||
-       this.id =="employee_accounts_report" || this.id == "attendance_report" ||  this.id == "price_trend" || this.id == "com_off_report" || this.id == "stock_summary_report" || this.id == "tax_report" || this.id == "invoice_details" || this.id == "bills_details")
+       this.id =="employee_accounts_report" || this.id == "attendance_report" ||  this.id == "price_trend" || this.id == "com_off_report" || this.id == "paid_leave_report" || this.id == "stock_summary_report" || this.id == "tax_report" || this.id == "invoice_details" || this.id == "bills_details")
     {
        this.id = null;
        this.show = true

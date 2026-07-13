@@ -112,30 +112,46 @@
       [selected]="selected"
       (activate)="onActivate($event)">
 
-        <ngx-datatable-column     [resizeable]="false" prop="date" name="Date" [flexGrow]="2">
-              <ng-template ngx-datatable-cell-template let-row="row">
-                {{row.date}}
-              </ng-template>
-            </ngx-datatable-column>
+          <ngx-datatable-column     [resizeable]="false" prop="title" name="NAME" [flexGrow]="2">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.title}}
+          </ng-template>
+        </ngx-datatable-column>
 
-            <ngx-datatable-column     [resizeable]="false" prop="credit" name="Added" [flexGrow]="2">
-              <ng-template ngx-datatable-cell-template let-row="row">
-                {{row.credit}} hours
-              </ng-template>
-            </ngx-datatable-column>
+        <ngx-datatable-column     [resizeable]="false" prop="format" name="FORMAT" [flexGrow]="2">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            {{row.format}}
+          </ng-template>
+        </ngx-datatable-column>
 
+        <ngx-datatable-column     [resizeable]="false" prop="type" name="TYPE" [flexGrow]="1">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <label *ngIf="row.type == 1">Raw Material</label>
+            <label *ngIf="row.type == 2">Product</label>
+            <label *ngIf="row.type == 3">Service</label>
+          </ng-template>
+        </ngx-datatable-column>
 
-            <ngx-datatable-column     [resizeable]="false" prop="debit" name="Used" [flexGrow]="2">
-              <ng-template ngx-datatable-cell-template let-row="row">
-                {{row.debit}} hours
-              </ng-template>
-            </ngx-datatable-column>
+        <ngx-datatable-column     [resizeable]="false" prop="have_seriel_number" name="HAVE SERIAL NUMBER" [flexGrow]="1">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <label *ngIf="row.have_seriel_number == 0"><strong>No</strong></label>
+            <label *ngIf="row.have_seriel_number == 1"><strong>Yes</strong></label>
+          </ng-template>
+        </ngx-datatable-column>
 
-              <ngx-datatable-column     [resizeable]="false" prop="balance" name="Balance" [flexGrow]="2">
-              <ng-template ngx-datatable-cell-template let-row="row">
-                {{row.balance}} hours
-              </ng-template>
-            </ngx-datatable-column>
+      <ngx-datatable-column     [resizeable]="false" prop="have_seriel_number" name="JOB MATERIAL" [flexGrow]="1">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <label *ngIf="row.jobworkmaterial == 0"><strong>No</strong></label>
+            <label *ngIf="row.jobworkmaterial == 1"><strong>Yes</strong></label>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column     [resizeable]="false" prop="status" [flexGrow]="1" name="STATUS">
+          <ng-template ngx-datatable-cell-template let-row="row">
+            <label *ngIf="row.status == 0" style="color:red"><strong>Inactive</strong></label>
+            <label *ngIf="row.status == 1" style="color:green"><strong>Active</strong></label>
+          </ng-template>
+        </ngx-datatable-column>
 
       </ngx-datatable>
     </div>

@@ -598,16 +598,23 @@
               <small *ngIf="total_days*8 - total_workeddays > 32 && pl_status == null" style="color:red;">* Not eligible for PL leave due to insufficient worked days!</small>
               <small *ngIf="pl_status != null" style="color: #e0a225;" > * Already applied for PL leave</small>
         </div>
-
-
       <div class="form-group col-xl-3">
         <label for="name">No of Worked (hrs)</label>
-        </div>
-        <div class="form-group col-xl-9">
-        <input formControlName="no_of_workingdays" readonly id="no_of_workingdays" [(ngModel)]="total_workeddays" (input)="onInputChange()" placeholder="Enter No of Workingdays" type="number"
-          class="form-control input-size" >
+      </div>
+      <div class="form-group col-xl-4" style="padding-left: 0;">
+        <input formControlName="no_of_workingdays" readonly id="no_of_workingdays" [(ngModel)]="total_workeddays" (input)="onInputChange()" placeholder="Enter No of Workingdays" type="number" class="form-control" >
         <span class="help-block text-danger"
           *ngIf="payroll_days.get('no_of_workingdays').touched && payroll_days.get('no_of_workingdays').hasError('required')">Enter Worked Days !</span>
+      </div>
+      <div class="form-group col-xl-5" style="text-align: center;padding: center;" *ngIf="employee_type > 4"></div>
+      <div class="form-group col-xl-2" style="text-align: center;padding: center;" *ngIf="employee_type < 4">
+                 <label  *ngIf="permission_status == null" for="name"> Add Permission  </label>
+          <div   *ngIf="permission_status == null" >
+                <button  size="sm" class="btn btn-warning rounded-circle btn-sm" type="button" (click)="onAddPermission()" title="Add Permission"><i class="fa fa-plus"></i></button>
+          </div>
+      </div>
+      <div class="form-group col-xl-3" style="text-align: center;padding: center;" *ngIf="employee_type < 4">
+              <small *ngIf="permission_status != null" style="color: #e0a225;" > * Already applied for Permission</small>
       </div>
 
       <div class="form-group col-xl-3">
@@ -638,6 +645,8 @@
         <span class="help-block text-danger"
           *ngIf="payroll_days.get('no_of_ot').touched && payroll_days.get('no_of_ot').hasError('required')">Enter No of OT !</span>
       </div>
+
+
 
       <div class="form-group col-xl-2">
         <label for="name">PL Available (hrs)</label>
@@ -692,6 +701,33 @@
         <input formControlName="c_off_balance" id="c_off_balance" [(ngModel)]="cl_balance" placeholder="Enter Comp off Balance" min="0" type="number" readonly class="form-control" >
         <span class="help-block text-danger"
           *ngIf="payroll_days.get('c_off_balance').touched && payroll_days.get('c_off_balance').hasError('required')">Enter Comp off Balance !</span>
+      </div>
+
+      <div class="form-group col-xl-2">
+        <label for="name">Permission Available (hrs)</label>
+        </div>
+        <div class="form-group col-xl-2">
+        <input formControlName="permission_available" id="permission_available" placeholder="Enter Permission Available" readonly type="number" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="payroll_days.get('permission_available').touched && payroll_days.get('permission_available').hasError('required')">Enter Permission Available !</span>
+      </div>
+
+      <div class="form-group col-xl-2">
+        <label for="name">Permission Use (hrs)</label>
+        </div>
+        <div class="form-group col-xl-2">
+        <input formControlName="permission_use" id="permission_use" placeholder="Enter Permission Use" min="0" max="2" type="number" [(ngModel)]="permissionUseValue" (input)="onInputChange()" class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="payroll_days.get('permission_use').touched && payroll_days.get('permission_use').hasError('required')">Enter Permission Use !</span>
+      </div>
+
+      <div class="form-group col-xl-2">
+        <label for="name">Permission Balance (hrs)</label>
+        </div>
+        <div class="form-group col-xl-2">
+        <input formControlName="permission_balance" id="permission_balance" [(ngModel)]="permission_balance" placeholder="Enter Permission Balance" min="0" type="number" readonly class="form-control" >
+        <span class="help-block text-danger"
+          *ngIf="payroll_days.get('permission_balance').touched && payroll_days.get('permission_balance').hasError('required')">Enter Permission Balance !</span>
       </div>
 
       <div class="form-group col-xl-3">
@@ -765,8 +801,8 @@
           <thead>
 
               <tr>
-                  <th>Sick Leave Hours</th>
-                  <td>{{final_data.sick_leave}}</td>
+                  <th>Permission Use Hours</th>
+                  <td>{{final_data.permission_use}}</td>
               </tr>
           </thead>
           <tbody>
@@ -1507,6 +1543,20 @@
   </div>
   <div class="modal-footer">
       <button [disabled]="loading" type="button" class="btn btn-success" data-dismiss="modal" (click)="confirm()">Proceed <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
+      <button type="button" class="btn btn-danger" data-dismiss="modal" (click)="modal.dismiss('Cross click')">Close</button>
+  </div>
+</ng-template>
+
+<ng-template #PermissionConfirmation let-modal>
+  <div class="modal-header state modal-info">
+    <h2 class="modal-title" id="modal-primary-label">Confirmation</h2>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.dismiss('Cross click')"><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="modal-body">
+    Are you sure to add permission for this employee!
+  </div>
+  <div class="modal-footer">
+      <button [disabled]="loading" type="button" class="btn btn-success" data-dismiss="modal" (click)="confirm_permission()">Proceed <i class="fa fa-spinner fa-spin" *ngIf="loading"></i></button>
       <button type="button" class="btn btn-danger" data-dismiss="modal" (click)="modal.dismiss('Cross click')">Close</button>
   </div>
 </ng-template>

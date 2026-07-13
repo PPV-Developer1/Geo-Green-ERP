@@ -63,6 +63,8 @@ export class SalaryComponent implements OnInit
   SalaryAck           : any;
   employee_type       : any;
   plUseValue          : any;
+  permissionUseValue  : any;
+  permission_available: any;
   advance_date        : any;
   salary_dtails       : any;
   amount              : any;
@@ -109,6 +111,7 @@ export class SalaryComponent implements OnInit
   advance_emp         : any;
   pl_balance          : any;
   cl_balance          : any;
+  permission_balance  : any;
   advance             : Boolean = false;
   company_total_expence     : any;
   epf_employer_contribution : any;
@@ -132,6 +135,9 @@ month: any;
   @ViewChild("employee_salary_days",{static:true}) employee_salary_days !:ElementRef;
 
    @ViewChild("Confirmation",{static:true}) Confirmation !:ElementRef;
+   @ViewChild("PermissionConfirmation",{static:true}) PermissionConfirmation !:ElementRef;
+   permission_status:any;
+   addpermission:any;
 
   constructor(private modalService: NgbModal, public api: ApiService, public toastrService: ToastrService, fb:FormBuilder)
   {
@@ -235,7 +241,10 @@ month: any;
         c_off_balance     : [null],
         lop               : [null],
         salary_paid_day   : [null],
-        att_row           : [null]
+        att_row           : [null],
+        permission_available: [null],
+        permission_use      : [null],
+        permission_balance  : [null]
       }
     );
 
@@ -509,6 +518,20 @@ salaryCalculate()
         this.payroll_days.controls['c_off_available'].setValue(data[0].com_off);
         this.payroll_days.controls['c_off_use'].setValue(this.clUseValue);
         this.payroll_days.controls['att_row'].setValue(this.salary_details['att_row']);
+        this.permissionUseValue = 0;
+        this.permission_status = localStorage.getItem(`permission_${event.row.emp_id}_status`);
+        if(this.permission_status == "Added")
+        {
+          this.permission_available = parseFloat(localStorage.getItem(`permission_${event.row.emp_id}`) || '0');
+        }
+        else
+        {
+          this.permission_available = 0;
+        }
+        this.payroll_days.controls['permission_available'].setValue(this.permission_available);
+        this.permission_balance = this.permission_available;
+        this.payroll_days.controls['permission_use'].setValue(this.permissionUseValue);
+        this.payroll_days.controls['permission_balance'].setValue(this.permission_balance);
         this.onInputChange_cl()
         this.onInputChange()
       }).catch(error =>
@@ -760,6 +783,7 @@ salaryCalculate()
 
   const clUse = parseFloat(this.clUseValue) || 0;
   let plUse = parseFloat(this.plUseValue) || 0;
+  let permissionUse = parseFloat(this.permissionUseValue) || 0;
 
   const otHours = parseFloat(this.payroll_days.get('no_of_ot')?.value) || 0;
 
@@ -773,12 +797,6 @@ salaryCalculate()
   if (plUse > this.pl_available) {
     this.toastrService.error('PL Use is greater than PL Available');
     plUse = this.pl_available;
-    this.payroll_days.controls['pl_use'].setValue(plUse);
-  }
-
-  if (plUse > pl) {
-    this.toastrService.error('PL Use is greater than PL Earned');
-    plUse = pl;
     this.payroll_days.controls['pl_use'].setValue(plUse);
   }
 
@@ -796,11 +814,32 @@ salaryCalculate()
     this.payroll_days.controls['pl_balance'].setValue(0);
   }
 
+  // Validate permissionUse
+  if (permissionUse > this.permission_available) {
+    this.toastrService.error('Permission Use is greater than Permission Available');
+    permissionUse = this.permission_available;
+    this.payroll_days.controls['permission_use'].setValue(permissionUse);
+  }
+
+  // Calculate permission balance
+  let permissionBalance = this.permission_available - permissionUse;
+  if (permissionBalance < 0) permissionBalance = 0;
+  this.payroll_days.controls['permission_balance'].setValue(permissionBalance);
+  this.permission_balance = permissionBalance;
+
+  // Handle zero availability
+  if (this.permission_available <= 0) {
+    permissionUse = 0;
+    this.permissionUseValue = 0;
+    this.payroll_days.controls['permission_use'].setValue(0);
+    this.payroll_days.controls['permission_balance'].setValue(0);
+  }
+
         // Total Leave Earned (CL + PL + SL)
         const totalLeaveEarned = cl + pl + sl;
 
-        // Total Leave Applied (CL Use + PL Use)
-        const totalLeaveApplied = clUse + plUse;
+        // Total Leave Applied (CL Use + PL Use + Permission Use)
+        const totalLeaveApplied = clUse + plUse + permissionUse;
         const leave =totalHours  - workedHours;
         let lop = leave-totalLeaveApplied;
         console.log("totalHours", totalHours);
@@ -810,8 +849,8 @@ salaryCalculate()
         if (lop < 0) lop = 0;
         this.payroll_days.controls['lop'].setValue(lop);
 
-        // 🔹 Salary Paid Hours = Worked + CL Use + PL Use + OT (if OT is considered)
-        let salaryPaidHours = workedHours + clUse + plUse ;
+        // 🔹 Salary Paid Hours = Worked + CL Use + PL Use + Permission Use + OT (if OT is considered)
+        let salaryPaidHours = workedHours + clUse + plUse + permissionUse;
         this.payroll_days.controls['salary_paid_day'].setValue(salaryPaidHours);
 
 }
@@ -829,6 +868,7 @@ salaryCalculate()
 
       let clUse = parseFloat(this.clUseValue) || 0;
       let plUse = parseFloat(this.plUseValue) || 0;
+      let permissionUse = parseFloat(this.permissionUseValue) || 0;
 
       const otHours = parseFloat(this.payroll_days.get('no_of_ot')?.value) || 0;
 
@@ -839,12 +879,6 @@ salaryCalculate()
         if (clUse > this.cl_available) {
           this.toastrService.error('Com-off Use is greater than Com-off Available');
           clUse = this.cl_available;
-          this.payroll_days.controls['c_off_use'].setValue(clUse);
-        }
-
-        if (clUse > cl) {
-          this.toastrService.error('Com-off Use is greater than Com-off Earned');
-          clUse = cl;
           this.payroll_days.controls['c_off_use'].setValue(clUse);
         }
 
@@ -862,9 +896,30 @@ salaryCalculate()
           this.payroll_days.controls['c_off_balance'].setValue(0);
         }
 
+      // Validate permissionUse
+      if (permissionUse > this.permission_available) {
+        this.toastrService.error('Permission Use is greater than Permission Available');
+        permissionUse = this.permission_available;
+        this.payroll_days.controls['permission_use'].setValue(permissionUse);
+      }
+
+      // Calculate permission balance
+      let permissionBalance = this.permission_available - permissionUse;
+      if (permissionBalance < 0) permissionBalance = 0;
+      this.payroll_days.controls['permission_balance'].setValue(permissionBalance);
+      this.permission_balance = permissionBalance;
+
+      // Handle zero availability
+      if (this.permission_available <= 0) {
+        permissionUse = 0;
+        this.permissionUseValue = 0;
+        this.payroll_days.controls['permission_use'].setValue(0);
+        this.payroll_days.controls['permission_balance'].setValue(0);
+      }
+
       const totalLeaveEarned = cl + pl + sl;
-      // Total Leave Applied (CL Use + PL Use)
-      const totalLeaveApplied = clUse + plUse;
+      // Total Leave Applied (CL Use + PL Use + Permission Use)
+      const totalLeaveApplied = clUse + plUse + permissionUse;
       const leave =totalHours  - workedHours;
       let lop = leave-totalLeaveApplied;
       console.log("totalHours", totalHours);
@@ -874,13 +929,19 @@ salaryCalculate()
       if (lop < 0) lop = 0;
       this.payroll_days.controls['lop'].setValue(lop);
 
-      // 🔹 Salary Paid Hours = Worked + CL Use + PL Use + OT (if OT is considered)
-      let salaryPaidHours = workedHours + clUse + plUse ;
+      // 🔹 Salary Paid Hours = Worked + CL Use + PL Use + Permission Use + OT (if OT is considered)
+      let salaryPaidHours = workedHours + clUse + plUse + permissionUse;
       this.payroll_days.controls['salary_paid_day'].setValue(salaryPaidHours);
     }
 
  async submit_payroll_days(value:any)
   {
+    const totalHours = (parseFloat(this.payroll_days.value.no_of_days) || 0) * 8;
+    const salaryPaidHours = parseFloat(value.salary_paid_day) || 0;
+    if (salaryPaidHours > totalHours) {
+      this.toastrService.error('Total salary paid hours cannot be greater than the total period hours (' + totalHours + ' hrs)');
+      return;
+    }
 
     Object.keys(this.payroll_days.controls).forEach(field =>
       {
@@ -906,6 +967,8 @@ salaryCalculate()
               this.loading=false;
               localStorage.removeItem(`pl_${emp_id}`);
               localStorage.removeItem(`pl_${emp_id}_status`);
+              localStorage.removeItem(`permission_${emp_id}`);
+              localStorage.removeItem(`permission_${emp_id}_status`);
            await this.SalaryLoad(this.salary_load.value )
             this.selected=[];
             // this.loadData();
@@ -1147,6 +1210,8 @@ addpl:any
       localStorage.setItem(`pl_${emp_id}_status`,'Added' );
       localStorage.removeItem(`pl_${emp_id}`);
       localStorage.removeItem(`pl_${emp_id}_status`);
+      localStorage.removeItem(`permission_${emp_id}`);
+      localStorage.removeItem(`permission_${emp_id}_status`);
       this.SalaryAck.close();
   }
 
@@ -1179,5 +1244,31 @@ addpl:any
       this.addpl.close();
     }
 
+  }
+
+  onAddPermission()
+  {
+    this.addpermission = this.modalService.open(this.PermissionConfirmation , { size: 'sm'});
+  }
+
+  async confirm_permission()
+  {
+    const emp_id  = this.salary_details['emp_id'];
+    this.permission_status = localStorage.getItem(`permission_${emp_id}_status`);
+    if(this.permission_status == null)
+    {
+      this.permission_available = 2;
+      this.payroll_days.controls['permission_available'].setValue(2);
+      localStorage.setItem(`permission_${emp_id}`, '2');
+      localStorage.setItem(`permission_${emp_id}_status`, 'Added');
+      this.permission_status = localStorage.getItem(`permission_${emp_id}_status`);
+      this.toastrService.success('Permission Added Succesfully');
+      this.onInputChange();
+      this.addpermission.close();
+    }
+    else{
+      this.toastrService.warning('You have already added Permission for this employee');
+      this.addpermission.close();
+    }
   }
 }
