@@ -86,6 +86,10 @@ export class InwardComponent implements OnInit {
   ngOnInit()
   {
     this.getProductList();
+    this.InwardEntry.get('inward_qty').valueChanges.subscribe(val => {
+      this.qty = val ? Number(val) : 0;
+      this.seriel_box();
+    });
   }
 
   async getProductList()
@@ -265,14 +269,20 @@ export class InwardComponent implements OnInit {
 
   seriel_box()
   {
+    if (this.has_serial != 1) return;
     let product = this.InwardEntry.get('seriel_no') as FormArray;
-    product.clear();
-    for(let i=1;i<=this.qty;i++)
-    {
-        let product = this.InwardEntry.get('seriel_no') as FormArray;
+    const currentLen = product.length;
+    const targetQty = Number(this.qty) || 0;
+    if (targetQty > currentLen) {
+      for (let i = currentLen; i < targetQty; i++) {
         product.push(this.fb.group({
-          seriel_number  : new FormControl(null,Validators.required),
-        }))
+          seriel_number  : new FormControl(null, Validators.required),
+        }));
+      }
+    } else if (targetQty < currentLen) {
+      for (let i = currentLen - 1; i >= targetQty; i--) {
+        product.removeAt(i);
+      }
     }
   }
 
