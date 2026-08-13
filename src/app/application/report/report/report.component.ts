@@ -91,6 +91,8 @@ export class ReportComponent implements OnInit {
   employee_list   :any;
   total_attedance :any;
 Employee_total_attedance :any;
+Employee_total_com_off   :any;
+Employee_total_pl        :any;
   public  group_id      : any;
   public  customer_list : any;
   public  vendor_list   : any;
@@ -1525,7 +1527,7 @@ purchase_list_view:boolean=false
                           this.name = employee.name+" com-off report "+from_date+" to " +to_date;
                         }
                         else{
-                          this.name = "Employee Com-Off Report ";
+                          this.name = "Admin Employee Com-Off Report ";
                         }
 
                        this.api.get('com_off_report.php?emp_id='+value.customer_id+'&from_date=' + from_date + '&to_date=' + to_date + '&authToken=' + environment.authToken).then((data: any) => {
@@ -1534,8 +1536,7 @@ purchase_list_view:boolean=false
                               console.log(data)
                               this.sale_by_cust    =  data['report'];
                               this.print_tran_data =  data['download_report'];
-
-
+                              this.Employee_total_com_off = data['load_list'];
 
                               if(this.sale_by_cust == null)
                               {
@@ -1546,9 +1547,8 @@ purchase_list_view:boolean=false
                             {
                               this.sale_by_cust = null;
                               this.print_data   = null;
-                              this.total_attedance = null;
+                              this.Employee_total_com_off = null;
                               this.toastrService.warning('No data');
-                              //this.date.reset();
                             }
                             this.loading= false;
                           })
@@ -1567,7 +1567,7 @@ purchase_list_view:boolean=false
                           this.name = employee.name+" PL report "+from_date+" to " +to_date;
                         }
                         else{
-                          this.name = "Employee Primary Leave Report ";
+                          this.name = "Employee Paid Leave Report ";
                         }
 
                        this.api.get('paid_leave_report.php?emp_id='+value.customer_id+'&from_date=' + from_date + '&to_date=' + to_date + '&authToken=' + environment.authToken).then((data: any) => {
@@ -1575,6 +1575,7 @@ purchase_list_view:boolean=false
                             {
                               this.sale_by_cust    =  data['report'];
                               this.print_tran_data =  data['download_report'];
+                              this.Employee_total_pl =  data['load_list'];
                               if(this.sale_by_cust == null)
                               {
                                 this.toastrService.warning('No Data');
@@ -1584,7 +1585,7 @@ purchase_list_view:boolean=false
                             {
                               this.sale_by_cust = null;
                               this.print_data   = null;
-                              this.total_attedance = null;
+                              this.Employee_total_pl = null;
                               this.toastrService.warning('No data');
                             }
                             this.loading= false;
@@ -1861,8 +1862,24 @@ purchase_list_view:boolean=false
   {
     if(this.print_tran_data != null)
     {
-    const csvData = this.convertToCSV(this.print_tran_data);
-    this.downloadCSVFile(csvData, this.name +'.csv');
+      let csvData = '';
+      if ((this.id == 'com_off_report' || this.id == 'paid_leave_report') && (this.customer.value.customer_id == '0' || this.customer.value.customer_id == 0)) {
+        const summaryData = this.id == 'com_off_report' ? this.Employee_total_com_off : this.Employee_total_pl;
+        if (summaryData && summaryData.length > 0) {
+          csvData += 'SUMMARY REPORT\n';
+          csvData += 'Employee Name,Opening Balance,Total Added,Total Used,Closing Balance\n';
+          summaryData.forEach(item => {
+            csvData += `"${item.name}",${item.opening_balance},${item.added},${item.used},${item.balance}\n`;
+          });
+          csvData += '\n\n';
+        }
+        
+        csvData += 'DETAILED TRANSACTION REPORT\n';
+        csvData += this.convertToCSV(this.print_tran_data);
+      } else {
+        csvData = this.convertToCSV(this.print_tran_data);
+      }
+      this.downloadCSVFile(csvData, this.name +'.csv');
     }
     else{
       this.toastrService.warning('No Data');

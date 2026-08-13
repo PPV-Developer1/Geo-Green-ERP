@@ -2113,6 +2113,7 @@
       <label>Select Employee</label>
       <ng-select  formControlName="customer_id" class="form-control"
                  [clearable]="false">
+        <ng-option value="0">All Employees</ng-option>
         <ng-option *ngFor="let state of employee_list"
                    [value]="state.emp_id">
           {{state.name}}
@@ -2154,6 +2155,43 @@
   </form>
 </div>
 
+  <div *ngIf="(customer.value.customer_id == '0' || customer.value.customer_id == 0) && Employee_total_com_off && Employee_total_com_off.length > 0" widget class="card">
+    <div class="card-header">
+      <span class="text-uppercase">Com-Off Summary</span>
+      <div class="widget-controls">
+        <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+        <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+        <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+        <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+        <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+      </div>
+    </div>
+    <div class="card-body widget-body">
+      <div class="row" style="max-height: 400px; overflow-y: auto; overflow-x: hidden;">
+        <table class="table col-md-12">
+          <tbody class="sticky-header-table">
+              <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Opening Balance</th>
+                <th>Total Added</th>
+                <th>Total Used</th>
+                <th>Closing Balance</th>
+              </tr>
+              <tr *ngFor="let item of Employee_total_com_off">
+                <td></td>
+                <td>{{item.name}}</td>
+                <td>{{item.opening_balance}} hours</td>
+                <td>{{item.added}} hours</td>
+                <td>{{item.used}} hours</td>
+                <td>{{item.balance}} hours</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <div widget class="card">
     <div class="card-header">
       <span class="text-uppercase">Com-Off Report</span>
@@ -2183,6 +2221,12 @@
                                           <ng-template ngx-datatable-cell-template let-row="row">
 
                                              <span *ngIf="row.remarks != 'Opening Balance'"> {{row.date}}</span>
+                                          </ng-template>
+                                        </ngx-datatable-column>
+
+      <ngx-datatable-column *ngIf="customer.value.customer_id == '0' || customer.value.customer_id == 0" [resizeable]="false" prop="Employee_Name" name="Name" [flexGrow]="2">
+                                          <ng-template ngx-datatable-cell-template let-row="row">
+                                            {{row.Employee_Name}}
                                           </ng-template>
                                         </ngx-datatable-column>
 
@@ -2226,6 +2270,7 @@
       <label>Select Employee</label>
       <ng-select  formControlName="customer_id" class="form-control"
                  [clearable]="false">
+        <ng-option value="0">All Employees</ng-option>
         <ng-option *ngFor="let state of employee_list"
                    [value]="state.emp_id">
           {{state.name}}
@@ -2267,6 +2312,43 @@
   </form>
 </div>
 
+  <div *ngIf="(customer.value.customer_id == '0' || customer.value.customer_id == 0) && Employee_total_pl && Employee_total_pl.length > 0" class="card">
+    <div class="card-header">
+      <span class="text-uppercase">Paid Leave Summary</span>
+      <div class="widget-controls">
+        <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+        <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+        <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+        <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>
+        <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+      </div>
+    </div>
+    <div class="card-body widget-body">
+      <div class="row" style="max-height: 400px; overflow-y: auto; overflow-x: hidden;">
+        <table class="table col-md-12">
+          <tbody class="sticky-header-table">
+              <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Opening Balance</th>
+                <th>Total Added</th>
+                <th>Total Used</th>
+                <th>Closing Balance</th>
+              </tr>
+              <tr *ngFor="let item of Employee_total_pl">
+                <td></td>
+                <td>{{item.name}}</td>
+                <td>{{item.opening_balance}} hours</td>
+                <td>{{item.added}} hours</td>
+                <td>{{item.used}} hours</td>
+                <td>{{item.balance}} hours</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <div  class="card">
     <div class="card-header">
       <span class="text-uppercase">Paid Leave (PL) Report</span>
@@ -2295,6 +2377,12 @@
       <ngx-datatable-column [resizeable]="false" prop="date" name="Date" [flexGrow]="2">
         <ng-template ngx-datatable-cell-template let-row="row">
            <span *ngIf="row.remarks != 'Opening Balance'"> {{row.date}}</span>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column *ngIf="customer.value.customer_id == '0' || customer.value.customer_id == 0" [resizeable]="false" prop="Employee_Name" name="Name" [flexGrow]="2">
+        <ng-template ngx-datatable-cell-template let-row="row">
+          {{row.Employee_Name}}
         </ng-template>
       </ngx-datatable-column>
 

@@ -32,6 +32,7 @@ export class Payment_viewComponent implements OnInit {
   imgUrl          : string = '../../../assets/img/logo/geogreen.png';
   select_data     :any;
   bill_attention  :any;
+  vendor_name     :any;
   address_line_1  :any;
   address_line_2  :any;
   bill_city       :any;
@@ -168,7 +169,8 @@ export class Payment_viewComponent implements OnInit {
      this.bill_city        = event.row.bill_city;
      this. bill_zip_code   = event.row.bill_zip_code;
      this.bill_phone       = event.row.bill_phone;
-     this.bill_attention   = event.row.customer_name;
+      this.vendor_name      = event.row.vendor_name;
+      this.bill_attention   = event.row.bill_attention;
      this.invoice_no       = event.row.bill_number;
      this.invoice_date     = event.row.tran_date;
      this.invoice_amount   = event.row.total;
@@ -198,7 +200,8 @@ export class Payment_viewComponent implements OnInit {
     this.bill_city         = data[0].bill_city;
     this.bill_zip_code     = data[0].bill_zip_code;
     this.bill_phone        = data[0].bill_phone;
-    this.bill_attention    = data[0].customer_name;
+    this.vendor_name       = data[0].vendor_name;
+    this.bill_attention    = data[0].bill_attention;
     this.invoice_no        = data[0].bill_number;
     this.invoice_date      = data[0].tran_date;
     this.invoice_amount    = data[0].total;
@@ -322,7 +325,8 @@ async pdfDownload(files) {
       },
       {
         stack: [
-          { text: this.bill_attention, bold: true },
+          this.vendor_name ? { text: this.vendor_name, bold: true } : '',
+          this.bill_attention ? { text: 'Attn: ' + this.bill_attention, italics: true } : '',
           this.bill_address_line_1 + ', ' + this.bill_address_line_2,
           this.bill_city + '-' + this.bill_zip_code,
           this.bill_phone,
@@ -473,7 +477,8 @@ advance_download()
       },
       {
         stack: [
-          { text: this.bill_attention, bold: true },
+          this.vendor_name ? { text: this.vendor_name, bold: true } : '',
+          this.bill_attention ? { text: 'Attn: ' + this.bill_attention, italics: true } : '',
           this.bill_address_line_1 + ', ' + this.bill_address_line_2,
           this.bill_city + '-' + this.bill_zip_code,
           this.bill_phone,

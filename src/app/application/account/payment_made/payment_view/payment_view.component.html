@@ -135,7 +135,8 @@
                     <strong>
                       Bill To :<br>
                       </strong>
-                        <b> {{bill_attention}}</b>, <br>
+                        <b> {{vendor_name}}</b>, <br>
+                        <span *ngIf="bill_attention && bill_attention != ''"><b>Attn: </b>{{bill_attention}}<br></span>
                         <p>{{bill_address_line_1}},{{bill_address_line_2}}
                           {{bill_city}}-{{bill_zip_code}}<br>
                           {{bill_phone}} </p>
