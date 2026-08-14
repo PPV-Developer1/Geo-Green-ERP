@@ -1876,6 +1876,22 @@ purchase_list_view:boolean=false
         
         csvData += 'DETAILED TRANSACTION REPORT\n';
         csvData += this.convertToCSV(this.print_tran_data);
+      } else if (this.id == 'attendance_report') {
+        const summaryData = this.Employee_total_attedance;
+        if (summaryData && summaryData.length > 0) {
+          csvData += 'SUMMARY REPORT\n';
+          csvData += 'Employee Name,Total Worked Hours,Total OverTime,Total PL,Total SickLeave\n';
+          summaryData.forEach(item => {
+            csvData += `"${item.name}","${item.worked_hours} hrs / ${item.worked_days} days","${item.ot_hours} hrs / ${item.ot_days} days","${item.pl_hours} hrs / ${item.pl_days} days","${item.cl_hours} hrs / ${item.cl_days} days"\n`;
+          });
+          if (this.total_attedance) {
+            csvData += `"Total","${this.total_attedance.worked_hours} hrs / ${this.total_attedance.worked_days} days","${this.total_attedance.ot_hours} hrs / ${this.total_attedance.ot_days} days","${this.total_attedance.pl_hours} hrs / ${this.total_attedance.pl_days} days","${this.total_attedance.cl_hours} hrs / ${this.total_attedance.cl_days} days"\n`;
+          }
+          csvData += '\n\n';
+        }
+        
+        csvData += 'DETAILED TRANSACTION REPORT\n';
+        csvData += this.convertToCSV(this.print_tran_data);
       } else {
         csvData = this.convertToCSV(this.print_tran_data);
       }

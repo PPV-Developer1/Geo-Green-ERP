@@ -1,6 +1,6 @@
 {
   "name": "accounts_erp",
-  "version": "6.1.2",
+  "version": "6.2.1",
 "scripts": {
   "ng": "ng",
   "start": "ng serve -o",
