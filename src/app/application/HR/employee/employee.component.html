@@ -346,7 +346,7 @@
 
                                                 <div *ngIf="!stateShow" class="custom-control custom-switch">
                                                   <input type="checkbox" formControlName="emp_status" [(ngModel)]="emp_status"
-                                                    class="custom-control-input" id="customSwitch1" />
+                                                    class="custom-control-input" id="customSwitch1" (change)="status_change_edit()" />
                                                   <label class="custom-control-label" for="customSwitch1"></label>
 
                                                   <span class="help-block text-danger" *ngIf="editEmpDetails.get('emp_status').touched && editEmpDetails.get('emp_status').hasError('required')">Required !</span>

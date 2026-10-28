@@ -452,6 +452,19 @@ export class EmployeeComponent implements OnInit
     }
   }
 
+  status_change_edit()
+  {
+    const statusValue = this.editEmpDetails.get('emp_status')?.value;
+    const isStatusFalse = statusValue === false || statusValue === 0 || statusValue === '0' || statusValue === 'false' || !statusValue;
+    const lastWorkingControl = this.editEmpDetails.get('emp_lastWorkingDay');
+    if (isStatusFalse) {
+      lastWorkingControl?.setValidators([Validators.required]);
+    } else {
+      lastWorkingControl?.clearValidators();
+    }
+    lastWorkingControl?.updateValueAndValidity();
+  }
+
   removeFile():void
   {
       this.file = '';
@@ -716,6 +729,19 @@ export class EmployeeComponent implements OnInit
 
   async updateEmp(updateEmp)
   {
+    this.status_change_edit();
+
+    const statusValue = this.editEmpDetails.get('emp_status')?.value;
+    const isStatusFalse = statusValue === false || statusValue === 0 || statusValue === '0' || statusValue === 'false' || !statusValue;
+    const lastWorkingDay = this.editEmpDetails.get('emp_lastWorkingDay')?.value;
+
+    if (isStatusFalse && (!lastWorkingDay || lastWorkingDay === '' || lastWorkingDay === null)) {
+      this.editEmpDetails.get('emp_lastWorkingDay')?.setErrors({ required: true });
+      this.editEmpDetails.get('emp_lastWorkingDay')?.markAsTouched();
+      this.toastrService.error('Last Working Date is required when status is Inactive');
+      return;
+    }
+
      Object.keys(this.editEmpDetails.controls).forEach(field =>
     {
       const control = this.editEmpDetails.get(field);
@@ -1109,6 +1135,7 @@ export class EmployeeComponent implements OnInit
       this.emp_uan                              = this.employee_details.uan,
       this.emp_designation_name                 = this.employee_details.designation_name
       this.Portal_access_edit()
+      this.status_change_edit()
       }
       else
       {
@@ -1174,6 +1201,7 @@ export class EmployeeComponent implements OnInit
     this.status    = false;
     this.stateShow = false;
     this.dropdown  = false;
+    this.status_change_edit();
   }
 
   final_data:any

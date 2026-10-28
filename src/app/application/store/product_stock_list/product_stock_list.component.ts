@@ -26,6 +26,7 @@ export class Product_stock_listComponent implements OnInit {
   await this.api.get('mp_production_stock.php?authToken='+environment.authToken).then((data: any) =>
     {
       this.stock_list = data;
+      console.log(data)
       if(data != null)
       this.filter_data = [...data];
     }).catch(error => {this.toastrService.error('Something went wrong');});

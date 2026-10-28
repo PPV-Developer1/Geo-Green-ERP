@@ -339,7 +339,7 @@ async itemLoad()
     if(this.id ==  'com_off_report')
     {
       this.customer_payment = true;
-      this.api.get('get_data.php?table=employee&find=emp_type&value=2&authToken=' + environment.authToken).then((data: any) =>
+      this.api.get('get_data.php?table=employee&find=status&value=1&find1=emp_type&value1=2&authToken=' + environment.authToken).then((data: any) =>
       {
         console.log("employee type ",data)
         this.employee_list = data;
@@ -349,7 +349,7 @@ async itemLoad()
     if(this.id ==  'paid_leave_report')
     {
       this.customer_payment = true;
-      this.api.get('get_data.php?table=employee&authToken=' + environment.authToken).then((data: any) =>
+      this.api.get('get_data.php?table=employee&find=status&value=1&authToken=' + environment.authToken).then((data: any) =>
       {
         this.employee_list = data;
       }).catch(error => { this.toastrService.error('API Faild : loadData employee list'); });

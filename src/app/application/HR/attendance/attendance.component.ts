@@ -313,13 +313,13 @@ export class AttendanceComponent implements OnInit
         const com_off = Number(this.form_att.controls['att_val_cl'].value) || 0;
         let valid = false;
             if (this.employee_type != 'Admin') {
-                valid = (hours + leave === 8);
+                valid = (hours + leave === 8) || (hours === 0 && leave === 0 && ot > 0);
               if (!valid) {
                 this.toastrService.error('Attendance (Leave + Hours) 8 Hours');
                 return;
               }
             } else {
-            valid = (hours + leave + com_off === 8);
+            valid = (hours + leave + com_off === 8) || (hours === 0 && leave === 0 && com_off === 0 && ot > 0);
             if (!valid) {
               this.toastrService.error('Attendance (Leave + Hours + Com-off) 8 Hours');
               return;
@@ -364,13 +364,13 @@ export class AttendanceComponent implements OnInit
       const com_off = Number(this.form_att_edit.controls['att_edit_val_cl'].value) || 0;
         let valid = false;
             if (this.employee_type != 'Admin') {
-                valid = (hours + leave === 8);
+                valid = (hours + leave === 8) || (hours === 0 && leave === 0 && ot > 0);
               if (!valid) {
                 this.toastrService.error('Attendance (Leave + Hours) 8 Hours');
                 return;
               }
             } else {
-            valid = (hours + leave + com_off === 8);
+            valid = (hours + leave + com_off === 8) || (hours === 0 && leave === 0 && com_off === 0 && ot > 0);
             if (!valid) {
               this.toastrService.error('Attendance (Leave + Hours + Com-off) 8 Hours');
               return;

@@ -82,12 +82,11 @@
           </ng-template>
         </ngx-datatable-column>
 
-        <!-- <ngx-datatable-column     [resizeable]="false" prop="type" [flexGrow]="2" name="PROJECT NAME">
+        <ngx-datatable-column     [resizeable]="false" prop="product_no" [flexGrow]="2" name="PRODUCT NO">
           <ng-template ngx-datatable-cell-template let-row="row">
-            <span *ngIf="row.type == 1">{{row.project_name}}</span>
-            <span *ngIf="row.type == 2"> <strong>For Store</strong></span>
+         {{row.product_no}}
           </ng-template>
-        </ngx-datatable-column> -->
+        </ngx-datatable-column>
 
         <ngx-datatable-column     [resizeable]="false" prop="product_name" [flexGrow]="2" name="PRODUCT NAME">
           <ng-template ngx-datatable-cell-template let-row="row">

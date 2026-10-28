@@ -93,6 +93,7 @@
          <ngx-datatable-column  [resizeable]="false" prop="edit_status" [flexGrow]="1" name="INWARD STATUS">
           <ng-template ngx-datatable-cell-template let-row="row">
             <span *ngIf="row.edit_status == 'No Items'" style="color: red;"> {{row.edit_status}} </span>
+            <span *ngIf="row.edit_status == 'Service' || row.edit_status == 'service'" style="color: green;"> Service </span>
              <span *ngIf="row.edit_status == 'Inward Complete'" style="color: green;"> {{row.edit_status}} </span>
               <span *ngIf="row.edit_status == 'Partially Inwarded'" style="color: rgb(138, 139, 25);"> {{row.edit_status}} </span>
                <span *ngIf="row.edit_status == 'Not Inward'" style="color: red;"> {{row.edit_status}} </span>
